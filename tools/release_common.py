@@ -38,7 +38,6 @@ def config():
         raise ValueError("Missing checked-in archive signing fingerprint")
     if not 1 <= value["validity_days"] <= 14:
         raise ValueError("APT validity must be bounded to at most fourteen days")
-    run(["dpkg", "--validate-version", value["migration_before"]])
     return value
 
 
@@ -133,7 +132,7 @@ def package_record(path):
         raise ValueError("Release package must be a regular .deb file")
     control = fields(run(["dpkg-deb", "--field", path]).stdout.decode().strip())
     name, release, architecture = (control[key] for key in ("Package", "Version", "Architecture"))
-    if not re.fullmatch(r"claw-(?:app|cap|apps)-[a-z0-9][a-z0-9-]*", name):
+    if not re.fullmatch(r"yuos-(?:app|cap|apps)-[a-z0-9][a-z0-9-]*", name):
         raise ValueError("Not an App-owned Debian package")
     version(release)
     if architecture not in ("all", "amd64", "arm64"):

@@ -86,7 +86,7 @@ apt/dpkg executable. The worker's authenticated session stays intact; call
 metadata does not grant pkg authority.
 The remaining human filesystem adapter still embeds the product library and
 uses isolated system Python with installed OS SDK/runtime and App-owned common
-support from `/usr/lib/cos/python`; it never invokes another App entrypoint.
+support from `/usr/lib/yuos/python`; it never invokes another App entrypoint.
 Human-only Flatpak data cleanup checks `fs.delete` and snapshots before removal;
 ref-file reads check `fs.read`. Both adapters reject MCP use. New Window and
 `store.open` use a fixed broker target under `proc.spawn:cosmic-store`.
@@ -107,7 +107,7 @@ status authorizes effects, and the GUI's startup grant is never widened.
 The package-only private GUI transport/shared wiring needs coordinated OS
 integration; older CLIs/daemons fail closed without a provider fallback.
 
-The client saves intent/correlation in its own authenticated `COS_DATA_DIR`
+The client saves intent/correlation in its own authenticated `YUOS_DATA_DIR`
 before dispatch, and reopens cached intents as **unconfirmed**, never as cached
 success. A resumed intent can request OS review only, without spending decisions
 or replaying effects. Root terminal reconciliation may trim this local pending
@@ -125,7 +125,7 @@ Only a matching authenticated Root `applied` record with confirmed completion
 can report applied; even the codec helper cannot turn acceptance into success.
 Unknown `/usr` readers still require the separate protected global-impact
 review in top-level OS Approvals (`yu agent serve --open`), and App deliveries
-still need independent per-App confirmation. The active `clawd` package remains
+still need independent per-App confirmation. The active `yuosd` package remains
 refused by the same Root controller.
 
 The upstream `packagekit` backend/source identifier stays stable, but Debian
@@ -143,7 +143,7 @@ transport; metadata is not authority to install arbitrary archives. Their
 inspection and GStreamer codec resolution also fail explicitly until controlled
 OS providers exist rather than reintroducing a raw PackageKit path.
 
-**Yu Apps** uses the signed `clawos-app` catalog for the native architecture.
+**Yu Apps** uses the signed `yuos-app` catalog for the native architecture.
 The install and update actions bind to its current Debian version; they do not
 install snapshots or bypass per-App review. **Linux Apps** uses the existing
 localized AppStream views for OS-approved APT sources and configured signed
@@ -158,7 +158,7 @@ from payload transactions, then reloads the installed and candidate versions.
 The Updates view separates Yu App releases from Linux and system updates.
 Update All applies to the Linux and system section, with separate reviews
 for Flatpak apps. Yu App upgrades are selected individually.
-These features use the paired `claw-os-software-store-v1` provider. The Agent
+These features use the paired `yuos-software-store-v1` provider. The Agent
 Web Store remains a separate Web-only catalog and does not present Linux packages.
 
 The separate clean-CI Store lane at OS source
@@ -180,7 +180,7 @@ publication, an SDK freeze or adoption of a new App pin.
 The native payload binds GUI and MCP to the real `bin/cosmic-store`, preserving
 resources and licenses. Its compatibility command enters the existing common
 Host rather than invoking the relocated ELF directly. The App-owned
-`claw-app-gui-argv` library removes one exact argv[1] `--gui` only in SDK GUI mode,
+`yuos-app-gui-argv` library removes one exact argv[1] `--gui` only in SDK GUI mode,
 after the existing MCP dispatch. Search/URI/codec strings and helper option
 values retain their original boundaries; `-- --gui` remains a positional value.
 Help still exits successfully, and the unconfigured `--version` still errors.

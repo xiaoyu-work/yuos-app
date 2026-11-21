@@ -1,5 +1,5 @@
 use super::*;
-use claw_notification_presentation::proxy::NotificationPresentationProxy;
+use yuos_notification_presentation::proxy::NotificationPresentationProxy;
 use cosmic::cosmic_config::ConfigGet;
 
 mod fixture {
@@ -20,7 +20,7 @@ async fn public_client_and_actual_app_server_preserve_preferences_and_bounded_ac
         .server(Guid::generate())
         .unwrap()
         .serve_at(
-            claw_notification_presentation::OBJECT_PATH,
+            yuos_notification_presentation::OBJECT_PATH,
             Presentation {
                 tx,
                 config: fixture.config.clone(),

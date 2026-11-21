@@ -5,10 +5,10 @@ edition = "2024"
 rust-version = "1.90"
 
 [dependencies]
-claw-app-gui-argv = { path = "../../../../shared/rust/gui-argv" }
+yuos-app-gui-argv = { path = "../../../../shared/rust/gui-argv" }
 # OS authority and typed services; no App dispatch.
-claw-os-sdk = { path = "../../../claw-os-sdk/rust" }
-cos-runtime = { path = "../../../cos-runtime/rust" }
+yuos-sdk = { path = "../../../yuos-sdk/rust" }
+yuos-runtime = { path = "../../../yuos-runtime/rust" }
 anyhow = "1"
 async-trait = "0.1"
 base64 = "0.22"

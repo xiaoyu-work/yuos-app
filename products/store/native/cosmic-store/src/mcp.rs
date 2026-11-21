@@ -1,6 +1,6 @@
 //! MCP tool surface for `cosmic-store`.
 //!
-//! Launched with `COS_MCP_SERVER=1`, the binary becomes a stdio MCP
+//! Launched with `YUOS_MCP_SERVER=1`, the binary becomes a stdio MCP
 //! server instead of opening the store GUI. Queries use the controlled OS
 //! package reader under this App's authenticated observation grants.
 //!
@@ -15,7 +15,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use claw_os_sdk::mcp::{App, CallContext, Tool, ToolResult};
+use yuos_sdk::mcp::{App, CallContext, Tool, ToolResult};
 use serde_json::{json, Value};
 
 async fn query(operation: &'static str, arguments: Value) -> Result<Value, String> {

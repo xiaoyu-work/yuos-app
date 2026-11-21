@@ -23,8 +23,8 @@ def main():
         stage("terminal", installed, ["cosmic-term"])
         libraries = prepare_exports(download=False)
         python = stage_shared(installed)
-        shutil.copytree(libraries["python-sdk"] / "claw_os_sdk", python / "claw_os_sdk", ignore=IGNORE)
-        shutil.copytree(libraries["python-runtime"] / "cos_runtime", python / "cos_runtime", ignore=IGNORE)
+        shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)
+        shutil.copytree(libraries["python-runtime"] / "yuos_runtime", python / "yuos_runtime", ignore=IGNORE)
         namespace = "/run/terminal-fixture"
         (fixture / "owner").mkdir()
         (fixture / "work").mkdir()
@@ -34,7 +34,7 @@ def main():
             "import json,pathlib,sys,os\n"
             f"root=pathlib.Path({namespace!r})\n"
             "args=sys.argv[1:]\n"
-            "with (root/'calls').open('a') as f:f.write(json.dumps([args,os.environ.get('COS_SESSION')])+'\\n')\n"
+            "with (root/'calls').open('a') as f:f.write(json.dumps([args,os.environ.get('YUOS_SESSION')])+'\\n')\n"
             "if (root/'deny').exists():\n"
             " print(json.dumps({'wire_version':1,'ok':False,'error':{'code':'denied','message':'fixture denied'}}));sys.exit(1)\n"
             "if args[1]=='__policy':data={'decision':'allow','verb':args[3]}\n"
@@ -61,22 +61,22 @@ def main():
             "--tmpfs", "/usr/local/bin", "--tmpfs", "/usr/bin",
         ]
         for library in Path("/usr/lib").iterdir():
-            if library.name != "cos":
+            if library.name != "yuos":
                 command.extend(["--ro-bind", str(library), str(library)])
         command += [
             "--bind", str(fixture), namespace,
             "--ro-bind", str(Path("/usr/bin/python3").resolve()), "/usr/bin/python3",
-            "--ro-bind", str(installed / "usr/lib/cos"), "/usr/lib/cos",
+            "--ro-bind", str(installed / "usr/lib/yuos"), "/usr/lib/yuos",
             "--ro-bind", str(broker), "/usr/local/bin/yu",
             "--ro-bind", str(child), "/usr/bin/fixture-command",
-            "--setenv", "COS_MCP_SERVER", "1",
-            "--setenv", "COS_APP_MANIFEST", "/usr/lib/cos/apps/cosmic-term/app.json",
-            "--setenv", "COS_DATA_DIR", namespace + "/data",
-            "--setenv", "COS_SESSION", "worker-session",
+            "--setenv", "YUOS_MCP_SERVER", "1",
+            "--setenv", "YUOS_APP_MANIFEST", "/usr/lib/yuos/apps/cosmic-term/app.json",
+            "--setenv", "YUOS_DATA_DIR", namespace + "/data",
+            "--setenv", "YUOS_SESSION", "worker-session",
             "--setenv", "HOME", namespace + "/owner",
             "--setenv", "TMPDIR", namespace,
-            "--setenv", "CLAW_COS_BIN", "/usr/local/bin/yu",
-            "--setenv", "COS_BIN", "/untrusted/must-not-execute",
+            "--setenv", "YUOS_KERNEL_BIN", "/usr/local/bin/yu",
+            "--setenv", "YUOS_BIN", "/untrusted/must-not-execute",
             "--setenv", "OPENAI_API_KEY", "synthetic-must-be-scrubbed",
             "--setenv", "PATH", "/usr/bin",
             "--setenv", "DISPLAY", "", "--setenv", "WAYLAND_DISPLAY", "",
@@ -107,7 +107,7 @@ def main():
         def call(name, arguments, **context):
             return request("tools/call", {
                 "name": f"term.{name}", "arguments": arguments,
-                "_meta": {"claw-os.dev/call-context": {
+                "_meta": {"yuos.dev/call-context": {
                     "wire_version": 1, "call_id": f"fixture-{counter}", "trace_id": "fixture",
                     "session_id": "caller-session", "task_id": "fixture-task",
                     "caller": {"kind": "system-agent", "id": "fixture", "owner_uid": 1000},

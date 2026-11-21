@@ -12,10 +12,10 @@ import uuid
 
 from _shared.atomic import atomic_write_json, _fsync_dir
 from _shared.paths import safe_realpath
-from claw_os_sdk import ai, events, kernel
-from claw_os_sdk.mcp import current_context
-from claw_os_sdk.objects import format_reference
-from cos_runtime import memory, policy
+from yuos_sdk import ai, events, kernel
+from yuos_sdk.mcp import current_context
+from yuos_sdk.objects import format_reference
+from yuos_runtime import memory, policy
 
 
 MAX_ATTACHMENT_BYTES = 16 * 1024 * 1024
@@ -72,7 +72,7 @@ def _mail(action, account=None, **arguments):
     if account is not None:
         request["account"] = account
     return kernel.call_json_with_stdin_binary(
-        os.environ.get("CLAW_COS_BIN", "/usr/local/bin/yu"),
+        os.environ.get("YUOS_KERNEL_BIN", "/usr/local/bin/yu"),
         ["__mail", "request", "--request-stdin"],
         json.dumps(request, ensure_ascii=False, allow_nan=False).encode("utf-8"),
         deadline_unix_ms=deadline,
@@ -336,7 +336,7 @@ def cmd_attachment_download(args):
 
 
 def _private_directory(name):
-    root = os.environ.get("COS_DATA_DIR")
+    root = os.environ.get("YUOS_DATA_DIR")
     if not root or not os.path.isabs(root):
         raise ValueError("Mail storage requires the authenticated App data partition")
     directory = os.path.join(root, name)

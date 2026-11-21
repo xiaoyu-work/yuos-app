@@ -6,5 +6,5 @@ license = "MPL-2.0"
 publish = false
 
 [dependencies]
-claw-os-sdk = { path = "../../../../../claw-os-sdk/rust" }
+yuos-sdk = { path = "../../../../../yuos-sdk/rust" }
 serde_json = "1"

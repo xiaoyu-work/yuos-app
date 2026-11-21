@@ -20,7 +20,7 @@ main = load_local_module(
 def mcp_app():
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
         os.environ, {
-            "COS_APP_MANIFEST": str(pathlib.Path(__file__).with_name("app.json")),
+            "YUOS_APP_MANIFEST": str(pathlib.Path(__file__).with_name("app.json")),
         },
     ):
         server = load_local_module(
@@ -58,7 +58,7 @@ def test_queries_require_location_capability(mcp_app, transport, action, accurac
         stdout=json.dumps({"provider": "geoclue2"}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         arguments = {} if accuracy is None else {"accuracy": accuracy}

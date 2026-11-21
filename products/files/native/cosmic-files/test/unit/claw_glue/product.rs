@@ -15,7 +15,7 @@ fn embedded_modules_are_valid_python_and_cannot_load_app_entrypoints() {
     assert!(script
         .to_str()
         .unwrap()
-        .contains("sys.path[:0] = ['/usr/lib/cos/python']"));
+        .contains("sys.path[:0] = ['/usr/lib/yuos/python']"));
     assert!(Command::new("/usr/bin/python3")
         .args(["-I", "-c", "import ast,sys; ast.parse(sys.argv[1])"])
         .arg(script).status().unwrap().success());

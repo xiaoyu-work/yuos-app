@@ -157,13 +157,13 @@ RoundedPolygonWrapper MaterialShapeItem::squircle(float n, int segments) {
 
     for (int i = 0; i < segments; ++i) {
         float t = pi2 * static_cast<float>(i) / static_cast<float>(segments);
-        float cosT = std::cos(t);
+        float yuT = std::cos(t);
         float sinT = std::sin(t);
 
         // Superellipse: |x|^n + |y|^n = 1
         // Parametric: x = sign(cos(t)) * |cos(t)|^(2/n)
         //             y = sign(sin(t)) * |sin(t)|^(2/n)
-        float x = std::copysign(std::pow(std::abs(cosT), exp), cosT);
+        float x = std::copysign(std::pow(std::abs(yuT), exp), yuT);
         float y = std::copysign(std::pow(std::abs(sinT), exp), sinT);
 
         // Scale to 0-1 range (centered at 0.5)

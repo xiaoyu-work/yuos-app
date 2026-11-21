@@ -11,7 +11,7 @@ use std::{
 };
 
 use anyhow::{Context, Result, ensure};
-use claw_notification_presentation::{Icon, MAX_IMAGE_BYTES, MAX_IMAGE_DIMENSION};
+use yuos_notification_presentation::{Icon, MAX_IMAGE_BYTES, MAX_IMAGE_DIMENSION};
 use cosmic::widget::icon;
 use cosmic_notifications_util::Image as NotificationImage;
 use image::{DynamicImage, ImageDecoder, ImageEncoder, ImageReader, RgbaImage};

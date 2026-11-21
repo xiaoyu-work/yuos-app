@@ -23,10 +23,10 @@ the command line):
 
   * ``webhook_default_url``    — fallback target if positional arg
                                  omitted (env override:
-                                 COS_WEBHOOK_URL)
+                                 YUOS_WEBHOOK_URL)
   * ``webhook_default_secret`` — fallback HMAC secret / bearer
                                  token (env override:
-                                 COS_WEBHOOK_SECRET)
+                                 YUOS_WEBHOOK_SECRET)
 
 Stdlib only. Every outbound request funnels through
 :func:`apps.gateway._shared.safe_egress.safe_urlopen` so the kernel
@@ -51,7 +51,7 @@ from gateway._shared import gateway_args, gateway_memory, safe_egress, safe_subp
 
 
 PLATFORM = "webhook"
-USER_AGENT = "ClawOSWebhook/0.1.0"
+USER_AGENT = "YuOSWebhook/0.1.0"
 DEFAULT_TIMEOUT = 20
 
 
@@ -67,11 +67,11 @@ def _env_or_credential(env_var: str, cred_name: str) -> tuple[str | None, str | 
 
 
 def _default_url() -> tuple[str | None, str | None]:
-    return _env_or_credential("COS_WEBHOOK_URL", "webhook_default_url")
+    return _env_or_credential("YUOS_WEBHOOK_URL", "webhook_default_url")
 
 
 def _default_secret() -> tuple[str | None, str | None]:
-    return _env_or_credential("COS_WEBHOOK_SECRET", "webhook_default_secret")
+    return _env_or_credential("YUOS_WEBHOOK_SECRET", "webhook_default_secret")
 
 
 def _build_body(text: str, raw: bool) -> tuple[bytes, str]:
@@ -195,7 +195,7 @@ def _send(
             "error": f"URL error: {e.reason}",
         }
     except Exception as e:
-        # Catches cos_runtime.policy.PermissionDenied (which is not
+        # Catches yuos_runtime.policy.PermissionDenied (which is not
         # importable here without coupling to the kernel) and any
         # other unexpected denial path.
         denial = getattr(e, "denial", None)
@@ -317,8 +317,8 @@ def run(command: str, args):
 
 
 if __name__ == "__main__":
-    cmd = os.environ.get("COS_COMMAND") or (sys.argv[1] if len(sys.argv) > 1 else "")
-    raw_args = os.environ.get("COS_ARGS_JSON")
+    cmd = os.environ.get("YUOS_COMMAND") or (sys.argv[1] if len(sys.argv) > 1 else "")
+    raw_args = os.environ.get("YUOS_ARGS_JSON")
     if raw_args:
         parsed_args = json.loads(raw_args)
     else:

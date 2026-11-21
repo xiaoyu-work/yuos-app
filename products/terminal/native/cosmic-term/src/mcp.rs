@@ -1,6 +1,6 @@
 //! MCP tool surface for `cosmic-term`.
 //!
-//! When launched with `COS_MCP_SERVER=1`, the binary flips into a tiny
+//! When launched with `YUOS_MCP_SERVER=1`, the binary flips into a tiny
 //! stdio MCP server instead of opening a terminal window. The agent
 //! gets a controlled shell-execution path that goes through the same
 //! capability gate as the canonical Terminal command library, with
@@ -12,7 +12,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use claw_os_sdk::mcp::{App, CallContext, Tool, ToolResult};
+use yuos_sdk::mcp::{App, CallContext, Tool, ToolResult};
 use serde_json::{json, Value};
 
 // ---------------------------------------------------------------------------

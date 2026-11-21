@@ -4,8 +4,8 @@ import re
 import sys
 import time
 
-from claw_os_sdk.generated import encode_wire_json
-from claw_os_sdk.kernel import (
+from yuos_sdk.generated import encode_wire_json
+from yuos_sdk.kernel import (
     KernelDenied,
     KernelUnavailable,
     call_json_with_stdin_binary,

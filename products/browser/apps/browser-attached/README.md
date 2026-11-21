@@ -9,13 +9,13 @@ CLI or Agent
   -> MCP-only browser-attached App
   -> private stdin runtime bridge
   -> typed system.browser.control route
-  -> clawd exact-capability check
+  -> yuosd exact-capability check
   -> root-only Native Messaging socket
   -> Chromium extension and top-frame content script
   -> user's tab
 ```
 
-The App sandbox never receives the browser socket. `clawd` maps the closed
+The App sandbox never receives the browser socket. `yuosd` maps the closed
 request schema to a fixed extension verb and injects `expected_origin`,
 `allow_secret`, and `allow_eval` only after authorization. The extension and
 content script verify the full `scheme://host:effective-port` origin
@@ -45,8 +45,8 @@ Use the URL returned by `tabs.list` as `--page-url` for tab-content tools.
 | --- | --- |
 | `app.json` | Authoritative MCP tool, argument, and capability contract |
 | `main.py` | Typed business operations and local policy checks |
-| `server.py` | Direct `claw_os_sdk.mcp` handlers |
+| `server.py` | Direct `yuos_sdk.mcp` handlers |
 | `native_host.py` | Root-client-only Unix socket to Chromium Native Messaging bridge |
 
-See [`claw-os/docs/browser-attached-design.md`](https://github.com/xiaoyu-work/claw-os/blob/main/docs/browser-attached-design.md)
+See [`yuos/docs/browser-attached-design.md`](https://github.com/xiaoyu-work/Yu-OS/blob/main/docs/browser-attached-design.md)
 for the full trust and data-flow design.

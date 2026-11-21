@@ -166,14 +166,14 @@ fn vim_status_glass_style(theme: &cosmic::Theme) -> widget::container::Style {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    if std::env::var("COS_MCP_SERVER").as_deref() == Ok("1") {
+    if std::env::var("YUOS_MCP_SERVER").as_deref() == Ok("1") {
         return mcp::run().map_err(|e| -> Box<dyn std::error::Error> { e.into() });
     }
 
-    let paths = cli::parse(env::args_os(), claw_os_sdk::gui::is_gui_launch());
+    let paths = cli::parse(env::args_os(), yuos_sdk::gui::is_gui_launch());
 
     #[cfg(all(unix, not(target_os = "redox")))]
-    if !claw_os_sdk::gui::is_gui_launch() {
+    if !yuos_sdk::gui::is_gui_launch() {
         match fork::daemon(true, true) {
             Ok(fork::Fork::Child) => (),
             Ok(fork::Fork::Parent(_child_pid)) => process::exit(0),
@@ -457,8 +457,8 @@ impl PartialEq for WatcherWrapper {
 
 fn dialog_settings(kind: DialogKind) -> DialogSettings {
     let settings = DialogSettings::new().kind(kind);
-    if claw_os_sdk::gui::is_gui_launch() {
-        if let Some(home) = claw_os_sdk::gui::owner_home() {
+    if yuos_sdk::gui::is_gui_launch() {
+        if let Some(home) = yuos_sdk::gui::owner_home() {
             return settings.path(home);
         }
     }
@@ -891,7 +891,7 @@ impl App {
                     return Some(NewTab::Exists(entity));
                 }
 
-                if claw_os_sdk::gui::is_gui_launch()
+                if yuos_sdk::gui::is_gui_launch()
                     && fs::File::open(&canonical)
                         .is_err_and(|error| error.kind() == io::ErrorKind::PermissionDenied)
                 {
@@ -3029,7 +3029,7 @@ impl Application for App {
                     if tab.path_opt.is_none() {
                         return self.update(Message::SaveAsDialog(Some(entity)));
                     }
-                    if claw_os_sdk::gui::is_gui_launch() {
+                    if yuos_sdk::gui::is_gui_launch() {
                         self.pending_file_saves.entry(tab.path_opt.clone().unwrap())
                             .or_insert(entity);
                         self.file_access_error = None;
@@ -3995,8 +3995,8 @@ fn file_access_subscription(
                                 let name = read_path.file_name().and_then(|name| name.to_str())
                                     .ok_or("creation requires one UTF-8 filename")?;
                                 let reply = match id {
-                                    Some(id) => claw_os_sdk::gui::file_create_status(&id, node),
-                                    None => claw_os_sdk::gui::request_file_create(node, name),
+                                    Some(id) => yuos_sdk::gui::file_create_status(&id, node),
+                                    None => yuos_sdk::gui::request_file_create(node, name),
                                 }.map_err(|error| error.to_string())?;
                                 if reply.name != name {
                                     return Err("creation status has another target".to_string());
@@ -4005,15 +4005,15 @@ fn file_access_subscription(
                                     reply.state, reply.reason))
                             } else if write {
                                 let reply = match id {
-                                    Some(id) => claw_os_sdk::gui::file_write_status(&id, node),
-                                    None => claw_os_sdk::gui::request_file_write(node),
+                                    Some(id) => yuos_sdk::gui::file_write_status(&id, node),
+                                    None => yuos_sdk::gui::request_file_write(node),
                                 }.map_err(|error| error.to_string())?;
                                 Ok((claw_glue::FileSelection::Existing(reply.selection_id, reply.node),
                                     reply.state, reply.reason))
                             } else {
                                 let reply = match id {
-                                    Some(id) => claw_os_sdk::gui::file_read_status(&id, node),
-                                    None => claw_os_sdk::gui::request_file_read(node),
+                                    Some(id) => yuos_sdk::gui::file_read_status(&id, node),
+                                    None => yuos_sdk::gui::request_file_read(node),
                                 }.map_err(|error| error.to_string())?;
                                 Ok((claw_glue::FileSelection::Existing(reply.selection_id, reply.node),
                                     reply.state, reply.reason))

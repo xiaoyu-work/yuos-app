@@ -16,7 +16,7 @@ from test_support import authenticated_mcp_params, load_local_module
 APP_DIR = pathlib.Path(__file__).parent
 MANIFEST_PATH = APP_DIR / "app.json"
 SERVER_PATH = APP_DIR / "server.py"
-COS_BIN = "/usr/local/bin/yu"
+YUOS_BIN = "/usr/local/bin/yu"
 LAYOUT_SOURCE = str((APP_DIR / "layout.kdl").resolve())
 BACKUP_TOKEN = "ABCDEF0123456789ABCDEF0123456789"
 TOOL_NAMES = [
@@ -42,7 +42,7 @@ main = load_local_module(
 @pytest.fixture
 def mcp_app():
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-        os.environ, {"COS_APP_MANIFEST": str(MANIFEST_PATH)}
+        os.environ, {"YUOS_APP_MANIFEST": str(MANIFEST_PATH)}
     ):
         server = load_local_module(SERVER_PATH, "claw_test_display_manager_server")
         listed = server.app._handle_request("tools/list", {}, True)
@@ -212,26 +212,26 @@ def test_manifest_and_handlers_are_mcp_only_and_aligned():
             "status",
             (),
             [mock.call("sys.observe", name="display")],
-            [COS_BIN, "__display", "status"],
+            [YUOS_BIN, "__display", "status"],
         ),
         (
             "enable",
             ("eDP-1",),
             [mock.call("device.display", name="manage")],
-            [COS_BIN, "__display", "enable", "--output", "eDP-1"],
+            [YUOS_BIN, "__display", "enable", "--output", "eDP-1"],
         ),
         (
             "disable",
             ("DP-1",),
             [mock.call("device.display", name="manage")],
-            [COS_BIN, "__display", "disable", "--output", "DP-1"],
+            [YUOS_BIN, "__display", "disable", "--output", "DP-1"],
         ),
         (
             "mirror",
             ("HDMI-A-1", "eDP-1"),
             [mock.call("device.display", name="manage")],
             [
-                COS_BIN,
+                YUOS_BIN,
                 "__display",
                 "mirror",
                 "--output",
@@ -245,7 +245,7 @@ def test_manifest_and_handlers_are_mcp_only_and_aligned():
             ("DP-1", -1920, 0),
             [mock.call("device.display", name="manage")],
             [
-                COS_BIN,
+                YUOS_BIN,
                 "__display",
                 "position",
                 "--output",
@@ -271,7 +271,7 @@ def test_manifest_and_handlers_are_mcp_only_and_aligned():
             ),
             [mock.call("device.display", name="manage")],
             [
-                COS_BIN,
+                YUOS_BIN,
                 "__display",
                 "mode",
                 "--output",
@@ -298,7 +298,7 @@ def test_manifest_and_handlers_are_mcp_only_and_aligned():
             "scale",
             ("eDP-1", 1.5),
             [mock.call("device.display", name="manage")],
-            [COS_BIN, "__display", "scale", "--output", "eDP-1", "--scale", "1.5"],
+            [YUOS_BIN, "__display", "scale", "--output", "eDP-1", "--scale", "1.5"],
         ),
         (
             "apply_layout",
@@ -308,7 +308,7 @@ def test_manifest_and_handlers_are_mcp_only_and_aligned():
                 mock.call("fs.read", path=LAYOUT_SOURCE),
             ],
             [
-                COS_BIN,
+                YUOS_BIN,
                 "__display",
                 "apply-layout",
                 "--source",
@@ -321,7 +321,7 @@ def test_manifest_and_handlers_are_mcp_only_and_aligned():
             ("intel_backlight", 75),
             [mock.call("device.display", name="manage")],
             [
-                COS_BIN,
+                YUOS_BIN,
                 "__display",
                 "brightness",
                 "--backlight",
@@ -335,7 +335,7 @@ def test_manifest_and_handlers_are_mcp_only_and_aligned():
             (BACKUP_TOKEN, True),
             [mock.call("device.display", name="manage")],
             [
-                COS_BIN,
+                YUOS_BIN,
                 "__display",
                 "restore",
                 "--token",
@@ -349,7 +349,7 @@ def test_routes_use_exact_capabilities_and_broker_argv(
     mcp_app, transport, function_name, args, capabilities, argv
 ):
     completed = mock.Mock(returncode=0, stdout='{"changed":true}', stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": COS_BIN}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YUOS_BIN}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         function = getattr(main, function_name)
@@ -376,7 +376,7 @@ def test_routes_use_exact_capabilities_and_broker_argv(
 @pytest.mark.parametrize("transport", ["direct", "mcp"])
 def test_mode_omits_all_defaulted_options(mcp_app, transport):
     completed = mock.Mock(returncode=0, stdout="{}", stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": COS_BIN}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YUOS_BIN}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         if transport == "direct":
@@ -392,7 +392,7 @@ def test_mode_omits_all_defaulted_options(mcp_app, transport):
             )
             assert response["structuredContent"] == {}
     assert run.call_args.args[0] == [
-        COS_BIN,
+        YUOS_BIN,
         "__display",
         "mode",
         "--output",
@@ -555,7 +555,7 @@ def test_noncanonical_or_symlink_layout_is_rejected_before_policy(
 )
 def test_broker_parses_stdout_before_stderr(stdout, stderr, expected):
     completed = mock.Mock(returncode=0, stdout=stdout, stderr=stderr)
-    with mock.patch.dict(os.environ, {"COS_BIN": COS_BIN}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YUOS_BIN}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed):
         assert main.status() == expected
@@ -586,7 +586,7 @@ def test_broker_parses_stdout_before_stderr(stdout, stderr, expected):
 )
 def test_broker_payload_failures_raise(returncode, stdout, stderr, message):
     completed = mock.Mock(returncode=returncode, stdout=stdout, stderr=stderr)
-    with mock.patch.dict(os.environ, {"COS_BIN": COS_BIN}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YUOS_BIN}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match=re.escape(message)):
@@ -624,7 +624,7 @@ def test_missing_broker_executable_raises():
     ],
 )
 def test_broker_execution_failures_raise(failure, exception_type, message):
-    with mock.patch.dict(os.environ, {"COS_BIN": COS_BIN}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YUOS_BIN}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", side_effect=failure):
         with pytest.raises(exception_type, match=message):

@@ -415,7 +415,7 @@ pub fn refresh(intent: &Intent, mode: Mode) -> Tracked {
         if intent.clone().canonical()? != *intent {
             return Err(io::Error::other("package intent is not canonical"));
         }
-        let value = claw_os_sdk::cos_call_json_with_binary(
+        let value = yuos_sdk::yu_call_json_with_binary(
             "/usr/local/bin/yu", "package", "intent", intent.argv(mode),
         ).map_err(io::Error::other)?;
         decode(intent, value)
@@ -436,7 +436,7 @@ pub fn refresh(intent: &Intent, mode: Mode) -> Tracked {
 }
 
 fn history_directory() -> io::Result<PathBuf> {
-    let root = std::env::var_os("COS_DATA_DIR").map(PathBuf::from)
+    let root = std::env::var_os("YUOS_DATA_DIR").map(PathBuf::from)
         .filter(|root| root.is_absolute())
         .ok_or_else(|| io::Error::other("authenticated App data is unavailable; package intent was not dispatched"))?;
     Ok(root.join("package-handoffs"))

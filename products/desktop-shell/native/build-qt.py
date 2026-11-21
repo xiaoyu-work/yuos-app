@@ -15,7 +15,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parent
 LOCK = ROOT / "qt.lock.json"
-INSTALL_DIR = Path("usr/share/claw-desktop-shell")
+INSTALL_DIR = Path("usr/share/yuos-desktop-shell")
 QT = "https://download.qt.io/official_releases/qt"
 
 
@@ -164,9 +164,9 @@ def stage(prefix, destination):
             search.append(f"$ORIGIN/{os.path.relpath(caelestia / 'lib', resource.parent)}")
         run("patchelf", "--set-rpath", ":".join(search), resource)
         run("strip", "--strip-unneeded", resource)
-    binary = destination / "usr/bin/claw-desktop-shell"
+    binary = destination / "usr/bin/yuos-desktop-shell"
     run("patchelf", "--set-rpath",
-        "$ORIGIN/../resources/usr/share/claw-desktop-shell/qt/lib", binary)
+        "$ORIGIN/../resources/usr/share/yuos-desktop-shell/qt/lib", binary)
     run("strip", "--strip-unneeded", binary)
 
 

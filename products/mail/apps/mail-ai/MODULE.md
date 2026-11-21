@@ -34,7 +34,7 @@ stdio contract; do not add a `run` wrapper or fallback rewrite.
 ## Coupled surfaces and tests
 
 Argument changes must update all
-[`claw-mail-ai`](../../extension/) callers and their contract
+[`yuos-mail-ai`](../../extension/) callers and their contract
 tests in the same change. Installed startup changes also require coordination
 with the core launcher, rootfs feature, and development installer.
 

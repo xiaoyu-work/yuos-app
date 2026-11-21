@@ -9,7 +9,7 @@ import sys
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
 TIMEOUT_SECS = int(os.environ.get("CLAW_DESKTOP_MANAGER_TIMEOUT", "120"))
@@ -17,7 +17,7 @@ APP_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,254}$")
 
 
 def _cos_binary() -> str | None:
-    return os.environ.get("COS_BIN") or shutil.which("yu")
+    return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _validate_identifier(value: object) -> str:
@@ -44,12 +44,12 @@ def _broker(
     identifier: str | None = None,
     app_id: str | None = None,
 ) -> dict:
-    cos_bin = _cos_binary()
-    if not cos_bin:
+    yu_bin = _cos_binary()
+    if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Desktop Manager broker unavailable"
         )
-    argv = [cos_bin, "__desktop", action]
+    argv = [yu_bin, "__desktop", action]
     if identifier is not None:
         argv.extend(["--identifier", identifier])
     if app_id is not None:

@@ -25,13 +25,13 @@ consider joining the [Pop!_OS Chat](https://chat.pop-os.org/). More information 
 
 This project is licensed under [GPLv3](LICENSE)
 
-## Claw OS MCP service
+## Yu OS MCP service
 
-The App Host starts `/usr/bin/cosmic-files` with `COS_MCP_SERVER=1`.
+The App Host starts `/usr/bin/cosmic-files` with `YUOS_MCP_SERVER=1`.
 Tool descriptions, arguments, defaults, and capability needs are authoritative
 in `apps/cosmic-files/app.json`; the Rust binary only binds implementations.
 
-In the Claw OS App repository, use `python3 tools/native_build.py files build`
+In the Yu OS App repository, use `python3 tools/native_build.py files build`
 or `test` from the repository root. The runner prepares immutable SDK/runtime
 and toolkit libraries in ignored build storage and builds each workspace
 package separately, as the upstream justfile does. OS image builds materialize

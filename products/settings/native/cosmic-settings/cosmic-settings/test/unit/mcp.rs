@@ -22,8 +22,8 @@ fn page_catalog_has_unique_ids_supported_by_default_cli() {
 
 #[test]
 fn mcp_cannot_enter_human_filesystem_or_process_adapters() {
-    let previous = std::env::var_os("COS_MCP_SERVER");
-    unsafe { std::env::set_var("COS_MCP_SERVER", "1"); }
+    let previous = std::env::var_os("YUOS_MCP_SERVER");
+    unsafe { std::env::set_var("YUOS_MCP_SERVER", "1"); }
     let path = std::path::Path::new("/not-accessed");
     assert!(crate::claw_glue::write_text(path, "not-written").is_err());
     assert!(crate::claw_glue::mkdir_all(path).is_err());
@@ -35,8 +35,8 @@ fn mcp_cannot_enter_human_filesystem_or_process_adapters() {
     assert!(crate::human::query("run", json!({})).is_err());
     unsafe {
         match previous {
-            Some(value) => std::env::set_var("COS_MCP_SERVER", value),
-            None => std::env::remove_var("COS_MCP_SERVER"),
+            Some(value) => std::env::set_var("YUOS_MCP_SERVER", value),
+            None => std::env::remove_var("YUOS_MCP_SERVER"),
         }
     }
 }

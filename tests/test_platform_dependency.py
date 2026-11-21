@@ -24,16 +24,16 @@ SPEC = importlib.util.spec_from_file_location("platform_dependency", ROOT / "too
 platform = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(platform)
 EXPORTS = {
-    "python-sdk": "claw-os-sdk/python/src", "python-runtime": "cos-runtime/python/src",
-    "rust-sdk": "claw-os-sdk/rust", "rust-runtime": "cos-runtime/rust",
+    "python-sdk": "yuos-sdk/python/src", "python-runtime": "yuos-runtime/python/src",
+    "rust-sdk": "yuos-sdk/rust", "rust-runtime": "yuos-runtime/rust",
     "ui-toolkit": "desktop/toolkit", "launcher-client": "desktop/launcher-backend",
 }
 URL = "https://releases.example.invalid/app-platform-v1.0.0/platform.tar.gz"
-SDK_FILE = "claw-os-sdk/python/src/claw_os_sdk/__init__.py"
+SDK_FILE = "yuos-sdk/python/src/yuos_sdk/__init__.py"
 FILES = {
     SDK_FILE: b"VALUE = 'public SDK'\n",
-    "cos-runtime/python/src/cos_runtime/__init__.py": b"VALUE = 'public runtime'\n",
-    "claw-os-sdk/wire/v1/manifest.schema.json": b'{"$id":"public manifest schema"}\n',
+    "yuos-runtime/python/src/yuos_runtime/__init__.py": b"VALUE = 'public runtime'\n",
+    "yuos-sdk/wire/v1/manifest.schema.json": b'{"$id":"public manifest schema"}\n',
     **{path + "/Cargo.toml": b"[workspace]\n" for name, path in EXPORTS.items() if not name.startswith("python")},
 }
 
@@ -57,7 +57,7 @@ def public_archive(*, files=None, links=None, mutate=None, tar_change=None):
                 name = str(parent)
                 nodes.setdefault(name, {"path": name, "kind": "directory", "mode": 0o755, "size": 0})
     manifest = {
-        "schema": "claw.app-platform/v1", "version": "1.0.0", "runtime_abi": 1,
+        "schema": "yuos.app-platform/v1", "version": "1.0.0", "runtime_abi": 1,
         "source_revision": "a" * 40, "exports": EXPORTS.copy(),
         "files": sorted(nodes.values(), key=lambda item: item["path"]),
     }
@@ -89,7 +89,7 @@ def public_archive(*, files=None, links=None, mutate=None, tar_change=None):
 
 @pytest.fixture
 def dependency(tmp_path, monkeypatch):
-    root = tmp_path / "clawos-app"
+    root = tmp_path / "yuos-app"
     root.mkdir()
     shared = root / "shared/python"
     for name in ["_shared", "gateway", "gateway/_shared"]:
@@ -148,12 +148,12 @@ def test_named_exports_share_one_verified_artifact_and_keep_app_support_local(de
     toolkit = platform.prepare_native()
     assert toolkit == payload / "desktop/toolkit"
     assert toolkit.parents[1] == payload
-    assert platform.manifest_schema_path() == payload / "claw-os-sdk/wire/v1/manifest.schema.json"
+    assert platform.manifest_schema_path() == payload / "yuos-sdk/wire/v1/manifest.schema.json"
     assert platform.prepare(download=False) == paths
     assert state.calls == [URL]
     assert not (payload / "core").exists()
     assert not (payload / "apps").exists()
-    assert not (state.root.parent / "claw-os").exists()
+    assert not (state.root.parent / "yuos").exists()
     assert stat.S_IMODE(cache(state).stat().st_mode) == 0o700
     assert stat.S_IMODE((cache(state) / "archive.tar.gz").stat().st_mode) == 0o600
     assert stat.S_IMODE((payload / "desktop").stat().st_mode) == 0o755
@@ -178,7 +178,7 @@ def test_local_input_is_explicit_and_preserves_the_production_pin(dependency, de
     expected = development_cache(dependency, development) / "payload"
     assert selected == {name: expected / path for name, path in EXPORTS.items()}
     assert platform.prepare_native(development=development) == expected / "desktop/toolkit"
-    assert platform.manifest_schema_path(development=development) == expected / "claw-os-sdk/wire/v1/manifest.schema.json"
+    assert platform.manifest_schema_path(development=development) == expected / "yuos-sdk/wire/v1/manifest.schema.json"
     assert platform.prepare_exports(download=False) == published
     assert platform.read_lock() == dependency.lock
     assert (dependency.root / "platform.lock.json").read_bytes() == original_lock
@@ -373,7 +373,7 @@ def test_pytest_helpers_use_only_the_explicit_development_selection(dependency, 
 @pytest.mark.parametrize("app_id", ["pkg", "mail-ai", "user-owned-example"])
 def test_artifact_interfaces_need_no_bundled_app_sources_or_special_identity(dependency, monkeypatch, app_id):
     shutil.rmtree(dependency.root / "shared")
-    monkeypatch.setenv("COS_APP_ID", app_id)
+    monkeypatch.setenv("YUOS_APP_ID", app_id)
     exports = platform.prepare_exports()
     assert set(exports) == set(EXPORTS)
     assert exports == platform.prepare_exports(download=False)
@@ -400,7 +400,7 @@ def test_archive_is_verified_before_tar_is_opened(dependency, monkeypatch):
     ("sha256", ""), ("sha256", "a" * 63), ("sha256", "z" * 64), ("sha256", 1),
     ("runtime_abi", 2), ("runtime_abi", True), ("runtime_abi", "1"),
     ("schema", "claw.app-platform/v2"), ("repository", "ignored Git source"),
-    ("revision", "a" * 40), ("python_sources", ["claw-os-sdk/python/src"]),
+    ("revision", "a" * 40), ("python_sources", ["yuos-sdk/python/src"]),
 ])
 def test_lock_cannot_select_git_unpinned_or_unsupported_inputs(dependency, field, value):
     dependency.lock[field] = value
@@ -412,7 +412,7 @@ def test_lock_cannot_select_git_unpinned_or_unsupported_inputs(dependency, field
 
 
 def test_explicit_v1_schema_and_uppercase_hex_pin_are_accepted(dependency):
-    dependency.lock.update(schema="claw.app-platform/v1", sha256=dependency.lock["sha256"].upper())
+    dependency.lock.update(schema="yuos.app-platform/v1", sha256=dependency.lock["sha256"].upper())
     write_lock(dependency)
     assert platform.prepare_native().is_dir()
 
@@ -446,14 +446,14 @@ def test_duplicate_lock_fields_are_not_ambiguous(dependency):
 
 
 def test_old_git_lock_and_existing_git_cache_are_never_fallbacks(dependency, monkeypatch):
-    old = dependency.root / "build/platform" / ("a" * 40) / "claw-os-sdk/python/src"
+    old = dependency.root / "build/platform" / ("a" * 40) / "yuos-sdk/python/src"
     old.mkdir(parents=True)
     (old / "decoy.py").write_text("must not be loaded")
     monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: pytest.fail("Git/source process invoked"))
     monkeypatch.setattr(subprocess, "check_output", lambda *args, **kwargs: pytest.fail("Git/source process invoked"))
     assert platform.prepare()[0] != old
     dependency.lock = {"repository": "https://example.test/os", "revision": "a" * 40,
-                       "python_sources": ["claw-os-sdk/python/src", "cos-runtime/python/src"]}
+                       "python_sources": ["yuos-sdk/python/src", "yuos-runtime/python/src"]}
     write_lock(dependency)
     with pytest.raises(ValueError, match="legacy OS Git"):
         platform.prepare()
@@ -513,11 +513,11 @@ def test_inventory_is_exact_and_canonical(dependency, change):
     assert_unpublished(dependency)
 
 
-@pytest.mark.parametrize("name", ["../escape", "/absolute", "claw-os-sdk/../../escape",
-                                  "claw-os-sdk\\escape", "core/private.py", "desktop/other-app/main.py",
+@pytest.mark.parametrize("name", ["../escape", "/absolute", "yuos-sdk/../../escape",
+                                  "yuos-sdk\\escape", "core/private.py", "desktop/other-app/main.py",
                                   "DEBIAN/postinst", "etc/sudoers.d/app",
                                   "usr/share/polkit-1/rules.d/app.rules",
-                                  "var/lib/cos/permissions.json"])
+                                  "var/lib/yuos/permissions.json"])
 def test_uninventoried_or_unsafe_tar_paths_never_extract(dependency, name):
     def change(members):
         entry = tarfile.TarInfo(name)
@@ -533,7 +533,7 @@ def test_uninventoried_or_unsafe_tar_paths_never_extract(dependency, name):
 @pytest.mark.parametrize("kind", [tarfile.LNKTYPE, tarfile.FIFOTYPE, tarfile.CHRTYPE, tarfile.BLKTYPE])
 def test_nonpublic_tar_node_types_are_rejected(dependency, kind):
     def change(members):
-        entry = tarfile.TarInfo("claw-os-sdk/special")
+        entry = tarfile.TarInfo("yuos-sdk/special")
         entry.type, entry.mode, entry.linkname = kind, 0o644, SDK_FILE
         members.append((entry, None))
     dependency.repin(public_archive(tar_change=change))
@@ -564,17 +564,17 @@ def test_duplicate_manifest_fields_are_rejected(dependency):
 @pytest.mark.parametrize("target", ["/etc/not-read", "../../../escape", "../../core/private",
                                     "bad\\target", "bad\ntarget", "alias.py", "missing.py"])
 def test_unsafe_cyclic_and_missing_symlink_targets_are_rejected(dependency, target):
-    dependency.repin(public_archive(links={"claw-os-sdk/python/src/alias.py": target}))
+    dependency.repin(public_archive(links={"yuos-sdk/python/src/alias.py": target}))
     with pytest.raises((ValueError, tarfile.FilterError)):
         platform.prepare()
     assert_unpublished(dependency)
 
 
 def test_safe_symlink_and_implicit_directory_are_verified_on_every_use(dependency):
-    dependency.repin(public_archive(links={"claw-os-sdk/python/src/alias.py": "claw_os_sdk/__init__.py"}))
+    dependency.repin(public_archive(links={"yuos-sdk/python/src/alias.py": "yuos_sdk/__init__.py"}))
     platform.prepare()
-    link = cache(dependency) / "payload/claw-os-sdk/python/src/alias.py"
-    assert link.is_symlink() and os.readlink(link) == "claw_os_sdk/__init__.py"
+    link = cache(dependency) / "payload/yuos-sdk/python/src/alias.py"
+    assert link.is_symlink() and os.readlink(link) == "yuos_sdk/__init__.py"
     assert platform.prepare_native().is_dir()
     link.unlink()
     link.symlink_to("missing.py")
@@ -718,7 +718,7 @@ def test_cache_archive_symlink_is_never_followed(dependency):
 
 
 def test_symlink_cannot_be_an_inventory_parent(dependency):
-    dependency.repin(public_archive(links={"claw-os-sdk/python": "../cos-runtime"}))
+    dependency.repin(public_archive(links={"yuos-sdk/python": "../yuos-runtime"}))
     with pytest.raises(ValueError, match="nondirectory ancestor"):
         platform.prepare()
     assert_unpublished(dependency)
@@ -734,9 +734,9 @@ def test_source_native_host_uses_only_verified_cached_exports(dependency):
     app.mkdir(parents=True)
     shutil.copy2(ROOT / "products/mail/apps/mail-ai/native_host.py", app / "native_host.py")
     (app / "main.py").write_text(
-        "import claw_os_sdk, cos_runtime\n"
-        "assert claw_os_sdk.VALUE == 'public SDK'\n"
-        "assert cos_runtime.VALUE == 'public runtime'\n"
+        "import yuos_sdk, yuos_runtime\n"
+        "assert yuos_sdk.VALUE == 'public SDK'\n"
+        "assert yuos_runtime.VALUE == 'public runtime'\n"
         "HANDLERS = {'fixture': lambda: None}\n"
     )
     driver = (
@@ -795,12 +795,12 @@ def test_real_os_artifact_interoperability(dependency, request):
     python = platform.prepare()
     toolkit = platform.prepare_native()
     assert (toolkit / "Cargo.toml").is_file()
-    assert (toolkit.parents[1] / "cos-runtime/rust/Cargo.toml").is_file()
+    assert (toolkit.parents[1] / "yuos-runtime/rust/Cargo.toml").is_file()
     script = (
         "import sys\n"
         "sys.path[:0] = sys.argv[1:]\n"
-        "from claw_os_sdk.mcp import App\n"
-        "from cos_runtime import policy\n"
+        "from yuos_sdk.mcp import App\n"
+        "from yuos_runtime import policy\n"
         "assert callable(App.from_manifest) and callable(policy.require)\n"
         "print('verified SDK/runtime imports')\n"
     )

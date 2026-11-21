@@ -12,10 +12,10 @@ def install_development_runtime(root):
     import platform_dependency
 
     exports = platform_dependency.prepare_exports()
-    for name, export in (("claw_os_sdk", "python-sdk"), ("cos_runtime", "python-runtime")):
+    for name, export in (("yuos_sdk", "python-sdk"), ("yuos_runtime", "python-runtime")):
         source = exports[export] / name
         assert source.is_dir(), f"Platform artifact must export {name} through {export}"
-        shutil.copytree(source, root / "usr/lib/cos/python" / name,
+        shutil.copytree(source, root / "usr/lib/yuos/python" / name,
                         ignore=shutil.ignore_patterns("__pycache__", "test_*.py"))
 
 
@@ -32,10 +32,10 @@ def test_packaged_doc_and_kv_use_public_mcp_and_installed_support_without_os_sou
     store = data / "kv.json"
     store.write_text('{"kept":"existing owner state"}')
     environment = {
-        "PATH": os.defpath, "PYTHONPATH": str(root / "usr/lib/cos/python"),
-        "COS_DATA_DIR": str(data), "TMPDIR": str(tmp_path),
+        "PATH": os.defpath, "PYTHONPATH": str(root / "usr/lib/yuos/python"),
+        "YUOS_DATA_DIR": str(data), "TMPDIR": str(tmp_path),
     }
-    app = root / "usr/lib/cos/apps/kv"
+    app = root / "usr/lib/yuos/apps/kv"
     with mcp_process(app, env=environment) as request:
         result = request("tools/call", authenticated_mcp_params({
             "name": "kv.get", "arguments": {"key": "kept"},
@@ -53,7 +53,7 @@ def test_packaged_doc_and_kv_use_public_mcp_and_installed_support_without_os_sou
         assert result["structuredContent"]["data"] == {
             "kept": "existing owner state", "added": "independent release",
         }
-    doc = root / "usr/lib/cos/apps/doc"
+    doc = root / "usr/lib/yuos/apps/doc"
     with mcp_process(doc, env=environment) as request:
         tools = request("tools/list", {})["tools"]
         assert {tool["name"] for tool in tools} == {
@@ -61,5 +61,5 @@ def test_packaged_doc_and_kv_use_public_mcp_and_installed_support_without_os_sou
         }
     assert json.loads(store.read_text())["kept"] == "existing owner state"
     assert not (data.parent / "doc").exists()
-    assert (root / "usr/lib/cos/python/claw_files/document.py").is_file()
-    assert not (root / "usr/lib/cos/apps/_shared").exists()
+    assert (root / "usr/lib/yuos/python/claw_files/document.py").is_file()
+    assert not (root / "usr/lib/yuos/apps/_shared").exists()

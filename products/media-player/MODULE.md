@@ -72,7 +72,7 @@ open user files, start playback devices, or connect to a live desktop bus.
 `native_payload` selects the real `bin/cosmic-player` for GUI/MCP and preserves
 the original resources, thumbnailer metadata and licenses. The primary legacy
 command enters the common Host; it does not bypass admission for thumbnailing.
-After the existing MCP dispatch, the App-owned `claw-app-gui-argv` library removes
+After the existing MCP dispatch, the App-owned `yuos-app-gui-argv` library removes
 one exact argv[1] `--gui` only in SDK GUI mode. The existing lexer still owns
 option values, URL order, local-path canonicalization, warning-and-continue
 behavior and help/version exits; no new `--` end-of-options state is added.

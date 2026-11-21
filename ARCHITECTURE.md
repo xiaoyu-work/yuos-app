@@ -1,7 +1,7 @@
 # Application Architecture
 
-`clawos-app` owns independently developed application products and explicitly
-declared shared-capability client source groups. `claw-os` owns the system
+`yuos-app` owns independently developed application products and explicitly
+declared shared-capability client source groups. `yuos` owns the system
 Agent, privileged broker, runtime authority, SDK and OS image.
 
 **The coordinated 0.2.1 generic runtime contract is verified.** Every App, regardless of origin,
@@ -21,7 +21,7 @@ builds, publication and physical-device deployment remain separate checks; see
 Product UI ----+
               +--> product business implementation --> versioned OS SDK/runtime
 Product MCP --+                                             |
-                                                     clawd (OS services)
+                                                     yuosd (OS services)
                                                            |
                                                   AI gate, when requested
 ```
@@ -39,11 +39,11 @@ Recovery stays unknown unless an existing contract explicitly declares more.
 ## App lifecycle and AI independence
 
 An App must run without opening the Agent UI, running an AI Agent task or
-making a model request. `clawd` is the OS service responsible for App lifetime,
-permissions and system resources; it is not the `claw-agentd` model/tool loop.
+making a model request. `yuosd` is the OS service responsible for App lifetime,
+permissions and system resources; it is not the `yuos-agentd` model/tool loop.
 Both terminal-only and desktop installations use that OS service.
 
-The accepted lifecycle contract requires `clawd` to be available for managed
+The accepted lifecycle contract requires `yuosd` to be available for managed
 App startup and lifetime operations. Stopping that system service is different
 from not running the AI Agent. An unavailable daemon must produce an explicit
 error, including for independent Root clients; Root is not a second App
@@ -67,7 +67,7 @@ already been published or that every physical device has been exercised.
 | `capabilities/storage-sdk/` | Legacy `db` SQLite and `kv` JSON clients, independent MCP/CLI contracts and state; separate from the Storage business product and OS SDK/providers |
 | `capabilities/http/` | Complete `net` HTTP client and MCP contract; shared transport, egress authority, SDK/runtime and installation remain OS-owned |
 | `capabilities/ai-helpers/` | Complete `summarize` presentation/MCP client and tests; Agent, AI/provider/consent/budget/safety/audit and memory authority remain OS-owned |
-| `products/browser/` | Search, private and attached Helium browsing, MV3 extension, launchers and vendored Helium source; process and network authority stay in Claw OS |
+| `products/browser/` | Search, private and attached Helium browsing, MV3 extension, launchers and vendored Helium source; process and network authority stay in Yu OS |
 | `products/terminal/` | Complete native Terminal UI/MCP/resources and command/script/background App operations; sandbox, snapshots and process authority remain OS-owned |
 | `products/containers/` | Container-management App contract and typed broker client; privileged backend remains OS-owned |
 | `products/backup-recovery/` | Data-backup and whole-system recovery App contracts; backend execution, credentials, mount authorization and snapshot index remain OS-owned |
@@ -96,12 +96,12 @@ already been published or that every physical device has been exercised.
 | `shared/rust/gui-argv/` | App-owned compile-time selector adaptation for native parsers; no provider, permission, transport or runtime package |
 | `tools/test.py` | Product/capability-scoped tests using the locked runtime and declared library exports |
 | `tools/release.py`, `tools/release_apt.py`, `tools/release_publish.py` | Independent product/capability Debian versions, real native payloads, immutable Release assets and separately signed retained App APT metadata |
-| `claw-os` | Native authority launcher, package signing, installation, core services and system integration |
+| `yuos` | Native authority launcher, package signing, installation, core services and system integration |
 
 App release CI builds selected independently versioned Debian packages. OS
 images and installed systems consume named packages from the separately signed
 App APT channel, not product source copied into an OS package. Desktop Shell
-is a signed build input to `claw-os-desktop`, not a separate Debian package.
+is a signed build input to `yuos-desktop`, not a separate Debian package.
 Existing installed App paths, exact identities, grants and publisher
 provenance checks remain intact.
 The OS still owns privileged package transactions and its security-floor gates;
@@ -168,7 +168,7 @@ see [local platform development](tools/MODULE.md#local-platform-development).
 Email, delivery and other products use the App-owned common libraries in
 `shared/python`: `_shared`, `gateway._shared` and `canonical_argv`. Development
 composes that local import root with the verified SDK/runtime roots; installed
-clients use `/usr/lib/cos/python`. `stage_shared` supplies a separate common
+clients use `/usr/lib/yuos/python`. `stage_shared` supplies a separate common
 payload, and individual product staging does not duplicate it. The installed
 file-ownership transition remains a coordinated package rollout, not a
 permission grant or user-data migration. See [shared support](shared/MODULE.md).
@@ -198,7 +198,7 @@ credentials and installed state are not deleted or migrated here.
 
 Document Engine declares a `python_dependencies` entry for the Files product's
 named `claw_files` export, scoped to `doc`. The same resolver supplies test
-imports and stages that exact library into `/usr/lib/cos/python`, even when
+imports and stages that exact library into `/usr/lib/yuos/python`, even when
 staging only Doc. Files/Doc co-staging accepts an identical library tree and
 rejects conflicting bytes, modes, symlinks or extra installed files; it never
 merges library trees. The OS supplies the SDK/runtime; the common App support dependency supplies the
@@ -235,13 +235,13 @@ Storage SDK preserves DB's five direct manifest-bound MCP tools and matching
 human CLI commands. The unchanged SQLite client keeps exact database read/write
 scopes, safe names, read-only connections, cross-database SQL authorizers,
 single-statement commits and the 1,000-returned-row bound. Its files stay at
-`$COS_DATA_DIR/db/<name>.db` inside the same owner/App partition, not KV or Agent
+`$YUOS_DATA_DIR/db/<name>.db` inside the same owner/App partition, not KV or Agent
 memory. No privileged SQLite provider, SDK implementation, account/state import
 or App-to-App call moves with it. The existing Storage business product remains
 separate; the capability group installs only `db` and `kv`, with no native assets.
 
 KV owns its complete `server.py`, manifest and `test_server.py`; it has no
-`main.py`. Its UTF-8 string map remains at `$COS_DATA_DIR/kv.json` inside the
+`main.py`. Its UTF-8 string map remains at `$YUOS_DATA_DIR/kv.json` inside the
 distinct `kv` owner/App partition, never Agent memory or DB. The OS still
 authorizes exact-key read/write/delete and full-store read for list/dump before
 dispatch. Those two operations use a fixed wildcard need, not wildcard
@@ -285,8 +285,8 @@ access. UI resources and build inputs are product-owned. Development checks
 out only the locked shared `desktop/toolkit` source, including its iced tree,
 into a separate native dependency cache. OS builds use their own forked
 toolkit and immutable App source pin. The panel manifest and compiled shell
-remain in `claw-os-desktop`; Calendar's Python backend remains in
-`claw-os-agent`. Installed state, grants and signed APT updates do not change.
+remain in `yuos-desktop`; Calendar's Python backend remains in
+`yuos-agent`. Installed state, grants and signed APT updates do not change.
 
 Clipboard's complete native popup and resources use the same native
 staging/build mechanism. The existing `panel-clipboard` identity owns its

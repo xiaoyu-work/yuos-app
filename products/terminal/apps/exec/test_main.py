@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from unittest import mock
 
-from cos_runtime import mcp
+from yuos_runtime import mcp
 from test_support import load_local_module
 
 
@@ -25,10 +25,10 @@ class TestCmdStartScratchNaming(unittest.TestCase):
     """
 
     def setUp(self) -> None:
-        # Redirect COS_DATA_DIR to a tempdir before importing main so
+        # Redirect YUOS_DATA_DIR to a tempdir before importing main so
         # PROC_DIR resolves to a writable spot we can inspect.
         self.tmp = tempfile.TemporaryDirectory()
-        environment = mock.patch.dict(os.environ, {"COS_DATA_DIR": self.tmp.name})
+        environment = mock.patch.dict(os.environ, {"YUOS_DATA_DIR": self.tmp.name})
         environment.start()
         self.addCleanup(environment.stop)
         self.main = load_local_module(
@@ -154,7 +154,7 @@ class TestShellScope(unittest.TestCase):
 
     def setUp(self) -> None:
         self.tmp = tempfile.TemporaryDirectory()
-        environment = mock.patch.dict(os.environ, {"COS_DATA_DIR": self.tmp.name})
+        environment = mock.patch.dict(os.environ, {"YUOS_DATA_DIR": self.tmp.name})
         environment.start()
         self.addCleanup(environment.stop)
         self.main = load_local_module(

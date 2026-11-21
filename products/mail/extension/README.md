@@ -6,9 +6,9 @@ UI and Agent MCP call the same six operations: `summarize`, `smart_reply`,
 [`app.json`](../apps/mail-ai/app.json).
 
 The extension identity remains `yu-mail-ai@yuos.io`, and the native host is
-`os.yuos.mail_ai`. The OS-owned `claw-mail-ai-host` launcher validates the
+`os.yuos.mail_ai`. The OS-owned `yuos-mail-ai-host` launcher validates the
 Thunderbird parent and registers the restricted App session before starting
-the canonical `/usr/lib/cos/apps/mail-ai/native_host.py`. This extension does
+the canonical `/usr/lib/yuos/apps/mail-ai/native_host.py`. This extension does
 not manufacture an MCP caller or own model credentials.
 
 Native requests are `{id, verb, args}` objects framed with a four-byte

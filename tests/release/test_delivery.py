@@ -11,8 +11,8 @@ from release_common import config, package_record
 
 
 @pytest.mark.parametrize(("name", "architecture"), [
-    ("claw-app-calendar-desktop", "amd64"),
-    ("claw-app-independent-example", "all"),
+    ("yuos-app-calendar-desktop", "amd64"),
+    ("yuos-app-independent-example", "all"),
 ])
 @pytest.mark.parametrize("hook", ["preinst", "postinst", "prerm", "postrm", "config", "triggers"])
 def test_no_origin_or_package_variant_can_supply_root_hooks(deb, name, architecture, hook):
@@ -24,7 +24,7 @@ def test_no_origin_or_package_variant_can_supply_root_hooks(deb, name, architect
 
 
 @pytest.mark.parametrize("path", [
-    "var/lib/cos/owners/1000/grants.json",
+    "var/lib/yuos/owners/1000/grants.json",
     "etc/sudoers.d/app-fixture",
     "usr/lib/systemd/system/app-fixture.service",
     "usr/lib/systemd/system-generators/app-fixture",
@@ -50,7 +50,7 @@ def test_app_asset_symlink_cannot_redirect_to_authority_configuration(deb):
 
 
 def test_settings_package_origin_does_not_exempt_polkit_configuration(deb):
-    package = deb("claw-app-settings-desktop", architecture="amd64", files={
+    package = deb("yuos-app-settings-desktop", architecture="amd64", files={
         "usr/share/polkit-1/rules.d/cosmic-settings.rules": b"fixture only\n",
         "usr/share/polkit-1/actions/com.yuos.Settings.Users.policy": b"fixture only\n",
     })
@@ -89,8 +89,8 @@ def test_app_installer_cannot_create_debian_metadata(tmp_path):
 
 
 @pytest.mark.parametrize(("name", "architecture", "runtime"), [
-    ("claw-app-calendar-desktop", "amd64", "binary"),
-    ("claw-app-independent-example", "all", "python"),
+    ("yuos-app-calendar-desktop", "amd64", "binary"),
+    ("yuos-app-independent-example", "all", "python"),
 ])
 def test_manifest_needs_remain_declarations_not_installed_grants(deb, name, architecture, runtime):
     manifest = json.dumps({
@@ -98,7 +98,7 @@ def test_manifest_needs_remain_declarations_not_installed_grants(deb, name, arch
         "mcp": {"tools": [{"name": "example.read", "needs": [{"verb": "fs.read", "scope": {"kind": "wild"}}]}]},
     }).encode()
     package = deb(name, architecture=architecture, files={
-        "usr/lib/cos/apps/example/app.json": manifest,
+        "usr/lib/yuos/apps/example/app.json": manifest,
         "usr/share/doc/app-fixture/copyright": b"fixture only\n",
     })
     record = package_record(package)

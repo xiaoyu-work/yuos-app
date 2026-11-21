@@ -15,11 +15,11 @@ pub fn command(operation: &str, arguments: Value) -> io::Result<Value> {
     let mut child = Command::new("/usr/bin/python3")
         .args(["-I", "-c", &format!(
             "import sys,os,json,types\n\
-             sys.path[:0] = ['/usr/lib/cos/python']\n\
-             os.environ['COS_BIN'] = '/usr/local/bin/yu'\n\
-             os.environ['CLAW_COS_BIN'] = '/usr/local/bin/yu'\n\
+             sys.path[:0] = ['/usr/lib/yuos/python']\n\
+             os.environ['YUOS_BIN'] = '/usr/local/bin/yu'\n\
+             os.environ['YUOS_KERNEL_BIN'] = '/usr/local/bin/yu'\n\
              backend = types.ModuleType('terminal_commands')\n\
-             backend.__file__ = '/usr/lib/cos/apps/cosmic-term/embedded.py'\n\
+             backend.__file__ = '/usr/lib/yuos/apps/cosmic-term/embedded.py'\n\
              exec(compile({backend}, '<terminal-commands>', 'exec'), backend.__dict__)\n\
              exec(compile({bridge}, '<terminal-bridge>', 'exec'))\n"
         )])
@@ -49,7 +49,7 @@ pub fn command(operation: &str, arguments: Value) -> io::Result<Value> {
     Ok(value)
 }
 
-pub fn open(cwd: Option<&str>) -> Result<(), cos_runtime::BridgeError> {
+pub fn open(cwd: Option<&str>) -> Result<(), yuos_runtime::BridgeError> {
     let mut args = vec![
         "__desktop".to_string(), "launch".into(), "--app-id".into(), "com.yuos.Term".into(),
     ];
@@ -63,11 +63,11 @@ pub fn open(cwd: Option<&str>) -> Result<(), cos_runtime::BridgeError> {
         })?;
         args.extend(["--uri".into(), uri.to_string()]);
     }
-    let value = claw_os_sdk::cos_call_json("desktop", "launch", args)?;
+    let value = yuos_sdk::yu_call_json("desktop", "launch", args)?;
     if value["launched"] != true || value["app_id"] != "com.yuos.Term"
         || value["launcher"] != "/usr/bin/cosmic-term"
     {
-        return Err(cos_runtime::BridgeError::Decode {
+        return Err(yuos_runtime::BridgeError::Decode {
             app: "desktop".into(), verb: "launch".into(),
             message: "provider did not confirm native Terminal launch".into(),
         });
@@ -80,24 +80,24 @@ pub mod files {
     use super::*;
 
     fn ui_only() -> io::Result<()> {
-        if std::env::var("COS_MCP_SERVER").as_deref() == Ok("1") {
+        if std::env::var("YUOS_MCP_SERVER").as_deref() == Ok("1") {
             return Err(io::Error::new(io::ErrorKind::PermissionDenied, "UI writes are unavailable in MCP"));
         }
 
         Ok(())
     }
 
-    pub fn mkdir(path: impl AsRef<str>) -> Result<(), cos_runtime::BridgeError> {
+    pub fn mkdir(path: impl AsRef<str>) -> Result<(), yuos_runtime::BridgeError> {
         ui_only()?;
         let path = std::path::absolute(path.as_ref())?;
-        cos_runtime::policy::require(
-            "fs.write", cos_runtime::policy::Scope::path(path.to_string_lossy()),
+        yuos_runtime::policy::require(
+            "fs.write", yuos_runtime::policy::Scope::path(path.to_string_lossy()),
         ).map_err(io::Error::other)?;
         std::fs::create_dir_all(path)?;
         Ok(())
     }
 
-    pub fn write(path: impl AsRef<str>, content: &str) -> Result<(), cos_runtime::BridgeError> {
+    pub fn write(path: impl AsRef<str>, content: &str) -> Result<(), yuos_runtime::BridgeError> {
         ui_only()?;
         let path = path.as_ref();
         let parent = Path::new(path).parent().filter(|parent| !parent.as_os_str().is_empty());
@@ -106,7 +106,7 @@ pub mod files {
                 mkdir(parent.to_string_lossy())?;
             }
         }
-        cos_runtime::filesystem::write(path, content).map(|_| ())
+        yuos_runtime::filesystem::write(path, content).map(|_| ())
     }
 }
 

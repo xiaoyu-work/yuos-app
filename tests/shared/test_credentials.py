@@ -9,7 +9,7 @@ from _shared import credentials
 
 class CredentialLoaderTests(unittest.TestCase):
     def setUp(self):
-        self.binary = mock.patch.dict(credentials.os.environ, {"COS_BIN": "/fixture/cos"})
+        self.binary = mock.patch.dict(credentials.os.environ, {"YUOS_BIN": "/fixture/cos"})
         self.binary.start()
         self.addCleanup(self.binary.stop)
 
@@ -49,7 +49,7 @@ class CredentialLoaderTests(unittest.TestCase):
         )
         for app_id in ("pkg", "mail-ai", "user-owned-example"):
             with self.subTest(app_id=app_id), mock.patch.dict(
-                credentials.os.environ, {"COS_APP_ID": app_id},
+                credentials.os.environ, {"YUOS_APP_ID": app_id},
             ):
                 value, error = credentials.load_credential("TOKEN", namespace="owner")
                 self.assertIsNone(value)

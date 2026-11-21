@@ -2,7 +2,7 @@
 
 This directory owns common App client support, not OS providers or another
 App's entrypoint. The first-party sources retain the root [license](../LICENSE).
-The Python helpers originate from `claw-os/apps`. Removing the OS copy and transferring
+The Python helpers originate from `yuos/apps`. Removing the OS copy and transferring
 installed file ownership are coordinated with the consumer/package cutover,
 not an App-data migration.
 
@@ -12,14 +12,14 @@ not an App-data migration.
 | `python/gateway/_shared/` | `gateway._shared` argument, transport, memory, inbound and subprocess helpers |
 | `python/gateway/_shared/channels.py` | Presentation-only public channel SDK client; Root retains owner/sender binding, credentials, replay and receiver lifetime |
 | `python/canonical_argv.py` | `canonical_argv` parsing and normalization |
-| `rust/gui-argv/` | Private std-only `claw-app-gui-argv` compile-time dependency for native CLI adaptation |
+| `rust/gui-argv/` | Private std-only `yuos-app-gui-argv` compile-time dependency for native CLI adaptation |
 | `web/` | Bundled Web presentation styles, DOM helpers and the owning-App Host message client; no authority or Agent credential |
 | `../tests/shared/` | Helper behavior, staging/import isolation and App transport contracts |
 | `../tests/shared/vectors/` | URL/IDNA/effective-port regression vectors; never runtime payload |
 
 ## Native CLI Adapter
 
-`claw-app-gui-argv::normalize` accepts explicit OS-string argv, a GUI-mode bool
+`yuos-app-gui-argv::normalize` accepts explicit OS-string argv, a GUI-mode bool
 and a selector. It removes only an exact, nonempty selector at argv index 1
 when GUI mode is selected. It preserves argv0, all other bytes/order, option
 values, repeated selectors and `--`; the original product parser retains its
@@ -29,13 +29,13 @@ confers authority.
 
 Native callers observe GUI mode through the existing SDK 1.0.0
 `gui::is_gui_launch()` and pass the Host-forwarded argv directly. They do not
-reconstruct it from `COS_ARGS_JSON` or treat the mode marker as authentication.
+reconstruct it from `YUOS_ARGS_JSON` or treat the mode marker as authentication.
 Notifications has no argv consumer and needs no unused adapter dependency.
 The eight consumers compile this App-owned crate into their own binaries;
 there is no shared native runtime package, new support ABI or SDK pin.
 `tools/native_build.py` resolves its checked-in relative Cargo path for flat
 and nested prepared workspaces. Native payload preparation preserves the root
-Apache-2.0 license under `licenses/claw-app-gui-argv/LICENSE` in each consuming
+Apache-2.0 license under `licenses/yuos-app-gui-argv/LICENSE` in each consuming
 App, alongside all original native licenses.
 
 Run the isolated pure parser tests from the repository root on Linux/WSL:
@@ -60,14 +60,14 @@ regressions live in `tests/shared/test_atomic.py`; no OS provider is copied.
 
 Development puts `shared/python` on the same explicit Python path as the
 immutable OS SDK/runtime. Installed Python and native embedded clients use
-`/usr/lib/cos/python`. Imports do not search an App parent directory or a sibling
+`/usr/lib/yuos/python`. Imports do not search an App parent directory or a sibling
 OS checkout. The regular `gateway` package exposes its library namespace without
 merging other gateway App directories into it.
 
 ## Staging and Ownership
 
 `tools/stage.py` exports `stage_shared(destination)`, returning
-`destination/usr/lib/cos/python`. Its CLI is:
+`destination/usr/lib/yuos/python`. Its CLI is:
 
 ```bash
 python3 tools/stage.py --shared --root build/support-stage

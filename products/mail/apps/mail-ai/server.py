@@ -2,7 +2,7 @@
 
 from functools import wraps
 
-from claw_os_sdk.mcp import App, ToolResult
+from yuos_sdk.mcp import App, ToolResult
 import main as mail
 
 

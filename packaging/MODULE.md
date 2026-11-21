@@ -19,7 +19,7 @@ construction or a privileged updater.
   `release_apt.py` retains and authenticates the complete repository;
   `release_publish.py` handles immutable Releases, state commits and refresh.
 - `../tools/release_desktop_shell.py` builds and signs the Desktop Shell
-  archive consumed by `claw-os-desktop`. It uses the same App publisher and
+  archive consumed by `yuos-desktop`. It uses the same App publisher and
   native payload tools but creates no App APT or Store entry.
 - `../tools/native_payload.py` consumes original native installer output,
   prepares complete package-local App executables/resources/licenses and emits
@@ -51,7 +51,7 @@ construction or a privileged updater.
   signed resources so the system can resolve a menu selection without trusting
   the exported desktop command. Build-input digests remain distinct from authenticated
   release digests. Product Web assets and `store/index.json` remain authenticated.
-  Official Store transactions, review and runtime authority stay in `clawd`;
+  Official Store transactions, review and runtime authority stay in `yuosd`;
   this producer supplies no installer, grant or snapshot/source fallback.
   Public tool pins and signing inputs remain owner-controlled prerequisites.
 - `../tools/release_development.py` assembles the complete declared fixture

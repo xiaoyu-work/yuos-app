@@ -19,8 +19,8 @@ safe_egress = main.safe_egress
 
 @pytest.fixture(autouse=True)
 def isolated_effects(monkeypatch):
-    monkeypatch.setenv("COS_BIN", "cos")
-    monkeypatch.delenv("COS_TELEGRAM_TOKEN", raising=False)
+    monkeypatch.setenv("YUOS_BIN", "yu")
+    monkeypatch.delenv("YUOS_TELEGRAM_TOKEN", raising=False)
     with mock.patch.object(safe_subprocess, "safe_credential_load", return_value=("fixture-token", None)), mock.patch.object(
         safe_subprocess, "safe_subprocess", side_effect=AssertionError("unexpected process"),
     ), mock.patch.object(safe_egress, "safe_urlopen", side_effect=AssertionError("unexpected network")), mock.patch.object(
@@ -31,12 +31,12 @@ def isolated_effects(monkeypatch):
 
 @pytest.fixture(params=["direct", "mcp"])
 def invoke(request):
-    from claw_os_sdk.mcp import App
+    from yuos_sdk.mcp import App
 
     manifest = Path(__file__).with_name("app.json")
     servers = []
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-        os.environ, {"COS_APP_MANIFEST": str(manifest)},
+        os.environ, {"YUOS_APP_MANIFEST": str(manifest)},
     ), mock.patch.object(App, "serve", lambda app: servers.append(app)):
         load_local_module(Path(__file__).with_name("server.py"), "gateway_telegram_server")
     app = servers[0]
@@ -65,12 +65,12 @@ def test_send_preserves_repeatable_text_and_chat(invoke, chat_id, parts):
     assert urllib.parse.parse_qs(transport.call_args.kwargs["body"].decode()) == {"chat_id": [chat_id], "text": [text]}
     assert transport.call_args.kwargs["timeout"] == 15
     assert transport.call_args.kwargs["verb_id"] == "net.dial"
-    safe_subprocess.safe_credential_load.assert_called_once_with("telegram_bot_token", timeout=10.0, cos_bin="cos")
+    safe_subprocess.safe_credential_load.assert_called_once_with("telegram_bot_token", timeout=10.0, yu_bin="yu")
     main.gateway_memory.remember_send.assert_called_once_with("telegram", result, channel_id=chat_id, text=text)
 
 
 def test_environment_token_still_takes_precedence(invoke, monkeypatch):
-    monkeypatch.setenv("COS_TELEGRAM_TOKEN", " override-fixture ")
+    monkeypatch.setenv("YUOS_TELEGRAM_TOKEN", " override-fixture ")
     with mock.patch.object(safe_egress, "safe_urlopen", return_value=(200, {}, b'{"ok":true}')) as transport:
         assert invoke("send", chat_id="12345", text=["hello"])["ok"] is True
     assert transport.call_args.args[1] == "https://api.telegram.org/botoverride-fixture/sendMessage"

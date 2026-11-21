@@ -15,7 +15,7 @@ from test_support import authenticated_mcp_params, load_local_module
 APP_DIR = pathlib.Path(__file__).parent
 MANIFEST_PATH = APP_DIR / "app.json"
 SERVER_PATH = APP_DIR / "server.py"
-COS_BIN = "/usr/local/bin/yu"
+YUOS_BIN = "/usr/local/bin/yu"
 SHELL = "/opt/claw-shell"
 CREDENTIAL = "default/alice-password"
 BACKUP_TOKEN = "ABCDEF0123456789ABCDEF0123456789"
@@ -30,7 +30,7 @@ main = load_local_module(
 @pytest.fixture(params=["direct", "mcp"])
 def invoke(request):
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-        os.environ, {"COS_APP_MANIFEST": str(MANIFEST_PATH)}
+        os.environ, {"YUOS_APP_MANIFEST": str(MANIFEST_PATH)}
     ):
         server = load_local_module(SERVER_PATH, "claw_test_user_manager_server")
         listed = server.app._handle_request("tools/list", {}, True)
@@ -189,32 +189,32 @@ def test_server_handlers_match_manifest_argument_names_and_defaults():
         (
             lambda invoke: invoke("status"),
             [mock.call("sys.observe", name="identities")],
-            [COS_BIN, "__users", "status"],
+            [YUOS_BIN, "__users", "status"],
         ),
         (
             lambda invoke: invoke("create-user", "alice"),
             [mock.call("sys.identity", name="manage")],
-            [COS_BIN, "__users", "create-user", "--user", "alice"],
+            [YUOS_BIN, "__users", "create-user", "--user", "alice"],
         ),
         (
             lambda invoke: invoke("delete-user", "alice", True),
             [mock.call("sys.identity", name="manage")],
-            [COS_BIN, "__users", "delete-user", "--user", "alice", "--confirm"],
+            [YUOS_BIN, "__users", "delete-user", "--user", "alice", "--confirm"],
         ),
         (
             lambda invoke: invoke("lock-user", "alice"),
             [mock.call("sys.identity", name="manage")],
-            [COS_BIN, "__users", "lock-user", "--user", "alice"],
+            [YUOS_BIN, "__users", "lock-user", "--user", "alice"],
         ),
         (
             lambda invoke: invoke("unlock-user", "alice"),
             [mock.call("sys.identity", name="manage")],
-            [COS_BIN, "__users", "unlock-user", "--user", "alice"],
+            [YUOS_BIN, "__users", "unlock-user", "--user", "alice"],
         ),
         (
             lambda invoke: invoke("set-shell", "alice", SHELL),
             [mock.call("sys.identity", name="manage")],
-            [COS_BIN, "__users", "set-shell", "--user", "alice", "--shell", SHELL],
+            [YUOS_BIN, "__users", "set-shell", "--user", "alice", "--shell", SHELL],
         ),
         (
             lambda invoke: invoke("set-password", "alice", CREDENTIAL),
@@ -223,7 +223,7 @@ def test_server_handlers_match_manifest_argument_names_and_defaults():
                 mock.call("secret.read", name=CREDENTIAL),
             ],
             [
-                COS_BIN,
+                YUOS_BIN,
                 "__users",
                 "set-password",
                 "--user",
@@ -235,13 +235,13 @@ def test_server_handlers_match_manifest_argument_names_and_defaults():
         (
             lambda invoke: invoke("create-group", "developers"),
             [mock.call("sys.identity", name="manage")],
-            [COS_BIN, "__users", "create-group", "--group", "developers"],
+            [YUOS_BIN, "__users", "create-group", "--group", "developers"],
         ),
         (
             lambda invoke: invoke("delete-group", "developers", True),
             [mock.call("sys.identity", name="manage")],
             [
-                COS_BIN,
+                YUOS_BIN,
                 "__users",
                 "delete-group",
                 "--group",
@@ -253,7 +253,7 @@ def test_server_handlers_match_manifest_argument_names_and_defaults():
             lambda invoke: invoke("add-to-group", "alice", "developers"),
             [mock.call("sys.identity", name="manage")],
             [
-                COS_BIN,
+                YUOS_BIN,
                 "__users",
                 "add-to-group",
                 "--user",
@@ -266,7 +266,7 @@ def test_server_handlers_match_manifest_argument_names_and_defaults():
             lambda invoke: invoke("remove-from-group", "alice", "developers"),
             [mock.call("sys.identity", name="manage")],
             [
-                COS_BIN,
+                YUOS_BIN,
                 "__users",
                 "remove-from-group",
                 "--user",
@@ -279,7 +279,7 @@ def test_server_handlers_match_manifest_argument_names_and_defaults():
             lambda invoke: invoke("restore", BACKUP_TOKEN, True),
             [mock.call("sys.identity", name="manage")],
             [
-                COS_BIN,
+                YUOS_BIN,
                 "__users",
                 "restore",
                 "--token",
@@ -297,7 +297,7 @@ def test_all_routes_use_exact_capabilities_and_broker_argv(
         stdout=json.dumps({"changed": True}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": COS_BIN}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YUOS_BIN}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         result = call(invoke)
@@ -310,7 +310,7 @@ def test_all_routes_use_exact_capabilities_and_broker_argv(
 
 def test_create_user_normalizes_and_forwards_optional_flags(invoke):
     completed = mock.Mock(returncode=0, stdout="{}", stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": COS_BIN}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YUOS_BIN}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         invoke(
@@ -321,7 +321,7 @@ def test_create_user_normalizes_and_forwards_optional_flags(invoke):
             shell=SHELL,
         )
     assert run.call_args.args[0] == [
-        COS_BIN,
+        YUOS_BIN,
         "__users",
         "create-user",
         "--user",
@@ -478,7 +478,7 @@ def test_destructive_actions_require_real_true_before_policy(call):
 )
 def test_broker_parses_stdout_before_stderr(stdout, stderr, expected):
     completed = mock.Mock(returncode=0, stdout=stdout, stderr=stderr)
-    with mock.patch.dict(os.environ, {"COS_BIN": COS_BIN}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YUOS_BIN}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed):
         assert main.status() == expected
@@ -509,7 +509,7 @@ def test_broker_parses_stdout_before_stderr(stdout, stderr, expected):
 )
 def test_broker_payload_failures_raise(returncode, stdout, stderr, message):
     completed = mock.Mock(returncode=returncode, stdout=stdout, stderr=stderr)
-    with mock.patch.dict(os.environ, {"COS_BIN": COS_BIN}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YUOS_BIN}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match=re.escape(message)):
@@ -547,7 +547,7 @@ def test_missing_broker_executable_raises():
     ],
 )
 def test_broker_execution_failures_raise(failure, exception_type, message):
-    with mock.patch.dict(os.environ, {"COS_BIN": COS_BIN}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YUOS_BIN}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", side_effect=failure):
         with pytest.raises(exception_type, match=message):

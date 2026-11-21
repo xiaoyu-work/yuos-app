@@ -1,4 +1,4 @@
-from claw_os_sdk.mcp import App
+from yuos_sdk.mcp import App
 
 from main import backtrace, diagnose, recent
 

@@ -22,7 +22,7 @@ def test_content_addressed_fixture_is_deterministic_and_stages_the_complete_decl
     first = build_archive(plan, "capability:document-engine", tmp_path / "first")
     second = build_archive(plan, "capability:document-engine", tmp_path / "second")
     assert first == second
-    assert first["filename"] == f"claw-app-development-{first['sha256']}.tar.xz"
+    assert first["filename"] == f"yuos-app-development-{first['sha256']}.tar.xz"
     archive = tmp_path / "first" / first["filename"]
     manifest = verify_archive(archive, first, plan)
     assert manifest["apps"] == ["doc"]
@@ -42,12 +42,12 @@ def test_content_addressed_fixture_is_deterministic_and_stages_the_complete_decl
                   "--root", staged], cwd=root, env={"PYTHONDONTWRITEBYTECODE": "1"})
     assert json.loads(result.stdout) == ["doc"]
     run([sys.executable, root / "tools/stage.py", "--shared", "--root", staged], cwd=root)
-    for relative in ("usr/lib/cos/apps/doc/server.py", "usr/lib/cos/python/claw_files/document.py",
-                     "usr/lib/cos/python/_shared/atomic.py", "usr/lib/cos/python/canonical_argv.py"):
+    for relative in ("usr/lib/yuos/apps/doc/server.py", "usr/lib/yuos/python/claw_files/document.py",
+                     "usr/lib/yuos/python/_shared/atomic.py", "usr/lib/yuos/python/canonical_argv.py"):
         assert (staged / relative).read_bytes() == (root / "payload" / relative).read_bytes()
-    assert (root / "payload/usr/lib/cos/python/pptx/__init__.py").is_file()
-    assert (root / "payload/usr/lib/cos/python/python_pptx-1.0.2.dist-info/LICENSE").is_file()
-    assert not (root / "payload/usr/lib/cos/apps/fs").exists()
+    assert (root / "payload/usr/lib/yuos/python/pptx/__init__.py").is_file()
+    assert (root / "payload/usr/lib/yuos/python/python_pptx-1.0.2.dist-info/LICENSE").is_file()
+    assert not (root / "payload/usr/lib/yuos/apps/fs").exists()
     assert not (root / "payload/usr/bin").exists()
 
 
@@ -108,7 +108,7 @@ def test_fixtures_cannot_restore_retired_config_util_exports_with_rehashed_metad
                     member.mode = 0o755
                     output.addfile(member)
     checksum = digest(candidate)
-    artifact = candidate.with_name(f"claw-app-development-{checksum}.tar.xz")
+    artifact = candidate.with_name(f"yuos-app-development-{checksum}.tar.xz")
     candidate.rename(artifact)
     changed = {**record, "filename": artifact.name, "sha256": checksum, "size": artifact.stat().st_size}
     with pytest.raises(ValueError, match="Retired|retired"):
@@ -139,7 +139,7 @@ def test_fixture_tampering_and_missing_release_archives_are_refused(tmp_path):
     release.build(plan, "all", directory)
     packages, development, interfaces = verify_artifacts(plan, directory)
     assert interfaces == {}
-    assert [path.name for path in packages] == ["claw-cap-http_1.0.0_all.deb"]
+    assert [path.name for path in packages] == ["yuos-cap-http_1.0.0_all.deb"]
     record = development["capability:http"]
     archive = directory / record["filename"]
     original = archive.read_bytes()

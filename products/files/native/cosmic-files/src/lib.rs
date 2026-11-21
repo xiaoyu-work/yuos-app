@@ -48,9 +48,9 @@ pub(crate) fn err_str<T: ToString>(err: T) -> String {
 pub(crate) fn gui_user_path(path: Option<PathBuf>) -> Option<PathBuf> {
     let path = path?;
     // Navigation follows the owner hint; HOME and App state stay private.
-    if claw_os_sdk::gui::is_gui_launch()
+    if yuos_sdk::gui::is_gui_launch()
         && let (Some(owner), Some(private)) =
-            (claw_os_sdk::gui::owner_home(), dirs::home_dir())
+            (yuos_sdk::gui::owner_home(), dirs::home_dir())
         && let Ok(relative) = path.strip_prefix(private)
     {
         return Some(owner.join(relative));
@@ -145,7 +145,7 @@ pub fn desktop() -> Result<(), Box<dyn std::error::Error>> {
 /// Runs application with these settings
 #[rustfmt::skip]
 pub fn main() -> Result<(), Box<dyn std::error::Error>> {
-    if std::env::var("COS_MCP_SERVER").as_deref() == Ok("1") {
+    if std::env::var("YUOS_MCP_SERVER").as_deref() == Ok("1") {
         return mcp::run().map_err(|e| -> Box<dyn std::error::Error> { e.into() });
     }
 
@@ -172,12 +172,12 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let cli::Args { daemonize, locations, uris } = cli::parse(
         env::args_os(),
-        claw_os_sdk::gui::is_gui_launch(),
+        yuos_sdk::gui::is_gui_launch(),
         config.show_recents,
         |path| fs::canonicalize(path),
     );
 
-    if daemonize && !claw_os_sdk::gui::is_gui_launch() {
+    if daemonize && !yuos_sdk::gui::is_gui_launch() {
         #[cfg(all(unix, not(any(target_os = "macos", target_os = "redox"))))]
         match fork::daemon(true, true) {
             Ok(fork::Fork::Child) => (),

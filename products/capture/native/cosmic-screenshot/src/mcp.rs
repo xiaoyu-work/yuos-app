@@ -1,6 +1,6 @@
 //! MCP tool surface for the kernel agent.
 //!
-//! When spawned with `COS_MCP_SERVER=1`, `cosmic-screenshot` flips
+//! When spawned with `YUOS_MCP_SERVER=1`, `cosmic-screenshot` flips
 //! into a tiny MCP stdio server that exposes one tool —
 //! `screenshot.capture` — backed by the same non-interactive OS service
 //! as the CLI. Interactive destination/clipboard selection remains a human
@@ -10,7 +10,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use claw_os_sdk::mcp::{App, AppError, CallContext, Tool, ToolResult};
+use yuos_sdk::mcp::{App, AppError, CallContext, Tool, ToolResult};
 use serde_json::{Value, json};
 
 use crate::noninteractive;

@@ -5,7 +5,7 @@
   "name": {"en": "Yu Desktop"},
   "summary": {"en": "The Yu OS desktop shell, built from Quickshell and Caelestia."},
   "runtime": "binary",
-  "entry": "bin/claw-desktop-shell",
+  "entry": "bin/yuos-desktop-shell",
   "desktop": {
     "exec": "--gui",
     "needs": [

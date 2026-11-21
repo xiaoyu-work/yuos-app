@@ -282,7 +282,7 @@ pub fn run() -> cosmic::iced::Result {
         .scale_factor(1.0)
         .no_main_window(true)
         .exit_on_close(false);
-    if claw_os_sdk::gui::is_gui_launch() {
+    if yuos_sdk::gui::is_gui_launch() {
         cosmic::app::run::<CosmicLauncher>(settings, args)
     } else {
         cosmic::app::run_single_instance::<CosmicLauncher>(settings, args)
@@ -499,7 +499,7 @@ impl CosmicLauncher {
 
         self.surface_state = SurfaceState::Hidden;
 
-        if claw_os_sdk::gui::is_gui_launch() {
+        if yuos_sdk::gui::is_gui_launch() {
             tasks.push(cosmic::iced::exit());
         }
 
@@ -1170,7 +1170,7 @@ impl cosmic::Application for CosmicLauncher {
             launch_error: None,
             width: PALETTE_WIDTH,
         };
-        let task = if claw_os_sdk::gui::is_gui_launch() {
+        let task = if yuos_sdk::gui::is_gui_launch() {
             if matches!(flags.subcommand, Some(LauncherTasks::Close)) {
                 return (app, cosmic::iced::exit());
             }
@@ -1408,7 +1408,7 @@ impl cosmic::Application for CosmicLauncher {
                         action_name,
                     } => {
                         if let Some(entry) = cosmic::desktop::load_desktop_file(&[], path) {
-                            if claw_os_sdk::gui::is_gui_launch() {
+                            if yuos_sdk::gui::is_gui_launch() {
                                 if action_name.is_some() {
                                     self.launch_error = Some(fl!("desktop-action-unsupported"));
                                     return Task::none();
@@ -1622,7 +1622,7 @@ impl cosmic::Application for CosmicLauncher {
             }
             Message::LaunchSubmitted(Ok(())) => return self.hide(),
             Message::LaunchSubmitted(Err(error)) => {
-                tracing::warn!(%error, "Claw OS did not open the selected application");
+                tracing::warn!(%error, "Yu OS did not open the selected application");
                 self.launch_error = Some(error);
             }
             Message::AltTab => {

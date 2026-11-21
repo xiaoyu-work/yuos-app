@@ -70,7 +70,7 @@ def test_all_routes_preserve_scopes_and_broker_argv(
     transport, function_name, action, arguments, capabilities, flags
 ):
     completed = mock.Mock(returncode=0, stdout='{"changed":true}', stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         if transport == "direct":
@@ -78,7 +78,7 @@ def test_all_routes_preserve_scopes_and_broker_argv(
         else:
             with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
                 os.environ, {
-                    "COS_APP_MANIFEST": str(pathlib.Path(__file__).with_name("app.json")),
+                    "YUOS_APP_MANIFEST": str(pathlib.Path(__file__).with_name("app.json")),
                 },
             ):
                 server = load_local_module(
@@ -111,7 +111,7 @@ def test_all_routes_preserve_scopes_and_broker_argv(
 
 def test_wifi_connect_requests_network_and_secret_scopes():
     completed = mock.Mock(returncode=0, stdout=json.dumps({"changed": True}), stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         result = main.connect_wifi("Cafe", "default/cafe_psk")
@@ -147,7 +147,7 @@ def test_wifi_connect_validates_before_policy(ssid, credential, message):
 
 def test_airplane_maps_to_fixed_scope():
     completed = mock.Mock(returncode=0, stdout=json.dumps({"changed": True}), stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         main.set_airplane_mode("on")
@@ -183,7 +183,7 @@ def test_invalid_airplane_state_is_rejected_before_policy():
 )
 def test_broker_failures_raise(returncode, stdout, message):
     completed = mock.Mock(returncode=returncode, stdout=stdout, stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match=message):
@@ -201,7 +201,7 @@ def test_missing_broker_executable_raises():
 
 
 def test_broker_timeout_raises():
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(
         main.subprocess,

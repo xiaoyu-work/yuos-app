@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(claw-desktop-shell LANGUAGES NONE)
+project(yuos-desktop-shell LANGUAGES NONE)
 
 include(ExternalProject)
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
@@ -21,7 +21,7 @@ execute_process(
 file(READ "${qt_prefix_file}" qt_prefix)
 set(shapes_payload "${CMAKE_CURRENT_BINARY_DIR}/payload-shapes")
 set(presentation_payload "${CMAKE_CURRENT_BINARY_DIR}/payload-presentation")
-set(qml_directory "share/claw-desktop-shell/qml")
+set(qml_directory "share/yuos-desktop-shell/qml")
 set(common_args
     "-DQt6_DIR=${qt_prefix}/lib/cmake/Qt6"
     "-DCMAKE_PREFIX_PATH=${qt_prefix}"
@@ -60,7 +60,7 @@ ExternalProject_Add(desktop-presentation
         -DDISTRIBUTOR=Claw
         "-DENABLE_MODULES=plugin|shell"
         "-DINSTALL_QMLDIR=${qml_directory}"
-        -DINSTALL_QSCONFDIR=share/claw-desktop-shell
+        -DINSTALL_QSCONFDIR=share/yuos-desktop-shell
     BUILD_COMMAND "${CMAKE_COMMAND}" --build <BINARY_DIR> --parallel 2
     BUILD_ALWAYS ON
     INSTALL_COMMAND "${CMAKE_COMMAND}" -E rm -rf "${presentation_payload}"
@@ -89,11 +89,11 @@ ExternalProject_Add(desktop-engine
 )
 
 install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/quickshell/src/quickshell"
-    DESTINATION bin RENAME claw-desktop-shell)
+    DESTINATION bin RENAME yuos-desktop-shell)
 install(DIRECTORY "${shapes_payload}/usr/share/" DESTINATION share USE_SOURCE_PERMISSIONS)
 install(DIRECTORY "${presentation_payload}/usr/share/" DESTINATION share USE_SOURCE_PERMISSIONS)
 
-set(license_directory "share/claw-desktop-shell/licenses")
+set(license_directory "share/yuos-desktop-shell/licenses")
 install(FILES quickshell/LICENSE quickshell/LICENSE-GPL DESTINATION "${license_directory}/quickshell")
 install(FILES m3shapes/LICENSE DESTINATION "${license_directory}/material-shapes")
 install(FILES caelestia/plugin/3rdparty/libcava/LICENSE DESTINATION "${license_directory}/libcava")

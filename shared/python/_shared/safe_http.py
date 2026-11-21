@@ -8,7 +8,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-from cos_runtime import egress, policy
+from yuos_runtime import egress, policy
 
 try:
     import idna

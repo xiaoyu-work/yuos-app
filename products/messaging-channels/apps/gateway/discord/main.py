@@ -18,7 +18,7 @@ from typing import Any
 from gateway._shared import atomic, channels, gateway_memory, safe_egress, safe_subprocess
 
 try:
-    from cos_runtime import policy as _cos_policy
+    from yuos_runtime import policy as _cos_policy
 except ImportError:
     _cos_policy = None
 
@@ -26,15 +26,15 @@ _POLICY_ERRORS = (_cos_policy.PolicyError,) if _cos_policy is not None else ()
 PLATFORM = "discord"
 VERSION = "0.3.0"
 DISCORD_API = "https://discord.com/api/v10"
-USER_AGENT = "DiscordBot (https://github.com/xiaoyu-work/claw-os, 0.3.0)"
+USER_AGENT = "DiscordBot (https://github.com/xiaoyu-work/Yu-OS, 0.3.0)"
 MAX_MESSAGE_LEN = 2000
 DEFAULT_RPM = 5
-ENV_TOKEN = "COS_DISCORD_TOKEN"
-ENV_ALLOWED_USERS = "COS_DISCORD_ALLOWED_USERS"
-ENV_ALLOWED_GUILDS = "COS_DISCORD_ALLOWED_GUILDS"
-ENV_ALLOWED_CHANNELS = "COS_DISCORD_ALLOWED_CHANNELS"
-ENV_REQUIRE_MENTION = "COS_DISCORD_REQUIRE_MENTION"
-ENV_RPM = "COS_DISCORD_RPM"
+ENV_TOKEN = "YUOS_DISCORD_TOKEN"
+ENV_ALLOWED_USERS = "YUOS_DISCORD_ALLOWED_USERS"
+ENV_ALLOWED_GUILDS = "YUOS_DISCORD_ALLOWED_GUILDS"
+ENV_ALLOWED_CHANNELS = "YUOS_DISCORD_ALLOWED_CHANNELS"
+ENV_REQUIRE_MENTION = "YUOS_DISCORD_REQUIRE_MENTION"
+ENV_RPM = "YUOS_DISCORD_RPM"
 _ID_RE = re.compile(r"^\d{1,20}$")
 
 
@@ -43,9 +43,9 @@ class DiscordApiError(Exception):
 
 
 def _state_dir() -> str:
-    base = os.environ.get("COS_DATA_DIR")
+    base = os.environ.get("YUOS_DATA_DIR")
     if not base:
-        base = os.path.join(os.environ.get("LOCALAPPDATA") or os.path.expanduser("~"), "cos") if sys.platform == "win32" else "/var/lib/cos"
+        base = os.path.join(os.environ.get("LOCALAPPDATA") or os.path.expanduser("~"), "yuos") if sys.platform == "win32" else "/var/lib/yuos"
     path = os.path.join(base, "apps", "gateway-discord")
     os.makedirs(path, exist_ok=True)
     return path
@@ -178,14 +178,14 @@ def _configure(args: Any) -> dict[str, Any]:
 
 
 def _cos_bin() -> str:
-    return os.environ.get("COS_BIN", "yu")
+    return os.environ.get("YUOS_BIN", "yu")
 
 
 def _load_token() -> str:
     env_token = os.environ.get(ENV_TOKEN)
     if env_token:
         return env_token.strip()
-    token, error = safe_subprocess.safe_credential_load("discord_bot_token", timeout=10.0, cos_bin=_cos_bin())
+    token, error = safe_subprocess.safe_credential_load("discord_bot_token", timeout=10.0, yu_bin=_cos_bin())
     if token is None:
         raise RuntimeError(error or "discord_bot_token is not configured; run `yu credential store discord_bot_token <token>`")
     return token
@@ -308,6 +308,6 @@ def run(command, args):
 
 
 if __name__ == "__main__":
-    cmd = os.environ.get("COS_COMMAND") or (sys.argv[1] if len(sys.argv) > 1 else "")
-    raw_args = os.environ.get("COS_ARGS_JSON")
+    cmd = os.environ.get("YUOS_COMMAND") or (sys.argv[1] if len(sys.argv) > 1 else "")
+    raw_args = os.environ.get("YUOS_ARGS_JSON")
     print(json.dumps(run(cmd, json.loads(raw_args) if raw_args else sys.argv[2:])))

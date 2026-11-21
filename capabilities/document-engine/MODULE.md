@@ -20,7 +20,7 @@ resolve its named export and the immutable OS SDK/runtime dependency, never a
 sibling checkout. Doc-only staging installs `doc` and `claw_files`, not the
 Files Apps or any native UI. Files/Doc co-staging refuses conflicting libraries.
 The OS supplies SDK/runtime; the separately staged App common runtime supplies
-`canonical_argv` from the same `/usr/lib/cos/python` import root.
+`canonical_argv` from the same `/usr/lib/yuos/python` import root.
 
 Read/info retain their exact file/metadata checks and descriptor-safe behavior;
 convert retains its existing read/write declaration and output behavior.

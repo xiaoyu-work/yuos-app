@@ -26,7 +26,7 @@ BACKUP_TOKEN = "ABCDEF0123456789ABCDEF0123456789"
 def invoke(request):
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
         os.environ, {
-            "COS_APP_MANIFEST": str(pathlib.Path(__file__).with_name("app.json")),
+            "YUOS_APP_MANIFEST": str(pathlib.Path(__file__).with_name("app.json")),
         },
     ):
         server = load_local_module(
@@ -87,7 +87,7 @@ def _canonical_paths():
 
 def test_inspect_uses_exact_scope_and_argv(invoke):
     with _canonical_paths(), mock.patch.dict(
-        os.environ, {"COS_BIN": "/usr/local/bin/yu"}
+        os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}
     ), mock.patch.object(main.policy, "require") as require, mock.patch.object(
         main.subprocess, "run", return_value=_completed({"content": "hosts"})
     ) as run:
@@ -107,7 +107,7 @@ def test_inspect_uses_exact_scope_and_argv(invoke):
 
 def test_validate_uses_exact_scopes_and_argv(invoke):
     with _canonical_paths(), mock.patch.dict(
-        os.environ, {"COS_BIN": "/usr/local/bin/yu"}
+        os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}
     ), mock.patch.object(main.policy, "require") as require, mock.patch.object(
         main.subprocess, "run", return_value=_completed({"valid": True})
     ) as run:
@@ -130,7 +130,7 @@ def test_validate_uses_exact_scopes_and_argv(invoke):
 
 def test_apply_uses_exact_scopes_and_argv(invoke):
     with _canonical_paths(), mock.patch.dict(
-        os.environ, {"COS_BIN": "/usr/local/bin/yu"}
+        os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}
     ), mock.patch.object(main.policy, "require") as require, mock.patch.object(
         main.subprocess, "run", return_value=_completed({"applied": True})
     ) as run:
@@ -154,7 +154,7 @@ def test_apply_uses_exact_scopes_and_argv(invoke):
 
 def test_restore_uses_exact_scope_and_normalized_token_argv(invoke):
     with _canonical_paths(), mock.patch.dict(
-        os.environ, {"COS_BIN": "/usr/local/bin/yu"}
+        os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}
     ), mock.patch.object(main.policy, "require") as require, mock.patch.object(
         main.subprocess, "run", return_value=_completed({"restored": True})
     ) as run:
@@ -303,7 +303,7 @@ def test_confirmation_requires_real_true_before_policy(action, confirm):
 def test_broker_payload_failures_raise(returncode, stdout, stderr, message):
     completed = mock.Mock(returncode=returncode, stdout=stdout, stderr=stderr)
     with _canonical_paths(), mock.patch.dict(
-        os.environ, {"COS_BIN": "/usr/local/bin/yu"}
+        os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}
     ), mock.patch.object(main.policy, "require"), mock.patch.object(
         main.subprocess, "run", return_value=completed
     ):
@@ -338,7 +338,7 @@ def test_missing_broker_executable_raises():
 )
 def test_broker_launch_failures_raise(error, exception, message):
     with _canonical_paths(), mock.patch.dict(
-        os.environ, {"COS_BIN": "/usr/local/bin/yu"}
+        os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}
     ), mock.patch.object(main.policy, "require"), mock.patch.object(
         main.subprocess, "run", side_effect=error
     ):
@@ -348,7 +348,7 @@ def test_broker_launch_failures_raise(error, exception, message):
 
 def test_broker_timeout_raises():
     with _canonical_paths(), mock.patch.dict(
-        os.environ, {"COS_BIN": "/usr/local/bin/yu"}
+        os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}
     ), mock.patch.object(main.policy, "require"), mock.patch.object(
         main.subprocess,
         "run",

@@ -39,7 +39,7 @@ pub struct Status {
 }
 
 pub async fn status() -> Result<Status, Failure> {
-    let response = claw_os_sdk::cos_call_json_async_with_binary(
+    let response = yuos_sdk::yu_call_json_async_with_binary(
         "/usr/local/bin/yu", "regional-settings", "control",
         ["__regional-settings".to_owned(), json_request("status")],
     ).await.map_err(classify)?;
@@ -73,7 +73,7 @@ pub struct TimeStatus {
 }
 
 pub async fn time_status() -> Result<TimeStatus, Failure> {
-    let response = claw_os_sdk::cos_call_json_async_with_binary(
+    let response = yuos_sdk::yu_call_json_async_with_binary(
         "/usr/local/bin/yu", "regional-settings", "control",
         ["__regional-settings".to_owned(), json_request("time_status")],
     ).await.map_err(classify)?;
@@ -160,7 +160,7 @@ enum ReviewStatus {
 }
 
 pub async fn call(change: Change) -> Result<(), Failure> {
-    let response = claw_os_sdk::cos_call_json_async_with_binary(
+    let response = yuos_sdk::yu_call_json_async_with_binary(
         "/usr/local/bin/yu",
         "regional-settings",
         "control",
@@ -175,17 +175,17 @@ pub async fn call(change: Change) -> Result<(), Failure> {
     decode(&change, response)
 }
 
-fn classify(error: claw_os_sdk::BridgeError) -> Failure {
+fn classify(error: yuos_sdk::BridgeError) -> Failure {
     match error {
-        claw_os_sdk::BridgeError::AppError { code, message, .. } if code == "PERMISSION_DENIED" => {
+        yuos_sdk::BridgeError::AppError { code, message, .. } if code == "PERMISSION_DENIED" => {
             Failure::Denied(message)
         }
-        claw_os_sdk::BridgeError::AppError { code, message, .. }
+        yuos_sdk::BridgeError::AppError { code, message, .. }
             if code == "KERNEL_UNAVAILABLE" =>
         {
             Failure::Unavailable(message)
         }
-        claw_os_sdk::BridgeError::BinaryNotFound(error) => Failure::Unavailable(error.to_string()),
+        yuos_sdk::BridgeError::BinaryNotFound(error) => Failure::Unavailable(error.to_string()),
         other => Failure::Unconfirmed(other.to_string()),
     }
 }

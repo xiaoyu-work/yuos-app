@@ -39,7 +39,7 @@ def test_original_nested_workspace_patches_and_full_default_graph(tmp_path):
     main = tomllib.loads((output / "cosmic-settings/Cargo.toml").read_text())
     assert main["features"]["default"] == ["a11y", "linux", "single-instance", "wgpu"]
     assert len([feature for feature in main["features"]["linux"] if feature.startswith("page-")]) == 16
-    for library in ("claw-os-sdk", "cos-runtime"):
+    for library in ("yuos-sdk", "yuos-runtime"):
         assert main["dependencies"][library]["path"] == str(tmp_path / "platform" / library / "rust")
     assert (output / "Cargo.lock").read_bytes() == (NATIVE / "Cargo.lock").read_bytes()
     for path in ("i18n/en/cosmic_settings.ftl", "page/src/lib.rs", "pages/wallpapers/src/lib.rs",
@@ -55,14 +55,14 @@ def test_permission_restoration_has_no_app_owned_approval_transport():
     ]
     for source in sources:
         text = source.read_text()
-        for forbidden in ("pkexec", "claw-approval-helper", "permissions::decide",
-                          "Message::Decide", "SystemReview", "clawd_client"):
+        for forbidden in ("pkexec", "yuos-approval-helper", "permissions::decide",
+                          "Message::Decide", "SystemReview", "yuosd_client"):
             assert forbidden not in text, (source, forbidden)
     client = sources[0].read_text()
-    assert "cos_call_json_with_binary" in client
+    assert "yu_call_json_with_binary" in client
     assert '"/usr/local/bin/yu"' in client and '"__app-permissions"' in client
     cargo = tomllib.loads((NATIVE / "cosmic-settings/Cargo.toml").read_text())
-    assert "clawd-client" not in cargo["dependencies"]
+    assert "yuosd-client" not in cargo["dependencies"]
     labels = (NATIVE / "i18n/en/cosmic_settings.ftl").read_text()
     assert "app-permissions-approve =" not in labels
     assert "app-permissions-deny =" not in labels
@@ -100,7 +100,7 @@ def test_native_users_have_one_protected_transport_without_app_owned_authority()
                       "std::process::Command", "tokio::process::Command"):
         assert forbidden not in page, forbidden
         assert forbidden not in client, forbidden
-    assert "cos_call_json_async_with_binary" in client
+    assert "yu_call_json_async_with_binary" in client
     assert '"/usr/local/bin/yu"' in client and '"__users"' in client
     assert '"--uid"' in client and '"--icon"' in client
     assert '"--credential"' not in client
@@ -132,14 +132,14 @@ def test_system_authority_is_never_installed_or_removed_by_the_product():
     keyboard = (NATIVE / "cosmic-settings/src/pages/input/keyboard/mod.rs").read_text()
     assert 'config.set("xkb_config", xkb)' in keyboard
     regional = (NATIVE / "cosmic-settings/src/regional_settings.rs").read_text()
-    assert "cos_call_json_async_with_binary" in regional
+    assert "yu_call_json_async_with_binary" in regional
     assert '"__regional-settings"' in regional
 
 
 @pytest.fixture
 def human(monkeypatch):
-    monkeypatch.delenv("COS_MCP_SERVER", raising=False)
-    monkeypatch.setenv("COS_SESSION", "fixture-session")
+    monkeypatch.delenv("YUOS_MCP_SERVER", raising=False)
+    monkeypatch.setenv("YUOS_SESSION", "fixture-session")
     module = load_local_module(NATIVE / "human_bridge.py", "settings_human")
     events = []
     monkeypatch.setattr(module.policy, "require", lambda verb, **scope: events.append((verb, scope)))
@@ -172,11 +172,11 @@ def test_human_adapters_fail_closed_before_mutations(human, tmp_path, monkeypatc
     source = tmp_path / "source"
     source.write_text("unchanged")
     request = {"operation": "remove", "arguments": {"path": str(source)}}
-    monkeypatch.setenv("COS_MCP_SERVER", "1")
+    monkeypatch.setenv("YUOS_MCP_SERVER", "1")
     with pytest.raises(PermissionError):
         module.dispatch(request)
     assert events == [] and source.read_text() == "unchanged"
-    monkeypatch.delenv("COS_MCP_SERVER")
+    monkeypatch.delenv("YUOS_MCP_SERVER")
     def denied(*args, **kwargs):
         raise PermissionError("denied")
     monkeypatch.setattr(module.policy, "require", denied)

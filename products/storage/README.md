@@ -6,7 +6,7 @@ It preserves separate observation/diagnostic permissions and exact-device
 mount authority.
 
 UDisks2 execution, block-device validation and no-repair checkers remain
-behind the Claw OS broker. Existing mounted data, installed App identity and
+behind the Yu OS broker. Existing mounted data, installed App identity and
 permissions do not change. This is storage management, not a shared database
 interface for other products.
 

@@ -134,14 +134,14 @@ def test_native_preparation_preserves_bytes_modes_licenses_and_raw_manifest(prod
     for license_path in license_files(selected.license.parent):
         target = result.root / "licenses" / license_path.relative_to(selected.license.parent)
         assert target.read_bytes() == license_path.read_bytes()
-    support_license = result.root / "licenses/claw-app-gui-argv/LICENSE"
+    support_license = result.root / "licenses/yuos-app-gui-argv/LICENSE"
     if product == "notifications":
         assert not support_license.exists()
     else:
         assert support_license.read_bytes() == (ROOT / "LICENSE").read_bytes()
         assert support_license.stat().st_mode == (ROOT / "LICENSE").stat().st_mode
     assert not (result.root / ".provenance.json").exists()
-    assert not (result.root / "usr/lib/cos/python").exists()
+    assert not (result.root / "usr/lib/yuos/python").exists()
     snapshots.validate_manifest_entries(result.root, json.loads(original), result.entrypoints)
     with pytest.raises(ValueError, match="declared signed"):
         snapshots.validate_manifest_entries(result.root, json.loads(original), [])
@@ -175,8 +175,8 @@ def test_native_preparation_resolves_flat_and_nested_app_owned_gui_support(tmp_p
     manifest.parent.mkdir(exist_ok=True)
     original = (
         "[dependencies]\n"
-        f'claw-app-gui-argv = {{ path = "{"../" * (4 + depth)}shared/rust/gui-argv" }}\n'
-        f'claw-os-sdk = {{ path = "{"../" * (3 + depth)}claw-os-sdk/rust" }}\n'
+        f'yuos-app-gui-argv = {{ path = "{"../" * (4 + depth)}shared/rust/gui-argv" }}\n'
+        f'yuos-sdk = {{ path = "{"../" * (3 + depth)}yuos-sdk/rust" }}\n'
     )
     manifest.write_text(original)
     toolkit = tmp_path / "verified-platform/desktop/toolkit"
@@ -184,8 +184,8 @@ def test_native_preparation_resolves_flat_and_nested_app_owned_gui_support(tmp_p
     destination = tmp_path / "prepared"
     native_build.prepare("fixture", toolkit, destination)
     dependencies = tomllib.loads((destination / manifest.relative_to(source)).read_text())["dependencies"]
-    assert dependencies["claw-app-gui-argv"]["path"] == (repository / "shared/rust/gui-argv").as_posix()
-    assert dependencies["claw-os-sdk"]["path"] == (toolkit.parents[1] / "claw-os-sdk/rust").as_posix()
+    assert dependencies["yuos-app-gui-argv"]["path"] == (repository / "shared/rust/gui-argv").as_posix()
+    assert dependencies["yuos-sdk"]["path"] == (toolkit.parents[1] / "yuos-sdk/rust").as_posix()
     assert manifest.read_text() == original
     assert not (repository / "shared").exists()
 

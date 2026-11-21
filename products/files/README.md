@@ -12,7 +12,7 @@ existence, permission or rollback guarantees. See
 
 The `docs` App adds four MCP tools for Recoll document search, indexing, status
 and configuration. It uses the owner's existing `~/.recoll` state, with
-`COS_OWNER_HOME` supplied by the OS host rather than the service's private home.
+`YUOS_OWNER_HOME` supplied by the OS host rather than the service's private home.
 Recoll remains an external system dependency; its background index service is
 OS-owned. The product does not duplicate that service or add semantic search.
 

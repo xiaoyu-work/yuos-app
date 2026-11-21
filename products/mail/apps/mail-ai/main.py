@@ -1,7 +1,7 @@
 """Shared Mail AI business functions for MCP and Thunderbird Native Messaging.
 
 Both transports call these typed functions in process. AI access goes through
-the kernel gate via ``claw_os_sdk.ai``; credentials, consent, budgets, safety
+the kernel gate via ``yuos_sdk.ai``; credentials, consent, budgets, safety
 and audit stay there. Summary and notable-triage memory writes retain the
 existing ``mail-ai`` self scope. No mailbox ownership or App-to-App calls live
 here: this is the preparatory M1 foundation, not a unified Mail product yet.
@@ -24,8 +24,8 @@ from __future__ import annotations
 import json
 import re
 
-from claw_os_sdk import ai
-from cos_runtime import memory, policy
+from yuos_sdk import ai
+from yuos_runtime import memory, policy
 
 
 # ---------------------------------------------------------------------------

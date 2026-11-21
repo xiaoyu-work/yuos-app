@@ -34,9 +34,9 @@ def _denied(code, detail=None):
 def client(tmp_path, request):
     stage = load_local_module(ROOT / "tools/stage.py", "claw_summary_test_stage")
     assert stage.stage("ai-helpers", tmp_path / "stage", kind="capability") == ["summarize"]
-    python = tmp_path / "stage/usr/lib/cos/python"
+    python = tmp_path / "stage/usr/lib/yuos/python"
     stage_platform_python(python)
-    app = tmp_path / "stage/usr/lib/cos/apps/summarize"
+    app = tmp_path / "stage/usr/lib/yuos/apps/summarize"
     manifest = json.loads((app / "app.json").read_text())
     if request.param == "private-module":
         (app / "main.py").rename(app / "summary_client.py")
@@ -78,10 +78,10 @@ def client(tmp_path, request):
         import json, os, sys
         from pathlib import Path
         assert sys.argv[1] == "--wire=1", sys.argv
-        assert os.environ["COS_APP_ID"] == "summarize"
-        assert os.environ["COS_SESSION"] == "summary-fixture"
+        assert os.environ["YUOS_APP_ID"] == "summarize"
+        assert os.environ["YUOS_SESSION"] == "summary-fixture"
         args = sys.argv[2:]
-        record = {"app": os.environ["COS_APP_ID"], "session": os.environ["COS_SESSION"]}
+        record = {"app": os.environ["YUOS_APP_ID"], "session": os.environ["YUOS_SESSION"]}
         if args[:2] == ["__policy", "check"]:
             assert args[2:] == ["ai.chat.untrusted", "--wild"], args
             kind = "policy"
@@ -115,8 +115,8 @@ def client(tmp_path, request):
     """))
     peer.chmod(0o755)
     with mcp_process(app, env={
-        "PATH": os.defpath, "PYTHONPATH": str(python), "CLAW_COS_BIN": str(peer),
-        "COS_DATA_DIR": str(data), "COS_SESSION": "summary-fixture", "TMPDIR": str(private),
+        "PATH": os.defpath, "PYTHONPATH": str(python), "YUOS_KERNEL_BIN": str(peer),
+        "YUOS_DATA_DIR": str(data), "YUOS_SESSION": "summary-fixture", "TMPDIR": str(private),
         "TEST_WIRE_LOG": str(log), "TEST_RESPONSES": str(settings),
     }) as rpc:
         def call(arguments):

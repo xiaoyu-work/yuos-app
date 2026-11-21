@@ -13,7 +13,7 @@ default `https://ntfy.sh`; explicit authentication remains caller-controlled.
 
 The OS Notification Service separately owns durable records, owner isolation,
 DND, deduplication, leases, retries and acknowledgements. Its Rust ntfy adapter
-and deterministic dispatcher stay in `claw-os` and do not call this App.
+and deterministic dispatcher stay in `yuos` and do not call this App.
 Source relocation does not connect this one-shot path to that queue, add a
 database or claim end-to-end durable delivery. Any later integration must use
 the existing service contract, not duplicate its state machine.

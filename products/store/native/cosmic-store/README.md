@@ -1,9 +1,9 @@
 # cosmic-store
 WIP COSMIC Store
 
-## Claw OS MCP service
+## Yu OS MCP service
 
-The App Host starts `/usr/bin/cosmic-store` with `COS_MCP_SERVER=1`.
+The App Host starts `/usr/bin/cosmic-store` with `YUOS_MCP_SERVER=1`.
 The product's `apps/cosmic-store/app.json` is the sole authority for the Store MCP tool
 catalog and its capability requirements.
 

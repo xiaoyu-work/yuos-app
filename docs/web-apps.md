@@ -28,7 +28,7 @@ submit handler. Do not add `allow-forms` or same-origin access to make a form
 work. A required confirmation remains unchecked until the user selects it.
 
 The App Store obtains only authenticated release metadata and immutable
-payloads from `xiaoyu-work/clawos-app`. Installation uses the OS's protected
+payloads from `xiaoyu-work/yuos-app`. Installation uses the OS's protected
 human review and verified directory installer. Catalog signatures, package
 signatures, digests and freshness checks are complementary; none grants
 runtime permissions. A missing release, unsupported resource or dependency
@@ -38,7 +38,7 @@ Source UI completion is not release approval. The existing publication gate,
 independent versions, platform pin, installed identities and native resource
 acceptance requirements remain unchanged.
 
-Release publication additionally requires an owner-approved published `cos`
+Release publication additionally requires an owner-approved published `yu`
 provenance tool URL/SHA256, its App publisher key ID, the public
 `CLAW_APPS_PROVENANCE_PUBLISHER_JSON` repository variable, and the dedicated
 `CLAW_APPS_PROVENANCE_SIGNING_PRIVATE_KEY` secret. The public OS signer signs

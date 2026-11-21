@@ -1,6 +1,6 @@
 {
   "extension_name":            { "message": "Yu Mail AI" },
-  "extension_description":     { "message": "On-device AI assistant for Thunderbird, routed through claw-os." },
+  "extension_description":     { "message": "On-device AI assistant for Thunderbird, routed through yuos." },
 
   "action_title":              { "message": "Yu AI Assistant" },
   "summarize_title":           { "message": "Summary" },

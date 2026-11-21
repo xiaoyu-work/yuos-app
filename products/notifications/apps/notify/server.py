@@ -1,7 +1,7 @@
 from collections.abc import Callable
 
-from claw_os_sdk import kernel
-from claw_os_sdk.mcp import App, ToolResult
+from yuos_sdk import kernel
+from yuos_sdk.mcp import App, ToolResult
 from main import list_notifications, send
 
 app = App.from_manifest()

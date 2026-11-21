@@ -59,7 +59,7 @@ def build_interfaces(plan, selection, output):
     output.mkdir(parents=True, exist_ok=True)
     root = output / ".notification-interfaces"
     root.mkdir()
-    filename = f"claw-app-interfaces-{plan['version']}.tar.gz"
+    filename = f"yuos-app-interfaces-{plan['version']}.tar.gz"
     target = output / filename
     try:
         manifest = prepare_sources(root, plan)
@@ -86,7 +86,7 @@ def verify_interfaces(path, record, plan):
     if record.get("integration_status") != INTEGRATION_STATUS or record["format"] != FORMAT or (
         record["selection"] != "notifications"
     ) or record["filename"] != (
-        f"claw-app-interfaces-{plan['version']}.tar.gz"
+        f"yuos-app-interfaces-{plan['version']}.tar.gz"
     ):
         raise ValueError("Invalid OS interface archive identity")
     with tempfile.TemporaryDirectory(prefix="interface-check-", dir=ROOT / "build") as temporary:

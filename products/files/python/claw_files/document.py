@@ -6,7 +6,7 @@ import io
 import json
 import os
 import stat
-from cos_runtime import policy
+from yuos_runtime import policy
 
 
 class _OpenedDocument:

@@ -2,7 +2,7 @@
 
 By default, `platform_dependency.py` fetches only the versioned public platform
 artifact selected by `platform.lock.json`. `platform_archive.py` verifies its public
-`claw.app-platform/v1` inventory and extracts it with `tarfile`'s data filter.
+`yuos.app-platform/v1` inventory and extracts it with `tarfile`'s data filter.
 No Git fetching, OS source checkout, sibling lookup or unverified cache fallback
 remains. Its Python paths include the named SDK/runtime exports and local
 App-owned `shared/python`, never OS `apps/`.
@@ -30,7 +30,7 @@ use the same contract rather than copying another native host implementation.
 
 The lock has exactly `version` (release SemVer), `url` (HTTPS),
 `sha256` (64 hexadecimal characters), and `runtime_abi` (currently integer `1`).
-It may additionally declare `schema: "claw.app-platform/v1"`. Old repository,
+It may additionally declare `schema: "yuos.app-platform/v1"`. Old repository,
 revision and source-selection fields are errors. Publication must supply the
 real release URL and digest; a probe fixture or placeholder is not a release pin.
 `validate_lock(lock)` exposes that same pure validation to release callers;
@@ -73,7 +73,7 @@ capability and sandbox contract. A signed archive or Debian package is not a
 permission grant or authorization to run an App-supplied root hook.
 
 `stage_shared(destination)` separately stages the common App support dependency
-to `destination/usr/lib/cos/python`; `--shared --root <destination>` is its CLI.
+to `destination/usr/lib/yuos/python`; `--shared --root <destination>` is its CLI.
 The exact owned entries are `_shared/`, `gateway/` and `canonical_argv.py`.
 Individual product/capability staging does not duplicate them. Both installed
 Python Apps and native embedded clients use this root, alongside OS SDK/runtime.
@@ -155,7 +155,7 @@ local OS-built probe can test real SDK imports without a production override:
 ```bash
 PYTHONPATH=tests:shared/python python3 -m pytest -q --import-mode=importlib \
   tests/test_platform_dependency.py \
-  --platform-artifact-fixture=/path/to/claw-os-app-platform-1.0.0.tar.gz
+  --platform-artifact-fixture=/path/to/yuos-app-platform-1.0.0.tar.gz
 ```
 
 The optional test fixture path is test-only; production always uses the lock's
@@ -178,7 +178,7 @@ installed resource checks, isolated MCP and a private MPRIS fixture built from
 the actual native backend. Fixtures never connect to the user's desktop bus.
 Notifications retains its standalone graph and private daemon/config/util
 packages, but no longer exports config/util libraries. OS consumers use
-`claw-os-sdk/rust/notification-presentation` from the normal SDK artifact.
+`yuos-sdk/rust/notification-presentation` from the normal SDK artifact.
 Other declared data-only library fixtures retain path/identity checks; retired
 Notifications exports cannot re-enter release or development artifacts.
 Notifications process fixtures cover installed isolated MCP and actual private-FD
@@ -220,7 +220,7 @@ or workflow `fixtures=true`), never a distribution prerequisite.
 No native product implementation, OS source
 checkout, or installed-system archive dependency is introduced.
 The release layer delegates source staging but removes dependency-owned Python
-trees from consumer packages; `claw-app-support` and named library owners alone
+trees from consumer packages; `yuos-app-support` and named library owners alone
 install those shared paths. Runtime dependencies are public versioned service/
 library ABIs, not an OS source revision. See
 [release commands and prerequisites](../docs/releases.md) and
@@ -269,12 +269,12 @@ From the App repository root, with the archive and `EXPECTED_SHA256` supplied:
 
 ```bash
 python3 tools/test.py mail \
-  --development-platform build/local-platform/claw-os-app-platform-0.1.0.tar.gz \
+  --development-platform build/local-platform/yuos-app-platform-0.1.0.tar.gz \
   --development-platform-version 0.1.0 \
   --development-platform-sha256 "$EXPECTED_SHA256"
 
 python3 tools/native_build.py launcher check \
-  --development-platform build/local-platform/claw-os-app-platform-0.1.0.tar.gz \
+  --development-platform build/local-platform/yuos-app-platform-0.1.0.tar.gz \
   --development-platform-version 0.1.0 \
   --development-platform-sha256 "$EXPECTED_SHA256"
 ```

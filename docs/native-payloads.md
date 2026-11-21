@@ -6,7 +6,7 @@ and Widget Rail. It is not permission to publish or an assertion of
 GUI/resource integration acceptance.
 
 Clipboard History preserves `panel-clipboard` and its `open` desktop selector.
-Its real `bin/claw-applet-clipboard` serves both the unchanged native popup and
+Its real `bin/yuos-applet-clipboard` serves both the unchanged native popup and
 four manifest-bound history MCP tools. Its original installer exports the
 program name; compatibility preparation replaces that command with the common
 Host launcher while preserving the original ELF, desktop resource and GPL
@@ -97,21 +97,21 @@ bin/<auxiliary-program>          owned ELF; Host selection requires an explicit 
 resources/usr/share/...          original installed resource bytes
 LICENSE
 licenses/...                     original native license/copyright/notice files
-licenses/claw-app-gui-argv/LICENSE  root Apache-2.0 license in helper-consuming Apps
+licenses/yuos-app-gui-argv/LICENSE  root Apache-2.0 license in helper-consuming Apps
 .provenance.json                 supplied only by the existing public signer
 ```
 
 No SDK/runtime, common Python support, user configuration or state is copied
 into this directory. Common imports remain the separately owned
-`/usr/lib/cos/python` contract. There is no package-local venv/import activation.
+`/usr/lib/yuos/python` contract. There is no package-local venv/import activation.
 Ordinary `tools/stage.py` still stages source; it does not fabricate missing
 compiled binaries.
 
 ## Native argv adaptation
 
 The native contract is `[argv0, desktop.exec, user arguments...]`, not an empty
-native argv reconstructed from `COS_ARGS_JSON`. The App-owned std-only
-[`claw-app-gui-argv`](../shared/rust/gui-argv/src/lib.rs) consumes exactly one
+native argv reconstructed from `YUOS_ARGS_JSON`. The App-owned std-only
+[`yuos-app-gui-argv`](../shared/rust/gui-argv/src/lib.rs) consumes exactly one
 leading `--gui` only when the existing SDK `gui::is_gui_launch()` observes GUI
 mode. It retains argv0 and every remaining OS string in order. A repeated
 selector, a flag-looking option value or text after `--` stays with the original
@@ -143,7 +143,7 @@ mounts, file/URI access, provider execution or permission acquisition.
 
 `native_build.py build --release --install-root build/<destination>` runs the
 same original installer privately, stages the App under
-`usr/lib/cos/apps/<identity>/`, and exports the primary legacy program name
+`usr/lib/yuos/apps/<identity>/`, and exports the primary legacy program name
 only as a fixed common-Host launcher:
 
 ```text
@@ -189,7 +189,7 @@ It is not a physical-device, KMS or complete installed-image qualification.
 | GUI permissions | Mandatory and optional needs use the ordinary exact-owner flow and live revocation. Protected file read/write/create and OS FileChooser metadata remain separate. Layer-shell requires explicit `ui.panel`; MCP needs are never unioned and neither a returned filename nor installation grants authority. |
 | Files companion | The separate signed `cosmic-files-applet` uses its explicit `desktop.entries.applet` and `ui.panel`/Desktop metadata needs. Default Files has real Home-metadata window acceptance; the auxiliary uses the independently checked generic entry/role boundary. The OS FileManager1 facade owns URI transport, without raw App owner-bus access. Physical desktop layout remains deployment qualification. |
 | Settings authority ownership | Desktop/first-boot policy remains OS-owned. Native owner config, regional and device flows use closed Root providers with independent named capabilities, while file/folder/save decisions use the shared protected picker and selected-file resources. Empty mandatory startup and every optional right ungranted are verified, without an App permission store or owner-tree mount. |
-| Installed resources and state | Signed read-only resources use `COS_APP_RESOURCE_DIR`/`XDG_DATA_DIRS`. Global catalogs use public `/usr`; existing owner config uses typed Root services and pinned files. `COS_OWNER_HOME` is path context, not a grant. App data stays private and persists across checked Host/UID replacement; no user-state migration is performed. |
+| Installed resources and state | Signed read-only resources use `YUOS_APP_RESOURCE_DIR`/`XDG_DATA_DIRS`. Global catalogs use public `/usr`; existing owner config uses typed Root services and pinned files. `YUOS_OWNER_HOME` is path context, not a grant. App data stays private and persists across checked Host/UID replacement; no user-state migration is performed. |
 | Provider/helper executable identity | Capture uses authenticated descriptor-pinned OS portal helpers. Media uses its actual signed live UI and a Root-held output-only sound helper, never an owner bus or wrapper identity. Notifications uses the public bounded presentation contract and one Root delivery consumer. Cancellation, logout, no-clobber publication and checked cleanup remain enforced; uncertain effects are never automatic replay. |
 
 Files' explicit GUI filesystem needs use the coordinated `owner-path` binding:
@@ -236,7 +236,7 @@ python3 -m pytest -q tests/release/test_snapshots.py \
 ```
 
 The public test CLI must include the
-[linear large-file SHA-256 fix](https://github.com/xiaoyu-work/claw-os/commit/9e1eaab088bc301963f1de3accf69bf6ac148e8f).
+[linear large-file SHA-256 fix](https://github.com/xiaoyu-work/Yu-OS/commit/9e1eaab088bc301963f1de3accf69bf6ac148e8f).
 Older implementations repeatedly drain the front of a whole-file buffer and
 must not be reused for these large native cases. The fix preserves the hashing
 API, compression algorithm, digests and provenance format; no App-side hashing

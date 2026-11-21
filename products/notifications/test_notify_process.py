@@ -7,7 +7,7 @@ import selectors
 import subprocess
 import time
 
-import claw_os_sdk
+import yuos_sdk
 
 from test_support import authenticated_mcp_params, load_local_module
 
@@ -17,12 +17,12 @@ ID = "notif-" + "b" * 32
 # Canned wire responses, not an OS provider or notification state implementation.
 CLI = r'''#!/usr/bin/python3
 import json, os, pathlib, sys, time
-assert os.environ["COS_SESSION"] == "authenticated-worker-session"
+assert os.environ["YUOS_SESSION"] == "authenticated-worker-session"
 assert "DBUS_SESSION_BUS_ADDRESS" not in os.environ
-assert "CLAW_COS_BIN" not in os.environ
+assert "YUOS_KERNEL_BIN" not in os.environ
 assert not pathlib.Path("/run/user").exists()
-assert not pathlib.Path("/run/cos/clawd.sock").exists()
-assert not pathlib.Path("/var/lib/cos").exists()
+assert not pathlib.Path("/run/yuos/yuosd.sock").exists()
+assert not pathlib.Path("/var/lib/yuos").exists()
 args = sys.argv[1:]
 assert args[:5] == ["--wire=1", "__notifications", "request", "--request-stdin", "--deadline"]
 assert len(args) == 6 and int(args[5]) > time.time() * 1000
@@ -69,7 +69,7 @@ def write(process, ident, method, params):
 def test_installed_notify_mcp_sdk_errors_cancellation_and_untouched_history(tmp_path):
     stage = load_local_module(ROOT / "tools/stage.py", "notify_process_stage")
     assert stage.stage("notifications", tmp_path / "installed", ["notify"]) == ["notify"]
-    app = tmp_path / "installed/usr/lib/cos/apps/notify"
+    app = tmp_path / "installed/usr/lib/yuos/apps/notify"
     data = tmp_path / "data"
     data.mkdir()
     history = data / "notifications.json"
@@ -79,10 +79,10 @@ def test_installed_notify_mcp_sdk_errors_cancellation_and_untouched_history(tmp_
     before = history.stat()
     signals = tmp_path / "signals"
     signals.mkdir()
-    cli = tmp_path / "cos-fixture"
+    cli = tmp_path / "yuos-fixture"
     cli.write_text(CLI)
     cli.chmod(0o755)
-    sdk = Path(claw_os_sdk.__file__).parent.parent
+    sdk = Path(yuos_sdk.__file__).parent.parent
     command = [
         "bwrap", "--die-with-parent", "--unshare-all", "--clearenv",
         "--ro-bind", "/usr/bin", "/usr/bin", "--ro-bind", "/usr/lib", "/usr/lib",
@@ -91,10 +91,10 @@ def test_installed_notify_mcp_sdk_errors_cancellation_and_untouched_history(tmp_
         "--ro-bind", str(cli), "/usr/local/bin/yu",
         "--ro-bind", str(app), "/app", "--ro-bind", str(sdk), "/sdk",
         "--bind", str(data), "/state", "--bind", str(signals), "/signals",
-        "--setenv", "COS_APP_MANIFEST", "/app/app.json",
-        "--setenv", "COS_APP_ID", "notify",
-        "--setenv", "COS_SESSION", "authenticated-worker-session",
-        "--setenv", "COS_DATA_DIR", "/state",
+        "--setenv", "YUOS_APP_MANIFEST", "/app/app.json",
+        "--setenv", "YUOS_APP_ID", "notify",
+        "--setenv", "YUOS_SESSION", "authenticated-worker-session",
+        "--setenv", "YUOS_DATA_DIR", "/state",
         "--setenv", "PYTHONPATH", "/sdk", "--setenv", "PYTHONDONTWRITEBYTECODE", "1",
         "--setenv", "HOME", "/state", "--setenv", "TMPDIR", "/state",
         "--chdir", "/app", "--", "/usr/bin/python3", "/app/server.py",
@@ -103,7 +103,7 @@ def test_installed_notify_mcp_sdk_errors_cancellation_and_untouched_history(tmp_
 
     def call(ident, tool, arguments):
         params = authenticated_mcp_params({"name": tool, "arguments": arguments}, call_id=f"call-{ident}")
-        params["_meta"]["claw-os.dev/call-context"]["session_id"] = "forged-metadata-not-authority"
+        params["_meta"]["yuos.dev/call-context"]["session_id"] = "forged-metadata-not-authority"
         write(process, ident, "tools/call", params)
         return response(process, ident)
 

@@ -204,24 +204,24 @@ impl Drop for AccountRequest<'_> {
 }
 
 async fn call(args: Vec<String>) -> Result<Value, Failure> {
-    claw_os_sdk::cos_call_json_async_with_binary("/usr/local/bin/yu", "users", "control", args)
+    yuos_sdk::yu_call_json_async_with_binary("/usr/local/bin/yu", "users", "control", args)
         .await
         .map_err(bridge_failure)
 }
 
-fn bridge_failure(error: claw_os_sdk::BridgeError) -> Failure {
+fn bridge_failure(error: yuos_sdk::BridgeError) -> Failure {
     match error {
-            claw_os_sdk::BridgeError::AppError { code, message, .. }
+            yuos_sdk::BridgeError::AppError { code, message, .. }
                 if code == "PERMISSION_DENIED" =>
             {
                 Failure::Denied(message)
             }
-            claw_os_sdk::BridgeError::AppError { code, message, .. }
+            yuos_sdk::BridgeError::AppError { code, message, .. }
                 if code == "KERNEL_UNAVAILABLE" =>
             {
                 Failure::Unavailable(message)
             }
-            claw_os_sdk::BridgeError::BinaryNotFound(error) => {
+            yuos_sdk::BridgeError::BinaryNotFound(error) => {
                 Failure::Unavailable(error.to_string())
             }
             other => Failure::Unconfirmed(other.to_string()),
@@ -334,7 +334,7 @@ pub(crate) fn decode(change: &Change, value: Value) -> Result<(), Failure> {
 }
 pub async fn apply(change: Change) -> Result<(), Failure> {
     if let Some(request) = change.account_request()? {
-        let value = claw_os_sdk::cos_call_json_async_with_stdin_binary(
+        let value = yuos_sdk::yu_call_json_async_with_stdin_binary(
             "/usr/local/bin/yu", "users", "control",
             ["__system-settings", "--request-stdin"], &request.input,
         ).await.map_err(bridge_failure)?;

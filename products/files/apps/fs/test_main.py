@@ -11,8 +11,8 @@ from unittest import mock
 
 import pytest
 
-from claw_os_sdk.generated import encode_wire_json
-from claw_os_sdk.mcp import MAX_LINE_BYTES
+from yuos_sdk.generated import encode_wire_json
+from yuos_sdk.mcp import MAX_LINE_BYTES
 from test_support import authenticated_mcp_params, load_local_module
 
 
@@ -45,7 +45,7 @@ def file(tmp_path):
 
 @pytest.fixture
 def server(monkeypatch):
-    monkeypatch.setenv("COS_APP_MANIFEST", str(Path(__file__).with_name("app.json")))
+    monkeypatch.setenv("YUOS_APP_MANIFEST", str(Path(__file__).with_name("app.json")))
     with mock.patch.dict(sys.modules, {"main": main, "file_plans": plans}):
         return load_local_module(
             Path(__file__).with_name("server.py"), "claw_test_fs_server"
@@ -618,9 +618,9 @@ def test_maximum_reads_fit_mcp_and_host_frames(server, tmp_path, name, kwargs, d
 
 def test_mcp_snapshots_use_each_authenticated_session(server, file, tmp_path, monkeypatch):
     data = tmp_path / "data"
-    monkeypatch.setenv("COS_DATA_DIR", str(data))
-    monkeypatch.setenv("COS_SESSION", "stale-service-session")
-    monkeypatch.setenv("COS_SNAPSHOT", "1")
+    monkeypatch.setenv("YUOS_DATA_DIR", str(data))
+    monkeypatch.setenv("YUOS_SESSION", "stale-service-session")
+    monkeypatch.setenv("YUOS_SNAPSHOT", "1")
     monkeypatch.setattr(main.snapshot, "snapshot", REAL_SNAPSHOT)
     for session_id, before, after in [
         ("first-session", "hello world", "first"),
@@ -629,7 +629,7 @@ def test_mcp_snapshots_use_each_authenticated_session(server, file, tmp_path, mo
         params = authenticated_mcp_params({
             "name": "fs.write", "arguments": {"path": file, "content": after}
         })
-        params["_meta"]["claw-os.dev/call-context"]["session_id"] = session_id
+        params["_meta"]["yuos.dev/call-context"]["session_id"] = session_id
         result = server.app._handle_request("tools/call", params, True)
         assert not result.get("isError", False)
         entries = list(main.snapshot.iter_entries(session_id))
@@ -637,7 +637,7 @@ def test_mcp_snapshots_use_each_authenticated_session(server, file, tmp_path, mo
         assert entries[0]["path"] == file
         assert Path(entries[0]["_dir"], "blob").read_text() == before
     assert not (data / "trash" / "stale-service-session").exists()
-    params["_meta"]["claw-os.dev/call-context"].pop("session_id")
+    params["_meta"]["yuos.dev/call-context"].pop("session_id")
     params["arguments"]["content"] = "no session"
     result = server.app._handle_request("tools/call", params, True)
     assert not result.get("isError", False)

@@ -50,6 +50,6 @@ def test_twelve_app_identities_remain_independent(tmp_path):
     stage = load_local_module(ROOT / "tools/stage.py", "settings_stage")
     installed = stage.stage("settings", tmp_path)
     assert len(installed) == 12 and len(set(installed)) == 12
-    app = tmp_path / "usr/lib/cos/apps/cosmic-settings"
+    app = tmp_path / "usr/lib/yuos/apps/cosmic-settings"
     assert {path.name for path in app.iterdir()} == {"app.json", "web", "web-ui.json"}
     assert json.loads((app / "app.json").read_text())["id"] == "cosmic-settings"

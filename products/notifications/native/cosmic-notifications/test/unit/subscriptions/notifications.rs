@@ -51,7 +51,7 @@ fn numerical_ids_are_sender_bound_not_hints_or_labels() {
 
 #[tokio::test]
 async fn actual_descriptor_handoff_fans_out_legacy_and_generic_presentations() {
-    use claw_notification_presentation::{Card, proxy::NotificationPresentationProxy};
+    use yuos_notification_presentation::{Card, proxy::NotificationPresentationProxy};
     use cosmic::cosmic_config::ConfigSet;
     use futures::StreamExt;
     use std::{os::fd::AsRawFd, time::Duration};
@@ -64,7 +64,7 @@ async fn actual_descriptor_handoff_fans_out_legacy_and_generic_presentations() {
     let (presenter_fd, panel_fd) = std::os::unix::net::UnixStream::pair().unwrap();
     panel_fd.set_nonblocking(true).unwrap();
     unsafe {
-        std::env::set_var(claw_notification_presentation::PRESENTER_FD_ENV,
+        std::env::set_var(yuos_notification_presentation::PRESENTER_FD_ENV,
             presenter_fd.as_raw_fd().to_string());
     }
     let server = applet::setup_panel_conn(tx.clone());
@@ -86,7 +86,7 @@ async fn actual_descriptor_handoff_fans_out_legacy_and_generic_presentations() {
     ).p2p().build().await.unwrap();
     let presentation = NotificationPresentationProxy::new(&applet_client).await.unwrap();
     assert_eq!(presentation.version().await.unwrap(), 1);
-    assert!(claw_notification_presentation::Preferences::from_json(
+    assert!(yuos_notification_presentation::Preferences::from_json(
         &presentation.preferences().await.unwrap(),
     ).unwrap().muted);
     let mut cards = presentation.receive_card().await.unwrap();

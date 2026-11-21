@@ -199,7 +199,7 @@ def test_relocated_sdk_preserves_exact_scopes_and_private_bridge_fields(
     action, arguments, fields
 ):
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-        os.environ, {"COS_APP_MANIFEST": str(APP_DIR / "app.json")}
+        os.environ, {"YUOS_APP_MANIFEST": str(APP_DIR / "app.json")}
     ):
         server = load_local_module(APP_DIR / "server.py", "claw_test_netdiag_server")
         listed = server.app._handle_request("tools/list", {}, True)

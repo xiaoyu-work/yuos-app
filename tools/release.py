@@ -53,11 +53,11 @@ def source_selection(selection):
 
 
 def package_name(name, kind):
-    return f"claw-{'cap' if kind == 'capability' else 'app'}-{name}"
+    return f"yuos-{'cap' if kind == 'capability' else 'app'}-{name}"
 
 
 def library_interface(name):
-    return f"claw-app-python-{name.replace('_', '-')}-v{config()['python_library_abi']}"
+    return f"yuos-app-python-{name.replace('_', '-')}-v{config()['python_library_abi']}"
 
 
 def require_platform_artifact(lock=None):
@@ -70,7 +70,7 @@ def require_platform_artifact(lock=None):
 def packages_for(selection):
     settings = config()
     if selection == "support":
-        return [{"package": "claw-app-support", "variant": "support", "architecture": "all",
+        return [{"package": "yuos-app-support", "variant": "support", "architecture": "all",
                  "selection": selection, "apps": []}]
     if selection == "sets":
         return [{"package": settings["headless_set"], "variant": "agent", "architecture": "all",
@@ -143,11 +143,11 @@ def dependencies(entry, release_version):
             for selected in selections("all") if selected not in ("support", "sets")
             for item in packages_for(selected) if item["variant"] == "agent"
         ]
-        return sorted(set(["claw-app-support", *other]))
+        return sorted(set(["yuos-app-support", *other]))
     result = [settings["runtime_dependency"], "python3 (>= 3.11)"]
     if selection == "support":
         return [*result, "python3-idna (>= 3.3)", "python3-idna (<< 4)"]
-    result.append(f"claw-app-support-v{settings['support_abi']}")
+    result.append(f"yuos-app-support-v{settings['support_abi']}")
     kind, name = source_selection(selection)
     source, package = stage.load_package(name, kind)
     selected = set(entry["apps"])
@@ -160,7 +160,7 @@ def dependencies(entry, release_version):
                 library_interface(dependency["library"]),
             ])
     if variant == "desktop":
-        result.extend(["claw-os-app-permissions-v1",
+        result.extend(["yuos-app-permissions-v1",
                        *settings["desktop_dependencies"].get(name, [])])
         if any(item["variant"] == "agent" for item in packages_for(selection)):
             result.append(f"{package_name(name, kind)} (= {release_version})")
@@ -176,23 +176,19 @@ def write_control(root, entry, plan, extra_dependencies=()):
     control = {
         "Package": entry["package"], "Version": plan["version"], "Section": "misc",
         "Priority": "optional", "Architecture": entry["architecture"],
-        "Maintainer": "Claw OS Applications <noreply@github.com>",
-        "Homepage": "https://github.com/xiaoyu-work/clawos-app",
+        "Maintainer": "Yu OS Applications <noreply@github.com>",
+        "Homepage": "https://github.com/xiaoyu-work/yuos-app",
         "Depends": ", ".join(sorted(set(dependencies(entry, plan["version"])) | set(extra_dependencies))),
-        "X-Claw-Product": name, "X-Claw-Source-Kind": kind, "X-Claw-Variant": entry["variant"],
-        "X-Claw-Runtime-ABI": "1", "X-Claw-Source-Revision": plan["source_revision"],
-        "Description": f"Claw OS Applications - {name} ({entry['variant']})\n"
-                       " Independently updated application payload; authority remains in Claw OS.\n"
+        "X-YuOS-Product": name, "X-YuOS-Source-Kind": kind, "X-YuOS-Variant": entry["variant"],
+        "X-YuOS-Runtime-ABI": "1", "X-YuOS-Source-Revision": plan["source_revision"],
+        "Description": f"Yu OS Applications - {name} ({entry['variant']})\n"
+                       " Independently updated application payload; authority remains in Yu OS.\n"
                        " Installed App identities, grants and user data remain separate.",
     }
     if entry["apps"]:
-        control["X-Claw-App-Ids"] = ", ".join(entry["apps"])
-    if selection != "sets":
-        former = "claw-os-desktop" if entry["variant"] == "desktop" and name != "mail" else "claw-os-agent"
-        control["Breaks"] = f"{former} (<< {settings['migration_before']})"
-        control["Replaces"] = control["Breaks"]
+        control["X-YuOS-App-Ids"] = ", ".join(entry["apps"])
     if selection == "support":
-        control["Provides"] = f"claw-app-support-v{settings['support_abi']}"
+        control["Provides"] = f"yuos-app-support-v{settings['support_abi']}"
     elif selection != "sets":
         _, package = stage.load_package(name, kind)
         library = package.get("python_library")
@@ -200,7 +196,7 @@ def write_control(root, entry, plan, extra_dependencies=()):
             control["Provides"] = library_interface(library["name"])
     (root / "DEBIAN").mkdir()
     (root / "DEBIAN/control").write_bytes(control_bytes(control))
-    write_json(root / "usr/share/clawos-app/packages" / f"{entry['package']}.json", {
+    write_json(root / "usr/share/yuos-app/packages" / f"{entry['package']}.json", {
         **entry, "version": plan["version"], "source_revision": plan["source_revision"],
         "runtime_abi": 1, "format": "claw.installed-app-package/v1",
     })
@@ -243,8 +239,8 @@ def stage_payload(root, entry):
         if entry["variant"] == "agent":
             shutil.rmtree(root / "usr/lib/thunderbird")
         else:
-            shutil.rmtree(root / "usr/lib/cos/apps")
-    python = root / "usr/lib/cos/python"
+            shutil.rmtree(root / "usr/lib/yuos/apps")
+    python = root / "usr/lib/yuos/python"
     own = package.get("python_library", {})
     keep = own.get("name") if set(own.get("apps", [])).intersection(entry["apps"]) else None
     allowed = {"_shared", "gateway", "canonical_argv.py",
@@ -289,7 +285,7 @@ def native_payload(root, entry):
         [root / native_plan.installed_app / "resources" / path for path in native_plan.private_resources]
         if native_plan else []
     )
-    for manifest in (root / "usr/lib/cos/apps").rglob("app.json"):
+    for manifest in (root / "usr/lib/yuos/apps").rglob("app.json"):
         app = json.loads(manifest.read_text())
         if app["runtime"] == "binary":
             if native_plan is None or app["id"] != native_plan.app_id:

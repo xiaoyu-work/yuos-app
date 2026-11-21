@@ -12,7 +12,7 @@ from test_support import authenticated_mcp_params, load_local_module
 
 pytestmark = pytest.mark.skipif(
     sys.platform != "linux" or not hasattr(os, "O_NOFOLLOW"),
-    reason="the document app's descriptor-safe contract targets Claw OS Linux",
+    reason="the document app's descriptor-safe contract targets Yu OS Linux",
 )
 
 
@@ -23,10 +23,10 @@ def doc_app():
 
 @pytest.fixture
 def sdk_app(monkeypatch, doc_app):
-    monkeypatch.setenv("COS_APP_MANIFEST", str(Path(__file__).with_name("app.json")))
-    monkeypatch.setenv("COS_APP_ID", "doc")
+    monkeypatch.setenv("YUOS_APP_MANIFEST", str(Path(__file__).with_name("app.json")))
+    monkeypatch.setenv("YUOS_APP_ID", "doc")
     with mock.patch.dict(sys.modules, {"main": doc_app}), mock.patch(
-        "claw_os_sdk.mcp.App.serve", autospec=True,
+        "yuos_sdk.mcp.App.serve", autospec=True,
     ) as serve:
         load_local_module(Path(__file__).with_name("server.py"), "doc_app_server")
     serve.assert_called_once()

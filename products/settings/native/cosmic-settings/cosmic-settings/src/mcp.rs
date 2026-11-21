@@ -1,13 +1,13 @@
 //! MCP tool surface for `cosmic-settings`.
 //!
-//! Launched with `COS_MCP_SERVER=1`, the binary becomes a stdio MCP
+//! Launched with `YUOS_MCP_SERVER=1`, the binary becomes a stdio MCP
 //! server instead of opening the settings GUI. The authoritative tool
 //! descriptions and argument schemas live in `apps/cosmic-settings/app.json`.
 
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use claw_os_sdk::mcp::{App, CallContext, Tool, ToolResult};
+use yuos_sdk::mcp::{App, CallContext, Tool, ToolResult};
 use serde_json::{json, Value};
 
 /// The full list of page-commands this build exposes. Keep in sync
@@ -207,7 +207,7 @@ impl Tool for OpenTool {
     }
 }
 
-fn open(page: Option<&str>) -> Result<(), cos_runtime::BridgeError> {
+fn open(page: Option<&str>) -> Result<(), yuos_runtime::BridgeError> {
     let mut args = vec![
         "__desktop".to_string(), "launch".into(), "--app-id".into(),
         "com.yuos.Settings".into(),
@@ -215,13 +215,13 @@ fn open(page: Option<&str>) -> Result<(), cos_runtime::BridgeError> {
     if let Some(page) = page {
         args.extend(["--uri".into(), format!("settings://{page}")]);
     }
-    let value = claw_os_sdk::cos_call_json_with_binary(
+    let value = yuos_sdk::yu_call_json_with_binary(
         "/usr/local/bin/yu", "desktop", "launch", args,
     )?;
     if value["launched"] != true || value["app_id"] != "com.yuos.Settings"
         || value["launcher"] != "/usr/bin/cosmic-settings"
     {
-        return Err(cos_runtime::BridgeError::Decode {
+        return Err(yuos_runtime::BridgeError::Decode {
             app: "desktop".into(), verb: "launch".into(),
             message: "provider did not confirm native Settings launch".into(),
         });

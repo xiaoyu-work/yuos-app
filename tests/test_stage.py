@@ -57,7 +57,7 @@ def test_staged_calendar_files_mail_chain_uses_public_mcp_and_isolated_wire(tmp_
     stage.stage("files", destination, ["fs"])
     stage.stage("mail", destination, ["email"])
     stage.stage_shared(destination)
-    python = destination / "usr/lib/cos/python"
+    python = destination / "usr/lib/yuos/python"
     stage_platform_python(python)
     control = tmp_path / "wire-control.json"
     control.write_text('{"deny":null}')
@@ -67,7 +67,7 @@ def test_staged_calendar_files_mail_chain_uses_public_mcp_and_isolated_wire(tmp_
         import json, os, sys
         from pathlib import Path
         assert sys.argv[1] == "--wire=1"
-        app = os.environ["COS_APP_ID"]
+        app = os.environ["YUOS_APP_ID"]
         assert app in {"calendar", "fs", "email"}
         args = sys.argv[2:]
         record = {"app":app,"args":args}
@@ -107,8 +107,8 @@ def test_staged_calendar_files_mail_chain_uses_public_mcp_and_isolated_wire(tmp_
         data = tmp_path / "owner" / "apps" / app
         data.mkdir(parents=True, mode=0o700)
         return {
-            "PATH": os.defpath, "PYTHONPATH": str(python), "CLAW_COS_BIN": str(peer),
-            "COS_SESSION": f"synthetic-{app}", "COS_DATA_DIR": str(data),
+            "PATH": os.defpath, "PYTHONPATH": str(python), "YUOS_KERNEL_BIN": str(peer),
+            "YUOS_SESSION": f"synthetic-{app}", "YUOS_DATA_DIR": str(data),
             "TEST_CONTROL": str(control), "TEST_LOG": str(log),
         }
 
@@ -117,7 +117,7 @@ def test_staged_calendar_files_mail_chain_uses_public_mcp_and_isolated_wire(tmp_
         assert not result.get("isError"), result
         return result["structuredContent"]
 
-    apps = destination / "usr/lib/cos/apps"
+    apps = destination / "usr/lib/yuos/apps"
     with mcp_process(apps / "calendar", env=environment("calendar")) as calendar:
         event = call(calendar, "calendar.create", {
             "provider": "local", "title": "Synthetic review", "start": "2026-11-10T10:00:00Z",
@@ -154,25 +154,25 @@ def test_staged_calendar_files_mail_chain_uses_public_mcp_and_isolated_wire(tmp_
 def test_calendar_stage_is_separate_and_preserves_its_manifest(tmp_path):
     assert {"mail", "calendar"} <= set(stage.products())
     assert stage.stage("calendar", tmp_path) == ["calendar", "panel-calendar"]
-    app = tmp_path / "usr/lib/cos/apps/calendar"
+    app = tmp_path / "usr/lib/yuos/apps/calendar"
     source = ROOT / "products/calendar/apps/calendar"
     assert (app / "app.json").read_bytes() == (source / "app.json").read_bytes()
     assert (app / "main.py").read_bytes() == (source / "main.py").read_bytes()
     assert (app / "server.py").is_file()
     assert not (app / "test_main.py").exists()
-    assert not (tmp_path / "usr/lib/cos/apps/mail-ai").exists()
+    assert not (tmp_path / "usr/lib/yuos/apps/mail-ai").exists()
 
 
 def test_files_stage_preserves_the_direct_mcp_contract(tmp_path):
     assert "files" in stage.products()
     assert stage.stage("files", tmp_path) == ["fs", "docs", "cosmic-files"]
     for app_id in ("fs", "docs"):
-        app = tmp_path / "usr/lib/cos/apps" / app_id
+        app = tmp_path / "usr/lib/yuos/apps" / app_id
         source = ROOT / "products/files/apps" / app_id
         for filename in ("app.json", "main.py", "server.py"):
             assert (app / filename).read_bytes() == (source / filename).read_bytes()
         assert not (app / "test_main.py").exists()
-    assert (tmp_path / "usr/lib/cos/python/claw_files/document.py").read_bytes() == (
+    assert (tmp_path / "usr/lib/yuos/python/claw_files/document.py").read_bytes() == (
         ROOT / "products/files/python/claw_files/document.py"
     ).read_bytes()
     assert not (tmp_path / "usr/lib/systemd").exists()
@@ -183,17 +183,17 @@ def test_document_engine_is_a_capability_not_a_business_product(tmp_path):
     assert "document-engine" not in stage.products()
     assert stage.stage("document-engine", tmp_path, kind="capability") == ["doc"]
     source = ROOT / "capabilities/document-engine/apps/doc"
-    installed = tmp_path / "usr/lib/cos/apps/doc"
+    installed = tmp_path / "usr/lib/yuos/apps/doc"
     assert {path.name for path in installed.iterdir()} == {"app.json", "main.py", "server.py", "web", "web-ui.json"}
     for name in ("app.json", "main.py", "server.py"):
         assert (installed / name).read_bytes() == (source / name).read_bytes()
         assert (installed / name).stat().st_mode == (source / name).stat().st_mode
-    library = tmp_path / "usr/lib/cos/python/claw_files"
+    library = tmp_path / "usr/lib/yuos/python/claw_files"
     assert (library / "document.py").read_bytes() == (
         ROOT / "products/files/python/claw_files/document.py"
     ).read_bytes()
-    assert not (tmp_path / "usr/lib/cos/apps/fs").exists()
-    assert not (tmp_path / "usr/lib/cos/apps/docs").exists()
+    assert not (tmp_path / "usr/lib/yuos/apps/fs").exists()
+    assert not (tmp_path / "usr/lib/yuos/apps/docs").exists()
     assert not (tmp_path / "usr/bin").exists()
     assert not (tmp_path / "var").exists()
     with pytest.raises(ValueError, match="Unknown product source"):
@@ -212,13 +212,13 @@ def test_ai_helpers_complete_original_source_ownership_without_provider_or_state
     assert "summarize" in identities
     assert stage.stage("ai-helpers", tmp_path, kind="capability") == ["summarize"]
     original = ROOT / "capabilities/ai-helpers/apps/summarize"
-    installed = tmp_path / "usr/lib/cos/apps/summarize"
+    installed = tmp_path / "usr/lib/yuos/apps/summarize"
     assert {path.name for path in installed.iterdir()} == {"app.json", "main.py", "server.py", "web", "web-ui.json"}
     for name in ("app.json", "main.py", "server.py"):
         assert (installed / name).read_bytes() == (original / name).read_bytes()
         assert (installed / name).stat().st_mode == (original / name).stat().st_mode
     assert [path.name for path in installed.parent.iterdir()] == ["summarize"]
-    assert not (tmp_path / "usr/lib/cos/python").exists()
+    assert not (tmp_path / "usr/lib/yuos/python").exists()
     assert not (tmp_path / "usr/bin").exists()
     assert not (tmp_path / "var").exists()
     with pytest.raises(ValueError, match="Unknown product source"):
@@ -231,13 +231,13 @@ def test_http_stages_the_complete_client_without_an_os_provider_or_product(tmp_p
     assert "http" not in stage.products()
     assert stage.stage("http", tmp_path, kind="capability") == ["net"]
     source = ROOT / "capabilities/http/apps/net"
-    installed = tmp_path / "usr/lib/cos/apps/net"
+    installed = tmp_path / "usr/lib/yuos/apps/net"
     assert {path.name for path in installed.iterdir()} == {"app.json", "main.py", "server.py", "web", "web-ui.json"}
     for name in ("app.json", "main.py", "server.py"):
         assert (installed / name).read_bytes() == (source / name).read_bytes()
         assert (installed / name).stat().st_mode == (source / name).stat().st_mode
     assert [path.name for path in installed.parent.iterdir()] == ["net"]
-    assert not (tmp_path / "usr/lib/cos/python").exists()
+    assert not (tmp_path / "usr/lib/yuos/python").exists()
     assert not (tmp_path / "usr/bin").exists()
     assert not (tmp_path / "var").exists()
     with pytest.raises(ValueError, match="Unknown product source"):
@@ -251,13 +251,13 @@ def test_storage_sdk_stages_only_db_without_copying_sdk_providers_or_state(tmp_p
     assert "storage-sdk" not in stage.products()
     assert stage.stage("storage-sdk", tmp_path, ["db"], kind="capability") == ["db"]
     source = ROOT / "capabilities/storage-sdk/apps/db"
-    installed = tmp_path / "usr/lib/cos/apps/db"
+    installed = tmp_path / "usr/lib/yuos/apps/db"
     assert {path.name for path in installed.iterdir()} == {"app.json", "main.py", "server.py", "web", "web-ui.json"}
     for name in ("app.json", "main.py", "server.py"):
         assert (installed / name).read_bytes() == (source / name).read_bytes()
         assert (installed / name).stat().st_mode == (source / name).stat().st_mode
     assert [path.name for path in installed.parent.iterdir()] == ["db"]
-    assert not (tmp_path / "usr/lib/cos/python").exists()
+    assert not (tmp_path / "usr/lib/yuos/python").exists()
     assert not (tmp_path / "usr/bin").exists()
     assert not (tmp_path / "var").exists()
     with pytest.raises(ValueError, match="Unknown product source"):
@@ -268,7 +268,7 @@ def test_storage_sdk_stages_only_db_without_copying_sdk_providers_or_state(tmp_p
 
 def test_storage_sdk_stages_independent_db_and_kv_without_platform_code(tmp_path):
     assert stage.stage("storage-sdk", tmp_path, kind="capability") == ["db", "kv"]
-    apps = tmp_path / "usr/lib/cos/apps"
+    apps = tmp_path / "usr/lib/yuos/apps"
     assert sorted(path.name for path in apps.iterdir()) == ["db", "kv"]
     kv = apps / "kv"
     original = ROOT / "capabilities/storage-sdk/apps/kv"
@@ -276,17 +276,17 @@ def test_storage_sdk_stages_independent_db_and_kv_without_platform_code(tmp_path
     for name in ("app.json", "server.py"):
         assert (kv / name).read_bytes() == (original / name).read_bytes()
         assert (kv / name).stat().st_mode == (original / name).stat().st_mode
-    assert not (tmp_path / "usr/lib/cos/python").exists()
+    assert not (tmp_path / "usr/lib/yuos/python").exists()
     assert not (tmp_path / "var").exists()
     assert stage.stage("storage-sdk", tmp_path / "kv-only", ["kv"], kind="capability") == ["kv"]
-    assert not (tmp_path / "kv-only/usr/lib/cos/apps/db").exists()
+    assert not (tmp_path / "kv-only/usr/lib/yuos/apps/db").exists()
 
 
 def test_public_mcp_requires_common_runtime_and_never_imports_legacy_sibling_helpers(tmp_path):
     root = tmp_path / "installed"
     stage.stage("http", root, kind="capability")
-    app = root / "usr/lib/cos/apps/net"
-    python = root / "usr/lib/cos/python"
+    app = root / "usr/lib/yuos/apps/net"
+    python = root / "usr/lib/yuos/python"
     stage_platform_python(python)
     legacy = app.parent / "_shared"
     legacy.mkdir()
@@ -295,7 +295,7 @@ def test_public_mcp_requires_common_runtime_and_never_imports_legacy_sibling_hel
     environment = {
         "PATH": os.defpath, "PYTHONPATH": str(python),
         "PYTHONDONTWRITEBYTECODE": "1", "PYTHONNOUSERSITE": "1",
-        "COS_APP_MANIFEST": str(app / "app.json"),
+        "YUOS_APP_MANIFEST": str(app / "app.json"),
     }
     missing = subprocess.run(
         [sys.executable, str(app / manifest["mcp"]["entry"])],
@@ -337,7 +337,7 @@ def test_staged_kv_uses_public_mcp_and_preserves_its_independent_namespace(tmp_p
     stage.stage("storage-sdk", tmp_path, ["kv"], kind="capability")
     python = stage.stage_shared(tmp_path)
     stage_platform_python(python)
-    apps = tmp_path / "usr/lib/cos/apps"
+    apps = tmp_path / "usr/lib/yuos/apps"
     app = apps / "kv"
     manifest = json.loads((app / "app.json").read_text())
     if refactor == "private-module":
@@ -364,7 +364,7 @@ def test_staged_kv_uses_public_mcp_and_preserves_its_independent_namespace(tmp_p
         path.write_bytes(b"unrelated private state")
     environment = {
         "PATH": os.defpath, "PYTHONPATH": str(python),
-        "COS_DATA_DIR": str(data),
+        "YUOS_DATA_DIR": str(data),
     }
     with mcp_process(app, env=environment) as request:
         def call(command, arguments):
@@ -402,7 +402,7 @@ def test_staged_kv_uses_public_mcp_and_preserves_its_independent_namespace(tmp_p
 @pytest.mark.parametrize("refactor", ["none", "private-module", "declared-entrypoint"])
 def test_staged_db_dispatches_with_real_sdk_and_preserves_its_data_namespace(tmp_path, refactor):
     stage.stage("storage-sdk", tmp_path, kind="capability")
-    python = tmp_path / "usr/lib/cos/python"
+    python = tmp_path / "usr/lib/yuos/python"
     stage_platform_python(python)
     data = tmp_path / "owner-data/apps/db"
     database = data / "db/existing.db"
@@ -437,7 +437,7 @@ def test_staged_db_dispatches_with_real_sdk_and_preserves_its_data_namespace(tmp
         ("query", {"database": "other", "sql": "SELECT 1"}),
         ("databases", {}),
     ]
-    app = tmp_path / "usr/lib/cos/apps/db"
+    app = tmp_path / "usr/lib/yuos/apps/db"
     if refactor == "private-module":
         (app / "main.py").rename(app / "database_client.py")
         entry = app / json.loads((app / "app.json").read_text())["mcp"]["entry"]
@@ -448,8 +448,8 @@ def test_staged_db_dispatches_with_real_sdk_and_preserves_its_data_namespace(tmp
         manifest["mcp"]["entry"] = "db_mcp.py"
         (app / "app.json").write_text(json.dumps(manifest))
     with mcp_process(app, env={
-        "PATH": os.defpath, "PYTHONPATH": str(python), "COS_DATA_DIR": str(data),
-        "CLAW_COS_BIN": str(policy),
+        "PATH": os.defpath, "PYTHONPATH": str(python), "YUOS_DATA_DIR": str(data),
+        "YUOS_KERNEL_BIN": str(policy),
     }) as request:
         results = [
             request("tools/call", authenticated_mcp_params({
@@ -473,8 +473,8 @@ def test_staged_db_dispatches_with_real_sdk_and_preserves_its_data_namespace(tmp
 def test_shared_library_costages_once_without_merging_trees(tmp_path, order):
     for name in order:
         stage.stage(name, tmp_path, kind="capability" if name == "document-engine" else "product")
-    assert sorted(path.name for path in (tmp_path / "usr/lib/cos/python").iterdir()) == ["claw_files"]
-    assert sorted(path.name for path in (tmp_path / "usr/lib/cos/apps").iterdir()) == [
+    assert sorted(path.name for path in (tmp_path / "usr/lib/yuos/python").iterdir()) == ["claw_files"]
+    assert sorted(path.name for path in (tmp_path / "usr/lib/yuos/apps").iterdir()) == [
         "cosmic-files", "doc", "docs", "fs",
     ]
 
@@ -482,7 +482,7 @@ def test_shared_library_costages_once_without_merging_trees(tmp_path, order):
 @pytest.mark.parametrize("change", ["content", "mode", "extra", "symlink"])
 def test_conflicting_shared_library_is_never_overwritten_or_merged(tmp_path, change):
     stage.stage("files", tmp_path)
-    library = tmp_path / "usr/lib/cos/python/claw_files"
+    library = tmp_path / "usr/lib/yuos/python/claw_files"
     document = library / "document.py"
     if change == "content":
         document.write_text("different source")
@@ -497,7 +497,7 @@ def test_conflicting_shared_library_is_never_overwritten_or_merged(tmp_path, cha
     with pytest.raises(ValueError, match="Conflicting staged Python library"):
         stage.stage("document-engine", tmp_path, kind="capability")
     assert stage._library_tree(library) == before
-    assert not (tmp_path / "usr/lib/cos/apps/doc").exists()
+    assert not (tmp_path / "usr/lib/yuos/apps/doc").exists()
 
 
 def test_filtered_capability_does_not_stage_unused_library(tmp_path):
@@ -637,7 +637,7 @@ def test_document_runs_with_only_the_actual_staged_library_and_platform(tmp_path
         'printf \'%s\\n\' \'{"ok":true,"wire_version":1,"data":{"decision":"allow"}}\'\n'
     )
     policy.chmod(0o755)
-    app = tmp_path / "usr/lib/cos/apps/doc"
+    app = tmp_path / "usr/lib/yuos/apps/doc"
     result = subprocess.run(
         [sys.executable, "-c",
          "import json; import claw_files.document as library; import main; "
@@ -645,7 +645,7 @@ def test_document_runs_with_only_the_actual_staged_library_and_platform(tmp_path
          f"[{str(document)!r}])}}))"],
         cwd=app, capture_output=True, text=True, check=True, timeout=20,
         env={"PATH": os.defpath, "PYTHONPATH": str(python),
-             "PYTHONDONTWRITEBYTECODE": "1", "CLAW_COS_BIN": str(policy)},
+             "PYTHONDONTWRITEBYTECODE": "1", "YUOS_KERNEL_BIN": str(policy)},
     )
     payload = json.loads(result.stdout)
     assert payload["library"] == str(python / "claw_files/document.py")
@@ -656,12 +656,12 @@ def test_browser_stage_preserves_search_without_os_services(tmp_path):
     assert "browser" in stage.products()
     assert stage.stage("browser", tmp_path) == ["search", "web", "browser-attached"]
     for app_id in ("search", "web", "browser-attached"):
-        app = tmp_path / "usr/lib/cos/apps" / app_id
+        app = tmp_path / "usr/lib/yuos/apps" / app_id
         source = ROOT / "products/browser/apps" / app_id
         for filename in ("app.json", "main.py", "server.py"):
             assert (app / filename).read_bytes() == (source / filename).read_bytes()
         assert not (app / "test_main.py").exists()
-    native_host = "usr/lib/cos/apps/browser-attached/native_host.py"
+    native_host = "usr/lib/yuos/apps/browser-attached/native_host.py"
     assert (tmp_path / native_host).read_bytes() == (
         ROOT / "products/browser/apps/browser-attached/native_host.py"
     ).read_bytes()
@@ -669,16 +669,16 @@ def test_browser_stage_preserves_search_without_os_services(tmp_path):
     assert stage._library_tree(extension) == stage._library_tree(
         ROOT / "products/browser/extension", payload=True,
     )
-    launcher = tmp_path / "usr/lib/cos/claw-browser-host"
+    launcher = tmp_path / "usr/lib/yuos/claw-browser-host"
     source_launcher = ROOT / "products/browser/packaging/claw-browser-host"
     assert launcher.read_bytes() == source_launcher.read_bytes()
     assert launcher.stat().st_mode == source_launcher.stat().st_mode
     assert launcher.stat().st_mode & 0o111
     assert not (extension / "test_contract.py").exists()
-    assert not (tmp_path / "usr/lib/cos/browser-agent").exists()
-    assert not (tmp_path / "usr/lib/cos/apps/_shared").exists()
-    assert not (tmp_path / "usr/lib/cos/python").exists()
-    assert not (tmp_path / "usr/bin/cos-browser").exists()
+    assert not (tmp_path / "usr/lib/yuos/browser-agent").exists()
+    assert not (tmp_path / "usr/lib/yuos/apps/_shared").exists()
+    assert not (tmp_path / "usr/lib/yuos/python").exists()
+    assert not (tmp_path / "usr/bin/yuos-browser").exists()
     assert not (tmp_path / "etc/chromium").exists()
 
 
@@ -690,16 +690,16 @@ def test_browser_assets_follow_declared_owner_selection(tmp_path, selected):
     assert stage.stage("browser", tmp_path, selected) == selected
     attached = "browser-attached" in selected
     extension = tmp_path / "usr/share/claw/extensions/claw-agent-browser"
-    launcher = tmp_path / "usr/lib/cos/claw-browser-host"
+    launcher = tmp_path / "usr/lib/yuos/claw-browser-host"
     assert extension.exists() is attached
     assert launcher.exists() is attached
-    apps = tmp_path / "usr/lib/cos/apps"
+    apps = tmp_path / "usr/lib/yuos/apps"
     if selected:
         assert sorted(path.name for path in apps.iterdir()) == sorted(selected)
     else:
         assert not apps.exists()
-    assert not (tmp_path / "usr/lib/cos/python").exists()
-    assert not (tmp_path / "usr/lib/cos/browser-agent").exists()
+    assert not (tmp_path / "usr/lib/yuos/python").exists()
+    assert not (tmp_path / "usr/lib/yuos/browser-agent").exists()
     assert not (tmp_path / "etc").exists()
     assert not (tmp_path / "var").exists()
 
@@ -713,11 +713,11 @@ def test_browser_cli_stage_includes_declared_assets_without_a_second_stager(tmp_
     )
     assert json.loads(result.stdout) == ["browser-attached"]
     assert (tmp_path / "usr/share/claw/extensions/claw-agent-browser/manifest.json").is_file()
-    assert (tmp_path / "usr/lib/cos/claw-browser-host").is_file()
-    assert (tmp_path / "usr/lib/cos/apps/browser-attached/native_host.py").is_file()
-    assert not (tmp_path / "usr/lib/cos/apps/search").exists()
-    assert not (tmp_path / "usr/lib/cos/apps/web").exists()
-    assert not (tmp_path / "usr/lib/cos/python").exists()
+    assert (tmp_path / "usr/lib/yuos/claw-browser-host").is_file()
+    assert (tmp_path / "usr/lib/yuos/apps/browser-attached/native_host.py").is_file()
+    assert not (tmp_path / "usr/lib/yuos/apps/search").exists()
+    assert not (tmp_path / "usr/lib/yuos/apps/web").exists()
+    assert not (tmp_path / "usr/lib/yuos/python").exists()
 
 
 def test_normal_staging_propagates_asset_validation_before_payload_writes(tmp_path, monkeypatch):
@@ -731,26 +731,26 @@ def test_normal_staging_propagates_asset_validation_before_payload_writes(tmp_pa
 
 
 def test_normal_staging_never_overwrites_a_conflicting_installed_asset(tmp_path):
-    launcher = tmp_path / "usr/lib/cos/claw-browser-host"
+    launcher = tmp_path / "usr/lib/yuos/claw-browser-host"
     launcher.parent.mkdir(parents=True)
     launcher.write_bytes(b"unrelated existing file")
     with pytest.raises(ValueError, match="Conflicting staged installed asset"):
         stage.stage("browser", tmp_path, ["browser-attached"])
     assert launcher.read_bytes() == b"unrelated existing file"
     assert not (tmp_path / "usr/share/claw/extensions/claw-agent-browser").exists()
-    assert not (tmp_path / "usr/lib/cos/apps").exists()
+    assert not (tmp_path / "usr/lib/yuos/apps").exists()
 
 
 def test_terminal_stage_preserves_exec_without_process_services(tmp_path):
     assert "terminal" in stage.products()
     assert stage.stage("terminal", tmp_path) == ["exec", "cosmic-term"]
-    app = tmp_path / "usr/lib/cos/apps/exec"
+    app = tmp_path / "usr/lib/yuos/apps/exec"
     source = ROOT / "products/terminal/apps/exec"
     for filename in ("app.json", "main.py", "server.py"):
         assert (app / filename).read_bytes() == (source / filename).read_bytes()
     assert not (app / "test_main.py").exists()
-    assert not (tmp_path / "usr/lib/cos/python").exists()
-    assert not (tmp_path / "var/lib/cos").exists()
+    assert not (tmp_path / "usr/lib/yuos/python").exists()
+    assert not (tmp_path / "var/lib/yuos").exists()
 
 
 @pytest.mark.parametrize(("product", "app_ids"), [
@@ -762,7 +762,7 @@ def test_terminal_stage_preserves_exec_without_process_services(tmp_path):
     ("security", ["security-center", "firewall-manager", "usb-guard"]),
     ("maintenance", ["config-editor", "systemd"]),
     ("events-audit", ["event-center", "log"]),
-    ("launcher", ["launcher", "claw-launcher"]),
+    ("launcher", ["launcher", "yuos-launcher"]),
     ("clipboard", ["clipboard-manager", "panel-clipboard"]),
     ("settings", ["accessibility-manager", "audio-manager", "bluetooth-manager", "camera-manager", "display-manager", "desktop-manager", "location-manager", "network-manager", "power-manager", "printer-manager", "user-manager", "cosmic-settings"]),
 ])
@@ -770,35 +770,35 @@ def test_broker_products_stage_without_os_services(tmp_path, product, app_ids):
     assert product in stage.products()
     assert stage.stage(product, tmp_path) == app_ids
     for app_id in app_ids:
-        app = tmp_path / "usr/lib/cos/apps" / app_id
+        app = tmp_path / "usr/lib/yuos/apps" / app_id
         source = ROOT / "products" / product / "apps" / app_id
-        filenames = (("app.json",) if app_id in ("claw-launcher", "cosmic-store", "cosmic-settings", "panel-clipboard") else
+        filenames = (("app.json",) if app_id in ("yuos-launcher", "cosmic-store", "cosmic-settings", "panel-clipboard") else
                      ("app.json", "main.py", "server.py"))
         for filename in filenames:
             assert (app / filename).read_bytes() == (source / filename).read_bytes()
         assert not (app / "test_main.py").exists()
-    assert not (tmp_path / "usr/lib/cos/python").exists()
+    assert not (tmp_path / "usr/lib/yuos/python").exists()
     assert not (tmp_path / "usr/bin").exists()
     assert not (tmp_path / "var/lib").exists()
 
 
 def test_mail_stage_contains_matching_app_and_ui_without_os_runtime(tmp_path):
     assert stage.stage("mail", tmp_path) == ["mail-ai", "email"]
-    app = tmp_path / "usr/lib/cos/apps/mail-ai"
+    app = tmp_path / "usr/lib/yuos/apps/mail-ai"
     assert (app / "server.py").is_file()
     assert (app / "native_host.py").is_file()
     assert not (app / "test_main.py").exists()
-    email = tmp_path / "usr/lib/cos/apps/email"
+    email = tmp_path / "usr/lib/yuos/apps/email"
     assert (email / "main.py").is_file()
     assert (email / "server.py").is_file()
     assert not (email / "test_main.py").exists()
-    assert not (tmp_path / "usr/lib/cos/apps/_shared").exists()
-    gateway = tmp_path / "usr/lib/cos/apps/gateway/email"
+    assert not (tmp_path / "usr/lib/yuos/apps/_shared").exists()
+    gateway = tmp_path / "usr/lib/yuos/apps/gateway/email"
     assert not gateway.exists()
-    assert not (tmp_path / "usr/lib/cos/apps/gateway-email").exists()
-    assert not (tmp_path / "usr/lib/cos/apps/gateway/_shared").exists()
-    assert not (tmp_path / "usr/lib/cos/python").exists()
-    assert not (tmp_path / "usr/lib/cos/claw-mail-ai-host").exists()
+    assert not (tmp_path / "usr/lib/yuos/apps/gateway-email").exists()
+    assert not (tmp_path / "usr/lib/yuos/apps/gateway/_shared").exists()
+    assert not (tmp_path / "usr/lib/yuos/python").exists()
+    assert not (tmp_path / "usr/lib/yuos/yuos-mail-ai-host").exists()
     manifest = json.loads((app / "app.json").read_text())
     xpi = tmp_path / "usr/lib/thunderbird/distribution/extensions/yu-mail-ai@yuos.io.xpi"
     with zipfile.ZipFile(xpi) as archive:
@@ -811,12 +811,12 @@ def test_mail_stage_contains_matching_app_and_ui_without_os_runtime(tmp_path):
 def test_home_integration_stages_only_adapter_payload(tmp_path):
     assert stage.stage("home-integration", tmp_path) == ["gateway-homeassistant"]
     source = ROOT / "products/home-integration/apps/gateway/homeassistant"
-    installed = tmp_path / "usr/lib/cos/apps/gateway/homeassistant"
+    installed = tmp_path / "usr/lib/yuos/apps/gateway/homeassistant"
     assert {path.name for path in installed.iterdir()} == {"app.json", "main.py", "server.py", "web", "web-ui.json"}
     for filename in ("app.json", "main.py", "server.py"):
         assert (installed / filename).read_bytes() == (source / filename).read_bytes()
-    assert not (tmp_path / "usr/lib/cos/apps/gateway-homeassistant").exists()
-    assert not (tmp_path / "usr/lib/cos/apps/gateway/_shared").exists()
+    assert not (tmp_path / "usr/lib/yuos/apps/gateway-homeassistant").exists()
+    assert not (tmp_path / "usr/lib/yuos/apps/gateway/_shared").exists()
     assert not (tmp_path / "var/lib").exists()
 
 
@@ -824,12 +824,12 @@ def test_notification_delivery_stages_only_product_payload(tmp_path):
     assert stage.stage("notification-delivery", tmp_path) == ["gateway-ntfy", "gateway-pushover", "gateway-webhook"]
     for channel in ("ntfy", "pushover", "webhook"):
         source = ROOT / "products/notification-delivery/apps/gateway" / channel
-        installed = tmp_path / "usr/lib/cos/apps/gateway" / channel
+        installed = tmp_path / "usr/lib/yuos/apps/gateway" / channel
         assert {path.name for path in installed.iterdir()} == {"app.json", "main.py", "server.py", "web", "web-ui.json"}
         for filename in ("app.json", "main.py", "server.py"):
             assert (installed / filename).read_bytes() == (source / filename).read_bytes()
-        assert not (tmp_path / "usr/lib/cos/apps" / f"gateway-{channel}").exists()
-    assert not (tmp_path / "usr/lib/cos/apps/gateway/_shared").exists()
+        assert not (tmp_path / "usr/lib/yuos/apps" / f"gateway-{channel}").exists()
+    assert not (tmp_path / "usr/lib/yuos/apps/gateway/_shared").exists()
     assert not (tmp_path / "var/lib").exists()
 
 
@@ -837,13 +837,13 @@ def test_messaging_channels_stage_nested_connector_without_shared_runtime_or_sta
     assert stage.stage("messaging-channels", tmp_path) == ["gateway-discord", "gateway-slack", "gateway-telegram", "gateway-whatsapp"]
     for channel in ("discord", "slack", "telegram", "whatsapp"):
         source = ROOT / "products/messaging-channels/apps/gateway" / channel
-        installed = tmp_path / "usr/lib/cos/apps/gateway" / channel
+        installed = tmp_path / "usr/lib/yuos/apps/gateway" / channel
         for filename in ("app.json", "main.py", "server.py"):
             assert (installed / filename).read_bytes() == (source / filename).read_bytes()
         assert not (installed / "test_main.py").exists()
-        assert not (tmp_path / "usr/lib/cos/apps" / f"gateway-{channel}").exists()
-    assert not (tmp_path / "usr/lib/cos/apps/gateway/_shared").exists()
-    assert not (tmp_path / "usr/lib/cos/python").exists()
+        assert not (tmp_path / "usr/lib/yuos/apps" / f"gateway-{channel}").exists()
+    assert not (tmp_path / "usr/lib/yuos/apps/gateway/_shared").exists()
+    assert not (tmp_path / "usr/lib/yuos/python").exists()
     assert not (tmp_path / "var/lib").exists()
 
 

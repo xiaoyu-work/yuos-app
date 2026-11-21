@@ -48,9 +48,9 @@ def main():
         )
         broker.chmod(0o755)
         env = {
-            **os.environ, "COS_MCP_SERVER": "1",
-            "COS_APP_MANIFEST": str(fixture / "installed/usr/lib/cos/apps/cosmic-edit/app.json"),
-            "CLAW_COS_BIN": str(broker), "TMPDIR": str(fixture),
+            **os.environ, "YUOS_MCP_SERVER": "1",
+            "YUOS_APP_MANIFEST": str(fixture / "installed/usr/lib/yuos/apps/cosmic-edit/app.json"),
+            "YUOS_KERNEL_BIN": str(broker), "TMPDIR": str(fixture),
             "XDG_CONFIG_HOME": str(fixture / "config"),
             "XDG_DATA_HOME": str(fixture / "data"),
             "DISPLAY": "", "WAYLAND_DISPLAY": "",
@@ -82,7 +82,7 @@ def main():
         def call(name, arguments, **context):
             return request("tools/call", {
                 "name": f"edit.{name}", "arguments": arguments,
-                "_meta": {"claw-os.dev/call-context": {
+                "_meta": {"yuos.dev/call-context": {
                     "wire_version": 1, "call_id": f"fixture-{counter}",
                     "trace_id": "fixture", "session_id": "fixture", "task_id": "fixture-task",
                     "caller": {"kind": "system-agent", "id": "fixture", "owner_uid": 1000},

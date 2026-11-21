@@ -2,10 +2,10 @@
   "web_ui": {"source": "web", "apps": ["calendar", "panel-calendar"]},
   "apps": ["apps/calendar", "apps/panel-calendar"],
   "tests": ["native/test_build.py"],
-  "native": {"claw-applet-calendar": "native/claw-applet-calendar"},
+  "native": {"yuos-applet-calendar": "native/yuos-applet-calendar"},
   "native_kind": "binary",
-  "native_payload": {"app": "panel-calendar", "program": "claw-applet-calendar"},
-  "native_assets": {"claw-applet-calendar": {
+  "native_payload": {"app": "panel-calendar", "program": "yuos-applet-calendar"},
+  "native_assets": {"yuos-applet-calendar": {
     "Cargo.lock": "native/Cargo.lock", "LICENSE": "native/LICENSE",
     "app.json": "apps/panel-calendar/app.json"
   }}

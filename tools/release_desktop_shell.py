@@ -1,4 +1,4 @@
-"""Build and authenticate the Desktop Shell input to claw-os-desktop, not an App .deb."""
+"""Build and authenticate the Desktop Shell input to yuos-desktop, not an App .deb."""
 
 import argparse
 import os
@@ -19,8 +19,8 @@ from release_publish import GitHub, existing_release, require_publication_contra
 
 WORK = ROOT / "build/desktop-shell-release"
 APP = "desktop-shell"
-ENTRY = "bin/claw-desktop-shell"
-SHELL_QML = "resources/usr/share/claw-desktop-shell/shell.qml"
+ENTRY = "bin/yuos-desktop-shell"
+SHELL_QML = "resources/usr/share/yuos-desktop-shell/shell.qml"
 BUILD_FORMAT = "yuos.desktop-shell-build/v1"
 
 
@@ -41,7 +41,7 @@ def build(architecture, version):
             sys.executable, ROOT / "tools/native_build.py", APP, "build", "--release", "--app-root", root,
         ], check=True, cwd=ROOT)
         selected = native_payload.plan(APP)
-        dependencies = scan_native_payload(root, "claw-os-desktop", architecture, root / "bin", [
+        dependencies = scan_native_payload(root, "yuos-desktop", architecture, root / "bin", [
             root / "resources" / path for path in selected.private_resources
         ])
         write_json(root / "build.json", {
@@ -83,15 +83,15 @@ def publish(version, url, sha256, key_id):
     require_publication_contract(config())
     github = GitHub()
     github.preflight()
-    tag = f"desktop-shell-v{version}"
+    tag = f"yuos-desktop-shell-v{version}"
     revision = source_revision()
     if existing_release(github, tag, revision):
         raise ValueError("Desktop Shell release is already immutable")
     parsed = urlsplit(url)
     if parsed.scheme != "https" or parsed.netloc != "github.com" or not parsed.path.startswith(
-        "/xiaoyu-work/claw-os/releases/download/"
+        "/xiaoyu-work/Yu-OS/releases/download/"
     ):
-        raise ValueError("Use the owner-approved published Claw OS provenance CLI")
+        raise ValueError("Use the owner-approved published Yu OS provenance CLI")
     snapshots.sha256_value(sha256)
     with tempfile.TemporaryDirectory(prefix="publish-", dir=WORK) as scratch:
         scratch = Path(scratch)
@@ -122,7 +122,7 @@ def publish(version, url, sha256, key_id):
                    data={"ref": f"refs/tags/{tag}", "sha": revision}, allowed=(201,))
         _, draft = github.api("releases", method="POST", allowed=(201,), data={
             "tag_name": tag, "target_commitish": revision, "draft": True, "name": tag,
-            "body": f"Signed Desktop Shell build inputs for claw-os-desktop. Source commit: {revision}.",
+            "body": f"Signed Desktop Shell build inputs for yuos-desktop. Source commit: {revision}.",
         })
         run(["gh", "release", "upload", tag, "--repo", github.repository, *assets])
         _, published = github.api(f"releases/{draft['id']}", method="PATCH",

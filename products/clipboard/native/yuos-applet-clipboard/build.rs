@@ -1,0 +1,20 @@
+// SPDX-License-Identifier: GPL-3.0-only
+
+use std::{env, fs, path::PathBuf};
+use xdgen::{App, Context, FluentString};
+
+fn main() {
+    const ID: &str = "com.yuos.AppletClipboard";
+    println!("cargo:rerun-if-changed=i18n");
+    println!("cargo:rerun-if-changed=data/{ID}.desktop");
+    let context = Context::new("i18n/", "desktop_entries").unwrap();
+    let app = App::new(FluentString("yuos-applet-clipboard"))
+        .comment(FluentString("yuos-applet-clipboard-comment"))
+        .keywords(FluentString("yuos-applet-clipboard-keywords"));
+    let desktop = app
+        .expand_desktop(&format!("data/{ID}.desktop"), &context)
+        .unwrap();
+    let destination = PathBuf::from(env::var_os("OUT_DIR").unwrap());
+    fs::create_dir_all(&destination).unwrap();
+    fs::write(destination.join(format!("{ID}.desktop")), desktop).unwrap();
+}

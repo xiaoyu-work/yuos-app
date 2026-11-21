@@ -10,9 +10,9 @@
   "icon": "edit-paste-symbolic",
   "runtime": "binary",
   "schema_version": 2,
-  "entry": "bin/claw-applet-clipboard",
+  "entry": "bin/yuos-applet-clipboard",
   "mcp": {
-    "entry": "bin/claw-applet-clipboard",
+    "entry": "bin/yuos-applet-clipboard",
     "transport": "stdio",
     "lifecycle": "lazy",
     "access": {"system_agent": true},

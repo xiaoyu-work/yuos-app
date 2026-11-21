@@ -17,10 +17,10 @@ Credentials needed:
   * ``homeassistant_url``   — full base URL, e.g.
                                ``https://ha.example.com`` or
                                ``http://homeassistant.local:8123``
-                               (env override: COS_HOMEASSISTANT_URL)
+                               (env override: YUOS_HOMEASSISTANT_URL)
   * ``homeassistant_token`` — long-lived access token from
                                Profile → Long-Lived Access Tokens
-                               (env override: COS_HOMEASSISTANT_TOKEN)
+                               (env override: YUOS_HOMEASSISTANT_TOKEN)
 
 Stdlib only.
 """
@@ -37,7 +37,7 @@ from gateway._shared import gateway_args, gateway_memory, safe_egress, safe_subp
 
 
 PLATFORM = "homeassistant"
-USER_AGENT = "ClawOSHomeAssistant/0.1.0"
+USER_AGENT = "YuOSHomeAssistant/0.1.0"
 
 
 def _load_credential(name: str) -> tuple[str | None, str | None]:
@@ -52,11 +52,11 @@ def _env_or_credential(env_var: str, cred_name: str) -> tuple[str | None, str | 
 
 
 def _load_config() -> tuple[dict | None, str | None]:
-    base, err = _env_or_credential("COS_HOMEASSISTANT_URL", "homeassistant_url")
+    base, err = _env_or_credential("YUOS_HOMEASSISTANT_URL", "homeassistant_url")
     if not base:
         return None, err or "homeassistant_url required"
     token, err = _env_or_credential(
-        "COS_HOMEASSISTANT_TOKEN", "homeassistant_token"
+        "YUOS_HOMEASSISTANT_TOKEN", "homeassistant_token"
     )
     if not token:
         return None, err or "homeassistant_token required"
@@ -249,8 +249,8 @@ def run(command: str, args):
 
 
 if __name__ == "__main__":
-    cmd = os.environ.get("COS_COMMAND") or (sys.argv[1] if len(sys.argv) > 1 else "")
-    raw_args = os.environ.get("COS_ARGS_JSON")
+    cmd = os.environ.get("YUOS_COMMAND") or (sys.argv[1] if len(sys.argv) > 1 else "")
+    raw_args = os.environ.get("YUOS_ARGS_JSON")
     if raw_args:
         parsed_args = json.loads(raw_args)
     else:

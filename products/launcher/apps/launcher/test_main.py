@@ -15,7 +15,7 @@ from test_support import authenticated_mcp_params, load_local_module
 APP_DIR = pathlib.Path(__file__).parent
 MANIFEST_PATH = APP_DIR / "app.json"
 SERVER_PATH = APP_DIR / "server.py"
-COS_BIN = "/usr/local/bin/yu"
+YUOS_BIN = "/usr/local/bin/yu"
 APP_ID = "com.example.Editor"
 TOOL_NAMES = [
     "launcher.list",
@@ -35,7 +35,7 @@ main = load_local_module(
 @pytest.fixture(params=["direct", "mcp"])
 def dispatch(request):
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-        os.environ, {"COS_APP_MANIFEST": str(MANIFEST_PATH)},
+        os.environ, {"YUOS_APP_MANIFEST": str(MANIFEST_PATH)},
     ):
         server = load_local_module(SERVER_PATH, "claw_test_launcher_server")
         listed = server.app._handle_request("tools/list", {}, True)
@@ -427,7 +427,7 @@ def test_owner_home_and_cosmic_default_drive_user_app_discovery(
     )
     monkeypatch.delenv("XDG_DATA_HOME", raising=False)
     monkeypatch.delenv("XDG_CURRENT_DESKTOP", raising=False)
-    monkeypatch.setenv("COS_OWNER_HOME", str(owner_home))
+    monkeypatch.setenv("YUOS_OWNER_HOME", str(owner_home))
     monkeypatch.setenv("XDG_DATA_DIRS", str(tmp_path / "system"))
     monkeypatch.setenv("LANG", "C")
 
@@ -571,7 +571,7 @@ def test_open_uses_exact_policy_and_only_brokered_app_id_and_uris(
         events.append("recent")
         assert record["extras"] == ["https://example.test/report", file_uri]
 
-    with mock.patch.dict(os.environ, {"COS_BIN": COS_BIN}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YUOS_BIN}), mock.patch.object(
         main.policy, "require", side_effect=require
     ) as require_mock, mock.patch.object(
         main, "_find_entry", side_effect=find_entry
@@ -593,7 +593,7 @@ def test_open_uses_exact_policy_and_only_brokered_app_id_and_uris(
         mock.call("desktop.launch", name=APP_ID),
     ]
     assert run_mock.call_args.args[0] == [
-        COS_BIN,
+        YUOS_BIN,
         "__desktop",
         "launch",
         "--app-id",
@@ -617,7 +617,7 @@ def test_open_records_nothing_when_broker_fails() -> None:
         stdout=json.dumps({"error": "desktop unavailable"}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": COS_BIN}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YUOS_BIN}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main, "_find_entry", return_value=_entry()), mock.patch.object(
         main.subprocess, "run", return_value=completed
@@ -639,7 +639,7 @@ def test_recent_write_failure_after_launch_is_not_hidden() -> None:
         ),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": COS_BIN}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YUOS_BIN}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main, "_find_entry", return_value=_entry()), mock.patch.object(
         main.subprocess, "run", return_value=completed
@@ -719,7 +719,7 @@ def test_broker_payload_failures_raise(
     message: str,
 ) -> None:
     completed = mock.Mock(returncode=returncode, stdout=stdout, stderr=stderr)
-    with mock.patch.dict(os.environ, {"COS_BIN": COS_BIN}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YUOS_BIN}), mock.patch.object(
         main.subprocess, "run", return_value=completed
     ):
         with pytest.raises(RuntimeError, match=re.escape(message)):
@@ -751,7 +751,7 @@ def test_broker_execution_failures_raise(
     exception_type: type[Exception],
     message: str,
 ) -> None:
-    with mock.patch.dict(os.environ, {"COS_BIN": COS_BIN}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YUOS_BIN}), mock.patch.object(
         main.subprocess, "run", side_effect=failure
     ):
         with pytest.raises(exception_type, match=message):
@@ -855,7 +855,7 @@ def test_catalog_launch_and_history_round_trip_with_defaults(
     monkeypatch.setenv("LANG", "C")
     monkeypatch.delenv("LC_MESSAGES", raising=False)
     monkeypatch.delenv("LC_ALL", raising=False)
-    monkeypatch.setenv("COS_BIN", COS_BIN)
+    monkeypatch.setenv("YUOS_BIN", YUOS_BIN)
     require = mock.Mock()
     monkeypatch.setattr(main.policy, "require", require)
     completed = mock.Mock(
@@ -868,7 +868,7 @@ def test_catalog_launch_and_history_round_trip_with_defaults(
         assert dispatch("find", "Editor")["matches"][0]["app_id"] == APP_ID
         assert dispatch("open", APP_ID)["launched"] is True
     run.assert_called_once()
-    assert run.call_args.args[0] == [COS_BIN, "__desktop", "launch", "--app-id", APP_ID]
+    assert run.call_args.args[0] == [YUOS_BIN, "__desktop", "launch", "--app-id", APP_ID]
     assert dispatch("recent")["recent"][0]["app_id"] == APP_ID
     assert json.loads(recent_state.read_text())["extras"] == []
     assert require.call_args_list == [

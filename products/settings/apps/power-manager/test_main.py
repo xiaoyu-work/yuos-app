@@ -26,7 +26,7 @@ ACTIONS = [
 def mcp_app():
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
         os.environ, {
-            "COS_APP_MANIFEST": str(pathlib.Path(__file__).with_name("app.json")),
+            "YUOS_APP_MANIFEST": str(pathlib.Path(__file__).with_name("app.json")),
         },
     ):
         server = load_local_module(
@@ -76,7 +76,7 @@ def test_all_routes_use_exact_power_scopes(mcp_app, transport, action):
         stdout=json.dumps({"requested": True}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         if transport == "direct":
@@ -111,7 +111,7 @@ def test_broker_error_raises():
         stdout=json.dumps({"error": "reboot failed"}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match="reboot failed"):

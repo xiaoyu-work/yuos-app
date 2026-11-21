@@ -112,7 +112,7 @@ class DocsAppTests(unittest.TestCase):
         self._saved_env: dict[str, str | None] = {}
         environment = {
             "HOME": str(self.private_home),
-            "COS_OWNER_HOME": str(self.owner_home),
+            "YUOS_OWNER_HOME": str(self.owner_home),
             "RECOLLQ_ARGS_LOG": str(self.q_args),
             "RECOLLQ_HOME_LOG": str(self.q_home),
             "RECOLLINDEX_ARGS_LOG": str(self.index_args),
@@ -187,7 +187,7 @@ class DocsAppTests(unittest.TestCase):
         )
 
         source = SERVER_PATH.read_text(encoding="utf-8")
-        self.assertIn("from claw_os_sdk.mcp import App", source)
+        self.assertIn("from yuos_sdk.mcp import App", source)
         self.assertNotIn("serve_manifest_operations", source)
         bindings = _server_bindings()
         self.assertEqual(list(bindings), TOOL_NAMES)
@@ -221,12 +221,12 @@ class DocsAppTests(unittest.TestCase):
 
     def test_owner_home_has_no_missing_or_noncanonical_fallback(self):
         with mock.patch.dict(os.environ, {}, clear=False):
-            os.environ.pop("COS_OWNER_HOME", None)
-            with self.assertRaisesRegex(RuntimeError, "COS_OWNER_HOME is required"):
+            os.environ.pop("YUOS_OWNER_HOME", None)
+            with self.assertRaisesRegex(RuntimeError, "YUOS_OWNER_HOME is required"):
                 self.main._owner_home()
         with mock.patch.dict(
             os.environ,
-            {"COS_OWNER_HOME": str(self.owner_home / ".." / "owner")},
+            {"YUOS_OWNER_HOME": str(self.owner_home / ".." / "owner")},
         ):
             with self.assertRaisesRegex(RuntimeError, "absolute canonical path"):
                 self.main._owner_home()

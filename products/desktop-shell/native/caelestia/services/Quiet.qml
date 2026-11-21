@@ -91,7 +91,7 @@ Singleton {
     FileView {
         id: file
 
-        readonly property string directory: Quickshell.env("COS_DATA_DIR") || ""
+        readonly property string directory: Quickshell.env("YUOS_DATA_DIR") || ""
         path: directory ? `${directory}/quiet-desktop.json` : ""
         onAdapterUpdated: {
             if (directory)

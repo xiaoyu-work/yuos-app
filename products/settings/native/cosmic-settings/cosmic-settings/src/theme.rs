@@ -9,7 +9,7 @@ use cosmic::{
 
 /// Fill for an elevated Claw Glass card.
 ///
-/// ClawOS light puts `component.base` (`#D7DAE1`) *below* the page background
+/// YuOS light puts `component.base` (`#D7DAE1`) *below* the page background
 /// (`#EEF1F8`), so raising its opacity sinks a card instead of lifting it.
 /// Light mode therefore elevates towards white; dark mode keeps the component
 /// surface, which is already the lighter of the two.
@@ -92,7 +92,7 @@ pub fn icon_tile() -> cosmic::theme::Container<'static> {
 
 /// Claw Glass — the grouped section card used inside settings pages.
 ///
-/// The stock `Container::List` fills with `component.base`, which on ClawOS
+/// The stock `Container::List` fills with `component.base`, which on YuOS
 /// light composites to `#DDE0E7` against the `#EEF1F8` page and carries no
 /// border or shadow — sections read as a flat wash. This instead *elevates*
 /// the card: in light mode it is brighter than the page (the macOS grouped

@@ -3,8 +3,8 @@
 import sys
 
 from claw_files.document import cmd_convert, cmd_info, cmd_read
-from claw_os_sdk import ai
-from cos_runtime import memory, policy
+from yuos_sdk import ai
+from yuos_runtime import memory, policy
 
 
 _SUMMARIZE_SYSTEM = "Summarize the document into exactly 5 short bullet lines."

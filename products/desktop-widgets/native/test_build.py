@@ -21,9 +21,9 @@ def module(path):
 
 def test_native_staging_preserves_complete_ui_and_license(tmp_path):
     stage = module(ROOT / "tools/stage_native.py")
-    assert stage.stage("desktop-widgets", tmp_path) == ["claw-applet-widget-rail"]
-    output = tmp_path / "claw-applet-widget-rail"
-    source_root = NATIVE / "claw-applet-widget-rail"
+    assert stage.stage("desktop-widgets", tmp_path) == ["yuos-applet-widget-rail"]
+    output = tmp_path / "yuos-applet-widget-rail"
+    source_root = NATIVE / "yuos-applet-widget-rail"
     for source in source_root.rglob("*"):
         if source.is_file():
             assert (output / source.relative_to(source_root)).read_bytes() == source.read_bytes()
@@ -33,7 +33,7 @@ def test_native_staging_preserves_complete_ui_and_license(tmp_path):
         NATIVE.parent / "apps/widget-rail/app.json"
     ).read_bytes()
     entry = (output / "data/com.yuos.AppletWidgetRail.desktop").read_text()
-    assert "Exec=claw-applet-widget-rail" in entry
+    assert "Exec=yuos-applet-widget-rail" in entry
     assert "Icon=view-grid-symbolic" in entry
 
 
@@ -43,16 +43,16 @@ def test_native_build_has_only_sdk_and_toolkit_dependencies(tmp_path):
                     tmp_path / "build")
     manifest = tomllib.loads((tmp_path / "build/Cargo.toml").read_text())
     assert {name for name, value in manifest["dependencies"].items()
-            if isinstance(value, dict) and "path" in value} == {"claw-os-sdk"}
-    assert manifest["dependencies"]["claw-os-sdk"]["path"] == str(
-        tmp_path / "platform/claw-os-sdk/rust"
+            if isinstance(value, dict) and "path" in value} == {"yuos-sdk"}
+    assert manifest["dependencies"]["yuos-sdk"]["path"] == str(
+        tmp_path / "platform/yuos-sdk/rust"
     )
-    assert not any(name.startswith("claw-applet-") for name in manifest["dependencies"])
+    assert not any(name.startswith("yuos-applet-") for name in manifest["dependencies"])
     patch = manifest["patch"]["https://github.com/pop-os/libcosmic"]
     assert len(patch) == 17
     assert all(str(tmp_path / "platform/desktop/toolkit") in value["path"]
                for value in patch.values())
-    assert manifest["bin"] == [{"name": "claw-applet-widget-rail", "path": "src/main.rs"}]
+    assert manifest["bin"] == [{"name": "yuos-applet-widget-rail", "path": "src/main.rs"}]
     assert manifest["profile"]["release"]["opt-level"] == 1
     assert (tmp_path / "build/Cargo.lock").read_bytes() == (NATIVE / "Cargo.lock").read_bytes()
 
@@ -60,9 +60,9 @@ def test_native_build_has_only_sdk_and_toolkit_dependencies(tmp_path):
 def test_desktop_identity_stages_without_tests(tmp_path):
     stage = module(ROOT / "tools/stage.py")
     assert stage.stage("desktop-widgets", tmp_path, ["widget-rail"]) == ["widget-rail"]
-    output = tmp_path / "usr/lib/cos/apps/widget-rail"
+    output = tmp_path / "usr/lib/yuos/apps/widget-rail"
     manifest = json.loads((output / "app.json").read_text())
-    assert manifest["entry"] == manifest["mcp"]["entry"] == "bin/claw-applet-widget-rail"
+    assert manifest["entry"] == manifest["mcp"]["entry"] == "bin/yuos-applet-widget-rail"
     assert not (output / manifest["entry"]).exists(), "source staging must not fabricate an ELF"
     assert not (output / "test_main.py").exists()
 
@@ -84,7 +84,7 @@ def test_install_requires_explicit_build_staging_not_live_root(tmp_path):
         "GENERATION_PROBE": str(generation), "DESKTOP_PROBE": str(tmp_path / "generated.desktop"),
         "CLAW_NATIVE_DESKTOP_METADATA": str(ROOT / "tools/native_desktop_metadata.py"),
     }
-    command = [just, "--justfile", str(NATIVE / "claw-applet-widget-rail/justfile")]
+    command = [just, "--justfile", str(NATIVE / "yuos-applet-widget-rail/justfile")]
     for root in ["", "/", "//", "/usr/.."]:
         result = subprocess.run(command + [f"rootdir={root}", "install"],
                                 env=env, capture_output=True, text=True, timeout=10)

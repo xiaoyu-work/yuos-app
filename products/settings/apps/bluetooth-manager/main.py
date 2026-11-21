@@ -10,7 +10,7 @@ import unicodedata
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
 ADDRESS_RE = re.compile(r"^(?:[0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$")
@@ -19,7 +19,7 @@ TIMEOUT_SECS = int(os.environ.get("CLAW_BLUETOOTH_MANAGER_TIMEOUT", "240"))
 
 
 def _cos_binary() -> str | None:
-    return os.environ.get("COS_BIN") or shutil.which("yu")
+    return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _address(raw: object, name: str) -> str:
@@ -89,12 +89,12 @@ def _broker(
     pairing_id: str | None = None,
     response: str | None = None,
 ) -> dict:
-    cos_bin = _cos_binary()
-    if not cos_bin:
+    yu_bin = _cos_binary()
+    if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Bluetooth Manager broker unavailable"
         )
-    argv = [cos_bin, "__bluetooth", action]
+    argv = [yu_bin, "__bluetooth", action]
     if adapter is not None:
         argv.extend(["--adapter", adapter])
     if device is not None:
@@ -122,11 +122,11 @@ def _broker(
         result = subprocess.run(argv, **run_options)
     except FileNotFoundError as exc:
         raise FileNotFoundError(
-            f"Bluetooth Manager broker executable not found: {cos_bin}"
+            f"Bluetooth Manager broker executable not found: {yu_bin}"
         ) from exc
     except PermissionError as exc:
         raise PermissionError(
-            f"permission denied launching Bluetooth Manager broker: {cos_bin}"
+            f"permission denied launching Bluetooth Manager broker: {yu_bin}"
         ) from exc
     except subprocess.TimeoutExpired as exc:
         raise TimeoutError(

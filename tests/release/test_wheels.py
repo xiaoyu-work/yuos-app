@@ -9,11 +9,11 @@ import release_wheels
 
 
 def test_real_pinned_powerpoint_dependency_has_one_owner_and_retains_its_license(tmp_path):
-    release_wheels.stage_wheels("files", tmp_path, owner="claw-app-files")
-    assert (tmp_path / "usr/lib/cos/python/pptx/__init__.py").is_file()
-    metadata = tmp_path / "usr/lib/cos/python/python_pptx-1.0.2.dist-info"
+    release_wheels.stage_wheels("files", tmp_path, owner="yuos-app-files")
+    assert (tmp_path / "usr/lib/yuos/python/pptx/__init__.py").is_file()
+    metadata = tmp_path / "usr/lib/yuos/python/python_pptx-1.0.2.dist-info"
     assert "MIT License" in (metadata / "LICENSE").read_text()
-    assert (tmp_path / "usr/share/doc/claw-app-files/licenses/python-pptx/LICENSE").read_bytes() == (
+    assert (tmp_path / "usr/share/doc/yuos-app-files/licenses/python-pptx/LICENSE").read_bytes() == (
         metadata / "LICENSE"
     ).read_bytes()
     assert "Requires-Dist: lxml" in (metadata / "METADATA").read_text()
@@ -44,5 +44,5 @@ def test_wheel_cannot_inject_an_arbitrary_path_even_when_fixture_digest_matches(
     monkeypatch.setattr(release_wheels, "config", lambda: {"python_wheels": {"files": [specification]}})
     monkeypatch.setattr(release_wheels, "wheel_path", lambda _: wheel)
     with pytest.raises(ValueError, match="escapes"):
-        release_wheels.stage_wheels("files", tmp_path / "installed", owner="claw-app-files")
+        release_wheels.stage_wheels("files", tmp_path / "installed", owner="yuos-app-files")
     assert not (tmp_path / "escape").exists()

@@ -9,7 +9,7 @@
     },
     {
       "source": "packaging/claw-browser-host",
-      "destination": "usr/lib/cos/claw-browser-host",
+      "destination": "usr/lib/yuos/claw-browser-host",
       "apps": ["browser-attached"]
     }
   ],

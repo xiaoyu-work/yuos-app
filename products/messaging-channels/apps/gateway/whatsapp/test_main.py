@@ -23,7 +23,7 @@ SUCCESS = (200, {}, b'{"messages":[{"id":"wamid.fixture"}]}')
 
 @pytest.fixture(autouse=True)
 def isolated_credentials(monkeypatch):
-    for name in ("COS_WHATSAPP_TOKEN", "COS_WHATSAPP_PHONE_NUMBER_ID"):
+    for name in ("YUOS_WHATSAPP_TOKEN", "YUOS_WHATSAPP_PHONE_NUMBER_ID"):
         monkeypatch.delenv(name, raising=False)
     with mock.patch.object(
         main, "_load_credential", side_effect=lambda name: (CREDENTIALS[name], None),
@@ -33,11 +33,11 @@ def isolated_credentials(monkeypatch):
 
 @pytest.fixture(params=["direct", "mcp"])
 def invoke(request):
-    from claw_os_sdk.mcp import App
+    from yuos_sdk.mcp import App
 
     servers = []
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-        os.environ, {"COS_APP_MANIFEST": str(Path(__file__).with_name("app.json"))},
+        os.environ, {"YUOS_APP_MANIFEST": str(Path(__file__).with_name("app.json"))},
     ), mock.patch.object(App, "serve", lambda app: servers.append(app)):
         load_local_module(Path(__file__).with_name("server.py"), "gateway_whatsapp_server")
     assert len(servers) == 1
@@ -90,8 +90,8 @@ def test_send_separates_sender_id_and_recipient_number(invoke, recipient, text):
 
 
 def test_environment_credentials_take_precedence(invoke, monkeypatch):
-    monkeypatch.setenv("COS_WHATSAPP_TOKEN", " override-fixture ")
-    monkeypatch.setenv("COS_WHATSAPP_PHONE_NUMBER_ID", " 123456789 ")
+    monkeypatch.setenv("YUOS_WHATSAPP_TOKEN", " override-fixture ")
+    monkeypatch.setenv("YUOS_WHATSAPP_PHONE_NUMBER_ID", " 123456789 ")
     with mock.patch.object(main.safe_egress, "safe_urlopen", return_value=SUCCESS) as transport:
         assert invoke("send", recipient_phone="+12025550101", text="hello")["ok"] is True
     assert transport.call_args.args[1] == "https://graph.facebook.com/v21.0/123456789/messages"

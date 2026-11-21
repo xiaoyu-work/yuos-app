@@ -5,7 +5,7 @@ from unittest import mock
 
 import pytest
 
-from cos_runtime import mcp
+from yuos_runtime import mcp
 from test_support import authenticated_mcp_params, load_local_module
 
 

@@ -51,7 +51,7 @@ def test_stages_complete_native_source_separately_from_descriptor(tmp_path):
     stage = load_local_module(ROOT / "tools/stage.py", "editor_stage")
     native = load_local_module(ROOT / "tools/stage_native.py", "editor_native_stage")
     assert stage.stage("editor", tmp_path / "installed") == ["cosmic-edit"]
-    installed = tmp_path / "installed/usr/lib/cos/apps/cosmic-edit"
+    installed = tmp_path / "installed/usr/lib/yuos/apps/cosmic-edit"
     assert {path.name for path in installed.iterdir()} == {"app.json", "web", "web-ui.json"}
     assert (installed / "app.json").read_bytes() == MANIFEST.read_bytes()
     assert native.stage("editor", tmp_path / "native") == ["cosmic-edit"]
@@ -70,7 +70,7 @@ def test_standalone_build_rewrites_only_shared_runtime_paths(tmp_path):
     destination = tmp_path / "native"
     native.prepare("editor", toolkit, destination)
     cargo = tomllib.loads((destination / "Cargo.toml").read_text())
-    for library in ("claw-os-sdk", "cos-runtime"):
+    for library in ("yuos-sdk", "yuos-runtime"):
         assert cargo["dependencies"][library]["path"] == str(
             tmp_path / "platform" / library / "rust",
         )

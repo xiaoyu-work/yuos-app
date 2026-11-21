@@ -42,22 +42,22 @@ def test_all_identities_have_exactly_one_headless_or_desktop_package_owner():
     assert len(desktop) == 12
     assert not set(agent).intersection(desktop)
     assert len(set(agent) | set(desktop)) == 63
-    assert desktop["cosmic-files"] == "claw-app-files-desktop"
-    assert agent["db"] == agent["kv"] == "claw-cap-storage-sdk"
+    assert desktop["cosmic-files"] == "yuos-app-files-desktop"
+    assert agent["db"] == agent["kv"] == "yuos-cap-storage-sdk"
     (headless_set,) = release.packages_for("sets")
-    assert headless_set["package"] == "claw-apps-agent"
+    assert headless_set["package"] == "yuos-apps-agent"
     headless = release.dependencies(headless_set, "1.0.0")
-    assert "claw-cap-storage-sdk" in headless and "claw-app-files" in headless
+    assert "yuos-cap-storage-sdk" in headless and "yuos-app-files" in headless
     assert not any(name.endswith("-desktop") for name in headless)
 
 
 def test_selected_python_products_do_not_schedule_unrelated_native_builds():
     plan = release.make_plan("capability:http", "1.2.3")
     assert [job["architecture"] for job in plan["matrix"]["include"]] == ["all"]
-    assert [entry["package"] for entry in plan["packages"]] == ["claw-cap-http"]
+    assert [entry["package"] for entry in plan["packages"]] == ["yuos-cap-http"]
     plan = release.make_plan("files", "1.2.3")
     assert [job["architecture"] for job in plan["matrix"]["include"]] == ["all", "amd64", "arm64"]
-    assert {entry["package"] for entry in plan["packages"]} == {"claw-app-files", "claw-app-files-desktop"}
+    assert {entry["package"] for entry in plan["packages"]} == {"yuos-app-files", "yuos-app-files-desktop"}
 
 
 @pytest.mark.parametrize("product", ["calendar", "clipboard", "desktop-widgets", "launcher"])
@@ -67,40 +67,39 @@ def test_standalone_applet_packages_require_the_versioned_os_service_only_for_de
     assert {entry["architecture"] for entry in native} == {"amd64", "arm64"}
     for entry in packages:
         dependencies = release.dependencies(entry, "1.0.0")
-        assert "claw-os-applet-services-v1 (= 1)" not in dependencies
-        assert ("claw-os-clipboard-history-v1 (= 1)" in dependencies) == (
+        assert "yuos-applet-services-v1 (= 1)" not in dependencies
+        assert ("yuos-clipboard-history-v1 (= 1)" in dependencies) == (
             product == "clipboard" and entry["variant"] == "desktop"
         )
-        assert ("claw-os-calendar-read-v1 (= 1)" in dependencies) == (
+        assert ("yuos-calendar-read-v1 (= 1)" in dependencies) == (
             product in {"calendar", "desktop-widgets"} and entry["variant"] == "desktop"
         )
-        assert ("claw-os-observation-v1 (= 1)" in dependencies) == (
+        assert ("yuos-observation-v1 (= 1)" in dependencies) == (
             product == "desktop-widgets" and entry["variant"] == "desktop"
         )
-        assert ("claw-os-launcher-backend-v1 (= 1)" in dependencies) == (
+        assert ("yuos-launcher-backend-v1 (= 1)" in dependencies) == (
             product == "launcher" and entry["variant"] == "desktop"
         )
-        assert "yuos-app-runtime-v1 (>= 0.2.1)" in dependencies
+        assert "yuos-app-runtime-v1 (>= 0.1.0)" in dependencies
         root = tmp_path / entry["package"] / entry["architecture"]
         root.mkdir(parents=True)
         release.write_control(root, entry, release.make_plan(product, "1.0.0"))
         control = fields((root / "DEBIAN/control").read_text().strip())
-        former = "claw-os-desktop" if entry["variant"] == "desktop" else "claw-os-agent"
-        assert control["Breaks"] == control["Replaces"] == f"{former} (<< 1:0.2.1)"
+        assert "Breaks" not in control and "Replaces" not in control
 
 
 def test_support_package_declares_the_idna_compatibility_bounds(tmp_path):
     release.build(release.make_plan("support", "1.2.3"), "all", tmp_path / "packages")
-    package = tmp_path / "packages/claw-app-support_1.2.3_all.deb"
+    package = tmp_path / "packages/yuos-app-support_1.2.3_all.deb"
     control = fields(run(["dpkg-deb", "-f", package]).stdout.decode().strip())
     dependencies = {value.strip() for value in control["Depends"].split(",")}
-    assert {"python3-idna (>= 3.3)", "python3-idna (<< 4)", "yuos-app-runtime-v1 (>= 0.2.1)"} <= dependencies
-    assert control["Provides"] == "claw-app-support-v1"
-    assert control["Breaks"] == control["Replaces"] == "claw-os-agent (<< 1:0.2.1)"
+    assert {"python3-idna (>= 3.3)", "python3-idna (<< 4)", "yuos-app-runtime-v1 (>= 0.1.0)"} <= dependencies
+    assert control["Provides"] == "yuos-app-support-v1"
+    assert "Breaks" not in control and "Replaces" not in control
     payload = tmp_path / "payload"
     run(["dpkg-deb", "--extract", package, payload])
     for relative in ("_shared/__init__.py", "gateway/__init__.py", "canonical_argv.py"):
-        assert (payload / "usr/lib/cos/python" / relative).read_bytes() == (
+        assert (payload / "usr/lib/yuos/python" / relative).read_bytes() == (
             ROOT / "shared/python" / relative
         ).read_bytes()
 
@@ -123,27 +122,27 @@ def test_real_packages_are_deterministic_and_have_nonconflicting_ownership(tmp_p
             if entry.isfile() or entry.issym():
                 assert path not in owned, (package.name, owned.get(path), path)
                 owned[path] = package.name
-    assert owned["usr/lib/cos/python/claw_files/document.py"].startswith("claw-app-files_")
-    assert owned["usr/lib/cos/python/pptx/__init__.py"].startswith("claw-app-files_")
-    assert owned["usr/lib/cos/python/python_pptx-1.0.2.dist-info/LICENSE"].startswith("claw-app-files_")
-    assert owned["usr/lib/cos/python/_shared/atomic.py"].startswith("claw-app-support_")
-    assert owned["usr/lib/cos/python/canonical_argv.py"].startswith("claw-app-support_")
+    assert owned["usr/lib/yuos/python/claw_files/document.py"].startswith("yuos-app-files_")
+    assert owned["usr/lib/yuos/python/pptx/__init__.py"].startswith("yuos-app-files_")
+    assert owned["usr/lib/yuos/python/python_pptx-1.0.2.dist-info/LICENSE"].startswith("yuos-app-files_")
+    assert owned["usr/lib/yuos/python/_shared/atomic.py"].startswith("yuos-app-support_")
+    assert owned["usr/lib/yuos/python/canonical_argv.py"].startswith("yuos-app-support_")
     xpi = "usr/lib/thunderbird/distribution/extensions/yu-mail-ai@yuos.io.xpi"
-    assert owned[xpi].startswith("claw-app-mail-desktop_")
-    mail = fields(run(["dpkg-deb", "-f", first / "claw-app-mail_1.2.3_all.deb"]).stdout.decode().strip())
+    assert owned[xpi].startswith("yuos-app-mail-desktop_")
+    mail = fields(run(["dpkg-deb", "-f", first / "yuos-app-mail_1.2.3_all.deb"]).stdout.decode().strip())
     assert "thunderbird" not in mail["Depends"]
-    desktop = fields(run(["dpkg-deb", "-f", first / "claw-app-mail-desktop_1.2.3_all.deb"]).stdout.decode().strip())
+    desktop = fields(run(["dpkg-deb", "-f", first / "yuos-app-mail-desktop_1.2.3_all.deb"]).stdout.decode().strip())
     assert "thunderbird" in desktop["Depends"]
-    assert "claw-app-mail (= 1.2.3)" in desktop["Depends"]
-    assert desktop["Replaces"] == "claw-os-agent (<< 1:0.2.1)"
-    doc = fields(run(["dpkg-deb", "-f", first / "claw-cap-document-engine_1.2.3_all.deb"]).stdout.decode().strip())
-    assert "claw-app-files" in doc["Depends"] and "claw-app-python-claw-files-v1" in doc["Depends"]
-    assert "claw_os_sdk" not in repr(owned)
+    assert "yuos-app-mail (= 1.2.3)" in desktop["Depends"]
+    assert "Replaces" not in desktop
+    doc = fields(run(["dpkg-deb", "-f", first / "yuos-cap-document-engine_1.2.3_all.deb"]).stdout.decode().strip())
+    assert "yuos-app-files" in doc["Depends"] and "yuos-app-python-claw-files-v1" in doc["Depends"]
+    assert "yuos_sdk" not in repr(owned)
     assert not any("test_" in path or "Cargo.toml" in path for path in owned)
-    assert doc["Breaks"] == doc["Replaces"] == "claw-os-agent (<< 1:0.2.1)"
-    assert "yuos-app-runtime-v1 (>= 0.2.1)" in doc["Depends"]
+    assert "Breaks" not in doc and "Replaces" not in doc
+    assert "yuos-app-runtime-v1 (>= 0.1.0)" in doc["Depends"]
     assert "python3-pptx" not in doc["Depends"]
-    assert doc["X-Claw-App-Ids"] == "doc"
+    assert doc["X-YuOS-App-Ids"] == "doc"
 
 
 def test_build_refuses_to_overwrite_a_version_and_publish_requires_every_architecture(tmp_path):
@@ -159,7 +158,7 @@ def test_native_packages_refuse_a_placeholder_or_wrong_architecture(tmp_path, mo
     entry = release.packages_for("capture")[0]
     entry["architecture"] = run(["dpkg", "--print-architecture"]).stdout.decode().strip()
     root = tmp_path / "installed"
-    binary = root / "usr/lib/cos/apps/cosmic-screenshot/bin/cosmic-screenshot"
+    binary = root / "usr/lib/yuos/apps/cosmic-screenshot/bin/cosmic-screenshot"
     binary.parent.mkdir(parents=True)
     binary.write_bytes(b"not an executable")
     binary.chmod(0o755)

@@ -31,7 +31,7 @@ use super::{bridge_to_io, path_str};
 /// Paths to integration scripts on disk.
 #[derive(Clone, Debug)]
 pub struct IntegrationDirs {
-    /// Root directory under `XDG_CACHE_HOME/cosmic-term/cos-ai`.
+    /// Root directory under `XDG_CACHE_HOME/cosmic-term/yuos-ai`.
     pub root: PathBuf,
     pub bash_init: PathBuf,
     pub bash_integration: PathBuf,
@@ -69,7 +69,7 @@ pub fn ensure_integration_dirs(
     allow_all_tools: bool,
     model: &str,
 ) -> io::Result<IntegrationDirs> {
-    let root = cache_dir.join("cos-ai");
+    let root = cache_dir.join("yuos-ai");
     // Product writes create authorized parents, but we mkdir the root
     // up-front so a permission failure surfaces here (rather than partway
     // through the per-shell writes below) with a clear path in the error.
@@ -136,8 +136,8 @@ const BASH_RCFILE_WRAPPER: &str = r#"# cosmic-term AI integration wrapper.
 if [ -r "$HOME/.bashrc" ]; then
     . "$HOME/.bashrc"
 fi
-if [ -n "$COS_AI_INTEGRATION_DIR" ] && [ -r "$COS_AI_INTEGRATION_DIR/integration.bash" ]; then
-    . "$COS_AI_INTEGRATION_DIR/integration.bash"
+if [ -n "$YUOS_AI_INTEGRATION_DIR" ] && [ -r "$YUOS_AI_INTEGRATION_DIR/integration.bash" ]; then
+    . "$YUOS_AI_INTEGRATION_DIR/integration.bash"
 fi
 "#;
 
@@ -175,16 +175,16 @@ case "$HISTCONTROL" in
 esac
 
 # AI assistant function — invoked as ` __cos_ai <queryId>` by cosmic-term.
-# Reads prompt from $COS_AI_TMP/aq-$1.txt and context from $COS_AI_TMP/ac-$1.json.
+# Reads prompt from $YUOS_AI_TMP/aq-$1.txt and context from $YUOS_AI_TMP/ac-$1.json.
 __cos_ai() {{
-    if [ -z "$COS_AI_TMP" ]; then
+    if [ -z "$YUOS_AI_TMP" ]; then
         echo "cosmic-term AI not active in this shell." >&2
         return 1
     fi
-    local qfile="$COS_AI_TMP/aq-$1.txt"
-    local cfile="$COS_AI_TMP/ac-$1.json"
+    local qfile="$YUOS_AI_TMP/aq-$1.txt"
+    local cfile="$YUOS_AI_TMP/ac-$1.json"
     if [ ! -f "$qfile" ]; then
-        echo "cos-ai: query file $qfile missing." >&2
+        echo "yuos-ai: query file $qfile missing." >&2
         return 1
     fi
     # Overwrite shell echo of "__cos_ai <id>" with a clean "@ <prompt>" line.
@@ -217,15 +217,15 @@ $(cat "$qfile")
 
 const ZSH_DOTDIR_WRAPPER: &str = r#"# cosmic-term AI integration ZDOTDIR wrapper.
 # Source the user's real zshrc first (preferring an earlier $ZDOTDIR override).
-if [ -n "$COS_TERM_PREV_ZDOTDIR" ] && [ -r "$COS_TERM_PREV_ZDOTDIR/.zshrc" ]; then
-    ZDOTDIR="$COS_TERM_PREV_ZDOTDIR"
-    source "$COS_TERM_PREV_ZDOTDIR/.zshrc"
+if [ -n "$YUOS_TERM_PREV_ZDOTDIR" ] && [ -r "$YUOS_TERM_PREV_ZDOTDIR/.zshrc" ]; then
+    ZDOTDIR="$YUOS_TERM_PREV_ZDOTDIR"
+    source "$YUOS_TERM_PREV_ZDOTDIR/.zshrc"
 elif [ -r "$HOME/.zshrc" ]; then
     source "$HOME/.zshrc"
 fi
-unset COS_TERM_PREV_ZDOTDIR
-if [ -n "$COS_AI_INTEGRATION_DIR" ] && [ -r "$COS_AI_INTEGRATION_DIR/integration.zsh" ]; then
-    source "$COS_AI_INTEGRATION_DIR/integration.zsh"
+unset YUOS_TERM_PREV_ZDOTDIR
+if [ -n "$YUOS_AI_INTEGRATION_DIR" ] && [ -r "$YUOS_AI_INTEGRATION_DIR/integration.zsh" ]; then
+    source "$YUOS_AI_INTEGRATION_DIR/integration.zsh"
 fi
 "#;
 
@@ -252,14 +252,14 @@ PS1="${{PS1}}%{{$(printf '\e]133;B\a')%}}"
 setopt HIST_IGNORE_SPACE
 
 __cos_ai() {{
-    if [[ -z "$COS_AI_TMP" ]]; then
+    if [[ -z "$YUOS_AI_TMP" ]]; then
         echo "cosmic-term AI not active in this shell." >&2
         return 1
     fi
-    local qfile="$COS_AI_TMP/aq-$1.txt"
-    local cfile="$COS_AI_TMP/ac-$1.json"
+    local qfile="$YUOS_AI_TMP/aq-$1.txt"
+    local cfile="$YUOS_AI_TMP/ac-$1.json"
     if [[ ! -f "$qfile" ]]; then
-        echo "cos-ai: query file $qfile missing." >&2
+        echo "yuos-ai: query file $qfile missing." >&2
         return 1
     fi
     local fl
@@ -307,14 +307,14 @@ function __cos_term_postexec --on-event fish_postexec
 end
 
 function __cos_ai
-    if test -z "$COS_AI_TMP"
+    if test -z "$YUOS_AI_TMP"
         echo "cosmic-term AI not active in this shell." >&2
         return 1
     end
-    set -l qfile "$COS_AI_TMP/aq-$argv[1].txt"
-    set -l cfile "$COS_AI_TMP/ac-$argv[1].json"
+    set -l qfile "$YUOS_AI_TMP/aq-$argv[1].txt"
+    set -l cfile "$YUOS_AI_TMP/ac-$argv[1].json"
     if not test -f "$qfile"
-        echo "cos-ai: query file $qfile missing." >&2
+        echo "yuos-ai: query file $qfile missing." >&2
         return 1
     end
     set -l fl (head -n1 "$qfile")
@@ -368,14 +368,14 @@ if (Get-Module -ListAvailable PSReadLine) {{
 
 function global:__cos_ai {{
     param([string]$id)
-    if (-not $env:COS_AI_TMP) {{
+    if (-not $env:YUOS_AI_TMP) {{
         Write-Error "cosmic-term AI not active in this shell."
         return
     }}
-    $qfile = Join-Path $env:COS_AI_TMP "aq-$id.txt"
-    $cfile = Join-Path $env:COS_AI_TMP "ac-$id.json"
+    $qfile = Join-Path $env:YUOS_AI_TMP "aq-$id.txt"
+    $cfile = Join-Path $env:YUOS_AI_TMP "ac-$id.json"
     if (-not (Test-Path $qfile)) {{
-        Write-Error "cos-ai: query file $qfile missing."
+        Write-Error "yuos-ai: query file $qfile missing."
         return
     }}
     $query = Get-Content -Raw $qfile

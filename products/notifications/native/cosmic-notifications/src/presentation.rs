@@ -4,7 +4,7 @@
 mod images;
 
 use anyhow::Result;
-use claw_notification_presentation::{Card, Preferences, TextRun, VERSION};
+use yuos_notification_presentation::{Card, Preferences, TextRun, VERSION};
 use cosmic::{
     cosmic_config::{Config, ConfigGet, ConfigSet, CosmicConfigEntry},
     iced::font::{Style, Weight},
@@ -41,7 +41,7 @@ pub fn set_preferences(config: &Config, payload: &str) -> Result<Preferences> {
 
 pub fn card(notification: &Notification) -> Result<Card> {
     anyhow::ensure!(
-        notification.body.len() <= claw_notification_presentation::MAX_TEXT_BYTES,
+        notification.body.len() <= yuos_notification_presentation::MAX_TEXT_BYTES,
         "notification markup exceeds the presentation limit"
     );
     let body = markup::html_to_spans(&notification.body)

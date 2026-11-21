@@ -6,7 +6,7 @@ import ipaddress
 import math
 from decimal import Decimal
 
-from cos_runtime import network_diagnostics, policy
+from yuos_runtime import network_diagnostics, policy
 
 
 DEFAULT_ATTEMPTS = 3

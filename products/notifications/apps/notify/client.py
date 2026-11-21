@@ -1,12 +1,12 @@
-"""Shared installed-SDK client; identity and policy are enforced by clawd."""
+"""Shared installed-SDK client; identity and policy are enforced by yuosd."""
 
 from __future__ import annotations
 
 import json
 import time
 
-from claw_os_sdk import kernel
-from claw_os_sdk.mcp import current_context
+from yuos_sdk import kernel
+from yuos_sdk.mcp import current_context
 
 
 def request(intent: dict[str, object]) -> dict[str, object]:

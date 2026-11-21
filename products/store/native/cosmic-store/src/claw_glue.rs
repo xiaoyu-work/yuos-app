@@ -2,7 +2,7 @@
 //! Package effects use the retained Root service, never provider dialogs.
 
 use std::{io, path::Path};
-use cos_runtime::{ask_claw, BridgeError, policy};
+use yuos_runtime::{ask_claw, BridgeError, policy};
 use serde::Serialize;
 
 pub fn user_message(err: &BridgeError) -> String {
@@ -14,7 +14,7 @@ pub fn user_message(err: &BridgeError) -> String {
 }
 
 pub(crate) fn human_ui() -> Result<(), BridgeError> {
-    if std::env::var("COS_MCP_SERVER").as_deref() == Ok("1") {
+    if std::env::var("YUOS_MCP_SERVER").as_deref() == Ok("1") {
         return Err(io::Error::new(io::ErrorKind::PermissionDenied, "human UI access is unavailable in MCP").into());
     }
     Ok(())

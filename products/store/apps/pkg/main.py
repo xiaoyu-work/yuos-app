@@ -1,4 +1,4 @@
-"""pkg — Declarative capability management for Claw OS.
+"""pkg — Declarative capability management for Yu OS.
 
 Say what you need, not how to install it.
 """
@@ -14,8 +14,8 @@ import time
 # Keep credentials out of the OS package client process.
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
-from claw_os_sdk import kernel  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
+from yuos_sdk import kernel  # noqa: E402
 
 
 DEFAULT_SEARCH_LIMIT = 25
@@ -38,7 +38,7 @@ def _valid_package_name(package):
 
 
 def _cos_binary():
-    explicit = os.environ.get("COS_BIN")
+    explicit = os.environ.get("YUOS_BIN")
     if explicit:
         return explicit
     return shutil.which("yu")
@@ -62,12 +62,12 @@ def _package_query(action, *arguments):
 
 
 def _package_broker(action, package=None, version=None, packages=None):
-    """Run one privileged package action through clawd."""
-    cos_bin = _cos_binary()
-    if not cos_bin:
+    """Run one privileged package action through yuosd."""
+    yu_bin = _cos_binary()
+    if not yu_bin:
         return {"error": "yu binary not found; privileged package broker unavailable"}
     payload_action = action not in ("update-index", "hold", "unhold")
-    argv = [cos_bin, "__package"]
+    argv = [yu_bin, "__package"]
     if payload_action:
         argv.append("--retained")
     argv.append(action)

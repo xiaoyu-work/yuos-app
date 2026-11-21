@@ -68,18 +68,18 @@ def main():
         ], capture_output=True, text=True)
         assert installation.returncode == 0, installation.stderr
         binary = installed / "usr/bin/cosmic-notifications"
-        manifest = installed / "usr/lib/cos/apps/cosmic-notifications/app.json"
+        manifest = installed / "usr/lib/yuos/apps/cosmic-notifications/app.json"
         assert binary.stat().st_mode & 0o777 == 0o755
         assert binary.read_bytes() == options.binary.read_bytes()
         assert manifest.read_bytes() == (ROOT / "products/notifications/apps/cosmic-notifications/app.json").read_bytes()
         assert {str(path.relative_to(installed)) for path in installed.rglob("*") if path.is_file()} == {
-            "usr/bin/cosmic-notifications", "usr/lib/cos/apps/cosmic-notifications/app.json",
-            "usr/lib/cos/apps/cosmic-notifications/web-ui.json",
-            "usr/lib/cos/apps/cosmic-notifications/web/index.html",
-            "usr/lib/cos/apps/cosmic-notifications/web/app.js",
-            "usr/lib/cos/apps/cosmic-notifications/web/shared/client.js",
-            "usr/lib/cos/apps/cosmic-notifications/web/shared/ui.js",
-            "usr/lib/cos/apps/cosmic-notifications/web/shared/ui.css",
+            "usr/bin/cosmic-notifications", "usr/lib/yuos/apps/cosmic-notifications/app.json",
+            "usr/lib/yuos/apps/cosmic-notifications/web-ui.json",
+            "usr/lib/yuos/apps/cosmic-notifications/web/index.html",
+            "usr/lib/yuos/apps/cosmic-notifications/web/app.js",
+            "usr/lib/yuos/apps/cosmic-notifications/web/shared/client.js",
+            "usr/lib/yuos/apps/cosmic-notifications/web/shared/ui.js",
+            "usr/lib/yuos/apps/cosmic-notifications/web/shared/ui.css",
         }
 
         listener = socket.socket(socket.AF_UNIX)
@@ -152,21 +152,21 @@ def main():
             "#!/usr/bin/python3\n"
             "import json,os,socket,struct,sys,pathlib\n"
             "assert 'DBUS_SESSION_BUS_ADDRESS' not in os.environ\n"
-            "assert 'CLAW_COS_BIN' not in os.environ\n"
+            "assert 'YUOS_KERNEL_BIN' not in os.environ\n"
             "assert not pathlib.Path('/run/user').exists()\n"
-            "assert not pathlib.Path('/run/cos/session-bus').exists()\n"
+            "assert not pathlib.Path('/run/yuos/session-bus').exists()\n"
             "args=sys.argv[1:];assert args[:5]==['--wire=1','__notifications','request','--request-stdin','--deadline']\n"
             "assert len(args)==6\n"
             "intent=json.load(sys.stdin)\n"
             "request={'v':2,'id':'fixture-call','command':'system.notification.control',"
-            "'params':{'session':os.environ['COS_SESSION'],'deadline_unix_ms':int(args[5]),'request':intent}}\n"
+            "'params':{'session':os.environ['YUOS_SESSION'],'deadline_unix_ms':int(args[5]),'request':intent}}\n"
             "def read(s,n):\n"
             " data=b''\n"
             " while len(data)<n:\n"
             "  chunk=s.recv(n-len(data));assert chunk;data+=chunk\n"
             " return data\n"
             "with socket.socket(socket.AF_UNIX) as s:\n"
-            " s.connect('/run/cos/clawd.sock');data=json.dumps(request).encode()\n"
+            " s.connect('/run/yuos/yuosd.sock');data=json.dumps(request).encode()\n"
             " s.sendall(b'CBK1\\x01\\x00'+struct.pack('>I',len(data))+data)\n"
             " header=read(s,10);assert header[:6]==b'CBK1\\x02\\x00'\n"
             " result=json.loads(read(s,struct.unpack('>I',header[6:])[0]))\n"
@@ -183,17 +183,17 @@ def main():
             "--ro-bind", "/usr/share", "/usr/share", "--ro-bind", "/lib", "/lib",
             "--ro-bind", "/lib64", "/lib64", "--dir", "/usr/local/bin",
             "--proc", "/proc", "--dev", "/dev", "--tmpfs", "/run", "--tmpfs", "/work",
-            "--dir", "/run/cos",
-            "--ro-bind", str(options.cos_binary.resolve() if options.cos_binary else cli), "/usr/local/bin/yu",
+            "--dir", "/run/yuos",
+            "--ro-bind", str(options.yu_binary.resolve() if options.yu_binary else cli), "/usr/local/bin/yu",
             "--ro-bind", str(binary), "/work/cosmic-notifications",
             "--ro-bind", str(manifest), "/work/app.json",
-            "--ro-bind", str(fixture / "broker.sock"), "/run/cos/clawd.sock", "--chdir", "/work",
+            "--ro-bind", str(fixture / "broker.sock"), "/run/yuos/yuosd.sock", "--chdir", "/work",
         ]
         for name, value in {
-            "COS_MCP_SERVER": "1", "COS_APP_ID": "cosmic-notifications",
-            "COS_APP_MANIFEST": "/work/app.json", "COS_SESSION": "worker-session",
-            "COS_WORKER_SANDBOX": "1", "COS_RUNTIME_DIR": "/run/cos",
-            "COS_DATA_DIR": "/work/data", "HOME": "/work",
+            "YUOS_MCP_SERVER": "1", "YUOS_APP_ID": "cosmic-notifications",
+            "YUOS_APP_MANIFEST": "/work/app.json", "YUOS_SESSION": "worker-session",
+            "YUOS_WORKER_SANDBOX": "1", "YUOS_RUNTIME_DIR": "/run/yuos",
+            "YUOS_DATA_DIR": "/work/data", "HOME": "/work",
             "XDG_CONFIG_HOME": "/work/config", "XDG_CACHE_HOME": "/work/cache",
             "TMPDIR": "/work", "PATH": "/usr/sbin:/usr/bin:/sbin:/bin",
         }.items():
@@ -220,7 +220,7 @@ def main():
             return response(send(method, params))
 
         def params(name, arguments, **context):
-            return {"name": name, "arguments": arguments, "_meta": {"claw-os.dev/call-context": {
+            return {"name": name, "arguments": arguments, "_meta": {"yuos.dev/call-context": {
                 "wire_version": 1, "call_id": f"fixture-{counter}", "trace_id": "fixture",
                 "session_id": "forged-session", "task_id": "forged-task",
                 "caller": {"kind": "system-agent", "id": "fixture", "owner_uid": 23456}, **context,
@@ -258,7 +258,7 @@ def main():
                 ["--gui", os.fsdecode(b"private-not-opened-\xff")],
             ]:
                 probe = subprocess.run([
-                    *command, "--setenv", "COS_APP_GUI", gui,
+                    *command, "--setenv", "YUOS_APP_GUI", gui,
                     "--", "/work/cosmic-notifications", *arguments,
                 ], input=discovery, capture_output=True, text=True, timeout=15)
                 assert probe.returncode == 0, (gui, arguments, probe.stderr)
@@ -271,8 +271,8 @@ def main():
         (fixture / "wrong.json").write_text(json.dumps(wrong))
         refused = subprocess.run([
             *command, "--ro-bind", str(fixture / "wrong.json"), "/work/wrong.json",
-            "--setenv", "COS_APP_MANIFEST", "/work/wrong.json",
-            "--setenv", "COS_APP_GUI", "1", "--", "/work/cosmic-notifications", "--gui", "--help",
+            "--setenv", "YUOS_APP_MANIFEST", "/work/wrong.json",
+            "--setenv", "YUOS_APP_GUI", "1", "--", "/work/cosmic-notifications", "--gui", "--help",
         ], input="", capture_output=True, text=True, timeout=10)
         assert refused.returncode != 0 and "cosmic-notifications" in refused.stderr
         denied(request("tools/call", {"name": "notify.post", "arguments": {"summary": "No context"}}))
@@ -292,7 +292,7 @@ def main():
         assert calls == [], calls
         assert success(call("notify.post", {"summary": "Default"})) == {"id": NOTIFICATION_ID}
         assert calls[-1]["request"] == {
-            "action": "post", "summary": "Default", "body": "", "app_name": "Claw OS Agent",
+            "action": "post", "summary": "Default", "body": "", "app_name": "Yu OS Agent",
             "icon": "com.yuos.Notifications", "expire_ms": -1, "transient": False,
         }
         full = {"summary": "Title", "body": "<b>plain text stays off argv</b>", "app_name": "Label only",
@@ -302,7 +302,7 @@ def main():
         for expiry in [1, 2147483647]:
             success(call("notify.post", {"summary": "Expiry", "app_name": "", "icon": "", "expire_ms": expiry}))
             assert calls[-1]["request"]["expire_ms"] == expiry
-            assert calls[-1]["request"]["app_name"] == "Claw OS Agent"
+            assert calls[-1]["request"]["app_name"] == "Yu OS Agent"
         assert success(call("notify.close", {"id": NOTIFICATION_ID})) == {
             "ok": True, "id": NOTIFICATION_ID, "state": "dismissed",
         }

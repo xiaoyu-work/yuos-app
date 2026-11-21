@@ -1,7 +1,7 @@
 """Shared helpers for the gateway apps.
 
 Gateway clients import :mod:`gateway._shared` from the common Python root
-(``shared/python`` in development, ``/usr/lib/cos/python`` when installed).
+(``shared/python`` in development, ``/usr/lib/yuos/python`` when installed).
 Every gateway should reach for the helpers
 here before rolling its own. The goal is to give each gateway a tiny,
 audited blast radius:

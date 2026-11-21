@@ -20,7 +20,7 @@ main = load_local_module(
 def invoke(request):
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
         os.environ, {
-            "COS_APP_MANIFEST": str(pathlib.Path(__file__).with_name("app.json")),
+            "YUOS_APP_MANIFEST": str(pathlib.Path(__file__).with_name("app.json")),
         },
     ):
         server = load_local_module(
@@ -80,7 +80,7 @@ def _completed(payload: object, returncode: int = 0) -> mock.Mock:
 
 
 def test_status_uses_printing_observe_scope(invoke):
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(
         main.subprocess, "run", return_value=_completed({"printers": []})
@@ -92,7 +92,7 @@ def test_status_uses_printing_observe_scope(invoke):
 
 
 def test_capabilities_uses_printing_observe_scope(invoke):
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(
         main.subprocess, "run", return_value=_completed({"capabilities": []})
@@ -111,7 +111,7 @@ def test_capabilities_uses_printing_observe_scope(invoke):
 
 @pytest.mark.parametrize("printer", [None, "office"])
 def test_jobs_uses_printer_observe_scope_and_optional_printer(invoke, printer):
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(
         main.subprocess, "run", return_value=_completed({"jobs": []})
@@ -136,7 +136,7 @@ def test_jobs_uses_printer_observe_scope_and_optional_printer(invoke, printer):
     ],
 )
 def test_print_uses_exact_scopes_and_safe_arguments(invoke, options):
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.os.path, "realpath", side_effect=lambda value: value
     ), mock.patch.object(main.os.path, "islink", return_value=False), mock.patch.object(
         main.policy, "require"
@@ -183,7 +183,7 @@ def test_cancel_requires_confirmation_before_policy(confirm):
 
 
 def test_cancel_uses_control_scope_and_confirm_flag(invoke):
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(
         main.subprocess, "run", return_value=_completed({"cancelled": True})
@@ -283,7 +283,7 @@ def test_invalid_print_options_are_rejected_before_policy(options, message):
 )
 def test_broker_payload_failures_raise(returncode, stdout, message):
     completed = mock.Mock(returncode=returncode, stdout=stdout, stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match=message):
@@ -314,7 +314,7 @@ def test_missing_broker_executable_raises():
     ],
 )
 def test_broker_launch_failures_raise(error, exception, message):
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", side_effect=error):
         with pytest.raises(exception, match=message):
@@ -322,7 +322,7 @@ def test_broker_launch_failures_raise(error, exception, message):
 
 
 def test_broker_timeout_raises():
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(
         main.subprocess,

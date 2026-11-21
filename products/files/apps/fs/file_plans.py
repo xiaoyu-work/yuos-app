@@ -14,8 +14,8 @@ import time
 import uuid
 
 from _shared.atomic import _fsync_dir, atomic_write_json
-from claw_os_sdk.objects import format_reference
-from cos_runtime import file_changes, policy, snapshot
+from yuos_sdk.objects import format_reference
+from yuos_runtime import file_changes, policy, snapshot
 
 MAX_TEXT_BYTES = 65536
 MAX_PLAN_BYTES = 1024 * 1024
@@ -173,7 +173,7 @@ def _private_directory(path, create=False):
 
 
 def _bucket(path, create=False):
-    root = os.environ.get("COS_DATA_DIR")
+    root = os.environ.get("YUOS_DATA_DIR")
     if not root or not os.path.isabs(root):
         raise PlanError("plan_storage", "App data directory is not configured")
     _private_directory(root)

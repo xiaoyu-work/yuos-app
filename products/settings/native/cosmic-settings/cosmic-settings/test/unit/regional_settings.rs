@@ -98,7 +98,7 @@ fn locale_confirmation_requires_all_ten_exact_effective_values() {
 #[test]
 fn denied_and_ambiguous_transport_errors_never_confirm_a_change() {
     assert_eq!(
-        classify(claw_os_sdk::BridgeError::AppError {
+        classify(yuos_sdk::BridgeError::AppError {
             app: "regional-settings".into(),
             verb: "control".into(),
             message: "missing grant".into(),
@@ -107,7 +107,7 @@ fn denied_and_ambiguous_transport_errors_never_confirm_a_change() {
         Failure::Denied("missing grant".into())
     );
     assert!(matches!(
-        classify(claw_os_sdk::BridgeError::AppError {
+        classify(yuos_sdk::BridgeError::AppError {
             app: "regional-settings".into(),
             verb: "control".into(),
             message: "lost acknowledgement".into(),
@@ -116,7 +116,7 @@ fn denied_and_ambiguous_transport_errors_never_confirm_a_change() {
         Failure::Unconfirmed(_)
     ));
     assert!(matches!(
-        classify(claw_os_sdk::BridgeError::Decode {
+        classify(yuos_sdk::BridgeError::Decode {
             app: "regional-settings".into(),
             verb: "control".into(),
             message: "malformed".into(),
@@ -149,10 +149,10 @@ fn client_uses_only_the_fixed_public_sdk_service_bridge() {
         env!("CARGO_MANIFEST_DIR"),
         "/src/regional_settings.rs"
     ));
-    assert!(source.contains("cos_call_json_async_with_binary"));
+    assert!(source.contains("yu_call_json_async_with_binary"));
     assert!(source.contains("\"/usr/local/bin/yu\""));
     assert!(!source.contains("pkexec"));
     assert!(!source.contains("approval-helper"));
-    assert!(!source.contains("clawd_client::"));
+    assert!(!source.contains("yuosd_client::"));
     assert!(!source.contains("zbus::"));
 }

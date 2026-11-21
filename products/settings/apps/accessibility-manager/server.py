@@ -1,4 +1,4 @@
-from claw_os_sdk.mcp import App
+from yuos_sdk.mcp import App
 
 from main import set_filter, set_toggle, status
 

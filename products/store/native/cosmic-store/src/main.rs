@@ -109,7 +109,7 @@ pub const MAX_RESULTS: usize = 100;
 
 /// Runs application with these settings
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    if std::env::var("COS_MCP_SERVER").as_deref() == Ok("1") {
+    if std::env::var("YUOS_MCP_SERVER").as_deref() == Ok("1") {
         return mcp::run().map_err(|e| -> Box<dyn std::error::Error> { e.into() });
     }
 

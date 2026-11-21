@@ -77,12 +77,12 @@ python3 products/editor/native/test_process.py
 Rust environment-mutating tests run serially. These fixture checks do not
 replace interactive Wayland acceptance.
 
-Native startup uses the shared `claw-app-gui-argv` client helper and the
+Native startup uses the shared `yuos-app-gui-argv` client helper and the
 published SDK's GUI-launch signal to remove only one leading Host `--gui`.
 Every remaining argument is a filename, including `--gui` on direct launches
 and option-like names or `--`; OS path bytes and order are preserved.
 Startup captures these paths in `Flags`, rather than rereading process argv
-after GUI initialization. `COS_MCP_SERVER=1` still takes precedence.
+after GUI initialization. `YUOS_MCP_SERVER=1` still takes precedence.
 Managed GUI launches stay in the foreground so the common Host retains their
 actual lifetime. Only unmanaged Unix launches retain upstream daemonization;
 this mode choice grants no authority.

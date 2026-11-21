@@ -24,7 +24,7 @@ SUCCESS = (200, {}, b'[{"entity_id":"light.fixture","state":"on"}]')
 
 @pytest.fixture(autouse=True)
 def isolated_credentials(monkeypatch):
-    for name in ("COS_HOMEASSISTANT_URL", "COS_HOMEASSISTANT_TOKEN", "COS_GATEWAY_ALLOW_PRIVATE"):
+    for name in ("YUOS_HOMEASSISTANT_URL", "YUOS_HOMEASSISTANT_TOKEN", "YUOS_GATEWAY_ALLOW_PRIVATE"):
         monkeypatch.delenv(name, raising=False)
     with mock.patch.object(
         main, "_load_credential", side_effect=lambda name: (CREDENTIALS[name], None),
@@ -34,11 +34,11 @@ def isolated_credentials(monkeypatch):
 
 @pytest.fixture(params=["direct", "mcp"])
 def invoke(request):
-    from claw_os_sdk.mcp import App
+    from yuos_sdk.mcp import App
 
     servers = []
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-        os.environ, {"COS_APP_MANIFEST": str(Path(__file__).with_name("app.json"))},
+        os.environ, {"YUOS_APP_MANIFEST": str(Path(__file__).with_name("app.json"))},
     ), mock.patch.object(App, "serve", lambda app: servers.append(app)):
         load_local_module(Path(__file__).with_name("server.py"), "gateway_homeassistant_server")
     assert len(servers) == 1
@@ -151,8 +151,8 @@ def test_missing_configuration_stops_before_network(invoke, missing):
 
 
 def test_environment_overrides_stored_configuration(invoke, monkeypatch):
-    monkeypatch.setenv("COS_HOMEASSISTANT_URL", " https://override.example.test/// ")
-    monkeypatch.setenv("COS_HOMEASSISTANT_TOKEN", " override-fixture ")
+    monkeypatch.setenv("YUOS_HOMEASSISTANT_URL", " https://override.example.test/// ")
+    monkeypatch.setenv("YUOS_HOMEASSISTANT_TOKEN", " override-fixture ")
     with mock.patch.object(main.safe_egress, "safe_urlopen", return_value=SUCCESS) as transport:
         invoke("send", service="notify", text="hello")
     assert transport.call_args.args[1] == "https://override.example.test/api/services/notify/notify"
@@ -162,7 +162,7 @@ def test_environment_overrides_stored_configuration(invoke, monkeypatch):
 
 
 def test_non_http_base_is_rejected(invoke, monkeypatch):
-    monkeypatch.setenv("COS_HOMEASSISTANT_URL", "file:///fixture")
+    monkeypatch.setenv("YUOS_HOMEASSISTANT_URL", "file:///fixture")
     with mock.patch.object(main.safe_egress, "safe_urlopen") as transport:
         assert invoke("send", service="notify", text="hello")["ok"] is False
     transport.assert_not_called()
@@ -190,7 +190,7 @@ def test_transport_errors_are_structured(invoke, kind):
 
 
 def test_private_endpoint_remains_blocked(invoke, monkeypatch):
-    monkeypatch.setenv("COS_HOMEASSISTANT_URL", "http://127.0.0.1:8123")
+    monkeypatch.setenv("YUOS_HOMEASSISTANT_URL", "http://127.0.0.1:8123")
     answers = [(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP, "", ("127.0.0.1", 8123))]
     with mock.patch.object(main.safe_egress.egress, "available", return_value=False), \
          mock.patch.object(main.safe_egress.socket, "getaddrinfo", return_value=answers), \

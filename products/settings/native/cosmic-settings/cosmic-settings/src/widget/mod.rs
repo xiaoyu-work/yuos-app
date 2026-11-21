@@ -54,7 +54,7 @@ pub fn color_picker_context_view<'a, Message: Clone + 'static>(
 /// A settings section whose list card uses the Claw Glass elevated material.
 ///
 /// `settings::section()` defaults to `Container::List`, which fills with
-/// `component.base` and carries no border or shadow. On the ClawOS light
+/// `component.base` and carries no border or shadow. On the YuOS light
 /// palette that composites to `#DDE0E7` against the `#EEF1F8` page, so
 /// sections read as a flat wash. `ListColumn` does expose a style hook, so
 /// pages opt into the branded card by building the section from a pre-styled

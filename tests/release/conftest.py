@@ -55,7 +55,7 @@ def native_mcp_probe():
             "--proc", "/proc", "--dev", "/dev", "--tmpfs", "/tmp",
             "--ro-bind", root, "/app", "--chdir", "/app",
             "--setenv", "PATH", "/usr/bin:/bin", "--setenv", "HOME", "/tmp",
-            "--setenv", "COS_MCP_SERVER", "1", "--setenv", "COS_APP_MANIFEST", "/app/app.json",
+            "--setenv", "YUOS_MCP_SERVER", "1", "--setenv", "YUOS_APP_MANIFEST", "/app/app.json",
             "--setenv", "XDG_CONFIG_HOME", "/tmp/config", "--setenv", "XDG_DATA_HOME", "/tmp/data",
             "/app/" + entry,
         ]
@@ -102,7 +102,7 @@ def signing():
 def deb(tmp_path):
     counter = 0
 
-    def make(name="claw-app-fixture", version="1.0.0", payload=b"first payload\n", *,
+    def make(name="yuos-app-fixture", version="1.0.0", payload=b"first payload\n", *,
              architecture="all", extra=None, files=None, symlinks=None, control_files=None, modes=None):
         nonlocal counter
         counter += 1
@@ -119,7 +119,7 @@ def deb(tmp_path):
         (root / "DEBIAN/control").write_bytes(control_bytes(control))
         for control_name, content in (control_files or {}).items():
             (root / "DEBIAN" / control_name).write_bytes(content)
-        for relative, content in (files or {f"usr/share/clawos-fixture/{name}.txt": payload}).items():
+        for relative, content in (files or {f"usr/share/yuos-fixture/{name}.txt": payload}).items():
             target = root / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(content)

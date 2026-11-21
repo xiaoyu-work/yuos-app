@@ -1,4 +1,4 @@
-"""system-snapshot — full-system recovery points through clawd."""
+"""system-snapshot — full-system recovery points through yuosd."""
 
 import json
 import os
@@ -9,16 +9,16 @@ import sys
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
 SNAPSHOT_ID_RE = re.compile(r"^snap_[0-9a-f]{32}$")
 TIMEOUT_SECS = int(os.environ.get("CLAW_SNAPSHOT_TIMEOUT", "1800"))
-DEFAULT_DESCRIPTION = "Claw OS recovery point"
+DEFAULT_DESCRIPTION = "Yu OS recovery point"
 
 
 def _cos_binary() -> str | None:
-    return os.environ.get("COS_BIN") or shutil.which("yu")
+    return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _broker(
@@ -26,12 +26,12 @@ def _broker(
     value: str | None = None,
     confirm: bool = False,
 ) -> dict:
-    cos_bin = _cos_binary()
-    if not cos_bin:
+    yu_bin = _cos_binary()
+    if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; System Snapshot broker unavailable"
         )
-    argv = [cos_bin, "__snapshot", action]
+    argv = [yu_bin, "__snapshot", action]
     if value is not None:
         argv.append(value)
     if confirm:

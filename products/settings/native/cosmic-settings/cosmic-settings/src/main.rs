@@ -192,13 +192,13 @@ impl CosmicFlags for Args {
 ///
 /// Returns error if iced fails to run the application.
 pub fn main() -> color_eyre::Result<()> {
-    if std::env::var("COS_MCP_SERVER").as_deref() == Ok("1") {
+    if std::env::var("YUOS_MCP_SERVER").as_deref() == Ok("1") {
         return mcp::run().map_err(|e| color_eyre::eyre::eyre!("{e}"));
     }
 
     let args = Args::parse_from(claw_app_gui_argv::normalize(
         std::env::args_os(),
-        claw_os_sdk::gui::is_gui_launch(),
+        yuos_sdk::gui::is_gui_launch(),
         std::ffi::OsStr::new("--gui"),
     ));
 
@@ -229,7 +229,7 @@ pub fn main() -> color_eyre::Result<()> {
 
     let settings = cosmic::app::Settings::default()
         .size_limits(Limits::NONE.min_width(360.0).min_height(300.0))
-        // Frosted shell. The ClawOS theme is `is_frosted`, so the toolkit's
+        // Frosted shell. The YuOS theme is `is_frosted`, so the toolkit's
         // surface colours carry alpha; without asking the compositor to blur
         // behind the window that alpha would expose raw wallpaper under the
         // page text. Files uses the same pairing.

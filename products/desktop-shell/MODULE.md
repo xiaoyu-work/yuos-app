@@ -12,7 +12,7 @@ payload. The OS admits it as the shell of an authenticated login.
 `release: false` excludes it from independent App Debian and Store releases.
 Once its target ABI and authenticated launch are qualified, the separate
 Desktop Shell build workflow supplies the signed payload embedded in
-`claw-os-desktop`. `native/qt.lock.json` pins Qt 6.12.0 and
+`yuos-desktop`. `native/qt.lock.json` pins Qt 6.12.0 and
 its published corrections. The unified CMake build compiles those sources
 against the build host's ABI and uses them for every native child. Release
 payloads must be built on Debian 13, not the Ubuntu preview environment.
@@ -45,9 +45,9 @@ Claw runtime integration.
 | `native/caelestia/utils/scripts/desktop_review.py` | One reviewed menu selection or power action through the private GUI broker |
 
 Managed GUI mode accepts only `--gui` and requires the Host's absolute
-`COS_APP_RESOURCE_DIR`. It selects the bundled shell and QML modules there,
+`YUOS_APP_RESOURCE_DIR`. It selects the bundled shell and QML modules there,
 not the working directory, an ambient Quickshell config or caller-supplied
-CLI paths. `COS_APP_GUI` chooses parsing behavior, never identity or authority;
+CLI paths. `YUOS_APP_GUI` chooses parsing behavior, never identity or authority;
 Root still owns the authenticated launch and its whole lifetime.
 Outside GUI mode, the original CLI remains available for source development.
 
@@ -71,7 +71,7 @@ second copy when they are already running. A visible unmanaged window can
 still be focused, but it does not establish a managed App lifetime.
 Right-clicking an App pins it in the Shell's private data.
 The permanent Launcher entry opens the independent
-`claw-launcher` GUI; the Shell contains no launcher search.
+`yuos-launcher` GUI; the Shell contains no launcher search.
 `services/DesktopMenu.qml` sends one desktop entry ID through the existing
 `desktop_review.py` and private GUI broker, never an Exec string. The Claw
 mark sends the reserved Agent UI entry to the same broker, which handles it

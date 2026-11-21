@@ -1,7 +1,7 @@
 // Copyright 2023 System76 <info@system76.com>
 // SPDX-License-Identifier: GPL-3.0-only
 
-use cos_runtime::ask_claw;
+use yuos_runtime::ask_claw;
 use serde::Serialize;
 
 #[derive(Serialize)]

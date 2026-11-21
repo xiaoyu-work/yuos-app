@@ -53,7 +53,7 @@ pub fn query(operation: &str, arguments: Value) -> io::Result<Value> {
                     .map_err(|_| io::Error::other("Store metadata reader is unavailable"))?,
             )
         };
-        return claw_os_sdk::cos_call_json("package", "query", args)
+        return yuos_sdk::yu_call_json("package", "query", args)
             .map_err(|error| io::Error::other(error.to_string()));
     }
     let backend = serde_json::to_string(BACKEND)?;
@@ -61,11 +61,11 @@ pub fn query(operation: &str, arguments: Value) -> io::Result<Value> {
     let mut child = Command::new("/usr/bin/python3")
         .args(["-I", "-c", &format!(
             "import sys,os,json,types\n\
-             sys.path[:0] = ['/usr/lib/cos/python']\n\
-             os.environ['COS_BIN'] = '/usr/local/bin/yu'\n\
-             os.environ['CLAW_COS_BIN'] = '/usr/local/bin/yu'\n\
+             sys.path[:0] = ['/usr/lib/yuos/python']\n\
+             os.environ['YUOS_BIN'] = '/usr/local/bin/yu'\n\
+             os.environ['YUOS_KERNEL_BIN'] = '/usr/local/bin/yu'\n\
              backend = types.ModuleType('store_catalog')\n\
-             backend.__file__ = '/usr/lib/cos/apps/cosmic-store/embedded.py'\n\
+             backend.__file__ = '/usr/lib/yuos/apps/cosmic-store/embedded.py'\n\
              exec(compile({backend}, '<store-catalog>', 'exec'), backend.__dict__)\n\
              exec(compile({bridge}, '<store-bridge>', 'exec'))\n"
         )])
@@ -139,12 +139,12 @@ pub fn visit_catalog(
 }
 
 pub(crate) fn claw_app_package(name: &str) -> bool {
-    name.starts_with("claw-cap-") || name.starts_with("claw-app-")
-        && !name.starts_with("claw-app-python-")
-        && name != "claw-app-support" && name != "claw-app-support-v1"
+    name.starts_with("yuos-cap-") || name.starts_with("yuos-app-")
+        && !name.starts_with("yuos-app-python-")
+        && name != "yuos-app-support" && name != "yuos-app-support-v1"
 }
 
-pub fn open(name: Option<&str>) -> Result<(), cos_runtime::BridgeError> {
+pub fn open(name: Option<&str>) -> Result<(), yuos_runtime::BridgeError> {
     let mut args = vec![
         "__desktop".to_string(), "launch".into(), "--app-id".into(), "com.yuos.Store".into(),
     ];
@@ -154,11 +154,11 @@ pub fn open(name: Option<&str>) -> Result<(), cos_runtime::BridgeError> {
         }
         args.extend(["--uri".into(), format!("apt://{name}")]);
     }
-    let value = claw_os_sdk::cos_call_json("desktop", "launch", args)?;
+    let value = yuos_sdk::yu_call_json("desktop", "launch", args)?;
     if value["launched"] != true || value["app_id"] != "com.yuos.Store"
         || value["launcher"] != "/usr/bin/cosmic-store"
     {
-        return Err(cos_runtime::BridgeError::Decode {
+        return Err(yuos_runtime::BridgeError::Decode {
             app: "desktop".into(), verb: "launch".into(),
             message: "provider did not confirm native Store launch".into(),
         });

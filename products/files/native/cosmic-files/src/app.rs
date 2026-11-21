@@ -8439,8 +8439,8 @@ impl Application for App {
         }));
 
         if matches!(self.mode, Mode::App)
-            && claw_os_sdk::gui::is_gui_launch()
-            && std::env::var("COS_ARGS_JSON").as_deref() == Ok("[]")
+            && yuos_sdk::gui::is_gui_launch()
+            && std::env::var("YUOS_ARGS_JSON").as_deref() == Ok("[]")
         {
             let desktop = Subscription::run(crate::claw_glue::desktop_events);
             if self.desktop_resident && self.core.main_window_id().is_none()

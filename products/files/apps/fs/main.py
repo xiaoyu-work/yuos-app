@@ -11,11 +11,11 @@ import sys
 from _shared.atomic import atomic_write_bytes, atomic_write_json  # noqa: E402
 from _shared.env_scrub import scrub_env  # noqa: E402
 from _shared.paths import safe_realpath  # noqa: E402
-from cos_runtime import policy, snapshot  # noqa: E402
+from yuos_runtime import policy, snapshot  # noqa: E402
 
 
 WORKSPACE = "/workspace"
-META_FILENAME = ".cos-meta.json"
+META_FILENAME = ".yuos-meta.json"
 MAX_READ_BYTES = 1_000_000
 # MCP duplicates structured results as text; leave room for both representations
 # in its 16 MiB frame and for the text result in the 8 MiB Host frame.

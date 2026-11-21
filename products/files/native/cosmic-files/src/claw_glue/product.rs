@@ -18,15 +18,15 @@ fn command() -> Command {
     let mut command = Command::new("/usr/bin/python3");
     command.args(["-I", "-c", &format!(
         "import sys,os,types,json\n\
-         sys.path[:0] = ['/usr/lib/cos/python']\n\
-         os.environ['COS_BIN'] = '/usr/local/bin/yu'\n\
-         os.environ['CLAW_COS_BIN'] = '/usr/local/bin/yu'\n\
+         sys.path[:0] = ['/usr/lib/yuos/python']\n\
+         os.environ['YUOS_BIN'] = '/usr/local/bin/yu'\n\
+         os.environ['YUOS_KERNEL_BIN'] = '/usr/local/bin/yu'\n\
          request = json.load(sys.stdin)\n\
          needed = {{'document':'document', 'recoll':'recoll', 'remember':None}}.get(request['operation'], 'fs')\n\
          for name,source in {sources}:\n\
          \x20if name != needed: continue\n\
          \x20module = types.ModuleType(name)\n\
-         \x20module.__file__ = '/usr/lib/cos/apps/cosmic-files/embedded.py'\n\
+         \x20module.__file__ = '/usr/lib/yuos/apps/cosmic-files/embedded.py'\n\
          \x20exec(compile(source, '<files-' + name + '>', 'exec'), module.__dict__)\n\
          \x20globals()[name] = module\n\
          exec(compile({bridge}, '<files-bridge>', 'exec'))\n"

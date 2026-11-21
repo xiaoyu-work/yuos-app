@@ -55,7 +55,7 @@ def prepare(product: str, toolkit: Path | None, destination: Path):
             content = manifest.read_text().replace(
                 f'"{prefix}desktop/', '"' + toolkit.parent.as_posix() + "/"
             )
-            for library in ("cos-runtime", "claw-os-sdk"):
+            for library in ("yuos-runtime", "yuos-sdk"):
                 content = content.replace(
                     f'"{prefix}{library}/',
                     '"' + (toolkit.parents[1] / library).as_posix() + "/",
@@ -131,6 +131,8 @@ def main(product=None):
                         help="Stage a release App payload and common-Host compatibility launchers")
     parser.add_argument("--app-root", type=Path,
                         help="Prepare a release App directory for the existing provenance signer")
+    parser.add_argument("--acceptance-root", type=Path,
+                        help="Prepare an unsigned private acceptance fixture from a development platform")
     platform.add_development_arguments(parser)
     options = parser.parse_args()
     try:
@@ -143,8 +145,15 @@ def main(product=None):
         parser.error("--install-root requires build --release")
     if options.app_root and (options.command != "build" or not options.release):
         parser.error("--app-root requires build --release")
-    if options.install_root and options.app_root:
-        parser.error("--install-root and --app-root are separate staging outputs")
+    if options.acceptance_root:
+        if development is None or options.command != "build" or not options.release:
+            parser.error("--acceptance-root requires build --release and an explicit development platform")
+        acceptance = ROOT / "build/acceptance"
+        output = options.acceptance_root.resolve()
+        if output == acceptance or not output.is_relative_to(acceptance):
+            parser.error("--acceptance-root must be an explicit directory under build/acceptance")
+    if sum(path is not None for path in (options.app_root, options.install_root, options.acceptance_root)) > 1:
+        parser.error("Release, install and acceptance staging outputs are separate")
     product = product or options.product
     package = json.loads((ROOT / "products" / product / "package.json").read_text())
     system = build_system(package)
@@ -152,7 +161,7 @@ def main(product=None):
         parser.error("This CMake product has no test target; use build or check")
     if system == "cmake" and development is not None:
         parser.error("This CMake product does not consume the native Rust toolkit")
-    output = options.install_root or options.app_root
+    output = options.install_root or options.app_root or options.acceptance_root
     if output:
         if package.get("native_kind") != "binary":
             raise ValueError("A native library is not a runnable release payload")
@@ -214,7 +223,7 @@ def main(product=None):
             )
     if output:
         install_payload(product, package, destination, install_root, environment,
-                        app_only=bool(options.app_root))
+                        app_only=bool(options.app_root or options.acceptance_root))
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-"""user-manager — critical local identity management through clawd."""
+"""user-manager — critical local identity management through yuosd."""
 
 import json
 import os
@@ -10,7 +10,7 @@ import unicodedata
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
 NAME_RE = re.compile(r"^[a-z_][a-z0-9_-]{0,31}$")
@@ -25,7 +25,7 @@ TIMEOUT_SECS = int(os.environ.get("CLAW_USER_MANAGER_TIMEOUT", "300"))
 
 
 def _cos_binary() -> str | None:
-    return os.environ.get("COS_BIN") or shutil.which("yu")
+    return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _parse_payload(payload_text: str) -> dict:
@@ -57,12 +57,12 @@ def _broker(
     token: str | None = None,
     confirm: bool = False,
 ) -> dict:
-    cos_bin = _cos_binary()
-    if not cos_bin:
+    yu_bin = _cos_binary()
+    if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; User Manager broker unavailable"
         )
-    argv = [cos_bin, "__users", action]
+    argv = [yu_bin, "__users", action]
     for flag, value in (
         ("--user", user),
         ("--group", group),
@@ -88,11 +88,11 @@ def _broker(
         )
     except FileNotFoundError as exc:
         raise FileNotFoundError(
-            f"User Manager broker executable not found: {cos_bin}"
+            f"User Manager broker executable not found: {yu_bin}"
         ) from exc
     except PermissionError as exc:
         raise PermissionError(
-            f"permission denied launching User Manager broker: {cos_bin}"
+            f"permission denied launching User Manager broker: {yu_bin}"
         ) from exc
     except subprocess.TimeoutExpired as exc:
         raise TimeoutError(

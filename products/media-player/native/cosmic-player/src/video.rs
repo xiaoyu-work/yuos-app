@@ -32,7 +32,7 @@ pub fn new_video(
     //TODO: remove unwraps and enable playback of files with only audio.
     gst::init().unwrap();
 
-    let audio = if claw_os_sdk::gui::is_gui_launch() && !settings.mute {
+    let audio = if yuos_sdk::gui::is_gui_launch() && !settings.mute {
         match super::audio::Output::open() {
             Ok(output) => Some(output),
             Err(error) => {

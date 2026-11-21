@@ -19,7 +19,7 @@ pub(crate) struct Cli {
 }
 
 pub(crate) fn parse() -> Cli {
-    parse_from(std::env::args_os(), claw_os_sdk::gui::is_gui_launch())
+    parse_from(std::env::args_os(), yuos_sdk::gui::is_gui_launch())
         .unwrap_or_else(|error| error.exit())
 }
 

@@ -94,12 +94,12 @@ pub fn icon_cache_get(name: &'static str, size: u16) -> widget::icon::Icon {
 /// Runs application with these settings
 #[rustfmt::skip]
 fn main() -> Result<(), Box<dyn Error>> {
-    if std::env::var("COS_MCP_SERVER").as_deref() == Ok("1") {
+    if std::env::var("YUOS_MCP_SERVER").as_deref() == Ok("1") {
         return mcp::run().map_err(|e| -> Box<dyn Error> { e.into() });
     }
 
     let cli::Args { shell_program_opt, shell_args, daemonize, working_directory } =
-        match cli::parse(env::args_os(), claw_os_sdk::gui::is_gui_launch()) {
+        match cli::parse(env::args_os(), yuos_sdk::gui::is_gui_launch()) {
             Ok(cli::Outcome::Run(args)) => args,
             Ok(cli::Outcome::Help) => {
                 print_help();
@@ -118,7 +118,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Platform-specific daemonization logic
 
     #[cfg(all(unix, not(target_os = "redox")))]
-    if daemonize && !claw_os_sdk::gui::is_gui_launch() {
+    if daemonize && !yuos_sdk::gui::is_gui_launch() {
         match fork::daemon(true, true) {
             Ok(fork::Fork::Child) => (),
             Ok(fork::Fork::Parent(_child_pid)) => process::exit(0),
@@ -189,7 +189,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 fn print_help() {
     println!(
         r#"Terminal
-Designed for ClawOS, cosmic-term is a libcosmic-based terminal emulator.
+Designed for YuOS, cosmic-term is a libcosmic-based terminal emulator.
 
 Project home page: https://github.com/pop-os/cosmic-term
 Options:

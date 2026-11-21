@@ -1,6 +1,6 @@
 {
   "extension_name":            { "message": "Yu 邮件 AI" },
-  "extension_description":     { "message": "为 Thunderbird 接入 claw-os 本地 AI 的辅助插件。" },
+  "extension_description":     { "message": "为 Thunderbird 接入 yuos 本地 AI 的辅助插件。" },
 
   "action_title":              { "message": "Yu AI 助手" },
   "summarize_title":           { "message": "摘要" },

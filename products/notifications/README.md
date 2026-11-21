@@ -5,7 +5,7 @@ daemon, MCP, configuration/util libraries and original build/provenance inputs,
 plus the complete Python `notify` facade and its tests.
 The installed binary remains `/usr/bin/cosmic-notifications`, with identity
 `com.yuos.Notifications`; the independent native package is
-`claw-app-notifications-desktop`.
+`yuos-app-notifications-desktop`.
 
 Normal UI and MCP share the existing **OS durable Notification Service**
 through its single desktop delivery consumer. MCP submits bounded intent using
@@ -100,9 +100,9 @@ It is explicitly excluded from new lists. No archive browser or importer is
 added, and service failure is an MCP error, never JSON or empty-list fallback.
 Only new OS-service records persist across App/service restart.
 
-The old filename was relative to the actual launcher `COS_DATA_DIR`, not
-universally `/var/lib/cos`: a worker gets `<data-root>/apps/notify`, ordinarily
-under `~/.local/share/cos` or a configured owner root; an App service Host uses
+The old filename was relative to the actual launcher `YUOS_DATA_DIR`, not
+universally `/var/lib/yuos`: a worker gets `<data-root>/apps/notify`, ordinarily
+under `~/.local/share/yuos` or a configured owner root; an App service Host uses
 its private `<host-control>/data` root before partitioning. Older unpartitioned
 files may remain directly under their original root. The OS no longer
 automatically moves notify's old file at launch. This transition never searches

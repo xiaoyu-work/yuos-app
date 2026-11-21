@@ -11,9 +11,9 @@ work; Calendar never calls another App.
 | `apps/calendar/server.py` | MCP transport over the same implementation |
 | `apps/calendar/test_main.py` | Local event and provider behavior |
 | `apps/panel-calendar/` | Existing native identity, manifest-bound GUI/MCP entry and unchanged named Calendar read grant |
-| `native/claw-applet-calendar/` | Complete monthly picker, popup, selected-day agenda, translations, icon and desktop entry |
-| `native/claw-applet-calendar/src/main.rs`, `src/service.rs`, `src/mcp.rs` | MCP-first binary entry and shared read-only public OS SDK agenda client |
-| `native/claw-applet-calendar/build.rs`, `justfile` | Product-owned localized desktop generation and native installation through the shared App build helper |
+| `native/yuos-applet-calendar/` | Complete monthly picker, popup, selected-day agenda, translations, icon and desktop entry |
+| `native/yuos-applet-calendar/src/main.rs`, `src/service.rs`, `src/mcp.rs` | MCP-first binary entry and shared read-only public OS SDK agenda client |
+| `native/yuos-applet-calendar/build.rs`, `justfile` | Product-owned localized desktop generation and native installation through the shared App build helper |
 | `native/build.py`, `native/Cargo.lock`, `../../tools/native_build.py` | Locked standalone native build/test against declared SDK/toolkit inputs |
 | `PROVENANCE.md`, `native/LICENSE` | Native source origin and preserved GPL terms |
 | `package.json` | Product-owned installation and additional test inputs |
@@ -22,7 +22,7 @@ The source move preserves the installed `calendar` identity, data paths and
 grants. The OS retains the SDK/runtime, worker isolation, data-partition
 migration, policy and credential authority. App-owned support comes from
 [`shared/python`](../../shared/python). `panel-calendar` selects the same real
-`bin/claw-applet-calendar` ELF for GUI and lazy stdio MCP. The compatibility
+`bin/yuos-applet-calendar` ELF for GUI and lazy stdio MCP. The compatibility
 command is exported through the common Host, not `cosmic-applets`.
 The binary retains the existing UI and internal `AgendaProvider` seam. Both
 surfaces use the published SDK 0.2.1 generic wire client with the fixed
@@ -129,8 +129,8 @@ profile/target build and refuses missing, foreign or ambiguous output.
 Installation is build-time staging and requires an explicit non-root `rootdir`.
 It installs files only, not permissions or installed-system hooks.
 
-The binary no longer depends on `claw-os-applet-provider`; shared release
-metadata requires the Agent-provided `claw-os-calendar-read-v1 (= 1)` interface,
+The binary no longer depends on `yuos-applet-provider`; shared release
+metadata requires the Agent-provided `yuos-calendar-read-v1 (= 1)` interface,
 not the Desktop-only applet provider. The OS shell
 neither links this UI nor generates its resources. Native tests
 retain selected-day injection, stale generations, queued refreshes and visible

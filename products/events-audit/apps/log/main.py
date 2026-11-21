@@ -12,9 +12,9 @@ import os
 import re
 from datetime import datetime, timezone
 
-from cos_runtime import policy
+from yuos_runtime import policy
 
-DATA_DIR = os.environ.get("COS_DATA_DIR", "/var/lib/cos")
+DATA_DIR = os.environ.get("YUOS_DATA_DIR", "/var/lib/yuos")
 LOG_DIR = os.path.join(DATA_DIR, "logs")
 LOG_FILE = os.path.join(LOG_DIR, "audit.jsonl")
 

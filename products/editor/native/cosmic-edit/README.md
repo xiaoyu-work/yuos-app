@@ -19,14 +19,14 @@ You can get more detailed errors by using the `RUST_LOG` environment variables, 
 ## Clippy Lints
 PRs are welcome, as it builds a better product for everyone. It is recommended that you check your code with Clippy Lints turned on. You can find more about [Configuring Clippy](https://doc.rust-lang.org/nightly/clippy/configuration.html) here.
 
-## Claw OS MCP service
+## Yu OS MCP service
 
-The App Host starts `/usr/bin/cosmic-edit` with `COS_MCP_SERVER=1`.
+The App Host starts `/usr/bin/cosmic-edit` with `YUOS_MCP_SERVER=1`.
 `apps/cosmic-edit/app.json` owns the MCP tool descriptions, arguments,
 defaults, and capability needs; Rust binds only the handlers.
 
 All seven App tools use controlled primitives, never another App:
-filesystem reads/writes/replacements use `cos_runtime::filesystem`, opening
+filesystem reads/writes/replacements use `yuos_runtime::filesystem`, opening
 uses the fixed `com.yuos.Edit` desktop target, and AI uses SDK
 `ai::chat` as `cosmic-edit` with `external-content` origin. Summaries do not
 write memory. Replacement proposals do not modify the file.

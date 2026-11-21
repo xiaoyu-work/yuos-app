@@ -19,7 +19,7 @@ registry remain separate; this source move does not consolidate sessions.
 | `package.json` | Product-owned staging and test inputs |
 
 The source move preserves identity, capability declarations, output shapes
-and `COS_DATA_DIR/proc` state. Shared environment scrubbing and atomic writes
+and `YUOS_DATA_DIR/proc` state. Shared environment scrubbing and atomic writes
 come from App-owned [`shared/python`](../../shared/MODULE.md), staged separately
 from the pinned OS SDK/runtime. No App-to-App invocation is introduced.
 Native MCP embeds the canonical `exec` command implementation as a private
@@ -51,7 +51,7 @@ executables, never an interactive shell, GUI or live keyring. `just install`
 in the generated native tree retains upstream desktop/icon/metainfo paths.
 Native builds require the paired OS's fixed Terminal desktop service at runtime.
 
-Native startup uses shared `claw-app-gui-argv` with the published SDK's
+Native startup uses shared `yuos-app-gui-argv` with the published SDK's
 GUI-launch signal, removing only one leading Host `--gui` after MCP dispatch.
 The native parser still handles argv0, help/version early exits, working-directory
 values, unknown-argument warnings and unmanaged daemonization as before.

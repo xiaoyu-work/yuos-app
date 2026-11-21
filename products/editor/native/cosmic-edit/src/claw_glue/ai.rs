@@ -1,6 +1,6 @@
 //! Editor AI requests use the SDK's central consent, safety and budget gate.
 
-use claw_os_sdk::{ai, mcp::CallContext};
+use yuos_sdk::{ai, mcp::CallContext};
 
 const SYSTEM: &str = "You help the user edit a document. The user message is a JSON object \
     with an operation, an optional instruction, and document content. Follow the operation \
@@ -16,7 +16,7 @@ pub async fn transform(
 ) -> Result<String, String> {
     tokio::task::spawn_blocking(move || {
         context.check_cancelled().map_err(|e| e.to_string())?;
-        let document = cos_runtime::filesystem::read(&path).map_err(|e| e.to_string())?;
+        let document = yuos_runtime::filesystem::read(&path).map_err(|e| e.to_string())?;
         context.check_cancelled().map_err(|e| e.to_string())?;
         let text = transform_text(document.content, operation, instruction)?;
         context.check_cancelled().map_err(|e| e.to_string())?;

@@ -42,7 +42,7 @@ def app_id(value):
 
 
 def replaces_launcher(package):
-    return package["package"] == "claw-app-launcher-desktop" and package["apps"] == ["claw-launcher"]
+    return package["package"] == "yuos-app-launcher-desktop" and package["apps"] == ["yuos-launcher"]
 
 
 def validate_packages(packages):
@@ -53,7 +53,7 @@ def validate_packages(packages):
         if not isinstance(package, dict) or set(package) != PACKAGE_FIELDS or (
             not isinstance(package["package"], str)
             or len(package["package"]) > 255
-            or not re.fullmatch(r"claw-(?:app|cap|apps)-[a-z0-9][a-z0-9-]*", package["package"])
+            or not re.fullmatch(r"yuos-(?:app|cap|apps)-[a-z0-9][a-z0-9-]*", package["package"])
             or package["architecture"] not in ("all", "amd64", "arm64")
             or type(package["size"]) is not int or not 0 < package["size"] <= MAX_PACKAGE_BYTES
         ):
@@ -107,7 +107,7 @@ def timestamp(value):
 def record_tag(record):
     display = record["display"]
     prefix = "app" if display["source_kind"] == "product" else "cap"
-    return f"{prefix}-{display['source_name']}-v{record['release_version'].replace('~', '-')}"
+    return f"yuos-{prefix}-{display['source_name']}-v{record['release_version'].replace('~', '-')}"
 
 
 def validate_index(index, *, now=None, allow_expired=False):
@@ -149,7 +149,7 @@ def validate_index(index, *, now=None, allow_expired=False):
         ):
             raise ValueError("Invalid App Store artifact")
         checksum = snapshots.sha256_value(artifact["sha256"])
-        if artifact["file"] != f"claw-app-snapshot-{checksum}.tar.gz":
+        if artifact["file"] != f"yuos-app-snapshot-{checksum}.tar.gz":
             raise ValueError("App Store downloads must be immutable SHA256-named snapshots")
         display, web = record["display"], record["web_ui"]
         if not isinstance(display, dict) or set(display) != {
@@ -254,7 +254,7 @@ def snapshot_records(directory, provenance, signing, *, inventories=None):
 
 
 def debian_apps(root, record):
-    base = root / "usr/lib/cos/apps"
+    base = root / "usr/lib/yuos/apps"
     apps = {}
     for path in sorted(base.rglob("app.json")):
         manifest = snapshots.read_metadata(path)
@@ -263,7 +263,7 @@ def debian_apps(root, record):
             raise ValueError("Debian App identity conflicts with its installed layout")
         snapshots.tree_inventory(path.parent, record["architecture"])
         apps[value] = path.parent
-    declared = record["control"].get("X-Claw-App-Ids", "")
+    declared = record["control"].get("X-YuOS-App-Ids", "")
     selected = declared.split(", ") if declared else []
     if any(not app_id(value) for value in selected) or len(set(selected)) != len(selected) or (
         set(selected) != set(apps)
@@ -332,8 +332,8 @@ def compose(directories, output, provenance, signing, *, packages, previous=None
                 ):
                     raise ValueError("Snapshot bytes differ from the final authenticated Debian App")
                 display = selected["display"]
-                if record["control"].get("X-Claw-Product") != display["source_name"] or (
-                    record["control"].get("X-Claw-Source-Kind") != display["source_kind"]
+                if record["control"].get("X-YuOS-Product") != display["source_name"] or (
+                    record["control"].get("X-YuOS-Source-Kind") != display["source_kind"]
                 ):
                     raise ValueError("App snapshot and Debian package source ownership disagree")
                 selected["delivery"] = {"kind": "apt", "package_sha256": record["sha256"]}

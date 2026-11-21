@@ -1,9 +1,9 @@
 import hashlib
 import json
 
-from claw_os_sdk import events
-from claw_os_sdk.objects import format_reference
-from claw_os_sdk.mcp import App, ToolResult, current_context
+from yuos_sdk import events
+from yuos_sdk.objects import format_reference
+from yuos_sdk.mcp import App, ToolResult, current_context
 
 import file_plans
 import main

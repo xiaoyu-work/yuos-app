@@ -6,7 +6,7 @@ pub(crate) mod product;
 use std::io;
 use std::path::Path;
 
-use cos_runtime::ask_claw;
+use yuos_runtime::ask_claw;
 use serde::Serialize;
 use serde_json::json;
 
@@ -66,7 +66,7 @@ pub fn remove(path: &Path) -> io::Result<()> {
 pub fn reveal(path: &Path) -> Result<String, String> {
     let path = std::fs::canonicalize(path).map_err(|error| error.to_string())?;
     let uri = url::Url::from_file_path(&path).map_err(|_| "invalid local path")?;
-    let value = claw_os_sdk::cos_call_json("desktop", "launch", [
+    let value = yuos_sdk::yu_call_json("desktop", "launch", [
         "__desktop", "launch", "--app-id", "com.yuos.Files", "--uri", uri.as_str(),
     ]).map_err(|error| error.to_string())?;
     if value["launched"] != true || value["app_id"] != "com.yuos.Files"

@@ -20,7 +20,7 @@
 
 The config/util libraries remain private App implementation; they are no
 longer exported for OS compilation. The OS owns the lightweight versioned
-`claw-notification-presentation` contract in the public SDK artifact. The App
+`yuos-notification-presentation` contract in the public SDK artifact. The App
 converts its existing markup, image and action behavior to bounded records
 over the OS-controlled presentation resource and shell descriptor. Legacy
 private interfaces remain explicit compatibility-fixture inputs, not an
@@ -54,7 +54,7 @@ still follows the OS theme and inherited button/icon state at render time.
 
 The authoritative Notification Service, owner/App identity, consent, audit,
 SQLite history, retention, DND, channel preferences and delivery leases/retries
-remain in `claw-os`. Its Root-held GUI resource is the single automatic desktop
+remain in `yuos`. Its Root-held GUI resource is the single automatic desktop
 consumer; this product never claims that queue, reads the core database, or
 duplicates durable state. External freedesktop presentations remain untrusted
 and do not gain authority from hints or display labels. The original preference

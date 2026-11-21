@@ -15,10 +15,10 @@ def test_native_cli_uses_the_verified_local_sdk_without_unlocking_dependencies(d
     copy_development_tools(dependency.root)
     files = {
         **FILES,
-        "claw-os-sdk/rust/Cargo.toml": (
+        "yuos-sdk/rust/Cargo.toml": (
             b'[package]\nname="fixture-sdk"\nversion="0.0.0"\nedition="2021"\n[workspace]\n'
         ),
-        "claw-os-sdk/rust/src/lib.rs": b'pub const VALUE: &str = "verified local SDK";\n',
+        "yuos-sdk/rust/src/lib.rs": b'pub const VALUE: &str = "verified local SDK";\n',
     }
     data = public_archive(files=files, mutate=lambda manifest: manifest.update(version="0.1.0"))
     archive = dependency.root / "local-native.tar.gz"
@@ -32,7 +32,7 @@ def test_native_cli_uses_the_verified_local_sdk_without_unlocking_dependencies(d
     }))
     (native / "Cargo.toml").write_text(
         '[package]\nname="development-probe"\nversion="0.0.0"\nedition="2021"\n'
-        '[workspace]\n[dependencies]\nfixture-sdk={path="../../../claw-os-sdk/rust"}\n'
+        '[workspace]\n[dependencies]\nfixture-sdk={path="../../../yuos-sdk/rust"}\n'
     )
     (native / "Cargo.lock").write_text(
         'version=4\n[[package]]\nname="development-probe"\nversion="0.0.0"\n'

@@ -705,11 +705,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "claw-applet-clipboard"
+name = "yuos-applet-clipboard"
 version = "0.1.0"
 dependencies = [
  "async-trait",
- "claw-os-sdk",
+ "yuos-sdk",
  "i18n-embed",
  "i18n-embed-fl",
  "jiff",
@@ -725,8 +725,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "claw-os-sdk"
-version = "0.2.1"
+name = "yuos-sdk"
+version = "0.1.0"
 dependencies = [
  "async-trait",
  "base64",

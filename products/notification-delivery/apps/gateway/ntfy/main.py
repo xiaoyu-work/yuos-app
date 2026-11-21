@@ -8,7 +8,7 @@ that ntfy understands (``Title``, ``Priority``, ``Tags``,
 Auth modes (mutually exclusive; checked in order):
 
   1. ``--bearer <token>`` or ``ntfy_token`` credential / env
-     ``COS_NTFY_TOKEN``  → ``Authorization: Bearer <token>``
+     ``YUOS_NTFY_TOKEN``  → ``Authorization: Bearer <token>``
   2. ``--basic <user:pass>`` → ``Authorization: Basic <base64>``
   3. None (anonymous, only works on public topics)
 
@@ -16,10 +16,10 @@ Body is sent as ``text/plain; charset=utf-8`` so it works against
 both ntfy.sh and self-hosted ntfy servers without going through
 the JSON-publish endpoint.
 
-The kernel resolves the server from ``--server``, ``COS_NTFY_SERVER``,
+The kernel resolves the server from ``--server``, ``YUOS_NTFY_SERVER``,
 or the ``ntfy_server`` credential before launch, falling back to
 ``https://ntfy.sh``. Topic defaults to ``ntfy_default_topic`` /
-``COS_NTFY_DEFAULT_TOPIC`` when only the body is supplied.
+``YUOS_NTFY_DEFAULT_TOPIC`` when only the body is supplied.
 
 Stdlib only.
 """
@@ -37,7 +37,7 @@ from gateway._shared import gateway_args, gateway_memory, safe_egress, safe_subp
 
 
 PLATFORM = "ntfy"
-USER_AGENT = "ClawOSNtfy/0.1.0"
+USER_AGENT = "YuOSNtfy/0.1.0"
 DEFAULT_SERVER = "https://ntfy.sh"
 SOFT_LEN = 4000
 ALLOWED_PRIORITIES = {"min", "low", "default", "high", "max", "urgent"}
@@ -64,7 +64,7 @@ def _truncate(text: str, limit: int = SOFT_LEN) -> str:
 def _resolve_topic(topic: str | None) -> str | None:
     if topic and topic.strip():
         return topic.strip()
-    return _env_or_credential("COS_NTFY_DEFAULT_TOPIC", "ntfy_default_topic")
+    return _env_or_credential("YUOS_NTFY_DEFAULT_TOPIC", "ntfy_default_topic")
 
 
 def _resolve_server(server: str | None) -> str:
@@ -88,7 +88,7 @@ def _resolve_auth_header(
         return f"Basic {token}"
     if not allow_stored_token:
         return None
-    cred = _env_or_credential("COS_NTFY_TOKEN", "ntfy_token")
+    cred = _env_or_credential("YUOS_NTFY_TOKEN", "ntfy_token")
     if cred:
         return f"Bearer {cred}"
     return None
@@ -223,8 +223,8 @@ def _send(
 
 def _status(server: str | None = None) -> dict:
     server = _resolve_server(server)
-    topic = _env_or_credential("COS_NTFY_DEFAULT_TOPIC", "ntfy_default_topic")
-    has_token = bool(_env_or_credential("COS_NTFY_TOKEN", "ntfy_token"))
+    topic = _env_or_credential("YUOS_NTFY_DEFAULT_TOPIC", "ntfy_default_topic")
+    has_token = bool(_env_or_credential("YUOS_NTFY_TOKEN", "ntfy_token"))
     return {
         "ok": True,
         "platform": PLATFORM,
@@ -329,8 +329,8 @@ def run(command: str, args):
 
 
 if __name__ == "__main__":
-    cmd = os.environ.get("COS_COMMAND") or (sys.argv[1] if len(sys.argv) > 1 else "")
-    raw_args = os.environ.get("COS_ARGS_JSON")
+    cmd = os.environ.get("YUOS_COMMAND") or (sys.argv[1] if len(sys.argv) > 1 else "")
+    raw_args = os.environ.get("YUOS_ARGS_JSON")
     if raw_args:
         parsed_args = json.loads(raw_args)
     else:

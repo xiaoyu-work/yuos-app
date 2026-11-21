@@ -10,7 +10,7 @@ from typing import Literal
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
 DEVICE_RE = re.compile(r"^/dev/[A-Za-z0-9._/+:-]+$")
@@ -22,7 +22,7 @@ DIAGNOSTIC_ACTIONS = frozenset({"health", "check"})
 
 
 def _cos_binary() -> str | None:
-    return os.environ.get("COS_BIN") or shutil.which("yu")
+    return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _canonical_device(raw: object) -> str:
@@ -40,12 +40,12 @@ def _canonical_device(raw: object) -> str:
 
 
 def _broker(action: str, device: str | None = None) -> dict:
-    cos_bin = _cos_binary()
-    if not cos_bin:
+    yu_bin = _cos_binary()
+    if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Storage Manager broker unavailable"
         )
-    argv = [cos_bin, "__storage", action]
+    argv = [yu_bin, "__storage", action]
     if device is not None:
         argv.extend(["--device", device])
     timeout = CHECK_TIMEOUT_SECS if action == "check" else QUERY_TIMEOUT_SECS

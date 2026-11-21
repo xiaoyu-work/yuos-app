@@ -9,9 +9,9 @@ rust-version = "1.90"
 [dependencies]
 anyhow = "1"
 async-trait = "0.1"
-claw-app-gui-argv = { path = "../../../../shared/rust/gui-argv" }
-claw-os-sdk = { path = "../../../claw-os-sdk/rust" }
-cos-runtime = { path = "../../../cos-runtime/rust" }
+yuos-app-gui-argv = { path = "../../../../shared/rust/gui-argv" }
+yuos-sdk = { path = "../../../yuos-sdk/rust" }
+yuos-runtime = { path = "../../../yuos-runtime/rust" }
 dirs = "6"
 env_logger = "0.11.8"
 grep = "0.3.2"

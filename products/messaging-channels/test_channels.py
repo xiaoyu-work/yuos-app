@@ -13,14 +13,14 @@ from test_support import authenticated_mcp_params, load_local_module
 
 @pytest.fixture(params=["discord", "telegram", "slack", "whatsapp"])
 def connector(request):
-    from claw_os_sdk.mcp import App
+    from yuos_sdk.mcp import App
 
     platform = request.param
     directory = Path(__file__).parent / "apps" / "gateway" / platform
     main = load_local_module(directory / "main.py", f"channel_{platform}_client")
     servers = []
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-        os.environ, {"COS_APP_MANIFEST": str(directory / "app.json")},
+        os.environ, {"YUOS_APP_MANIFEST": str(directory / "app.json")},
     ), mock.patch.object(App, "serve", lambda app: servers.append(app)):
         load_local_module(directory / "server.py", f"channel_{platform}_server")
     return platform, main, servers[0]

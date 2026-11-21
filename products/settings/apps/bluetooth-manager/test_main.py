@@ -241,7 +241,7 @@ def test_routes_use_exact_capability_and_broker_argv(
         stdout=json.dumps({"changed": True}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         function = getattr(main, function_name)
@@ -249,7 +249,7 @@ def test_routes_use_exact_capability_and_broker_argv(
             result = function(*args)
         else:
             with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-                os.environ, {"COS_APP_MANIFEST": str(MANIFEST_PATH)}
+                os.environ, {"YUOS_APP_MANIFEST": str(MANIFEST_PATH)}
             ):
                 server = load_local_module(SERVER_PATH, "claw_test_bluetooth_manager_server")
                 manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
@@ -361,7 +361,7 @@ def test_invalid_arguments_are_rejected_before_policy(function_name, args, messa
 )
 def test_broker_parses_stdout_before_stderr(stdout, stderr, expected):
     completed = mock.Mock(returncode=0, stdout=stdout, stderr=stderr)
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed):
         assert main.status() == expected
@@ -392,7 +392,7 @@ def test_broker_parses_stdout_before_stderr(stdout, stderr, expected):
 )
 def test_broker_payload_failures_raise(returncode, stdout, stderr, message):
     completed = mock.Mock(returncode=returncode, stdout=stdout, stderr=stderr)
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match=re.escape(message)):
@@ -430,7 +430,7 @@ def test_missing_broker_executable_raises():
     ],
 )
 def test_broker_execution_failures_raise(failure, exception_type, message):
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", side_effect=failure):
         with pytest.raises(exception_type, match=message):

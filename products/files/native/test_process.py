@@ -23,13 +23,13 @@ def main():
         stage("files", installed, ["cosmic-files"])
         libraries = prepare_exports(download=False)
         python = stage_shared(installed)
-        shutil.copytree(libraries["python-sdk"] / "claw_os_sdk", python / "claw_os_sdk", ignore=IGNORE)
-        shutil.copytree(libraries["python-runtime"] / "cos_runtime", python / "cos_runtime", ignore=IGNORE)
+        shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)
+        shutil.copytree(libraries["python-runtime"] / "yuos_runtime", python / "yuos_runtime", ignore=IGNORE)
         namespace = "/run/files-fixture"
         (fixture / "owner/.recoll/xapiandb").mkdir(parents=True)
         (fixture / "work").mkdir()
         (fixture / "work/a.txt").write_text("untrusted document")
-        (fixture / "work/.cos-meta.json").write_text('{"a.txt":{"tags":["fixture"]}}')
+        (fixture / "work/.yuos-meta.json").write_text('{"a.txt":{"tags":["fixture"]}}')
         (fixture / "work/link.txt").symlink_to("a.txt")
         broker = fixture / "yu"
         broker.write_text(
@@ -75,21 +75,21 @@ def main():
             "--tmpfs", "/usr/local/bin", "--tmpfs", "/usr/bin",
         ]
         for library in Path("/usr/lib").iterdir():
-            if library.name != "cos":
+            if library.name != "yuos":
                 command.extend(["--ro-bind", str(library), str(library)])
         command += [
             "--bind", str(fixture), namespace,
             "--ro-bind", str(Path("/usr/bin/python3").resolve()), "/usr/bin/python3",
-            "--ro-bind", str(installed / "usr/lib/cos"), "/usr/lib/cos",
+            "--ro-bind", str(installed / "usr/lib/yuos"), "/usr/lib/yuos",
             "--ro-bind", str(broker), "/usr/local/bin/yu",
             "--ro-bind", str(recoll), "/usr/bin/recollq",
-            "--setenv", "COS_MCP_SERVER", "1",
-            "--setenv", "COS_APP_MANIFEST", "/usr/lib/cos/apps/cosmic-files/app.json",
-            "--setenv", "COS_OWNER_HOME", namespace + "/owner",
-            "--setenv", "COS_DATA_DIR", namespace + "/data",
+            "--setenv", "YUOS_MCP_SERVER", "1",
+            "--setenv", "YUOS_APP_MANIFEST", "/usr/lib/yuos/apps/cosmic-files/app.json",
+            "--setenv", "YUOS_OWNER_HOME", namespace + "/owner",
+            "--setenv", "YUOS_DATA_DIR", namespace + "/data",
             "--setenv", "TMPDIR", namespace,
-            "--setenv", "CLAW_COS_BIN", "/usr/local/bin/yu",
-            "--setenv", "COS_BIN", "/untrusted/must-not-execute",
+            "--setenv", "YUOS_KERNEL_BIN", "/usr/local/bin/yu",
+            "--setenv", "YUOS_BIN", "/untrusted/must-not-execute",
             "--setenv", "DISPLAY", "", "--setenv", "WAYLAND_DISPLAY", "",
             "--", str(Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else
                        ROOT / "build/native-target/debug/cosmic-files"),
@@ -118,7 +118,7 @@ def main():
         def call(name, arguments, **context):
             return request("tools/call", {
                 "name": f"files.{name}", "arguments": arguments,
-                "_meta": {"claw-os.dev/call-context": {
+                "_meta": {"yuos.dev/call-context": {
                     "wire_version": 1, "call_id": f"fixture-{counter}", "trace_id": "fixture",
                     "session_id": "caller-session", "task_id": "fixture-task",
                     "caller": {"kind": "system-agent", "id": "fixture", "owner_uid": 1000},

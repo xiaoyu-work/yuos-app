@@ -1,4 +1,4 @@
-from claw_os_sdk.mcp import App
+from yuos_sdk.mcp import App
 
 from main import find, is_running as check_running, list_apps, open_app, recent
 

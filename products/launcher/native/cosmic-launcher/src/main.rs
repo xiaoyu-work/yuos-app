@@ -16,9 +16,9 @@ use localize::localize;
 use crate::config::VERSION;
 
 fn main() -> cosmic::iced::Result {
-    if std::env::var("COS_MCP_SERVER").as_deref() == Ok("1") {
+    if std::env::var("YUOS_MCP_SERVER").as_deref() == Ok("1") {
         if let Err(e) = mcp::run() {
-            eprintln!("claw-launcher MCP server failed: {e}");
+            eprintln!("yuos-launcher MCP server failed: {e}");
             std::process::exit(1);
         }
         return Ok(());
@@ -27,7 +27,7 @@ fn main() -> cosmic::iced::Result {
     init_logging();
 
     info!(
-        "claw-launcher ({})",
+        "yuos-launcher ({})",
         <app::CosmicLauncher as cosmic::Application>::APP_ID
     );
     info!("Version: {} ({})", VERSION, config::profile());

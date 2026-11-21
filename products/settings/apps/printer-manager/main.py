@@ -9,7 +9,7 @@ import sys
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
 NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,126}$")
@@ -20,7 +20,7 @@ TIMEOUT_SECS = int(os.environ.get("CLAW_PRINTER_MANAGER_TIMEOUT", "600"))
 
 
 def _cos_binary() -> str | None:
-    return os.environ.get("COS_BIN") or shutil.which("yu")
+    return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _printer_name(raw: object) -> str:
@@ -96,12 +96,12 @@ def _broker(
     copies: int | None = None,
     confirm: bool = False,
 ) -> dict:
-    cos_bin = _cos_binary()
-    if not cos_bin:
+    yu_bin = _cos_binary()
+    if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Printer Manager broker unavailable"
         )
-    argv = [cos_bin, "__printer", action]
+    argv = [yu_bin, "__printer", action]
     values = {
         "printer": printer,
         "source": source,
@@ -129,11 +129,11 @@ def _broker(
         )
     except FileNotFoundError as exc:
         raise FileNotFoundError(
-            f"Printer Manager broker executable not found: {cos_bin}"
+            f"Printer Manager broker executable not found: {yu_bin}"
         ) from exc
     except PermissionError as exc:
         raise PermissionError(
-            f"permission denied launching Printer Manager broker: {cos_bin}"
+            f"permission denied launching Printer Manager broker: {yu_bin}"
         ) from exc
     except subprocess.TimeoutExpired as exc:
         raise TimeoutError(

@@ -63,7 +63,7 @@
     try {
       port = browser.runtime.connectNative(name);
     } catch (e) {
-      console.warn("[claw-mail-ai] connectNative threw:", e);
+      console.warn("[yuos-mail-ai] connectNative threw:", e);
       fireStatus({ status: "error", error: String(e) });
       scheduleReconnect();
       return;
@@ -85,7 +85,7 @@
     port.onDisconnect.addListener(() => {
       const err = browser.runtime.lastError;
       const msg = err?.message || "host disconnected";
-      console.warn("[claw-mail-ai] NM port disconnected:", msg);
+      console.warn("[yuos-mail-ai] NM port disconnected:", msg);
       port = null;
       if (stableTimer) { clearTimeout(stableTimer); stableTimer = null; }
       // Fail every in-flight request.

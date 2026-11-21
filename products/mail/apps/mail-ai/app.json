@@ -6,8 +6,8 @@
     "zh_CN": "邮件 AI"
   },
   "summary": {
-    "en": "AI helpers (summarize, smart-reply, smart-compose, translate, triage, chat) for the Thunderbird MailExtension `claw-mail-ai`.",
-    "zh_CN": "为 Thunderbird claw-mail-ai 扩展提供的 AI 助手(摘要、智能回复、智能撰写、翻译、分类、邮箱对话)。"
+    "en": "AI helpers (summarize, smart-reply, smart-compose, translate, triage, chat) for the Thunderbird MailExtension `yuos-mail-ai`.",
+    "zh_CN": "为 Thunderbird yuos-mail-ai 扩展提供的 AI 助手(摘要、智能回复、智能撰写、翻译、分类、邮箱对话)。"
   },
   "icon": "🦅",
   "runtime": "python",

@@ -37,7 +37,7 @@ from gateway._shared import safe_egress  # noqa: E402
 
 @pytest.fixture(autouse=True)
 def isolated_boundaries(monkeypatch):
-    for name in ("COS_WEBHOOK_URL", "COS_WEBHOOK_SECRET", "COS_GATEWAY_ALLOW_PRIVATE"):
+    for name in ("YUOS_WEBHOOK_URL", "YUOS_WEBHOOK_SECRET", "YUOS_GATEWAY_ALLOW_PRIVATE"):
         monkeypatch.delenv(name, raising=False)
 
     def resolve(host, port, **kwargs):
@@ -54,11 +54,11 @@ def isolated_boundaries(monkeypatch):
 
 @pytest.fixture(params=["direct", "mcp"])
 def invoke(request):
-    from claw_os_sdk.mcp import App
+    from yuos_sdk.mcp import App
 
     servers = []
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-        os.environ, {"COS_APP_MANIFEST": str(Path(__file__).with_name("app.json"))},
+        os.environ, {"YUOS_APP_MANIFEST": str(Path(__file__).with_name("app.json"))},
     ), mock.patch.object(App, "serve", lambda app: servers.append(app)):
         load_local_module(Path(__file__).with_name("server.py"), "gateway_webhook_server")
     assert len(servers) == 1
@@ -160,8 +160,8 @@ def test_auth_precedence_and_independent_hmac(invoke, mode):
 def test_default_target_and_signing_secret(invoke, monkeypatch, environment):
     credentials = {"webhook_default_url": "https://default.example.test/hook", "webhook_default_secret": "secret-fixture"}
     if environment:
-        monkeypatch.setenv("COS_WEBHOOK_URL", " " + credentials["webhook_default_url"] + " ")
-        monkeypatch.setenv("COS_WEBHOOK_SECRET", " secret-fixture ")
+        monkeypatch.setenv("YUOS_WEBHOOK_URL", " " + credentials["webhook_default_url"] + " ")
+        monkeypatch.setenv("YUOS_WEBHOOK_SECRET", " secret-fixture ")
     with mock.patch.object(main, "_load_credential", side_effect=lambda name: (credentials[name], None)) as load, \
          mock.patch.object(safe_egress, "safe_urlopen", return_value=(200, {}, b"ok")) as transport:
         result = invoke("send", text="hello", raw=True)
@@ -285,7 +285,7 @@ class RedirectSSRFTests(unittest.TestCase):
         safe_egress.policy = _AllowingPolicy()
         # Pre-resolve example.com to a non-private address by setting
         # the env override OFF (default).
-        os.environ.pop("COS_GATEWAY_ALLOW_PRIVATE", None)
+        os.environ.pop("YUOS_GATEWAY_ALLOW_PRIVATE", None)
 
     def tearDown(self):
         safe_egress.policy = self._orig_policy
@@ -327,7 +327,7 @@ class PrivateHostBlockingTests(unittest.TestCase):
     def setUp(self):
         self._orig_policy = safe_egress.policy
         safe_egress.policy = _AllowingPolicy()
-        os.environ.pop("COS_GATEWAY_ALLOW_PRIVATE", None)
+        os.environ.pop("YUOS_GATEWAY_ALLOW_PRIVATE", None)
 
     def tearDown(self):
         safe_egress.policy = self._orig_policy

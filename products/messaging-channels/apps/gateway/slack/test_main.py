@@ -20,7 +20,7 @@ SUCCESS = (200, {}, b'{"ok":true,"ts":"fixture-time"}')
 
 @pytest.fixture(autouse=True)
 def isolated_credentials(monkeypatch):
-    monkeypatch.delenv("COS_SLACK_TOKEN", raising=False)
+    monkeypatch.delenv("YUOS_SLACK_TOKEN", raising=False)
     with mock.patch.object(
         main.safe_subprocess, "safe_credential_load", return_value=(TOKEN, None),
     ), mock.patch.object(main.gateway_memory, "remember_send"):
@@ -29,11 +29,11 @@ def isolated_credentials(monkeypatch):
 
 @pytest.fixture(params=["direct", "mcp"])
 def invoke(request):
-    from claw_os_sdk.mcp import App
+    from yuos_sdk.mcp import App
 
     servers = []
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-        os.environ, {"COS_APP_MANIFEST": str(Path(__file__).with_name("app.json"))},
+        os.environ, {"YUOS_APP_MANIFEST": str(Path(__file__).with_name("app.json"))},
     ), mock.patch.object(App, "serve", lambda app: servers.append(app)):
         load_local_module(Path(__file__).with_name("server.py"), "gateway_slack_server")
     assert len(servers) == 1
@@ -83,7 +83,7 @@ def test_send_preserves_destination_text_and_authentication(invoke, channel, tex
 
 
 def test_environment_token_takes_precedence(invoke, monkeypatch):
-    monkeypatch.setenv("COS_SLACK_TOKEN", " override-fixture ")
+    monkeypatch.setenv("YUOS_SLACK_TOKEN", " override-fixture ")
     with mock.patch.object(main.safe_egress, "safe_urlopen", return_value=SUCCESS) as transport:
         result = invoke("send", channel_id="C123ABC", text="hello")
     assert result["ok"] is True

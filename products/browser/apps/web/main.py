@@ -22,12 +22,12 @@ import urllib.request
 
 from _shared.safe_http import canonical_url, host_scope, open_url, parse_url  # noqa: E402
 
-from claw_os_sdk import ai  # noqa: E402
-from cos_runtime import browser_bridge, memory, policy  # noqa: E402
+from yuos_sdk import ai  # noqa: E402
+from yuos_runtime import browser_bridge, memory, policy  # noqa: E402
 
-TIMEOUT = int(os.environ.get("COS_WEB_TIMEOUT", "30"))
-DEFAULT_MAX_LENGTH = int(os.environ.get("COS_WEB_MAX_CONTENT_LENGTH", "50000"))
-USER_AGENT = "cos/" + os.environ.get("COS_VERSION", "0.1.0")
+TIMEOUT = int(os.environ.get("YUOS_WEB_TIMEOUT", "30"))
+DEFAULT_MAX_LENGTH = int(os.environ.get("YUOS_WEB_MAX_CONTENT_LENGTH", "50000"))
+USER_AGENT = "cos/" + os.environ.get("YUOS_VERSION", "0.1.0")
 MAX_RENDER_TIMEOUT = 55
 MAX_SCREENSHOT = 4 * 1024 * 1024
 

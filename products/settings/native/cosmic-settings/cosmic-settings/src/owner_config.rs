@@ -22,7 +22,7 @@ pub fn failure() -> Option<String> {
 
 pub fn user_keyboard_layouts() -> Result<xkb_data::KeyboardLayouts, Error> {
     let entries = call("keyboard-catalog", "read", &[])?;
-    let parent = std::env::var_os("COS_DATA_DIR")
+    let parent = std::env::var_os("YUOS_DATA_DIR")
         .map(PathBuf::from)
         .ok_or_else(|| {
             failed("owner keyboard catalog requires the authenticated App data binding")
@@ -133,7 +133,7 @@ fn call(namespace: &str, action: &str, entries: &[Entry]) -> Result<Vec<Entry>, 
                 .build()
                 .map_err(|error| error.to_string())?;
             runtime
-                .block_on(claw_os_sdk::cos_call_json_async_with_stdin_binary(
+                .block_on(yuos_sdk::yu_call_json_async_with_stdin_binary(
                     "/usr/local/bin/yu",
                     "desktop-preferences",
                     "control",
@@ -229,7 +229,7 @@ impl Config {
         if version != 1 {
             return Err(Error::InvalidName(format!("{id}/v{version}")));
         }
-        let Some(data) = std::env::var_os("COS_DATA_DIR").map(PathBuf::from) else {
+        let Some(data) = std::env::var_os("YUOS_DATA_DIR").map(PathBuf::from) else {
             let _ = failed("owner preferences require the authenticated App data binding");
             return Ok(Self {
                 local: local::Config::system(id, version)?,

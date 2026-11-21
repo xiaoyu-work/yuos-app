@@ -14,8 +14,8 @@ from unittest import mock
 
 import pytest
 
-from claw_os_sdk.generated import validate_file_change_plan
-from claw_os_sdk.objects import parse_reference
+from yuos_sdk.generated import validate_file_change_plan
+from yuos_sdk.objects import parse_reference
 from test_support import (
     authenticated_mcp_params, load_local_module, mcp_process, unit_policy_bridge,
 )
@@ -36,7 +36,7 @@ def environment(tmp_path, monkeypatch):
     data.mkdir(mode=0o700)
     target = tmp_path / "document.txt"
     target.write_text("before\n", encoding="utf-8")
-    monkeypatch.setenv("COS_DATA_DIR", str(data))
+    monkeypatch.setenv("YUOS_DATA_DIR", str(data))
     require = mock.Mock()
     snapshot = mock.create_autospec(REAL_SNAPSHOT, return_value=None)
     monkeypatch.setattr(plans.policy, "require", require)
@@ -90,14 +90,14 @@ def expect_error(code, function, *args, **kwargs):
 
 @pytest.fixture
 def server(monkeypatch):
-    monkeypatch.setenv("COS_APP_MANIFEST", str(APP_DIR / "app.json"))
+    monkeypatch.setenv("YUOS_APP_MANIFEST", str(APP_DIR / "app.json"))
     with mock.patch.dict(sys.modules, {"main": main, "file_plans": plans}):
         return load_local_module(APP_DIR / "server.py", "claw_test_fs_plan_server")
 
 
 def call(server, name, arguments, *, session="test-session"):
     params = authenticated_mcp_params({"name": f"fs.{name}", "arguments": arguments})
-    context = params["_meta"]["claw-os.dev/call-context"]
+    context = params["_meta"]["yuos.dev/call-context"]
     if session is None:
         context.pop("session_id")
     else:
@@ -384,7 +384,7 @@ def test_snapshot_failure_keeps_unknown_bracket_and_skips_broker(environment):
 @pytest.mark.parametrize("value", ["", None, 1, True])
 def test_apply_requires_authenticated_session_without_ambient_fallback(environment, value, monkeypatch):
     plan = prepare(environment)
-    monkeypatch.setenv("COS_SESSION", "stale-service-session")
+    monkeypatch.setenv("YUOS_SESSION", "stale-service-session")
     environment.require.reset_mock()
     expect_error("plan_context", apply, plan, session_id=value)
     environment.require.assert_not_called()
@@ -662,7 +662,7 @@ def test_mcp_errors_keep_plan_code_and_error_flag(server, environment):
 
 
 def test_mcp_apply_uses_each_authenticated_session_not_process_environment(server, environment, monkeypatch):
-    monkeypatch.setenv("COS_SESSION", "stale-service-session")
+    monkeypatch.setenv("YUOS_SESSION", "stale-service-session")
     for session in ("first-session", "second-session"):
         plan = prepare(environment, session)
         result = call(server, "plan_apply", {
@@ -699,7 +699,7 @@ def test_mcp_never_accepts_a_forged_session_argument(server, environment):
 def test_public_mcp_prepare_show_and_prune_use_the_declared_entrypoint(environment, unit_policy_bridge):
     env = {
         "PATH": os.defpath, "PYTHONPATH": os.environ["PYTHONPATH"],
-        "CLAW_COS_BIN": os.environ["CLAW_COS_BIN"], "COS_DATA_DIR": str(environment.data),
+        "YUOS_KERNEL_BIN": os.environ["YUOS_KERNEL_BIN"], "YUOS_DATA_DIR": str(environment.data),
     }
     with mcp_process(APP_DIR, env=env) as request:
         result = request("tools/call", authenticated_mcp_params({

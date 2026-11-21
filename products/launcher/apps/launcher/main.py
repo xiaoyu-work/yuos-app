@@ -19,13 +19,13 @@ from typing import TypeVar
 from _shared.atomic import atomic_write_bytes  # noqa: E402
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
 DesktopEntry = dict[str, object]
 _T = TypeVar("_T")
 
-DATA_DIR = os.environ.get("COS_DATA_DIR", "/var/lib/cos")
+DATA_DIR = os.environ.get("YUOS_DATA_DIR", "/var/lib/yuos")
 LAUNCHER_DIR = os.path.join(DATA_DIR, "launcher")
 RECENT_PATH = os.path.join(LAUNCHER_DIR, "recent.jsonl")
 RECENT_ROTATE_BYTES = 1_000_000
@@ -42,7 +42,7 @@ URI_SCHEME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
 def _xdg_data_dirs() -> list[str]:
     """Return application directories in freedesktop shadowing order."""
     dirs: list[str] = []
-    owner_home = os.environ.get("COS_OWNER_HOME")
+    owner_home = os.environ.get("YUOS_OWNER_HOME")
     data_home = os.environ.get("XDG_DATA_HOME")
     if not data_home:
         data_home = os.path.join(
@@ -361,10 +361,10 @@ def _validate_launch_targets(
 
 
 def _cos_binary() -> str:
-    cos_binary = os.environ.get("COS_BIN") or shutil.which("yu")
-    if not cos_binary:
+    yu_binary = os.environ.get("YUOS_BIN") or shutil.which("yu")
+    if not yu_binary:
         raise FileNotFoundError("yu binary not found; Launcher broker unavailable")
-    return cos_binary
+    return yu_binary
 
 
 def _parse_broker_payload(payload_text: str) -> dict[str, object]:

@@ -37,7 +37,7 @@ def test_original_default_graph_and_nested_workspace(tmp_path):
     ]
     assert cargo["dependencies"]["libcosmic"]["git"] == "https://github.com/pop-os/libcosmic.git"
     assert "patch" not in cargo
-    for library in ("claw-os-sdk", "cos-runtime"):
+    for library in ("yuos-sdk", "yuos-runtime"):
         assert cargo["dependencies"][library]["path"] == str(tmp_path / "platform" / library / "rust")
     assert (output / "Cargo.lock").read_bytes() == (NATIVE / "Cargo.lock").read_bytes()
     assert (output / "res/icons/hicolor/scalable/apps/com.yuos.Store.svg").is_file()
@@ -70,7 +70,7 @@ def test_human_data_mutations_fail_closed_inside_mcp(monkeypatch):
     function = next(node for node in source.body if isinstance(node, ast.FunctionDef))
     scope = {"os": os}
     exec(compile(ast.Module(body=[function], type_ignores=[]), "<bridge>", "exec"), scope)
-    monkeypatch.setenv("COS_MCP_SERVER", "1")
+    monkeypatch.setenv("YUOS_MCP_SERVER", "1")
     with pytest.raises(ValueError, match="unavailable in MCP"):
         scope["dispatch"]({"operation": "remove_data", "arguments": {"path": "/not-accessed"}})
 
@@ -79,8 +79,8 @@ def test_human_data_cleanup_checks_delete_and_snapshots_before_removal(tmp_path,
     import os
     import shutil
     import stat
-    monkeypatch.delenv("COS_MCP_SERVER", raising=False)
-    monkeypatch.setenv("COS_SESSION", "authenticated-human-session")
+    monkeypatch.delenv("YUOS_MCP_SERVER", raising=False)
+    monkeypatch.setenv("YUOS_SESSION", "authenticated-human-session")
     path = tmp_path / "app-data"
     path.mkdir()
     (path / "content").write_text("synthetic user data")

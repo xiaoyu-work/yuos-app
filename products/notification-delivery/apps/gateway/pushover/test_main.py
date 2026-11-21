@@ -21,7 +21,7 @@ SUCCESS = (200, {}, b'{"status":1,"request":"request-fixture","receipt":"receipt
 
 @pytest.fixture(autouse=True)
 def isolated_credentials(monkeypatch):
-    for name in ("COS_PUSHOVER_APP_TOKEN", "COS_PUSHOVER_USER_KEY"):
+    for name in ("YUOS_PUSHOVER_APP_TOKEN", "YUOS_PUSHOVER_USER_KEY"):
         monkeypatch.delenv(name, raising=False)
     with mock.patch.object(
         main, "_load_credential", side_effect=lambda name: (CREDENTIALS[name], None),
@@ -31,11 +31,11 @@ def isolated_credentials(monkeypatch):
 
 @pytest.fixture(params=["direct", "mcp"])
 def invoke(request):
-    from claw_os_sdk.mcp import App
+    from yuos_sdk.mcp import App
 
     servers = []
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-        os.environ, {"COS_APP_MANIFEST": str(Path(__file__).with_name("app.json"))},
+        os.environ, {"YUOS_APP_MANIFEST": str(Path(__file__).with_name("app.json"))},
     ), mock.patch.object(App, "serve", lambda app: servers.append(app)):
         load_local_module(Path(__file__).with_name("server.py"), "gateway_pushover_server")
     assert len(servers) == 1
@@ -136,8 +136,8 @@ def test_nonemergency_priorities_omit_retry_fields(invoke, priority):
 
 
 def test_environment_credentials_take_precedence(invoke, monkeypatch):
-    monkeypatch.setenv("COS_PUSHOVER_APP_TOKEN", " env-app ")
-    monkeypatch.setenv("COS_PUSHOVER_USER_KEY", " env-user ")
+    monkeypatch.setenv("YUOS_PUSHOVER_APP_TOKEN", " env-app ")
+    monkeypatch.setenv("YUOS_PUSHOVER_USER_KEY", " env-user ")
     with mock.patch.object(main.safe_egress, "safe_urlopen", return_value=SUCCESS) as transport:
         assert invoke("send", text="hello")["ok"] is True
     fields = urllib.parse.parse_qs(transport.call_args.kwargs["body"].decode())

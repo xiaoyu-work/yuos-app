@@ -598,7 +598,7 @@ impl cosmic::Application for CosmicNotifications {
                 if self.config.do_not_disturb != config.do_not_disturb {
                     if let Some(tx) = self.notifications_tx.clone() {
                         let preferences =
-                            claw_notification_presentation::Preferences::new(config.do_not_disturb);
+                            yuos_notification_presentation::Preferences::new(config.do_not_disturb);
                         tokio::spawn(async move {
                             if let Err(error) = tx
                                 .send(notifications::Input::PresentationPreferencesChanged(

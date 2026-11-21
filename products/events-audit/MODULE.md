@@ -28,7 +28,7 @@ and Apps do not invoke other Apps.
 `log` retains separate `data.log.read` and `data.log.write` Wild grants. Read is
 newest-first, tail is chronological and search preserves stored order; manual
 entries keep `source=user`. Unlike `event-center`, this is not a broker client:
-it directly uses `COS_DATA_DIR/logs/audit.jsonl` (fallback `/var/lib/cos`).
+it directly uses `YUOS_DATA_DIR/logs/audit.jsonl` (fallback `/var/lib/yuos`).
 The App Host supplies an isolated data directory, so the filename and legacy
 manifest description do not prove access to the OS's authoritative audit trail.
 Do not mount the system audit file writable or append these unchained manual

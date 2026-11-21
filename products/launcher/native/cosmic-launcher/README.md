@@ -47,9 +47,9 @@ Translation files may be found in the i18n directory. New translations may copy 
 
 To debug issues with asynchronous code, install [tokio-console](https://github.com/tokio-rs/console) and run it within a separate terminal. Then kill the **cosmic-launcher** process a couple times in quick succession to prevent **cosmic-session** from spawning it again. Then you can start **cosmic-launcher** with **tokio-console** support either by running `just tokio-console` from this repository to test code changes, or `env TOKIO_CONSOLE=1 cosmic-launcher` to enable it with the installed version of **cosmic-launcher**.
 
-## Claw OS MCP service
+## Yu OS MCP service
 
-The App Host starts `/usr/bin/cosmic-launcher` with `COS_MCP_SERVER=1`.
+The App Host starts `/usr/bin/cosmic-launcher` with `YUOS_MCP_SERVER=1`.
 The product's `apps/cosmic-launcher/app.json` owns its four-tool contract.
 The native executable embeds the canonical product backend from
 `apps/launcher/main.py` and `mcp_server.py` at build time. MCP mode replaces

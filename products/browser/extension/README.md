@@ -21,7 +21,7 @@ it in the same window reconnects. **Pause tab access** separately disconnects
 the browser action bridge until resumed. It does not undo a dispatched action.
 
 Attach the current tab explicitly to share its ID and site origin rather than
-its full URL or contents. Read and write permissions still come from `clawd`,
+its full URL or contents. Read and write permissions still come from `yuosd`,
 not from opening the panel or selecting a tab.
 
 DOM messages are sent only to frame `0`, and the content script exits if it is
@@ -29,7 +29,7 @@ ever injected into a child frame. Element refs therefore cannot collide across
 iframes or authorize actions against a different embedded origin. A random
 per-document ref nonce also makes refs fail closed after navigation.
 
-Every tab-content request carries an `expected_origin` injected by `clawd`
+Every tab-content request carries an `expected_origin` injected by `yuosd`
 after exact capability authorization. It includes the scheme, host, and
 effective port. `background.js` checks it against the selected tab and
 `content.js` checks it again in the page immediately before the DOM action.
@@ -45,13 +45,13 @@ ordinary typed input values.
 ## Loading
 
 The OS-owned
-[`tools/install-browser-agent.sh`](https://github.com/xiaoyu-work/claw-os/blob/main/tools/install-browser-agent.sh)
-checks the installed `claw-app-browser` package assets and configures the
+[`tools/install-browser-agent.sh`](https://github.com/xiaoyu-work/Yu-OS/blob/main/tools/install-browser-agent.sh)
+checks the installed `yuos-app-browser` package assets and configures the
 extension allowlist and Native Messaging registration. The package owns this
 complete directory at `/usr/share/claw/extensions/claw-agent-browser` and
-`/usr/lib/cos/claw-browser-host`, which executes the OS-owned transport at
-`/usr/lib/cos/browser-native-host.py` with isolated `/usr/bin/python3`.
-The matching Agent provides `claw-os-browser-bridge-v1`; this is transport
+`/usr/lib/yuos/claw-browser-host`, which executes the OS-owned transport at
+`/usr/lib/yuos/browser-native-host.py` with isolated `/usr/bin/python3`.
+The matching Agent provides `yuos-browser-bridge-v1`; this is transport
 availability, not an App grant. Independent Browser APT upgrades update the
 extension and its launcher together; the OS registration
 command never clones App source or copies a second Native Host. It does not
@@ -88,5 +88,5 @@ The socket lives at `$XDG_RUNTIME_DIR/claw-browser.sock`, has mode `0600`, and
 accepts only a root peer. Sandboxed Apps never receive the socket; they call the
 typed `system.browser.control` provider through the private runtime bridge.
 
-See [`claw-os/docs/browser-attached-design.md`](https://github.com/xiaoyu-work/claw-os/blob/main/docs/browser-attached-design.md) for the full architecture diagram and
+See [`yuos/docs/browser-attached-design.md`](https://github.com/xiaoyu-work/Yu-OS/blob/main/docs/browser-attached-design.md) for the full architecture diagram and
 the capability matrix.

@@ -17,10 +17,10 @@ identities, grants and data; KV is not Agent memory.
 | `package.json` | Explicit source kind, installed App and test selection; no native assets or library exports |
 | `../../tests/test_stage.py` | Exact staged payload, public MCP execution and App-internal refactor cases using only installed platform libraries |
 
-`COS_DATA_DIR` remains the OS-provided owner/App partition. DB files stay at
-`$COS_DATA_DIR/db/<database>.db` (normally
+`YUOS_DATA_DIR` remains the OS-provided owner/App partition. DB files stay at
+`$YUOS_DATA_DIR/db/<database>.db` (normally
 `<owner-data>/apps/db/db/<database>.db`). No database is copied, imported or
-renamed. KV keeps `$COS_DATA_DIR/kv.json` and its `kv.json.lock` sibling
+renamed. KV keeps `$YUOS_DATA_DIR/kv.json` and its `kv.json.lock` sibling
 (normally `<owner-data>/apps/kv/kv.json`). It does not import or merge DB,
 Storage Manager, Agent memory, credentials, sessions or audit state.
 The OS retains App Host/sandbox, identity, grants, policy, SDK/runtime,
@@ -72,14 +72,14 @@ replay or user-data transition is introduced.
 ## Dependency contracts and independent evolution
 
 DB imports only Python's standard library, the SDK's
-`claw_os_sdk.mcp.App` (`from_manifest`, `tool`, `serve`), and the OS-bundled
-`cos_runtime.policy.require` export. DB uses exact-name and wildcard policy
+`yuos_sdk.mcp.App` (`from_manifest`, `tool`, `serve`), and the OS-bundled
+`yuos_runtime.policy.require` export. DB uses exact-name and wildcard policy
 scopes through the wire-v1 decision transport; it neither implements policy nor
-imports the SDK's private dispatcher or any core provider. `cos_runtime` is a
+imports the SDK's private dispatcher or any core provider. `yuos_runtime` is a
 first-party bundled interface, not an independently published third-party SDK.
 KV uses the App-owned `_shared.atomic.atomic_write_bytes` export from
 [`shared/python`](../../shared/MODULE.md). `stage_shared()` supplies the separate
-common runtime dependency at `/usr/lib/cos/python`; development uses the same
+common runtime dependency at `/usr/lib/yuos/python`; development uses the same
 imports from the local shared root. The server does not adjust `sys.path` or
 depend on a sibling source directory. No SDK/runtime or atomic helper is copied
 into the capability payload.
@@ -103,12 +103,12 @@ Paired source-cutover commits are migration choreography, not a requirement
 to edit both implementations for every future feature.
 
 DB's four original files came from
-[`xiaoyu-work/claw-os` at `7f0e53fa62cbdf46db22ced8747fa04d79081732`](https://github.com/xiaoyu-work/claw-os/tree/7f0e53fa62cbdf46db22ced8747fa04d79081732/apps/db).
+[`xiaoyu-work/Yu-OS` at `7f0e53fa62cbdf46db22ced8747fa04d79081732`](https://github.com/xiaoyu-work/Yu-OS/tree/7f0e53fa62cbdf46db22ced8747fa04d79081732/apps/db).
 The manifest, production implementation and MCP server retain their original
 bytes and modes; tests add relocation coverage. First-party attribution and
 Apache-2.0 terms remain covered by the identical root [LICENSE](../../LICENSE).
 KV's three original files came from
-[`xiaoyu-work/claw-os` at `2ade4720c0667601d2675a189c61ab08992e185d`](https://github.com/xiaoyu-work/claw-os/tree/2ade4720c0667601d2675a189c61ab08992e185d/apps/kv)
+[`xiaoyu-work/Yu-OS` at `2ade4720c0667601d2675a189c61ab08992e185d`](https://github.com/xiaoyu-work/Yu-OS/tree/2ade4720c0667601d2675a189c61ab08992e185d/apps/kv)
 under the same license. Its runtime fixes are described above. The manifest
 corrects stale Agent-memory wording and the two whole-store authorization
 bindings using the existing fixed-scope contract. Identity, version, tool/CLI

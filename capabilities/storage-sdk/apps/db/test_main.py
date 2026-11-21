@@ -114,7 +114,7 @@ def test_manifest_and_handlers_are_mcp_only_and_aligned() -> None:
     assert tool_map["db.databases"]["needs"][0]["scope"] == {"kind": "wild"}
 
     server_source = SERVER_PATH.read_text(encoding="utf-8")
-    assert "from claw_os_sdk.mcp import App" in server_source
+    assert "from yuos_sdk.mcp import App" in server_source
     assert "serve_manifest_operations" not in server_source
     bindings = _server_bindings()
     assert list(bindings) == TOOL_NAMES
@@ -334,7 +334,7 @@ def sdk_app(tmp_path):
     )
     policy.chmod(0o755)
     with mcp_process(APP_DIR, env={
-        **os.environ, "COS_DATA_DIR": str(tmp_path), "CLAW_COS_BIN": str(policy),
+        **os.environ, "YUOS_DATA_DIR": str(tmp_path), "YUOS_KERNEL_BIN": str(policy),
     }) as request:
         yield SimpleNamespace(request=request, log=log, decision=decision)
 

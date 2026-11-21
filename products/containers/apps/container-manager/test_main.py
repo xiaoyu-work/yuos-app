@@ -412,7 +412,7 @@ def test_all_routes_use_exact_broker_argv_and_capability(
         stdout=json.dumps({"ok": True}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": COS}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": COS}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(
         main.subprocess, "run", return_value=completed
@@ -503,7 +503,7 @@ def test_containerd_namespace_is_forwarded():
         stdout=json.dumps({"ok": True}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": COS}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": COS}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         main.logs("containerd", "web", 25, "default")
@@ -531,7 +531,7 @@ def test_containerd_namespace_is_forwarded():
 )
 def test_broker_parses_stdout_before_stderr(stdout, stderr, expected):
     completed = mock.Mock(returncode=0, stdout=stdout, stderr=stderr)
-    with mock.patch.dict(os.environ, {"COS_BIN": COS}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": COS}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed):
         assert main.status() == expected
@@ -571,7 +571,7 @@ def test_broker_payload_failures_raise(returncode, stdout, stderr, message):
         stdout=stdout,
         stderr=stderr,
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": COS}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": COS}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match=re.escape(message)):
@@ -606,7 +606,7 @@ def test_missing_broker_executable_raises():
     ],
 )
 def test_broker_launch_failures_raise(failure, exception_type, message):
-    with mock.patch.dict(os.environ, {"COS_BIN": COS}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": COS}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", side_effect=failure):
         with pytest.raises(exception_type, match=message):
@@ -614,7 +614,7 @@ def test_broker_launch_failures_raise(failure, exception_type, message):
 
 
 def test_broker_timeout_raises():
-    with mock.patch.dict(os.environ, {"COS_BIN": COS}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": COS}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(
         main.subprocess,

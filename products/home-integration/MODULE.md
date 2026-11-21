@@ -32,7 +32,7 @@ Use `gateway._shared.gateway_args` for canonical list dispatch so flags before
 positionals are rejected; do not restore the old index-based parser.
 
 Import `gateway._shared` from App-owned [`shared/python`](../../shared/MODULE.md),
-staged in the separate common runtime at `/usr/lib/cos/python`.
+staged in the separate common runtime at `/usr/lib/yuos/python`.
 OS credential access, capability policy, host-gated egress,
 signing and installation remain OS-owned. Do not bypass the shared default
 private-address block to make local Home Assistant endpoints reachable.

@@ -144,7 +144,7 @@ class _HTTPSRedirect(urllib.request.HTTPRedirectHandler):
 
 def _download(url, destination):
     request = urllib.request.Request(
-        _https(url), headers={"Accept-Encoding": "identity", "User-Agent": "clawos-app-platform/1"},
+        _https(url), headers={"Accept-Encoding": "identity", "User-Agent": "yuos-app-platform/1"},
     )
     opener = urllib.request.build_opener(_HTTPSRedirect())
     started = time.monotonic()

@@ -420,7 +420,7 @@ def verify_frozen_catalog(directory, provenance, signing):
             ):
                 raise ValueError("Invalid App snapshot artifact")
             checksum = sha256_value(artifact.get("sha256"))
-            filename = f"claw-app-snapshot-{checksum}.tar.gz"
+            filename = f"yuos-app-snapshot-{checksum}.tar.gz"
             if artifact.get("file") != filename:
                 raise ValueError("App snapshot filename must bind its exact SHA256")
             path = directory / filename
@@ -456,7 +456,7 @@ def verify_catalog(directory, provenance, signing):
         for index, source in enumerate(directory.iterdir()):
             if index >= 1000 + len(CATALOG_FILES) or source.is_symlink() or not source.is_file() or (
                 source.name not in CATALOG_FILES
-                and not re.fullmatch(r"claw-app-snapshot-[0-9a-f]{64}\.tar\.gz", source.name)
+                and not re.fullmatch(r"yuos-app-snapshot-[0-9a-f]{64}\.tar\.gz", source.name)
             ):
                 raise ValueError("App catalog contains an unexpected file, directory or symlink")
             size = source.stat().st_size
@@ -499,7 +499,7 @@ def build_catalog(app_directories, output, *, release_version, architecture, pro
             archive = scratch / f"app-{index}.tar.gz"
             write_archive(root, inventory, archive)
             checksum = digest(archive)
-            name = f"claw-app-snapshot-{checksum}.tar.gz"
+            name = f"yuos-app-snapshot-{checksum}.tar.gz"
             archive.rename(bundle / name)
             records.append({
                 **binding, "architecture": architecture,

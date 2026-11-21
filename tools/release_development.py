@@ -181,7 +181,7 @@ def stage_payload(destination, groups):
                 raise ValueError("Fixture staging differs from its declared identities")
             installed.extend(apps)
         stage_wheels(group["name"], payload, owner=(
-            f"claw-{'cap' if group['kind'] == 'capability' else 'app'}-{group['name']}"
+            f"yuos-{'cap' if group['kind'] == 'capability' else 'app'}-{group['name']}"
         ))
     return installed
 
@@ -261,7 +261,7 @@ def build_archive(plan, selection, output):
             for name, record in files.items():
                 tar_entry(archive, root, name, record, plan["source_date_epoch"])
         sha256 = digest(partial)
-        filename = f"claw-app-development-{sha256}.tar.xz"
+        filename = f"yuos-app-development-{sha256}.tar.xz"
         record = {
             "format": FORMAT, "selection": selection, "version": plan["version"],
             "source_revision": plan["source_revision"], "filename": filename,
@@ -337,7 +337,7 @@ def read_archive(path, record, plan, *, compression, expected_manifest=None):
 
 
 def verify_archive(path, record, plan):
-    if record["format"] != FORMAT or record["filename"] != f"claw-app-development-{record['sha256']}.tar.xz":
+    if record["format"] != FORMAT or record["filename"] != f"yuos-app-development-{record['sha256']}.tar.xz":
         raise ValueError("Development archive format or content-addressed filename is invalid")
     manifest = read_archive(path, record, plan, compression="xz")
     declared = manifest.get("native_interfaces")

@@ -109,7 +109,7 @@ async function ensureAssistantSpace() {
       badgeBackgroundColor: "#10b981",
     });
   } catch (e) {
-    console.warn("[claw-mail-ai] spaces.create failed:", e);
+    console.warn("[yuos-mail-ai] spaces.create failed:", e);
     return null;
   }
 }
@@ -140,9 +140,9 @@ browser.action.onClicked.addListener(async () => {
 // ---------------------------------------------------------------------------
 
 const MENU_IDS = {
-  summarize: "claw_mail_ai_summarize",
-  translate: "claw_mail_ai_translate",
-  reply: "claw_mail_ai_smart_reply",
+  summarize: "yuos_mail_ai_summarize",
+  translate: "yuos_mail_ai_translate",
+  reply: "yuos_mail_ai_smart_reply",
 };
 
 async function rebuildMenus() {
@@ -225,7 +225,7 @@ browser.messages.onNewMailReceived.addListener(async (folder, messageList) => {
     try {
       await triageMessage(header, s);
     } catch (e) {
-      console.warn("[claw-mail-ai] triage failed for", header.id, e);
+      console.warn("[yuos-mail-ai] triage failed for", header.id, e);
     }
   }
 });
@@ -284,7 +284,7 @@ async function ensureTag(key, color) {
     await browser.messages.tags.create(key, key.split("/").pop() || key, color);
   } catch (e) {
     // Older TB versions exposed this API differently — degrade silently.
-    console.warn("[claw-mail-ai] could not ensure tag", key, e);
+    console.warn("[yuos-mail-ai] could not ensure tag", key, e);
   }
 }
 

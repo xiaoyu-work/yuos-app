@@ -63,7 +63,7 @@ def stage_wheels(name, destination, *, owner):
         allowed = {specification["import"], metadata}
         if not re.fullmatch(r"[a-z_][a-z0-9_]*", specification["import"]):
             raise ValueError("Invalid wheel import package")
-        root = destination / "usr/lib/cos/python"
+        root = destination / "usr/lib/yuos/python"
         payload = path.read_bytes()
         if len(payload) != specification["size"] or hashlib.sha256(payload).hexdigest() != specification["sha256"]:
             raise ValueError("Python dependency snapshot digest mismatch")

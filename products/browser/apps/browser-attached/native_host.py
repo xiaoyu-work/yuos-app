@@ -8,5 +8,5 @@ import sys
 if __name__ == "__main__":
     os.execv(
         "/usr/bin/python3",
-        ["/usr/bin/python3", "-I", "/usr/lib/cos/browser-native-host.py", *sys.argv[1:]],
+        ["/usr/bin/python3", "-I", "/usr/lib/yuos/browser-native-host.py", *sys.argv[1:]],
     )
