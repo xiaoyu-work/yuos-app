@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "23 6 * * 1,4"
   workflow_dispatch:
+    inputs:
+      landing_only:
+        description: "Deploy the landing page before the first signed App release"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -14,7 +19,7 @@ concurrency:
 
 jobs:
   refresh:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && !inputs.landing_only
     runs-on: ubuntu-24.04
     environment: app-release
     permissions:
@@ -36,8 +41,33 @@ jobs:
         with:
           path: build/apt-publication
 
+  landing:
+    if: github.ref == 'refs/heads/main' && inputs.landing_only
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Confirm there is no signed App release to replace
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PYTHONPATH=tools python3 - <<'PY'
+          from release_publish import GitHub, assert_initial_publication
+
+          github = GitHub()
+          branch = github.settings["state_branch"]
+          status, _ = github.api(f"git/ref/heads/{branch}", allowed=(200, 404))
+          if status != 404:
+              raise SystemExit("The signed APT state already exists; use authenticated refresh")
+          assert_initial_publication(github)
+          PY
+          install -Dm0644 packaging/apt/landing.html build/apt-landing/index.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/apt-landing
+
   deploy:
-    needs: refresh
+    needs: [refresh, landing]
+    if: ${{ !cancelled() && !failure() && (needs.refresh.result == 'success' || needs.landing.result == 'success') }}
     runs-on: ubuntu-24.04
     permissions:
       pages: write
