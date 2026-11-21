@@ -1,6 +1,6 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi;
+  const ui = YuOsUi;
   const $ = (id) => document.getElementById(id);
   ui.showApp(app);
   if (app.id !== "widget-rail") {
@@ -51,14 +51,14 @@ ClawApp.ready.then((app) => {
     if (pending.has(source)) return;
     const state = $(`${source}-state`);
     const name = `widget-rail.${source}`;
-    if (!ClawApp.tool(app, name)) {
+    if (!YuOsApp.tool(app, name)) {
       state.textContent = "Unavailable: this App does not declare this data source.";
       return;
     }
     pending.add(source);
     state.textContent = "Refreshing…";
     try {
-      const result = await ClawApp.call(name, {});
+      const result = await YuOsApp.call(name, {});
       ui.replace($(source), renderers[source](result));
       state.textContent = "Updated";
     } catch (error) {

@@ -13,7 +13,7 @@ from test_support import load_local_module
 
 
 email = load_local_module(
-    Path(__file__).with_name("main.py"), "claw_test_email_main", clear_modules=("_shared",),
+    Path(__file__).with_name("main.py"), "yuos_test_email_main", clear_modules=("_shared",),
 )
 ACCOUNT = "00000000-0000-4000-8000-000000000001:account1"
 OTHER = "00000000-0000-4000-8000-000000000001:account2"

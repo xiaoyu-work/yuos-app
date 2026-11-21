@@ -87,7 +87,7 @@ def test_real_apt_install_and_independent_upgrade_preserve_unrelated_packages_an
     repository = tmp_path / "repository"
     compose([deb("yuos-app-alpha"), deb("yuos-app-beta")], repository, signing, initialize=True)
     apt = IsolatedApt(tmp_path / "root", repository, signing)
-    state = apt.root / "home/owner/.local/share/claw/apps/alpha/state.json"
+    state = apt.root / "home/owner/.local/share/yuos/apps/alpha/state.json"
     state.parent.mkdir(parents=True)
     state.write_bytes(b'{"private":"unchanged state and grant IDs"}\n')
     state.chmod(0o600)

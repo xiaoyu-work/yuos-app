@@ -1,6 +1,6 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi;
+  const ui = YuOsUi;
   ui.showApp(app);
   if (app.id === "panel-calendar") {
     panelCalendar(app, ui);
@@ -65,7 +65,7 @@ ClawApp.ready.then((app) => {
     const actions = ui.node("div", null, { class: "toolbar" });
     const values = { ...event, provider: provider.value };
     const add = (command, label, run) => {
-      if (!ClawApp.tool(app, command)) return;
+      if (!YuOsApp.tool(app, command)) return;
       const button = ui.node("button", label);
       button.onclick = run;
       actions.append(button);
@@ -127,11 +127,11 @@ ClawApp.ready.then((app) => {
     const request = ++generation;
     events = [];
     render();
-    if (!ClawApp.tool(app, "list")) {
+    if (!YuOsApp.tool(app, "list")) {
       notice.textContent = "This entry does not declare the Calendar event-list tool.";
       return;
     }
-    return ui.run(document.querySelector("#refresh"), () => ClawApp.call("list", {
+    return ui.run(document.querySelector("#refresh"), () => YuOsApp.call("list", {
       provider: provider.value,
       from: new Date(month.getFullYear(), month.getMonth(), 1).toISOString(),
       to: new Date(month.getFullYear(), month.getMonth() + 1, 1).toISOString(),
@@ -167,9 +167,9 @@ ClawApp.ready.then((app) => {
     ui.replace(document.querySelector("#details"), [ui.node("p", "Select an event to inspect it.", { class: "muted" })]);
     void load();
   };
-  document.querySelector("#create").disabled = !ClawApp.tool(app, "create");
+  document.querySelector("#create").disabled = !YuOsApp.tool(app, "create");
   document.querySelector("#create").onclick = () => edit("create", "New event", defaults(), "Create event");
-  if (ClawApp.tool(app, "invite")) {
+  if (YuOsApp.tool(app, "invite")) {
     const invite = ui.node("button", "Invite people");
     invite.onclick = () => {
       if (provider.value === "local") {
@@ -240,8 +240,8 @@ function panelCalendar(app, ui) {
     ui.replace($("agenda"), [ui.node("p", "Loading the selected day's agenda…", { class: "muted" })]);
     ui.replace($("details"), [ui.node("p", "Select an event to inspect it.", { class: "muted" })]);
     try {
-      if (!ClawApp.tool(app, "panel-calendar.day")) throw new Error("This App does not declare the day-agenda service.");
-      const result = await ClawApp.call("panel-calendar.day", { date: key(selected) });
+      if (!YuOsApp.tool(app, "panel-calendar.day")) throw new Error("This App does not declare the day-agenda service.");
+      const result = await YuOsApp.call("panel-calendar.day", { date: key(selected) });
       if (request !== generation) return;
       if (!Array.isArray(result.events)) throw new Error("The Calendar service returned an invalid agenda.");
       ui.replace($("agenda"), result.events.length ? result.events.map((event) => {

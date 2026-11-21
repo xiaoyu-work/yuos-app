@@ -110,12 +110,12 @@ impl<const LOGIN: bool> page::Page<pages::Message> for MachinePage<LOGIN> {
     fn info(&self) -> page::Info {
         if LOGIN {
             page::Info::new("sign-in", "system-users-symbolic")
-                .title(fl!("claw-sign-in"))
-                .description(fl!("claw-sign-in-description"))
+                .title(fl!("yuos-sign-in"))
+                .description(fl!("yuos-sign-in-description"))
         } else {
             page::Info::new("system-updates", "system-software-update-symbolic")
-                .title(fl!("claw-system-updates"))
-                .description(fl!("claw-update-description"))
+                .title(fl!("yuos-system-updates"))
+                .description(fl!("yuos-update-description"))
         }
     }
 
@@ -183,24 +183,24 @@ impl<const LOGIN: bool> MachinePage<LOGIN> {
             content = content.add(text::body(error));
         }
         if self.busy {
-            content = content.add(text::caption(fl!("claw-settings-working")));
+            content = content.add(text::caption(fl!("yuos-settings-working")));
         }
         if let Some(state) = &self.state {
             if LOGIN {
                 let description = match state.automatic_login_user.as_deref() {
-                    Some(user) => fl!("claw-login-on", user = user),
-                    None => fl!("claw-login-off"),
+                    Some(user) => fl!("yuos-login-on", user = user),
+                    None => fl!("yuos-login-off"),
                 };
                 let (label, action) =
                     if state.automatic_login_user.as_deref() == Some(state.current_user.as_str()) {
-                        (fl!("claw-login-disable"), Action::DisableAutomaticLogin)
+                        (fl!("yuos-login-disable"), Action::DisableAutomaticLogin)
                     } else {
-                        (fl!("claw-login-enable"), Action::EnableAutomaticLogin)
+                        (fl!("yuos-login-enable"), Action::EnableAutomaticLogin)
                     };
                 content = content
-                    .add(text::body(fl!("claw-sign-in-description")))
+                    .add(text::body(fl!("yuos-sign-in-description")))
                     .add(
-                        settings::item::builder(fl!("claw-auto-login"))
+                        settings::item::builder(fl!("yuos-auto-login"))
                             .description(description)
                             .flex_control(self.button(label, action, !self.busy)),
                     );
@@ -210,7 +210,7 @@ impl<const LOGIN: bool> MachinePage<LOGIN> {
                     .is_some_and(|user| user != state.current_user)
                 {
                     content = content.add(self.button(
-                        fl!("claw-login-disable"),
+                        fl!("yuos-login-disable"),
                         Action::DisableAutomaticLogin,
                         !self.busy,
                     ));
@@ -221,7 +221,7 @@ impl<const LOGIN: bool> MachinePage<LOGIN> {
                 content = content.add(text::body(update.status()));
                 if let Some(time) = &update.checked_at {
                     content = content.add(text::caption(fl!(
-                        "claw-update-checked",
+                        "yuos-update-checked",
                         time = time.as_str()
                     )));
                 }
@@ -231,18 +231,18 @@ impl<const LOGIN: bool> MachinePage<LOGIN> {
                 for package in &update.packages {
                     let versions = format!("{} → {}", package.installed, package.version);
                     let note = if package.held {
-                        fl!("claw-update-held", versions = versions.as_str())
+                        fl!("yuos-update-held", versions = versions.as_str())
                     } else {
                         versions
                     };
                     content = content.add(settings::flex_item(&package.package, text::body(note)));
                 }
                 if update.ready {
-                    content = content.add(text::body(fl!("claw-update-save-work")));
+                    content = content.add(text::body(fl!("yuos-update-save-work")));
                     if self.confirm_restart {
                         content = content
                             .add(self.button(
-                                fl!("claw-update-restart"),
+                                fl!("yuos-update-restart"),
                                 Action::RestartForUpdates,
                                 enabled,
                             ))
@@ -253,19 +253,19 @@ impl<const LOGIN: bool> MachinePage<LOGIN> {
                     } else {
                         content = content
                             .add(
-                                button::suggested(fl!("claw-update-restart")).on_press_maybe(
+                                button::suggested(fl!("yuos-update-restart")).on_press_maybe(
                                     enabled.then_some(Message::ConfirmRestart(true)),
                                 ),
                             )
                             .add(self.button(
-                                fl!("claw-update-cancel"),
+                                fl!("yuos-update-cancel"),
                                 Action::CancelUpdates,
                                 enabled,
                             ));
                     }
                 } else {
                     content = content.add(self.button(
-                        fl!("claw-update-check"),
+                        fl!("yuos-update-check"),
                         Action::CheckUpdates,
                         enabled,
                     ));
@@ -273,7 +273,7 @@ impl<const LOGIN: bool> MachinePage<LOGIN> {
                         && !update.packages.iter().any(|package| package.held)
                     {
                         content = content.add(self.button(
-                            fl!("claw-update-download"),
+                            fl!("yuos-update-download"),
                             Action::PrepareUpdates,
                             enabled,
                         ));
@@ -281,16 +281,16 @@ impl<const LOGIN: bool> MachinePage<LOGIN> {
                 }
                 for (title, help, is_on, on, off, available) in [
                     (
-                        fl!("claw-update-automatic"),
-                        fl!("claw-update-automatic-help"),
+                        fl!("yuos-update-automatic"),
+                        fl!("yuos-update-automatic-help"),
                         update.automatic_updates,
                         Action::EnableAutomaticUpdates,
                         Action::DisableAutomaticUpdates,
                         true,
                     ),
                     (
-                        fl!("claw-update-auto-restart"),
-                        fl!("claw-update-auto-restart-help"),
+                        fl!("yuos-update-auto-restart"),
+                        fl!("yuos-update-auto-restart-help"),
                         update.automatic_restart,
                         Action::EnableAutomaticRestart,
                         Action::DisableAutomaticRestart,
@@ -298,9 +298,9 @@ impl<const LOGIN: bool> MachinePage<LOGIN> {
                     ),
                 ] {
                     let label = if is_on {
-                        fl!("claw-setting-turn-off")
+                        fl!("yuos-setting-turn-off")
                     } else {
-                        fl!("claw-setting-turn-on")
+                        fl!("yuos-setting-turn-on")
                     };
                     let action = if is_on { off } else { on };
                     content = content.add(
@@ -311,7 +311,7 @@ impl<const LOGIN: bool> MachinePage<LOGIN> {
                 }
             }
         } else if !self.busy {
-            content = content.add(self.button(fl!("claw-settings-refresh"), Action::Status, true));
+            content = content.add(self.button(fl!("yuos-settings-refresh"), Action::Status, true));
         }
         content.apply(cosmic::Element::from)
     }
@@ -326,17 +326,17 @@ impl<const LOGIN: bool> MachinePage<LOGIN> {
 impl Updates {
     fn status(&self) -> String {
         if self.ready {
-            return fl!("claw-update-ready");
+            return fl!("yuos-update-ready");
         }
         match self.phase.as_str() {
-            "checking" => fl!("claw-update-checking"),
-            "available" => fl!("claw-update-available"),
-            "up-to-date" => fl!("claw-update-current"),
-            "downloading" => fl!("claw-update-downloading"),
-            "installed" => fl!("claw-update-installed"),
-            "failed" | "install-failed" | "interrupted" => fl!("claw-update-failed"),
-            _ if self.busy => fl!("claw-settings-working"),
-            _ => fl!("claw-update-unchecked"),
+            "checking" => fl!("yuos-update-checking"),
+            "available" => fl!("yuos-update-available"),
+            "up-to-date" => fl!("yuos-update-current"),
+            "downloading" => fl!("yuos-update-downloading"),
+            "installed" => fl!("yuos-update-installed"),
+            "failed" | "install-failed" | "interrupted" => fl!("yuos-update-failed"),
+            _ if self.busy => fl!("yuos-settings-working"),
+            _ => fl!("yuos-update-unchecked"),
         }
     }
 }

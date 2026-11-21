@@ -12,7 +12,7 @@ from _shared.env_scrub import scrub_env  # noqa: E402
 from yuos_runtime import policy  # noqa: E402
 
 
-TIMEOUT_SECS = int(os.environ.get("CLAW_NETWORK_MANAGER_TIMEOUT", "180"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_NETWORK_MANAGER_TIMEOUT", "180"))
 RadioState = Literal["on", "off"]
 
 

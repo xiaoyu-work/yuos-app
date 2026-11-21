@@ -33,12 +33,12 @@ class TestCmdStartScratchNaming(unittest.TestCase):
         self.addCleanup(environment.stop)
         self.main = load_local_module(
             pathlib.Path(__file__).with_name("main.py"),
-            "claw_test_exec_main",
+            "yuos_test_exec_main",
             clear_modules=("_shared",),
         )
 
     def tearDown(self) -> None:
-        sys.modules.pop("claw_test_exec_main", None)
+        sys.modules.pop("yuos_test_exec_main", None)
         self.tmp.cleanup()
 
     def _import_main(self):
@@ -64,7 +64,7 @@ class TestCmdStartScratchNaming(unittest.TestCase):
             pid = 424242
 
         with mock.patch.object(main.policy, "require", return_value=None), mock.patch(
-            "claw_test_exec_main.subprocess.Popen", return_value=FakeProc()
+            "yuos_test_exec_main.subprocess.Popen", return_value=FakeProc()
         ), mock.patch("builtins.open", side_effect=tracking_open):
             out = main.cmd_start(["/usr/bin/true"])
 
@@ -127,9 +127,9 @@ class TestCmdStartScratchNaming(unittest.TestCase):
         with mock.patch.object(main.policy, "require", return_value=None), mock.patch(
             "builtins.open", side_effect=tracking_open
         ):
-            with mock.patch("claw_test_exec_main.subprocess.Popen", return_value=FakeProc1()):
+            with mock.patch("yuos_test_exec_main.subprocess.Popen", return_value=FakeProc1()):
                 main.cmd_start(["/usr/bin/true"])
-            with mock.patch("claw_test_exec_main.subprocess.Popen", return_value=FakeProc2()):
+            with mock.patch("yuos_test_exec_main.subprocess.Popen", return_value=FakeProc2()):
                 main.cmd_start(["/usr/bin/true"])
 
         scratch_names = {
@@ -159,12 +159,12 @@ class TestShellScope(unittest.TestCase):
         self.addCleanup(environment.stop)
         self.main = load_local_module(
             pathlib.Path(__file__).with_name("main.py"),
-            "claw_test_exec_main",
+            "yuos_test_exec_main",
             clear_modules=("_shared",),
         )
 
     def tearDown(self) -> None:
-        sys.modules.pop("claw_test_exec_main", None)
+        sys.modules.pop("yuos_test_exec_main", None)
         self.tmp.cleanup()
 
     def _capture(self):
@@ -189,7 +189,7 @@ class TestShellScope(unittest.TestCase):
         # Bypass the bounded-Popen drain path with a stub that mimics
         # its successful return so we never spawn a real shell here.
         with mock.patch.object(self.main.policy, "require", side_effect=spy), mock.patch(
-            "claw_test_exec_main._run_bounded",
+            "yuos_test_exec_main._run_bounded",
             return_value=(b"hi\n", b"", 0, False, False),
         ):
             result = self.main.cmd_run(["--shell", "echo hi"])
@@ -203,7 +203,7 @@ class TestShellScope(unittest.TestCase):
     def test_delimited_shell_token_remains_a_positional_command(self):
         captured, spy = self._capture()
         with mock.patch.object(self.main.policy, "require", side_effect=spy), mock.patch(
-            "claw_test_exec_main._run_bounded",
+            "yuos_test_exec_main._run_bounded",
             side_effect=FileNotFoundError,
         ):
             self.main.cmd_run(["--", "--shell"])
@@ -213,7 +213,7 @@ class TestShellScope(unittest.TestCase):
     def test_shell_run_with_env_assignment_still_requires_wild(self):
         captured, spy = self._capture()
         with mock.patch.object(self.main.policy, "require", side_effect=spy), mock.patch(
-            "claw_test_exec_main._run_bounded",
+            "yuos_test_exec_main._run_bounded",
             return_value=(b"", b"", 0, False, False),
         ):
             result = self.main.cmd_run(["--shell", "FOO=bar python3 -c 'print(1)'"])
@@ -228,7 +228,7 @@ class TestShellScope(unittest.TestCase):
         """
         captured, spy = self._capture()
         with mock.patch.object(self.main.policy, "require", side_effect=spy), mock.patch(
-            "claw_test_exec_main._run_bounded",
+            "yuos_test_exec_main._run_bounded",
             return_value=(b"", b"", 0, False, False),
         ):
             result = self.main.cmd_run(["--shell", ""])

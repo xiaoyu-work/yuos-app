@@ -11,7 +11,7 @@ from _shared.env_scrub import scrub_env  # noqa: E402
 from yuos_runtime import policy  # noqa: E402
 
 
-TIMEOUT_SECS = int(os.environ.get("CLAW_POWER_MANAGER_TIMEOUT", "120"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_POWER_MANAGER_TIMEOUT", "120"))
 ACTIONS = frozenset(
     {
         "suspend",

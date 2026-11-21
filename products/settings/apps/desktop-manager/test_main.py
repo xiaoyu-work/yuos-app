@@ -12,7 +12,7 @@ from test_support import authenticated_mcp_params, load_local_module
 
 main = load_local_module(
     pathlib.Path(__file__).with_name("main.py"),
-    "claw_test_desktop_manager_main",
+    "yuos_test_desktop_manager_main",
     clear_modules=("_shared",),
 )
 
@@ -66,7 +66,7 @@ def test_routes_use_exact_scopes_and_broker_argv(
             ):
                 server = load_local_module(
                     pathlib.Path(__file__).with_name("server.py"),
-                    "claw_test_desktop_manager_server",
+                    "yuos_test_desktop_manager_server",
                 )
                 listed = server.app._handle_request("tools/list", {}, True)
                 assert {tool["name"] for tool in listed["tools"]} == {

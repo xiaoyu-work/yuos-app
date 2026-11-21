@@ -3,7 +3,7 @@
 // Each "send" passes the question and a fresh snapshot of recent message
 // metadata. Conversation history is local UI state, not model context.
 
-const { aiCall, showError, el, localiseDom } = window.ClawUI;
+const { aiCall, showError, el, localiseDom } = window.YuOsUI;
 
 const HISTORY_KEY = "assistantHistory";
 const MAX_HISTORY = 30;

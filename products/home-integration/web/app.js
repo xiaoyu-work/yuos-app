@@ -1,6 +1,6 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi;
+  const ui = YuOsUi;
   const $ = (id) => document.getElementById(id);
   let busy = false;
   let reviewing = false;
@@ -29,9 +29,9 @@ ClawApp.ready.then((app) => {
     busy = true;
     try {
       await ui.run(button, async () => {
-        const tool = ClawApp.tool(app, command);
+        const tool = YuOsApp.tool(app, command);
         if (!tool) throw new Error(`This App does not declare ${command}.`);
-        const value = await ClawApp.call(tool.name, args);
+        const value = await YuOsApp.call(tool.name, args);
         if (value && value.ok === false) throw new Error(value.error || "Home Assistant refused the request.");
         return value;
       }, done, notice);

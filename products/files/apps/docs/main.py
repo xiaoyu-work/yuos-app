@@ -102,7 +102,7 @@ def search(
             "count": 0,
             "hint": (
                 "No Recoll index found at ~/.recoll/xapiandb yet. The "
-                "claw-recoll-index.service (systemd --user) builds it "
+                "yuos-recoll-index.service (systemd --user) builds it "
                 "automatically about 60 seconds after the first graphical "
                 "login and then keeps it live via inotify. To start an "
                 "incremental pass now, run `yu app docs index`."

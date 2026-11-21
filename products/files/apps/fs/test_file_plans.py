@@ -22,8 +22,8 @@ from test_support import (
 
 
 APP_DIR = Path(__file__).parent
-plans = load_local_module(APP_DIR / "file_plans.py", "claw_test_fs_file_plans")
-main = load_local_module(APP_DIR / "main.py", "claw_test_fs_main_for_plans")
+plans = load_local_module(APP_DIR / "file_plans.py", "yuos_test_fs_file_plans")
+main = load_local_module(APP_DIR / "main.py", "yuos_test_fs_main_for_plans")
 from _shared import atomic
 
 REAL_REPLACE_FILE = plans.file_changes.replace_file
@@ -92,7 +92,7 @@ def expect_error(code, function, *args, **kwargs):
 def server(monkeypatch):
     monkeypatch.setenv("YUOS_APP_MANIFEST", str(APP_DIR / "app.json"))
     with mock.patch.dict(sys.modules, {"main": main, "file_plans": plans}):
-        return load_local_module(APP_DIR / "server.py", "claw_test_fs_plan_server")
+        return load_local_module(APP_DIR / "server.py", "yuos_test_fs_plan_server")
 
 
 def call(server, name, arguments, *, session="test-session"):

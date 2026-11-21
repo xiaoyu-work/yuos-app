@@ -13,7 +13,7 @@ from yuos_runtime import policy  # noqa: E402
 
 FILTERS = frozenset({"off", "greyscale", "protanopia", "deuteranopia", "tritanopia"})
 TOGGLES = frozenset({"screen-reader", "magnifier", "invert"})
-TIMEOUT_SECS = int(os.environ.get("CLAW_ACCESSIBILITY_MANAGER_TIMEOUT", "120"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_ACCESSIBILITY_MANAGER_TIMEOUT", "120"))
 
 
 def _cos_binary():

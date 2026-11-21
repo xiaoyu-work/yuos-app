@@ -1,6 +1,6 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi;
+  const ui = YuOsUi;
   const root = document.getElementById("workspace");
   const notice = document.getElementById("notice");
   const names = { "gateway-ntfy": "ntfy", "gateway-pushover": "Pushover", "gateway-webhook": "Webhook" };
@@ -55,9 +55,9 @@ ClawApp.ready.then((app) => {
     busy = true;
     try {
       await ui.run(control, async () => {
-        const tool = ClawApp.tool(app, command);
+        const tool = YuOsApp.tool(app, command);
         if (!tool) throw new Error(`This entry does not declare ${command}.`);
-        const value = await ClawApp.call(tool.name, args);
+        const value = await YuOsApp.call(tool.name, args);
         if (value && value.ok === false) throw new Error(value.error || (Array.isArray(value.errors) ? value.errors.join("; ") : "The provider did not accept the request."));
         return value;
       }, done, status);

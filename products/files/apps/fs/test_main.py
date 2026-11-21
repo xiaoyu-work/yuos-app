@@ -18,11 +18,11 @@ from test_support import authenticated_mcp_params, load_local_module
 
 main = load_local_module(
     Path(__file__).with_name("main.py"),
-    "claw_test_fs_main",
+    "yuos_test_fs_main",
     clear_modules=("_shared",),
 )
 plans = load_local_module(
-    Path(__file__).with_name("file_plans.py"), "claw_test_fs_plans_for_main"
+    Path(__file__).with_name("file_plans.py"), "yuos_test_fs_plans_for_main"
 )
 MANIFEST = json.loads(Path(__file__).with_name("app.json").read_text())
 REAL_SNAPSHOT = main.snapshot.snapshot
@@ -48,7 +48,7 @@ def server(monkeypatch):
     monkeypatch.setenv("YUOS_APP_MANIFEST", str(Path(__file__).with_name("app.json")))
     with mock.patch.dict(sys.modules, {"main": main, "file_plans": plans}):
         return load_local_module(
-            Path(__file__).with_name("server.py"), "claw_test_fs_server"
+            Path(__file__).with_name("server.py"), "yuos_test_fs_server"
         )
 
 

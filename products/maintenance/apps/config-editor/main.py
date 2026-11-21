@@ -13,7 +13,7 @@ from yuos_runtime import policy  # noqa: E402
 
 
 TOKEN_RE = re.compile(r"^[0-9A-Fa-f]{32}$")
-TIMEOUT_SECS = int(os.environ.get("CLAW_CONFIG_EDITOR_TIMEOUT", "180"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_CONFIG_EDITOR_TIMEOUT", "180"))
 
 
 def _cos_binary() -> str | None:

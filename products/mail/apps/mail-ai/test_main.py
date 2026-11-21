@@ -19,7 +19,7 @@ from test_support import load_local_module, stage_source_platform_fixture
 
 HERE = Path(__file__).parent
 PROCESS_APP = HERE
-main = load_local_module(HERE / "main.py", "claw_test_mail_ai_main")
+main = load_local_module(HERE / "main.py", "yuos_test_mail_ai_main")
 MANIFEST = json.loads((HERE / "app.json").read_text())
 CASES = [
     ("summarize", {"body": "Please review by Friday.", "subject": "Q3", "sender": "alex"},

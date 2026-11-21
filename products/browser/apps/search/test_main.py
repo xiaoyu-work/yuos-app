@@ -19,7 +19,7 @@ TOOL_NAMES = ["search.web", "search.image"]
 
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_search_main",
+    "yuos_test_search_main",
     clear_modules=("_shared",),
 )
 

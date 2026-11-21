@@ -77,7 +77,7 @@ function connect() {
     connection = chrome.runtime.connectNative(HOST_NAME);
     port = connection;
   } catch (e) {
-    console.warn("[claw-agent] connectNative threw:", e);
+    console.warn("[yuos-agent] connectNative threw:", e);
     scheduleReconnect();
     return;
   }
@@ -94,7 +94,7 @@ function connect() {
   connection.onDisconnect.addListener(() => {
     const err = chrome.runtime.lastError;
     if (port !== connection) return;
-    console.warn("[claw-agent] host disconnected:", err && err.message);
+    console.warn("[yuos-agent] host disconnected:", err && err.message);
     port = null;
     if (stableTimer) { clearTimeout(stableTimer); stableTimer = null; }
     setState("error");
@@ -148,7 +148,7 @@ function reply(connection, id, ok, result, error) {
   try {
     connection.postMessage(msg);
   } catch (e) {
-    console.warn("[claw-agent] postMessage failed:", e);
+    console.warn("[yuos-agent] postMessage failed:", e);
   }
 }
 
@@ -375,7 +375,7 @@ function sleep(ms) {
 
 chrome.runtime.onInstalled.addListener(() => {
   void chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch((error) => {
-    console.warn("[claw-agent] cannot configure the side panel:", error);
+    console.warn("[yuos-agent] cannot configure the side panel:", error);
   });
   void chrome.action.setIcon({
     imageData: iconContext.getImageData(0, 0, 32, 32),
@@ -431,5 +431,5 @@ chrome.windows.onRemoved.addListener((id) => {
 
 void accessReady.catch((error) => {
   setState("error");
-  console.warn("[claw-agent] could not read browser access state:", error);
+  console.warn("[yuos-agent] could not read browser access state:", error);
 });

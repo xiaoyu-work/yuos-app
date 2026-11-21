@@ -6,15 +6,15 @@
 // If `storage.local.pending` carries selectionText or messageIds, we
 // seed the source area. Otherwise the user pastes / types text.
 
-const { aiCall, showBusy, clearBusy, showError, el, localiseDom, copyToClipboard } = window.ClawUI;
-const { getBody } = window.ClawMessages;
+const { aiCall, showBusy, clearBusy, showError, el, localiseDom, copyToClipboard } = window.YuOsUI;
+const { getBody } = window.YuOsMessages;
 
 let lastTranslation = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
   localiseDom();
 
-  const settings = await ClawUI.getSettings();
+  const settings = await YuOsUI.getSettings();
   const target = settings.translate.defaultTarget || "English";
   document.getElementById("target").value = target;
 
@@ -55,7 +55,7 @@ async function run() {
     return;
   }
 
-  await ClawUI.setSettings({ translate: { defaultTarget: target } });
+  await YuOsUI.setSettings({ translate: { defaultTarget: target } });
 
   showBusy(out);
   document.getElementById("usage").textContent = "";

@@ -212,7 +212,7 @@ def bundle(tmp_path, public_signer, signing, app, deb):
     (roots[0] / "LICENSE").chmod(0o444)
     (roots[0] / "web").chmod(0o750)
     package = app_deb(deb, roots, version="1.0.0-2", control_files={"md5sums": b""},
-                      symlinks={"usr/share/claw-fixture/license-link": "./../../lib/cos/apps/bundle-first/LICENSE"})
+                      symlinks={"usr/share/yuos-fixture/license-link": "./../../lib/yuos/apps/bundle-first/LICENSE"})
     support = deb("yuos-app-support", "1.0.0-2",
                   extra={"X-YuOS-Variant": "support", "X-YuOS-Source-Revision": "a" * 40},
                   files={"usr/lib/yuos/python/fixture.py": b"shared library fixture\n"},
@@ -270,7 +270,7 @@ def test_final_signed_debs_drive_store_snapshots_apt_and_immutable_assets(tmp_pa
     assert (extracted / "DEBIAN/control").read_bytes() == (
         tmp_path / "deb-1/stage/DEBIAN/control"
     ).read_bytes()
-    assert os.readlink(extracted / "usr/share/claw-fixture/license-link") == "./../../lib/cos/apps/bundle-first/LICENSE"
+    assert os.readlink(extracted / "usr/share/yuos-fixture/license-link") == "./../../lib/yuos/apps/bundle-first/LICENSE"
     sums = (extracted / "DEBIAN/md5sums").read_text()
     for record in store.snapshot_records(groups["fixture"][0], verifier, signing):
         snapshot = tmp_path / record["app_id"]

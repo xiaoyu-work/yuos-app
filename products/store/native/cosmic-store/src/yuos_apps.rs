@@ -72,9 +72,9 @@ impl App {
                     if rows.is_empty() {
                         return column
                             .push(widget::text::body(if updates {
-                                fl!("claw-no-updates")
+                                fl!("yuos-no-updates")
                             } else if query.is_empty() {
-                                fl!("claw-no-apps")
+                                fl!("yuos-no-apps")
                             } else {
                                 fl!("no-results", search = self.search_input.trim())
                             }))
@@ -86,14 +86,14 @@ impl App {
                         }
                         let status = match &app.installed {
                             Some(current) if current == &app.released => {
-                                fl!("claw-installed", version = current.as_str())
+                                fl!("yuos-installed", version = current.as_str())
                             }
                             Some(current) => fl!(
-                                "claw-version-pair",
+                                "yuos-version-pair",
                                 current = current.as_str(),
                                 available = app.released.as_str()
                             ),
-                            None => fl!("claw-release", version = app.released.as_str()),
+                            None => fl!("yuos-release", version = app.released.as_str()),
                         };
                         let mut row = widget::row::with_capacity(2)
                             .spacing(12)
@@ -139,13 +139,13 @@ impl App {
                 }
                 Err(error) => {
                     column = column.push(widget::text::body(fl!(
-                        "claw-catalog-unavailable",
+                        "yuos-catalog-unavailable",
                         error = error.as_str()
                     )));
                 }
             }
         } else {
-            column = column.push(widget::text::body(fl!("claw-catalog-loading")));
+            column = column.push(widget::text::body(fl!("yuos-catalog-loading")));
         }
         column.into()
     }

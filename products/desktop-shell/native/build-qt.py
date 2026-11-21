@@ -99,7 +99,7 @@ def build(cache, jobs):
         run("cmake", "--build", output, "--parallel", str(jobs))
         run("cmake", "--install", output)
         complete.touch()
-    (prefix / "claw-qt-source").write_text(str(work / "src") + "\n")
+    (prefix / "yuos-qt-source").write_text(str(work / "src") + "\n")
     return prefix
 
 
@@ -142,7 +142,7 @@ def stage(prefix, destination):
     notices = base / "licenses/qt"
     notices.mkdir(parents=True)
     shutil.copyfile(LOCK, notices / LOCK.name)
-    source = Path((prefix / "claw-qt-source").read_text().strip())
+    source = Path((prefix / "yuos-qt-source").read_text().strip())
     for module in lock["modules"]:
         shutil.copytree(source / module / "LICENSES", notices / module)
 

@@ -14,7 +14,7 @@ from yuos_runtime import policy  # noqa: E402
 
 DEVICE_RE = re.compile(r"^(?=.{3,64}$)[0-9]+-[0-9]+(?:\.[0-9]+)*$")
 TOKEN_RE = re.compile(r"^[0-9A-Fa-f]{32}$")
-TIMEOUT_SECS = int(os.environ.get("CLAW_USB_GUARD_TIMEOUT", "180"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_USB_GUARD_TIMEOUT", "180"))
 USB_ACTIONS = frozenset({"status", "authorize", "block", "unblock", "eject", "restore"})
 USB_STATES = frozenset({"on", "off"})
 

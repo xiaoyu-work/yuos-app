@@ -23,7 +23,7 @@ StyledWindow {
     readonly property var backlight: screen ? Brightness.getMonitorForScreen(screen) : null
     readonly property bool pinMenu: page === "pin"
 
-    name: "claw-top-menu"
+    name: "yuos-top-menu"
     visible: page !== ""
     anchors {
         top: true

@@ -14,8 +14,8 @@ from yuos_runtime import policy  # noqa: E402
 
 
 DEVICE_RE = re.compile(r"^/dev/[A-Za-z0-9._/+:-]+$")
-QUERY_TIMEOUT_SECS = int(os.environ.get("CLAW_STORAGE_TIMEOUT", "300"))
-CHECK_TIMEOUT_SECS = int(os.environ.get("CLAW_STORAGE_CHECK_TIMEOUT", "2100"))
+QUERY_TIMEOUT_SECS = int(os.environ.get("YUOS_STORAGE_TIMEOUT", "300"))
+CHECK_TIMEOUT_SECS = int(os.environ.get("YUOS_STORAGE_CHECK_TIMEOUT", "2100"))
 StorageAction = Literal["health", "check", "mount", "unmount", "eject"]
 STORAGE_ACTIONS = frozenset({"health", "check", "mount", "unmount", "eject"})
 DIAGNOSTIC_ACTIONS = frozenset({"health", "check"})

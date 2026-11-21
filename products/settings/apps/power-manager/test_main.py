@@ -11,7 +11,7 @@ from test_support import authenticated_mcp_params, load_local_module
 
 main = load_local_module(
     pathlib.Path(__file__).with_name("main.py"),
-    "claw_test_power_manager_main",
+    "yuos_test_power_manager_main",
     clear_modules=("_shared",),
 )
 
@@ -31,7 +31,7 @@ def mcp_app():
     ):
         server = load_local_module(
             pathlib.Path(__file__).with_name("server.py"),
-            "claw_test_power_manager_server",
+            "yuos_test_power_manager_server",
         )
         yield server.app
 

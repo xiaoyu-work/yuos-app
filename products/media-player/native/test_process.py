@@ -44,7 +44,7 @@ def main():
     parser.add_argument("--binary", type=Path, default=ROOT / "build/native-target/debug/cosmic-player")
     parser.add_argument("--source", type=Path, default=ROOT / "build/media-player-native")
     parser.add_argument("--fixture-binary", type=Path, default=ROOT / "build/native-target/debug/examples/media-player-mpris-fixture")
-    parser.add_argument("--cos-binary", type=Path)
+    parser.add_argument("--yuos-binary", type=Path)
     options = parser.parse_args()
     fixture = ROOT / "build/player-process-fixture"
     fixture.mkdir()

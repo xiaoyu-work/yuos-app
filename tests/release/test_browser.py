@@ -16,8 +16,8 @@ from test_apt import IsolatedApt
 from test_packages import contents
 
 
-EXTENSION = Path("usr/share/claw/extensions/claw-agent-browser")
-LAUNCHER = Path("usr/lib/yuos/claw-browser-host")
+EXTENSION = Path("usr/share/yuos/extensions/yuos-agent-browser")
+LAUNCHER = Path("usr/lib/yuos/yuos-browser-host")
 HOST = Path("usr/lib/yuos/apps/browser-attached/native_host.py")
 RESOURCES = {"manifest.json", "background.js", "content.js", "popup.html", "popup.js", "README.md"}
 HOST_COMMAND = '#!/bin/sh\nexec /usr/bin/python3 -I /usr/lib/yuos/browser-native-host.py "$@"\n'
@@ -55,7 +55,7 @@ def test_browser_package_owns_complete_extension_and_the_single_canonical_host(t
     source, declaration = release.stage.load_package("browser")
     assert [(origin.relative_to(source).as_posix(), target.as_posix())
             for origin, target in asset_entries(source, declaration, ["browser-attached"])] == [
-        ("extension", EXTENSION.as_posix()), ("packaging/claw-browser-host", LAUNCHER.as_posix()),
+        ("extension", EXTENSION.as_posix()), ("packaging/yuos-browser-host", LAUNCHER.as_posix()),
     ]
     for resource in RESOURCES:
         assert (payload / EXTENSION / resource).read_bytes() == (source / "extension" / resource).read_bytes()
@@ -118,10 +118,10 @@ def test_real_browser_apt_upgrade_updates_extension_and_host_together_without_re
     preserved = {}
     for relative, content in {
         "var/lib/yuos/owners/1000/grants.json": b'{"browser-attached":["exact existing grants"]}\n',
-        "home/owner/.local/share/claw/apps/browser-attached/state.json": b'{"owner":"unchanged"}\n',
+        "home/owner/.local/share/yuos/apps/browser-attached/state.json": b'{"owner":"unchanged"}\n',
         "home/owner/.config/chromium/Default/Preferences": b'{"profile":"unchanged"}\n',
         "etc/chromium/native-messaging-hosts/com.yuos.browser.json": b'{"allowed_origins":["existing owner registration"]}\n',
-        "etc/chromium/policies/managed/claw-browser-agent.json": b'{"policy":"OS owned"}\n',
+        "etc/chromium/policies/managed/yuos-browser-agent.json": b'{"policy":"OS owned"}\n',
     }.items():
         path = apt.root / relative
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -171,8 +171,8 @@ def test_real_browser_apt_upgrade_updates_extension_and_host_together_without_re
 
 @pytest.mark.parametrize(("field", "value"), [
     ("source", "../other-product"),
-    ("destination", "/usr/lib/yuos/claw-browser-host"),
-    ("destination", "etc/chromium/policies/managed/claw-browser.json"),
+    ("destination", "/usr/lib/yuos/yuos-browser-host"),
+    ("destination", "etc/chromium/policies/managed/yuos-browser.json"),
     ("apps", ["other-app"]),
 ])
 def test_installed_asset_declarations_refuse_escapes_and_undeclared_owners(tmp_path, field, value):

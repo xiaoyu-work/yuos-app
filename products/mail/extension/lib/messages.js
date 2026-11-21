@@ -3,7 +3,7 @@
 // API directly in MV3 without `messagesRead` host_permissions
 // indirection — we just round-trip through runtime.onMessage).
 //
-// All exports attach to the global `ClawMessages` namespace.
+// All exports attach to the global `YuOsMessages` namespace.
 
 (function () {
   "use strict";
@@ -108,7 +108,7 @@
       .join("");
   }
 
-  window.ClawMessages = {
+  window.YuOsMessages = {
     getBody,
     getThread,
     getDisplayedMessage,

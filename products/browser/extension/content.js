@@ -6,8 +6,8 @@
 
 (() => {
   if (window !== window.top) return;
-  if (window.__clawAgentInstalled) return;
-  window.__clawAgentInstalled = true;
+  if (window.__yuosAgentInstalled) return;
+  window.__yuosAgentInstalled = true;
 
   const refNonce = new Uint8Array(16);
   crypto.getRandomValues(refNonce);

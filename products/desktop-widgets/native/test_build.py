@@ -82,7 +82,7 @@ def test_install_requires_explicit_build_staging_not_live_root(tmp_path):
     env = {
         "PATH": f"{tmp_path}{os.pathsep}{os.defpath}", "INSTALL_PROBE": str(probe),
         "GENERATION_PROBE": str(generation), "DESKTOP_PROBE": str(tmp_path / "generated.desktop"),
-        "CLAW_NATIVE_DESKTOP_METADATA": str(ROOT / "tools/native_desktop_metadata.py"),
+        "YUOS_NATIVE_DESKTOP_METADATA": str(ROOT / "tools/native_desktop_metadata.py"),
     }
     command = [just, "--justfile", str(NATIVE / "yuos-applet-widget-rail/justfile")]
     for root in ["", "/", "//", "/usr/.."]:

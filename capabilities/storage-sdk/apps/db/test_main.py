@@ -26,7 +26,7 @@ TOOL_NAMES = [
 
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_db_main",
+    "yuos_test_db_main",
     clear_modules=("_shared",),
 )
 

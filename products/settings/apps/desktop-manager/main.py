@@ -12,7 +12,7 @@ from _shared.env_scrub import scrub_env  # noqa: E402
 from yuos_runtime import policy  # noqa: E402
 
 
-TIMEOUT_SECS = int(os.environ.get("CLAW_DESKTOP_MANAGER_TIMEOUT", "120"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_DESKTOP_MANAGER_TIMEOUT", "120"))
 APP_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,254}$")
 
 

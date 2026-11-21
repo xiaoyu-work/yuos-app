@@ -32,7 +32,7 @@ def _denied(code, detail=None):
 
 @pytest.fixture(params=["original", "private-module", "declared-entrypoint"])
 def client(tmp_path, request):
-    stage = load_local_module(ROOT / "tools/stage.py", "claw_summary_test_stage")
+    stage = load_local_module(ROOT / "tools/stage.py", "yuos_summary_test_stage")
     assert stage.stage("ai-helpers", tmp_path / "stage", kind="capability") == ["summarize"]
     python = tmp_path / "stage/usr/lib/yuos/python"
     stage_platform_python(python)

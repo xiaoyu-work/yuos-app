@@ -12,7 +12,7 @@ from yuos_runtime import policy  # noqa: E402
 
 
 ACCURACIES = frozenset({"country", "city", "neighborhood", "street", "exact"})
-TIMEOUT_SECS = int(os.environ.get("CLAW_LOCATION_MANAGER_TIMEOUT", "45"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_LOCATION_MANAGER_TIMEOUT", "45"))
 
 
 def _cos_binary():

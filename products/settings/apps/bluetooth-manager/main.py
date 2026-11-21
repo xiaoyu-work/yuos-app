@@ -15,7 +15,7 @@ from yuos_runtime import policy  # noqa: E402
 
 ADDRESS_RE = re.compile(r"^(?:[0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$")
 PAIRING_ID_RE = re.compile(r"^[0-9A-Fa-f]{32}$")
-TIMEOUT_SECS = int(os.environ.get("CLAW_BLUETOOTH_MANAGER_TIMEOUT", "240"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_BLUETOOTH_MANAGER_TIMEOUT", "240"))
 
 
 def _cos_binary() -> str | None:

@@ -14,7 +14,7 @@ from yuos_runtime import policy  # noqa: E402
 COMMANDS = frozenset(
     {"summary", "cpu", "gpu", "pci", "usb", "memory", "storage", "drivers", "thermal"}
 )
-TIMEOUT_SECS = int(os.environ.get("CLAW_HARDWARE_CENTER_TIMEOUT", "180"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_HARDWARE_CENTER_TIMEOUT", "180"))
 
 
 def _cos_binary():

@@ -12,7 +12,7 @@ from yuos_runtime import policy  # noqa: E402
 
 
 SOURCES = frozenset({"udev", "systemd", "journal", "storage", "security", "process"})
-TIMEOUT_SECS = int(os.environ.get("CLAW_EVENT_CENTER_TIMEOUT", "120"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_EVENT_CENTER_TIMEOUT", "120"))
 
 
 def _cos_binary() -> str | None:

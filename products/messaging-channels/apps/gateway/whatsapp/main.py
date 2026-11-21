@@ -30,7 +30,7 @@ from gateway._shared import channels, gateway_memory, safe_egress, safe_subproce
 
 
 PLATFORM = "whatsapp"
-USER_AGENT = "YuOSWhatsApp/0.1.0 (+https://github.com/yuos/cos)"
+USER_AGENT = "YuOSWhatsApp/0.1.0 (+https://github.com/xiaoyu-work/Yu-OS)"
 GRAPH_API = "https://graph.facebook.com"
 API_VERSION = "v21.0"
 SOFT_LEN = 4096  # WhatsApp text body limit (per Meta docs, 4096 chars)

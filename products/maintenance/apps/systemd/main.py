@@ -16,7 +16,7 @@ UNIT_RE = re.compile(
     r"^[A-Za-z0-9_][A-Za-z0-9_.@:-]*\.(service|socket|timer|mount|target|path)$"
 )
 QUERY_TIMEOUT_SECS = 30
-CONTROL_TIMEOUT_SECS = int(os.environ.get("CLAW_SYSTEMD_TIMEOUT", "180"))
+CONTROL_TIMEOUT_SECS = int(os.environ.get("YUOS_SYSTEMD_TIMEOUT", "180"))
 MUTATING = frozenset({"start", "stop", "restart", "reload", "enable", "disable"})
 
 

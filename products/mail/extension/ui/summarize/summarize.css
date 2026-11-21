@@ -7,7 +7,7 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: .5px;
-  color: var(--claw-muted);
+  color: var(--yuos-muted);
   margin-top: 10px;
 }
 
@@ -15,13 +15,13 @@
   display: flex;
   gap: 6px;
   padding: 4px 0;
-  border-top: 1px dashed var(--claw-border);
+  border-top: 1px dashed var(--yuos-border);
 }
 .action-item:first-child { border-top: none; }
 .action-item .check {
   flex: 0 0 14px;
   height: 14px;
-  border: 1px solid var(--claw-border);
+  border: 1px solid var(--yuos-border);
   border-radius: 3px;
   margin-top: 2px;
 }

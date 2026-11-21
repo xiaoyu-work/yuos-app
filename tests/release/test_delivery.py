@@ -107,7 +107,7 @@ def test_manifest_needs_remain_declarations_not_installed_grants(deb, name, arch
 
 
 def test_publication_requires_generic_contract_review_and_has_no_environment_override(monkeypatch):
-    monkeypatch.setenv("CLAW_APPS_INTEGRATION_APPROVED", "1")
+    monkeypatch.setenv("YUOS_APPS_INTEGRATION_APPROVED", "1")
     with pytest.raises(ValueError, match="generic authenticated App Host"):
         release_publish.require_publication_contract({
             **config(), "integration_contract": "pending-origin-neutral-app-host",

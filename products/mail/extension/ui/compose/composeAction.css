@@ -4,9 +4,9 @@
 .panel             { padding-top: 10px; }
 
 .suggestion {
-  background: var(--claw-panel);
-  border: 1px solid var(--claw-border);
-  border-radius: var(--claw-radius);
+  background: var(--yuos-panel);
+  border: 1px solid var(--yuos-border);
+  border-radius: var(--yuos-radius);
   padding: 10px 12px;
   margin: 8px 0;
 }
@@ -14,7 +14,7 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: .5px;
-  color: var(--claw-muted);
+  color: var(--yuos-muted);
   margin-bottom: 4px;
 }
 .suggestion .body {
@@ -30,9 +30,9 @@
 }
 
 .compose-output {
-  background: var(--claw-panel);
-  border: 1px solid var(--claw-border);
-  border-radius: var(--claw-radius);
+  background: var(--yuos-panel);
+  border: 1px solid var(--yuos-border);
+  border-radius: var(--yuos-radius);
   padding: 10px 12px;
   margin: 10px 0 0 0;
   white-space: pre-wrap;

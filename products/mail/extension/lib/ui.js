@@ -113,7 +113,7 @@
     });
   }
 
-  window.ClawUI = {
+  window.YuOsUI = {
     aiCall,
     getSettings,
     setSettings,

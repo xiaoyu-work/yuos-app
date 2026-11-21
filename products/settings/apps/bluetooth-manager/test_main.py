@@ -21,7 +21,7 @@ PAIRING_ID = "ABCDEF0123456789ABCDEF0123456789"
 
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_bluetooth_manager_main",
+    "yuos_test_bluetooth_manager_main",
     clear_modules=("_shared",),
 )
 
@@ -251,7 +251,7 @@ def test_routes_use_exact_capability_and_broker_argv(
             with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
                 os.environ, {"YUOS_APP_MANIFEST": str(MANIFEST_PATH)}
             ):
-                server = load_local_module(SERVER_PATH, "claw_test_bluetooth_manager_server")
+                server = load_local_module(SERVER_PATH, "yuos_test_bluetooth_manager_server")
                 manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
                 tools = {tool["name"]: tool for tool in manifest["mcp"]["tools"]}
                 listed = server.app._handle_request("tools/list", {}, True)

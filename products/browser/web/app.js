@@ -1,11 +1,11 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi;
+  const ui = YuOsUi;
   const $ = (selector) => document.querySelector(selector);
   const attached = app.id === "browser-attached";
   const search = app.id === "search";
   const reader = app.id === "web";
-  const has = (command) => Boolean(ClawApp.tool(app, command));
+  const has = (command) => Boolean(YuOsApp.tool(app, command));
   let busy = false;
   let selected = null;
   let generation = 0;
@@ -20,9 +20,9 @@ ClawApp.ready.then((app) => {
     return value;
   }
   function call(command, args = {}) {
-    const tool = ClawApp.tool(app, command);
+    const tool = YuOsApp.tool(app, command);
     if (!tool) throw new Error(`This entry does not declare ${command}.`);
-    return ClawApp.call(tool.name, args);
+    return YuOsApp.call(tool.name, args);
   }
   function httpUrl(value, base) {
     const url = new URL(value, base);

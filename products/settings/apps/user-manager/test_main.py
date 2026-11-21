@@ -16,13 +16,13 @@ APP_DIR = pathlib.Path(__file__).parent
 MANIFEST_PATH = APP_DIR / "app.json"
 SERVER_PATH = APP_DIR / "server.py"
 YUOS_BIN = "/usr/local/bin/yu"
-SHELL = "/opt/claw-shell"
+SHELL = "/opt/yuos-shell"
 CREDENTIAL = "default/alice-password"
 BACKUP_TOKEN = "ABCDEF0123456789ABCDEF0123456789"
 
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_user_manager_main",
+    "yuos_test_user_manager_main",
     clear_modules=("_shared",),
 )
 
@@ -32,7 +32,7 @@ def invoke(request):
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
         os.environ, {"YUOS_APP_MANIFEST": str(MANIFEST_PATH)}
     ):
-        server = load_local_module(SERVER_PATH, "claw_test_user_manager_server")
+        server = load_local_module(SERVER_PATH, "yuos_test_user_manager_server")
         listed = server.app._handle_request("tools/list", {}, True)
         assert {tool["name"] for tool in listed["tools"]} == set(_server_signatures())
 

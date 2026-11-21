@@ -289,7 +289,7 @@ pub enum Message {
     CategoryIconsLoaded(&'static [Category], Vec<(usize, widget::icon::Handle)>),
     CheckUpdates,
     SourcesRefreshed(Result<(), String>),
-    ClawCatalog(Result<yuos_apps::Catalog, String>),
+    YuOsCatalog(Result<yuos_apps::Catalog, String>),
     UpdateQueryFailed(BackendName, String),
     Config(Config),
     DialogCancel,
@@ -1029,7 +1029,7 @@ impl App {
     }
 
     fn search(&self) -> Task<Message> {
-        if matches!(self.nav_model.active_data::<NavPage>(), Some(NavPage::ClawApps)) {
+        if matches!(self.nav_model.active_data::<NavPage>(), Some(NavPage::YuOsApps)) {
             return Task::none();
         }
         let input = self.search_input.clone();
@@ -1212,7 +1212,7 @@ impl App {
         if matches!(self.mode, Mode::Normal) {
             Task::batch([backends, Task::perform(
                 async { tokio::task::spawn_blocking(yuos_apps::load).await.unwrap_or_else(|error| Err(error.to_string())) },
-                |value| action::app(Message::ClawCatalog(value)),
+                |value| action::app(Message::YuOsCatalog(value)),
             )])
         } else {
             backends
@@ -1840,7 +1840,7 @@ impl App {
         let version_pair = self.updates.as_deref().and_then(|updates| updates.get(index))
             .and_then(|(_, package)| {
                 package.extra.get("previous_version").map(|current| {
-                    fl!("claw-version-pair", current = current.as_str(), available = package.version.as_str())
+                    fl!("yuos-version-pair", current = current.as_str(), available = package.version.as_str())
                 })
             });
 

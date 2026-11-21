@@ -14,7 +14,7 @@ from yuos_runtime import policy  # noqa: E402
 
 MAX_SINCE_MINUTES = 7 * 24 * 60
 MAX_LIMIT = 100
-TIMEOUT_SECS = int(os.environ.get("CLAW_CRASH_DOCTOR_TIMEOUT", "300"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_CRASH_DOCTOR_TIMEOUT", "300"))
 COREDUMP_ID_RE = re.compile(
     r"^[0-9A-Fa-f]{32}:[1-9][0-9]{0,9}:[1-9][0-9]{0,19}$"
 )

@@ -12,7 +12,7 @@ from test_support import authenticated_mcp_params, load_local_module
 APP_DIR = pathlib.Path(__file__).parent
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_storage_manager_main",
+    "yuos_test_storage_manager_main",
     clear_modules=("_shared",),
 )
 
@@ -162,7 +162,7 @@ def test_broker_timeout_raises(call, timeout, action):
 
 @pytest.mark.parametrize("action", ["status", "health", "check", "mount", "unmount", "eject"])
 def test_relocated_sdk_preserves_storage_authority_and_broker_contract(action):
-    device = "/dev/claw-test-device"
+    device = "/dev/yuos-test-device"
     arguments = {} if action == "status" else {"device": device}
     manifest = json.loads((APP_DIR / "app.json").read_text(encoding="utf-8"))
     assert "operations" not in manifest
@@ -191,7 +191,7 @@ def test_relocated_sdk_preserves_storage_authority_and_broker_contract(action):
             "YUOS_BIN": "/usr/local/bin/yu",
         }
     ):
-        server = load_local_module(APP_DIR / "server.py", "claw_test_storage_manager_server")
+        server = load_local_module(APP_DIR / "server.py", "yuos_test_storage_manager_server")
         listed = server.app._handle_request("tools/list", {}, True)
         assert {tool["name"] for tool in listed["tools"]} == set(tools)
         with mock.patch.object(main.os.path, "realpath", side_effect=lambda value: value), \

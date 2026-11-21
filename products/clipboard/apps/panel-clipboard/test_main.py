@@ -75,7 +75,7 @@ const app = JSON.parse(fs.readFileSync(process.argv[3], "utf8"));
 app.tools = app.mcp.tools;
 const calls = [], reviews = [];
 let unavailable = false;
-const ClawApp = {
+const YuOsApp = {
   ready: Promise.resolve(app),
   tool: (owner, name) => owner.tools.find((tool) => tool.name === name),
   call: async (name, args) => {
@@ -86,7 +86,7 @@ const ClawApp = {
     return {entries:[{identity:id, preview, copied_at:null}]};
   },
 };
-const ClawUi = {
+const YuOsUi = {
   node: (tag, text, attrs) => { const element = new Element(tag); if (text != null) element.textContent = String(text); for (const [k,v] of Object.entries(attrs || {})) element.setAttribute(k,v); return element; },
   showApp: () => {},
   replace: (target, children) => target.replaceChildren(...children),
@@ -99,12 +99,12 @@ const ClawUi = {
   },
   command: (owner, name, defaults, result, options) => {
     assert.equal(owner, app);
-    assert.ok(ClawApp.tool(owner, name));
+    assert.ok(YuOsApp.tool(owner, name));
     reviews.push({name, defaults, result, options});
   },
 };
 vm.runInNewContext(fs.readFileSync(process.argv[1], "utf8"), {
-  ClawApp, ClawUi, document:{getElementById:(name) => nodes[name]}, console,
+  YuOsApp, YuOsUi, document:{getElementById:(name) => nodes[name]}, console,
 });
 const flush = () => new Promise((resolve) => setImmediate(resolve));
 (async () => {

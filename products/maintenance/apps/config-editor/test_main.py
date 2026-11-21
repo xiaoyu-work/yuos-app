@@ -12,7 +12,7 @@ from test_support import authenticated_mcp_params, load_local_module
 
 main = load_local_module(
     pathlib.Path(__file__).with_name("main.py"),
-    "claw_test_config_editor_main",
+    "yuos_test_config_editor_main",
     clear_modules=("_shared",),
 )
 
@@ -30,7 +30,7 @@ def invoke(request):
         },
     ):
         server = load_local_module(
-            pathlib.Path(__file__).with_name("server.py"), "claw_test_config_editor_server",
+            pathlib.Path(__file__).with_name("server.py"), "yuos_test_config_editor_server",
         )
         listed = server.app._handle_request("tools/list", {}, True)
         assert {tool["name"] for tool in listed["tools"]} == {

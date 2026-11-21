@@ -21,11 +21,11 @@
 //   - browser.runtime.onMessage                    : popup → background bridge
 //
 // `lib/native.js` is loaded by the manifest (background.scripts) *before*
-// this file so the global ClawNative namespace is already available. We
+// this file so the global YuOsNative namespace is already available. We
 // can no longer use importScripts() here because Thunderbird's MV3
 // background is an event page, not a service worker.
 
-const ASSISTANT_SPACE_NAME = "claw_assistant";
+const ASSISTANT_SPACE_NAME = "yuos_assistant";
 const ASSISTANT_PAGE = browser.runtime.getURL("ui/spaces/assistant.html");
 
 const DEFAULT_SETTINGS = {
@@ -92,9 +92,9 @@ browser.runtime.onInstalled.addListener(async () => {
 });
 
 // Open the long-lived NM port as early as possible.
-ClawNative.setMailboxHandler(ClawMailbox.handle, ClawMailbox.ready);
-browser.messages.onNewMailReceived.addListener(ClawMailbox.onNewMail);
-ClawNative.connect("os.yuos.mail_ai");
+YuOsNative.setMailboxHandler(YuOsMailbox.handle, YuOsMailbox.ready);
+browser.messages.onNewMailReceived.addListener(YuOsMailbox.onNewMail);
+YuOsNative.connect("os.yuos.mail_ai");
 
 // Create the Spaces entry (TB 115+). The Spaces API is idempotent on
 // the name — calling create with the same name twice throws, so we
@@ -245,7 +245,7 @@ async function triageMessage(header, settings) {
     args.has_attachments = hasRealAttachments(full);
   } catch (_) { /* skip body fetch failures */ }
 
-  const result = await ClawNative.call("triage", args);
+  const result = await YuOsNative.call("triage", args);
   if (!result || !result.ok) return;
   const r = result.result;
 
@@ -378,7 +378,7 @@ browser.runtime.onMessage.addListener((msg, _sender) => {
 
     case "ai":
       // { kind: "ai", verb: "<verb>", args: { … } } → forwards through NM
-      return ClawNative.call(msg.verb, msg.args);
+      return YuOsNative.call(msg.verb, msg.args);
 
     case "getSettings":
       return getSettings();
@@ -440,7 +440,7 @@ browser.runtime.onMessage.addListener((msg, _sender) => {
     case "nativeStatus":
       return Promise.resolve({
         ok: true,
-        status: (ClawNative.getStatus && ClawNative.getStatus().status) || "unknown",
+        status: (YuOsNative.getStatus && YuOsNative.getStatus().status) || "unknown",
         hostName: "os.yuos.mail_ai",
       });
 
@@ -554,7 +554,7 @@ async function listRecentMessages(limit) {
 // browser.runtime.getBackgroundPage is not available in MV3; popups
 // use runtime.sendMessage instead).
 // ---------------------------------------------------------------------------
-self.ClawApp = {
+self.YuOsApp = {
   getSettings,
   setSettings,
   extractPlainText,

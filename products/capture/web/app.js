@@ -1,8 +1,8 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi;
+  const ui = YuOsUi;
   const $ = (selector) => document.querySelector(selector);
-  const tool = ClawApp.tool(app, "capture");
+  const tool = YuOsApp.tool(app, "capture");
   let busy = false;
   const history = [];
   ui.showApp(app);
@@ -24,7 +24,7 @@ ClawApp.ready.then((app) => {
     controls.forEach((control) => { control.disabled = true; });
     ui.replace($("#result"), [ui.node("h3", "Capture requested once"), ui.node("p",
       "Waiting for an authoritative path or cancellation. If this call fails or times out, the outcome may be unknown; no retry is automatic.")]);
-    void ui.run(null, () => ClawApp.call(tool.name, args), (value) => {
+    void ui.run(null, () => YuOsApp.call(tool.name, args), (value) => {
       ui.output($("#raw"), value);
       if (value && value.error) throw new Error(String(value.error));
       const received = new Date().toLocaleTimeString();

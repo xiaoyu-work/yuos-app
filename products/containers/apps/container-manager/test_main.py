@@ -51,7 +51,7 @@ IMPLEMENTATIONS = {
 
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_container_manager_main",
+    "yuos_test_container_manager_main",
     clear_modules=("_shared",),
 )
 

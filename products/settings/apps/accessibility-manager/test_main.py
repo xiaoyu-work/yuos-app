@@ -12,7 +12,7 @@ from test_support import authenticated_mcp_params, load_local_module
 APP_DIR = pathlib.Path(__file__).parent
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_accessibility_manager_main",
+    "yuos_test_accessibility_manager_main",
     clear_modules=("_shared",),
 )
 
@@ -93,7 +93,7 @@ def test_relocated_sdk_preserves_choices_and_accessibility_scope(action, argumen
             "YUOS_BIN": "/usr/local/bin/yu",
         }
     ):
-        server = load_local_module(APP_DIR / "server.py", "claw_test_accessibility_manager_server")
+        server = load_local_module(APP_DIR / "server.py", "yuos_test_accessibility_manager_server")
         listed = server.app._handle_request("tools/list", {}, True)
         assert {tool["name"] for tool in listed["tools"]} == set(tools)
         with mock.patch.object(main.policy, "require") as require, mock.patch.object(

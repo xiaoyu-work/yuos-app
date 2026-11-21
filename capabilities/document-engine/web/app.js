@@ -1,6 +1,6 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi; ui.showApp(app);
+  const ui = YuOsUi; ui.showApp(app);
   const path = document.querySelector("#path");
   const text = document.querySelector("#text");
   const notice = document.querySelector("#notice");
@@ -30,7 +30,7 @@ ClawApp.ready.then((app) => {
   }
   for (const [command, label] of [["read", "Read document"], ["info", "Document properties"], ["convert", "Convert format"]]) {
     const button = ui.node("button", label);
-    button.disabled = !ClawApp.tool(app, command);
+    button.disabled = !YuOsApp.tool(app, command);
     button.onclick = () => {
       if (!path.value.trim()) { notice.textContent = "Enter an authorized document path."; return; }
       if (command === "convert") {
@@ -46,13 +46,13 @@ ClawApp.ready.then((app) => {
           fields: { path: { label: "Source document", readOnly: true },
             to: { label: "Output format", choices: [format] } },
         });
-      } else void ui.run(button, () => ClawApp.call(command, { path: path.value }), output, notice);
+      } else void ui.run(button, () => YuOsApp.call(command, { path: path.value }), output, notice);
     };
     document.querySelector("#file-actions").append(button);
   }
   for (const [command, label] of [["summarize", "Summarize"], ["explain", "Explain"], ["rewrite", "Propose rewrite"]]) {
     const button = ui.node("button", label);
-    button.disabled = !ClawApp.tool(app, command);
+    button.disabled = !YuOsApp.tool(app, command);
     button.onclick = () => {
       const file = document.querySelector("#input-source").value === "file";
       if (!(file ? path.value : text.value).trim()) {
@@ -61,7 +61,7 @@ ClawApp.ready.then((app) => {
       }
       const arguments_ = file ? { file: path.value } : { text: [text.value] };
       if (command === "rewrite") arguments_.instruction = document.querySelector("#instruction").value;
-      void ui.run(button, () => ClawApp.call(command, arguments_), output, notice);
+      void ui.run(button, () => YuOsApp.call(command, arguments_), output, notice);
     };
     document.querySelector("#ai-actions").append(button);
   }

@@ -23,7 +23,7 @@ COS = "/usr/local/bin/yu"
 
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_backup_center_main",
+    "yuos_test_backup_center_main",
     clear_modules=("_shared",),
 )
 
@@ -265,7 +265,7 @@ def test_relocated_sdk_service_lists_tools_and_dispatches_to_the_broker():
         os.environ, {"YUOS_APP_MANIFEST": str(APP_DIR / "app.json"), "YUOS_BIN": COS}
     ):
         server = load_local_module(
-            APP_DIR / "server.py", "claw_test_backup_center_server"
+            APP_DIR / "server.py", "yuos_test_backup_center_server"
         )
         manifest = json.loads((APP_DIR / "app.json").read_text(encoding="utf-8"))
         listed = server.app._handle_request("tools/list", {}, True)

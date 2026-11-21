@@ -13,7 +13,7 @@ from yuos_runtime import policy  # noqa: E402
 
 
 SNAPSHOT_ID_RE = re.compile(r"^snap_[0-9a-f]{32}$")
-TIMEOUT_SECS = int(os.environ.get("CLAW_SNAPSHOT_TIMEOUT", "1800"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_SNAPSHOT_TIMEOUT", "1800"))
 DEFAULT_DESCRIPTION = "Yu OS recovery point"
 
 

@@ -541,7 +541,7 @@ impl Notifications {
             .ok_or_else(|| zbus::fdo::Error::AccessDenied("missing sender".into()))?;
         let (id, replacing) = self.allocate(sender.as_str(), replaces_id)?;
         let connection_bound = matches!(
-            hints.remove("x-claw-connection-bound"),
+            hints.remove("x-yuos-connection-bound"),
             Some(zbus::zvariant::Value::Bool(true)),
         );
         let hints_clone = hints

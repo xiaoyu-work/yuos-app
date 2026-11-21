@@ -1,6 +1,6 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi;
+  const ui = YuOsUi;
   ui.showApp(app);
   const accounts = document.querySelector("#accounts");
   const folders = document.querySelector("#folders");
@@ -59,7 +59,7 @@ ClawApp.ready.then((app) => {
     ui.replace(target, items);
   }
   function compose(values, replacing) {
-    const command = ClawApp.tool(app, "draft_save") ? "draft_save" : "send";
+    const command = YuOsApp.tool(app, "draft_save") ? "draft_save" : "send";
     const context = { account: accounts.value, "request-id": crypto.randomUUID(), ...values };
     ui.command(app, command, context, async (result) => {
       if (result.draft) await reviewDraft(result.draft);
@@ -95,14 +95,14 @@ ClawApp.ready.then((app) => {
     const actions = document.querySelector("#draft-actions");
     actions.replaceChildren();
     const account = message.account;
-    if (ClawApp.tool(app, "draft_save")) {
+    if (YuOsApp.tool(app, "draft_save")) {
       const edit = ui.node("button", "Edit draft");
       edit.onclick = () => compose({ account: accounts.value, id: draft.id,
         "source-account": account, to: addresses(message.to), cc: addresses(message.cc),
         subject: message.subject, body: message.body }, true);
       actions.append(edit);
     }
-    if (ClawApp.tool(app, "draft_send")) {
+    if (YuOsApp.tool(app, "draft_send")) {
       const senders = ui.node("select", null, { "aria-label": "Send draft from account" });
       for (const item of accountItems.values()) {
         if (item.can_send && item.id.split(":")[0] === account.split(":")[0]) {
@@ -129,9 +129,9 @@ ClawApp.ready.then((app) => {
     document.querySelector("#draft").hidden = false;
   }
   function reviewDraft(draft) {
-    if (!ClawApp.tool(app, "native_draft")) return;
+    if (!YuOsApp.tool(app, "native_draft")) return;
     const request = generation;
-    return ui.run(null, () => ClawApp.call("native_draft", { id: draft.id }), (result) => {
+    return ui.run(null, () => YuOsApp.call("native_draft", { id: draft.id }), (result) => {
       if (request === generation) showDraft(result.draft);
     }, notice);
   }
@@ -147,7 +147,7 @@ ClawApp.ready.then((app) => {
     for (const item of value.attachments || []) {
       const row = ui.node("div", null, { class: "row" });
       row.append(ui.node("span", `${item.name} - ${item.size} bytes`, { class: "small" }));
-      if (ClawApp.tool(app, "attachment_download")) {
+      if (YuOsApp.tool(app, "attachment_download")) {
         const download = ui.node("button", "Save attachment");
         download.onclick = () => ui.command(app, "attachment_download", {
           ...defaults(), attachment: item.id,
@@ -164,14 +164,14 @@ ClawApp.ready.then((app) => {
     }
     const actions = document.querySelector("#message-actions");
     actions.replaceChildren();
-    if (ClawApp.tool(app, "draft_save") || ClawApp.tool(app, "send")) {
+    if (YuOsApp.tool(app, "draft_save") || YuOsApp.tool(app, "send")) {
       const reply = ui.node("button", "Reply");
       reply.onclick = () => compose({ to: value.from, subject: /^re:/i.test(value.subject || "") ?
         value.subject : `Re: ${value.subject || ""}`, body: `\n\n${value.body || ""}` });
       actions.append(reply);
     }
     const folder = folderItems.find((entry) => entry.id === value.folder);
-    if (folder && folder.special_use && folder.special_use.includes("drafts") && ClawApp.tool(app, "native_draft")) {
+    if (folder && folder.special_use && folder.special_use.includes("drafts") && YuOsApp.tool(app, "native_draft")) {
       const review = ui.node("button", "Review saved draft");
       review.onclick = () => { void reviewDraft(value); };
       actions.append(review);
@@ -189,7 +189,7 @@ ClawApp.ready.then((app) => {
         ui.node("p", item.date ? new Date(item.date).toLocaleString() : "", { class: "small muted" }));
       button.onclick = () => {
         const request = ++readGeneration;
-        void ui.run(button, () => ClawApp.call("read", { account: item.account || accounts.value, id: item.id }), (value) => {
+        void ui.run(button, () => YuOsApp.call("read", { account: item.account || accounts.value, id: item.id }), (value) => {
           if (request === readGeneration) displayMessage(value, item);
         }, notice);
       };
@@ -197,7 +197,7 @@ ClawApp.ready.then((app) => {
     }) : [ui.node("p", "No messages returned.", { class: "empty" })]);
   }
   function load(searching) {
-    if (!ClawApp.tool(app, "list") || !accounts.value) return;
+    if (!YuOsApp.tool(app, "list") || !accounts.value) return;
     const request = ++generation;
     resetMessage();
     const arguments_ = { account: accounts.value, "max-results": Number(document.querySelector("#limit").value) };
@@ -205,7 +205,7 @@ ClawApp.ready.then((app) => {
     if (searching === true) arguments_.query = document.querySelector("#query").value;
     else arguments_.unread = document.querySelector("#unread").checked;
     return ui.run(document.querySelector(searching === true ? "#search" : "#refresh"),
-      () => ClawApp.call(searching === true ? "search" : "list", arguments_),
+      () => YuOsApp.call(searching === true ? "search" : "list", arguments_),
       (result) => { if (request === generation) list(result); }, notice);
   }
   accounts.onchange = () => {
@@ -216,8 +216,8 @@ ClawApp.ready.then((app) => {
     document.querySelector("#draft").hidden = true;
     const item = accountItems.get(accounts.value);
     document.querySelector("#compose").disabled = !item || !item.can_send ||
-      !(ClawApp.tool(app, "draft_save") || ClawApp.tool(app, "send"));
-    if (ClawApp.tool(app, "folders") && item) void ui.run(null, () => ClawApp.call("folders", { account: item.id }), (result) => {
+      !(YuOsApp.tool(app, "draft_save") || YuOsApp.tool(app, "send"));
+    if (YuOsApp.tool(app, "folders") && item) void ui.run(null, () => YuOsApp.call("folders", { account: item.id }), (result) => {
       if (request !== generation) return;
       folderItems = ui.rows(result, ["folders"]);
       ui.replace(folders, folderItems.map((entry) => ui.node("option", entry.name || entry.id, { value: entry.id })));
@@ -230,17 +230,17 @@ ClawApp.ready.then((app) => {
   document.querySelector("#refresh").onclick = () => { void load(); };
   document.querySelector("#unread").onchange = () => { void load(); };
   document.querySelector("#limit").onchange = () => { void load(); };
-  document.querySelector("#search").disabled = !ClawApp.tool(app, "search");
+  document.querySelector("#search").disabled = !YuOsApp.tool(app, "search");
   document.querySelector("#search").onclick = () => { void load(true); };
   document.querySelector("#query").onkeydown = (event) => {
-    if (event.key === "Enter" && ClawApp.tool(app, "search")) { event.preventDefault(); void load(true); }
+    if (event.key === "Enter" && YuOsApp.tool(app, "search")) { event.preventDefault(); void load(true); }
   };
   document.querySelector("#compose").disabled = true;
   document.querySelector("#compose").onclick = () => compose();
   const aiCommands = { summarize: "Summarize message", smart_reply: "Suggest replies",
     smart_compose: "Help compose", translate: "Translate", triage: "Triage", chat: "Ask about mail", draft: "Draft from context" };
   for (const [command, label] of Object.entries(aiCommands)) {
-    if (!ClawApp.tool(app, command)) continue;
+    if (!YuOsApp.tool(app, command)) continue;
     const button = ui.node("button", label);
     button.onclick = () => ui.command(app, command, {
       body: document.querySelector("#ai-input").value, context: document.querySelector("#ai-input").value,
@@ -254,7 +254,7 @@ ClawApp.ready.then((app) => {
   }
   document.querySelector("#ai").hidden = !document.querySelector("#ai-actions").children.length;
   ui.allTools(document.querySelector("#more"), app, (value) => ui.output(document.querySelector("#ai-result"), value), defaults);
-  if (ClawApp.tool(app, "accounts")) void ui.run(null, () => ClawApp.call("accounts"), (result) => {
+  if (YuOsApp.tool(app, "accounts")) void ui.run(null, () => YuOsApp.call("accounts"), (result) => {
     const values = ui.rows(result, ["accounts", "items"]);
     for (const item of values) accountItems.set(item.id, item);
     ui.replace(accounts, values.map((item) => ui.node("option", item.name || item.label || item.id, { value: item.id || item.account })));

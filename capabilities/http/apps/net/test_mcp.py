@@ -87,7 +87,7 @@ def _http_broker():
 
 @pytest.fixture(params=["original", "private-module", "declared-entrypoint"])
 def client(tmp_path, request):
-    stage = load_local_module(ROOT / "tools/stage.py", "claw_http_test_stage")
+    stage = load_local_module(ROOT / "tools/stage.py", "yuos_http_test_stage")
     stage.stage("http", tmp_path / "stage", kind="capability")
     apps = tmp_path / "stage/usr/lib/yuos/apps"
     python = stage.stage_shared(tmp_path / "stage")

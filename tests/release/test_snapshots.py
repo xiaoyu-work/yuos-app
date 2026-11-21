@@ -642,7 +642,7 @@ def test_complete_browser_and_mail_resources_remain_inside_signed_snapshots(tmp_
         resources = root / "assets"
         resources.mkdir()
         if product == "browser":
-            shutil.copytree(staged / "usr/share/claw/extensions/claw-agent-browser", resources / "extension")
+            shutil.copytree(staged / "usr/share/yuos/extensions/yuos-agent-browser", resources / "extension")
         else:
             shutil.copy2(staged / "usr/lib/thunderbird/distribution/extensions/yu-mail-ai@yuos.io.xpi",
                          resources / "yu-mail-ai@yuos.io.xpi")

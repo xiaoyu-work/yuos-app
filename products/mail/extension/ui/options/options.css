@@ -6,9 +6,9 @@ body.options-page {
 .options-page h1 { margin-top: 0; }
 
 .opt-card {
-  background: var(--claw-panel);
-  border: 1px solid var(--claw-border);
-  border-radius: var(--claw-radius);
+  background: var(--yuos-panel);
+  border: 1px solid var(--yuos-border);
+  border-radius: var(--yuos-radius);
   padding: 14px 16px;
   margin: 12px 0;
 }
@@ -27,12 +27,12 @@ body.options-page {
 .save-bar {
   position: sticky;
   bottom: 0;
-  background: var(--claw-bg);
+  background: var(--yuos-bg);
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 12px 0;
-  border-top: 1px solid var(--claw-border);
+  border-top: 1px solid var(--yuos-border);
   justify-content: flex-end;
 }
 

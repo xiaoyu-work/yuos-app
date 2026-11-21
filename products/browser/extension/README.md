@@ -48,8 +48,8 @@ The OS-owned
 [`tools/install-browser-agent.sh`](https://github.com/xiaoyu-work/Yu-OS/blob/main/tools/install-browser-agent.sh)
 checks the installed `yuos-app-browser` package assets and configures the
 extension allowlist and Native Messaging registration. The package owns this
-complete directory at `/usr/share/claw/extensions/claw-agent-browser` and
-`/usr/lib/yuos/claw-browser-host`, which executes the OS-owned transport at
+complete directory at `/usr/share/yuos/extensions/yuos-agent-browser` and
+`/usr/lib/yuos/yuos-browser-host`, which executes the OS-owned transport at
 `/usr/lib/yuos/browser-native-host.py` with isolated `/usr/bin/python3`.
 The matching Agent provides `yuos-browser-bridge-v1`; this is transport
 availability, not an App grant. Independent Browser APT upgrades update the
@@ -63,14 +63,14 @@ Load the installed directory unpacked, or this source directory during developme
 ```
 helium --no-default-browser-check
 # helium://extensions → Developer mode → Load unpacked
-# Installed package: /usr/share/claw/extensions/claw-agent-browser
+# Installed package: /usr/share/yuos/extensions/yuos-agent-browser
 ```
 
 Note the resulting extension ID and put it into
 `/etc/chromium/native-messaging-hosts/com.yuos.browser.json`'s
 `allowed_origins` array so Helium will start the native host. This is the
 upstream-compatible Linux path the Helium binary resolves.
-Run the installer with `CLAW_EXT_ID` to register both hosts; for chat,
+Run the installer with `YUOS_EXT_ID` to register both hosts; for chat,
 install the matching Yu OS Desktop package and keep the existing local
 Agent bridge available. The chat panel shows an error if it cannot reach it.
 
@@ -84,7 +84,7 @@ response: { id, ok: true,  result }
 response: { id, ok: false, error }
 ```
 
-The socket lives at `$XDG_RUNTIME_DIR/claw-browser.sock`, has mode `0600`, and
+The socket lives at `$XDG_RUNTIME_DIR/yuos-browser.sock`, has mode `0600`, and
 accepts only a root peer. Sandboxed Apps never receive the socket; they call the
 typed `system.browser.control` provider through the private runtime bridge.
 

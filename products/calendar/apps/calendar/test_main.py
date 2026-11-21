@@ -12,7 +12,7 @@ from test_support import load_local_module, unit_policy_bridge
 
 calendar_main = load_local_module(
     pathlib.Path(__file__).with_name("main.py"),
-    "claw_test_calendar_main",
+    "yuos_test_calendar_main",
     clear_modules=("_shared",),
 )
 run = calendar_main.run

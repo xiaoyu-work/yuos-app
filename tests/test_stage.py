@@ -318,7 +318,7 @@ def test_public_mcp_requires_common_runtime_and_never_imports_legacy_sibling_hel
 
 def test_mcp_only_app_uses_explicit_tests_without_a_main_module(tmp_path, monkeypatch):
     monkeypatch.syspath_prepend(str(ROOT / "tools"))
-    runner = load_local_module(ROOT / "tools/test.py", "claw_test_app_runner")
+    runner = load_local_module(ROOT / "tools/test.py", "yuos_test_app_runner")
     app = tmp_path / "apps/kv"
     app.mkdir(parents=True)
     (app / "app.json").write_text('{"id":"kv"}')
@@ -665,12 +665,12 @@ def test_browser_stage_preserves_search_without_os_services(tmp_path):
     assert (tmp_path / native_host).read_bytes() == (
         ROOT / "products/browser/apps/browser-attached/native_host.py"
     ).read_bytes()
-    extension = tmp_path / "usr/share/claw/extensions/claw-agent-browser"
+    extension = tmp_path / "usr/share/yuos/extensions/yuos-agent-browser"
     assert stage._library_tree(extension) == stage._library_tree(
         ROOT / "products/browser/extension", payload=True,
     )
-    launcher = tmp_path / "usr/lib/yuos/claw-browser-host"
-    source_launcher = ROOT / "products/browser/packaging/claw-browser-host"
+    launcher = tmp_path / "usr/lib/yuos/yuos-browser-host"
+    source_launcher = ROOT / "products/browser/packaging/yuos-browser-host"
     assert launcher.read_bytes() == source_launcher.read_bytes()
     assert launcher.stat().st_mode == source_launcher.stat().st_mode
     assert launcher.stat().st_mode & 0o111
@@ -689,8 +689,8 @@ def test_browser_stage_preserves_search_without_os_services(tmp_path):
 def test_browser_assets_follow_declared_owner_selection(tmp_path, selected):
     assert stage.stage("browser", tmp_path, selected) == selected
     attached = "browser-attached" in selected
-    extension = tmp_path / "usr/share/claw/extensions/claw-agent-browser"
-    launcher = tmp_path / "usr/lib/yuos/claw-browser-host"
+    extension = tmp_path / "usr/share/yuos/extensions/yuos-agent-browser"
+    launcher = tmp_path / "usr/lib/yuos/yuos-browser-host"
     assert extension.exists() is attached
     assert launcher.exists() is attached
     apps = tmp_path / "usr/lib/yuos/apps"
@@ -712,8 +712,8 @@ def test_browser_cli_stage_includes_declared_assets_without_a_second_stager(tmp_
         env={"PATH": os.defpath, "PYTHONDONTWRITEBYTECODE": "1"},
     )
     assert json.loads(result.stdout) == ["browser-attached"]
-    assert (tmp_path / "usr/share/claw/extensions/claw-agent-browser/manifest.json").is_file()
-    assert (tmp_path / "usr/lib/yuos/claw-browser-host").is_file()
+    assert (tmp_path / "usr/share/yuos/extensions/yuos-agent-browser/manifest.json").is_file()
+    assert (tmp_path / "usr/lib/yuos/yuos-browser-host").is_file()
     assert (tmp_path / "usr/lib/yuos/apps/browser-attached/native_host.py").is_file()
     assert not (tmp_path / "usr/lib/yuos/apps/search").exists()
     assert not (tmp_path / "usr/lib/yuos/apps/web").exists()
@@ -731,13 +731,13 @@ def test_normal_staging_propagates_asset_validation_before_payload_writes(tmp_pa
 
 
 def test_normal_staging_never_overwrites_a_conflicting_installed_asset(tmp_path):
-    launcher = tmp_path / "usr/lib/yuos/claw-browser-host"
+    launcher = tmp_path / "usr/lib/yuos/yuos-browser-host"
     launcher.parent.mkdir(parents=True)
     launcher.write_bytes(b"unrelated existing file")
     with pytest.raises(ValueError, match="Conflicting staged installed asset"):
         stage.stage("browser", tmp_path, ["browser-attached"])
     assert launcher.read_bytes() == b"unrelated existing file"
-    assert not (tmp_path / "usr/share/claw/extensions/claw-agent-browser").exists()
+    assert not (tmp_path / "usr/share/yuos/extensions/yuos-agent-browser").exists()
     assert not (tmp_path / "usr/lib/yuos/apps").exists()
 
 

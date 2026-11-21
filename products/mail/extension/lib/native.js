@@ -7,7 +7,7 @@
 //
 // This module is loaded into the background event page via the
 // `background.scripts` manifest list (it runs *before* background.js)
-// and intentionally exposes a single namespace `ClawNative`.
+// and intentionally exposes a single namespace `YuOsNative`.
 
 (function () {
   "use strict";
@@ -36,7 +36,7 @@
     const current = port;
     mailboxReady.then(() => {
       if (port === current) current.postMessage({ type: "mailbox.ready", version: 1 });
-    }).catch(() => console.error("[claw-mail] mailbox initialization failed"));
+    }).catch(() => console.error("[yuos-mail] mailbox initialization failed"));
   }
 
   function setMailboxHandler(handler, ready) {
@@ -180,5 +180,5 @@
 
   function getStatus() { return lastStatus; }
 
-  self.ClawNative = { connect, call, onStatus, getStatus, setMailboxHandler };
+  self.YuOsNative = { connect, call, onStatus, getStatus, setMailboxHandler };
 })();

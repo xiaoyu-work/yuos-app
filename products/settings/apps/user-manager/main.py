@@ -21,7 +21,7 @@ TOKEN_RE = re.compile(r"^[0-9A-Fa-f]{32}$")
 MAX_GROUPS = 64
 MAX_FULL_NAME_LENGTH = 128
 MAX_SHELL_LENGTH = 255
-TIMEOUT_SECS = int(os.environ.get("CLAW_USER_MANAGER_TIMEOUT", "300"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_USER_MANAGER_TIMEOUT", "300"))
 
 
 def _cos_binary() -> str | None:

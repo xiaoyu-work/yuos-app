@@ -122,8 +122,8 @@ class DocsAppTests(unittest.TestCase):
             self._saved_env[key] = os.environ.get(key)
             os.environ[key] = value
         for variable in (
-            "CLAW_RECOLLQ_BIN",
-            "CLAW_RECOLLINDEX_BIN",
+            "YUOS_RECOLLQ_BIN",
+            "YUOS_RECOLLINDEX_BIN",
             "RECOLLQ_FAIL",
             "RECOLLQ_EXIT",
             "RECOLLQ_MALFORMED",
@@ -133,7 +133,7 @@ class DocsAppTests(unittest.TestCase):
             os.environ.pop(variable, None)
 
         sys.path.insert(0, str(APP_DIR))
-        self.module_name = f"claw_test_docs_main_{id(self)}"
+        self.module_name = f"yuos_test_docs_main_{id(self)}"
         self.main = load_local_module(
             APP_DIR / "main.py",
             self.module_name,
@@ -204,8 +204,8 @@ class DocsAppTests(unittest.TestCase):
         main_source = (APP_DIR / "main.py").read_text(encoding="utf-8")
         self.assertIn('RECOLLQ_BIN = "/usr/bin/recollq"', main_source)
         self.assertIn('RECOLLINDEX_BIN = "/usr/bin/recollindex"', main_source)
-        self.assertNotIn("CLAW_RECOLLQ_BIN", main_source)
-        self.assertNotIn("CLAW_RECOLLINDEX_BIN", main_source)
+        self.assertNotIn("YUOS_RECOLLQ_BIN", main_source)
+        self.assertNotIn("YUOS_RECOLLINDEX_BIN", main_source)
         self.assertFalse(
             any(
                 isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))

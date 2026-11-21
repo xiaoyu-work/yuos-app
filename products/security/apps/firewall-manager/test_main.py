@@ -17,7 +17,7 @@ BACKUP_TOKEN = "0123456789ABCDEF0123456789ABCDEF"
 
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_firewall_manager_main",
+    "yuos_test_firewall_manager_main",
     clear_modules=("_shared",),
 )
 
@@ -28,7 +28,7 @@ def invoke(request):
         os.environ, {"YUOS_APP_MANIFEST": str(MANIFEST_PATH)},
     ):
         server = load_local_module(
-            APP_DIR / "server.py", "claw_test_firewall_manager_server",
+            APP_DIR / "server.py", "yuos_test_firewall_manager_server",
         )
         listed = server.app._handle_request("tools/list", {}, True)
         assert {tool["name"] for tool in listed["tools"]} == {

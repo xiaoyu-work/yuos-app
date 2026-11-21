@@ -1,6 +1,6 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi;
+  const ui = YuOsUi;
   const root = document.getElementById("workspace");
   const notice = document.getElementById("notice");
   const names = {
@@ -111,9 +111,9 @@ ClawApp.ready.then((app) => {
     busy = true;
     try {
       await ui.run(control, async () => {
-        const tool = ClawApp.tool(app, command);
+        const tool = YuOsApp.tool(app, command);
         if (!tool) throw new Error(`The loaded ${app.id} entry does not declare ${command}.`);
-        const value = await ClawApp.call(tool.name, args);
+        const value = await YuOsApp.call(tool.name, args);
         if (value && value.ok === false) throw new Error(value.error || "The OS did not accept the request.");
         return value;
       }, done, status);
@@ -121,7 +121,7 @@ ClawApp.ready.then((app) => {
   }
   function review(command, args, title, explanation, confirm = false, done = null, summary = args) {
     if (busy || reviewing) return;
-    if (!ClawApp.tool(app, command)) { notice.textContent = `This entry does not declare ${command}.`; return; }
+    if (!YuOsApp.tool(app, command)) { notice.textContent = `This entry does not declare ${command}.`; return; }
     reviewing = true;
     const dialog = ui.node("dialog"); const form = ui.node("form");
     const check = ui.node("input", null, { type: "checkbox", required: "" });

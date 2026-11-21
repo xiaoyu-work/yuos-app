@@ -34,7 +34,7 @@ TOOL_NAMES = [
 
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_display_manager_main",
+    "yuos_test_display_manager_main",
     clear_modules=("_shared",),
 )
 
@@ -44,7 +44,7 @@ def mcp_app():
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
         os.environ, {"YUOS_APP_MANIFEST": str(MANIFEST_PATH)}
     ):
-        server = load_local_module(SERVER_PATH, "claw_test_display_manager_server")
+        server = load_local_module(SERVER_PATH, "yuos_test_display_manager_server")
         listed = server.app._handle_request("tools/list", {}, True)
         assert {tool["name"] for tool in listed["tools"]} == set(TOOL_NAMES)
         yield server.app

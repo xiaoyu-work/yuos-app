@@ -23,7 +23,7 @@ def _load_server(monkeypatch: pytest.MonkeyPatch, data_dir: Path):
     monkeypatch.setenv("YUOS_DATA_DIR", str(data_dir))
     return load_local_module(
         APP_DIR / "server.py",
-        "claw_test_kv_server",
+        "yuos_test_kv_server",
         clear_modules=("_shared",),
     )
 

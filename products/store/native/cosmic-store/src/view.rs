@@ -677,18 +677,18 @@ impl App {
                     .active_data::<NavPage>()
                     .map_or(NavPage::default(), |nav_page| *nav_page)
                 {
-                    NavPage::ClawApps => {
+                    NavPage::YuOsApps => {
                         let mut column = widget::column::with_capacity(3)
                             .padding([0, space_s, space_m, space_s])
                             .spacing(space_s)
                             .width(Length::Fill)
                             .push(widget::flex_row(vec![
-                                widget::text::title2(NavPage::ClawApps.title()).into(),
+                                widget::text::title2(NavPage::YuOsApps.title()).into(),
                                 widget::space::horizontal().width(Length::Fill).into(),
                                 self.source_check_button(),
                             ]));
                         if let Some(error) = &self.refresh_error {
-                            column = column.push(widget::text::body(fl!("claw-refresh-failed", error = error.as_str())));
+                            column = column.push(widget::text::body(fl!("yuos-refresh-failed", error = error.as_str())));
                         }
                         column.push(self.yuos_apps_view(false)).into()
                     }
@@ -886,20 +886,20 @@ impl App {
                         ]));
                         if let Some(error) = &self.refresh_error {
                             column = column.push(widget::text::body(
-                                fl!("claw-refresh-failed", error = error.as_str())));
+                                fl!("yuos-refresh-failed", error = error.as_str())));
                         }
                         let checked = self.yuos_catalog.as_ref()
                             .and_then(|result| result.as_ref().ok())
                             .and_then(|catalog| catalog.checked_at.as_deref());
                         column = column.push(widget::text::caption(match checked {
-                            Some(time) => fl!("claw-last-checked", time = time),
-                            None => fl!("claw-not-checked"),
+                            Some(time) => fl!("yuos-last-checked", time = time),
+                            None => fl!("yuos-not-checked"),
                         }));
-                        column = column.push(widget::text::title3(NavPage::ClawApps.title()))
+                        column = column.push(widget::text::title3(NavPage::YuOsApps.title()))
                             .push(self.yuos_apps_view(true))
                             .push(widget::text::title3(fl!("linux-system-updates")));
                         for (source, error) in &self.update_errors {
-                            column = column.push(widget::text::body(fl!("claw-update-query-failed",
+                            column = column.push(widget::text::body(fl!("yuos-update-query-failed",
                                 source = source.as_str(), error = error.as_str())));
                         }
                         match &self.updates {

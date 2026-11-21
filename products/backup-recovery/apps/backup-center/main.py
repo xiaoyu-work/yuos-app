@@ -15,7 +15,7 @@ from yuos_runtime import policy  # noqa: E402
 CREDENTIAL_RE = re.compile(r"^[A-Za-z0-9_.:-]+/[A-Za-z0-9_.:-]+$")
 SNAPSHOT_ID_RE = re.compile(r"^[0-9A-Fa-f]{8,64}$")
 TAG_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
-TIMEOUT_SECS = int(os.environ.get("CLAW_BACKUP_CENTER_TIMEOUT", "10800"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_BACKUP_CENTER_TIMEOUT", "10800"))
 
 
 def _cos_binary() -> str | None:

@@ -9,7 +9,7 @@ from _shared import credentials
 
 class CredentialLoaderTests(unittest.TestCase):
     def setUp(self):
-        self.binary = mock.patch.dict(credentials.os.environ, {"YUOS_BIN": "/fixture/cos"})
+        self.binary = mock.patch.dict(credentials.os.environ, {"YUOS_BIN": "/fixture/yu"})
         self.binary.start()
         self.addCleanup(self.binary.stop)
 
@@ -58,7 +58,7 @@ class CredentialLoaderTests(unittest.TestCase):
                 self.assertNotIn("must-not-be-accepted", error)
                 self.assertEqual(
                     run.call_args.args[0],
-                    ["/fixture/cos", "credential", "load", "TOKEN", "--namespace", "owner"],
+                    ["/fixture/yu", "credential", "load", "TOKEN", "--namespace", "owner"],
                 )
 
 

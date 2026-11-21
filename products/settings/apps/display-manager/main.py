@@ -29,7 +29,7 @@ TRANSFORMS = frozenset(
     }
 )
 ADAPTIVE = frozenset({"true", "automatic", "false"})
-TIMEOUT_SECS = int(os.environ.get("CLAW_DISPLAY_MANAGER_TIMEOUT", "180"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_DISPLAY_MANAGER_TIMEOUT", "180"))
 
 
 def _cos_binary() -> str | None:

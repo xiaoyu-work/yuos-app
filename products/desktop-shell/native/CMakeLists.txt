@@ -9,12 +9,12 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(GIT_REVISION "source" CACHE STRING "Desktop Shell source revision")
-set(CLAW_QT_CACHE "${CMAKE_CURRENT_BINARY_DIR}/qt-cache" CACHE PATH "Native Qt source/build cache")
-set(CLAW_QT_JOBS "2" CACHE STRING "Qt build jobs")
+set(YUOS_QT_CACHE "${CMAKE_CURRENT_BINARY_DIR}/qt-cache" CACHE PATH "Native Qt source/build cache")
+set(YUOS_QT_JOBS "2" CACHE STRING "Qt build jobs")
 set(qt_prefix_file "${CMAKE_CURRENT_BINARY_DIR}/qt-prefix")
 set(qt_builder "${CMAKE_CURRENT_SOURCE_DIR}/build-qt.py")
 execute_process(
-    COMMAND "${Python3_EXECUTABLE}" "${qt_builder}" build "${CLAW_QT_CACHE}" "${CLAW_QT_JOBS}"
+    COMMAND "${Python3_EXECUTABLE}" "${qt_builder}" build "${YUOS_QT_CACHE}" "${YUOS_QT_JOBS}"
         --prefix-file "${qt_prefix_file}"
     COMMAND_ERROR_IS_FATAL ANY
 )

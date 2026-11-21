@@ -390,8 +390,8 @@ authority launcher remains OS-owned, but its special integration is an unresolve
 contract above, not an approved privileged App category.
 
 `yuos-app-browser` owns all three Browser Apps, the complete declared MV3
-extension at `/usr/share/claw/extensions/claw-agent-browser`, and executable
-`/usr/lib/yuos/claw-browser-host`. The launcher executes `/usr/bin/python3`
+extension at `/usr/share/yuos/extensions/yuos-agent-browser`, and executable
+`/usr/lib/yuos/yuos-browser-host`. The launcher executes `/usr/bin/python3`
 with the canonical `/usr/lib/yuos/apps/browser-attached/native_host.py`; it never
 duplicates that implementation under `/usr/lib/yuos/browser-agent`.
 Browser's `package.json` declares these `installed_assets`, scoped to

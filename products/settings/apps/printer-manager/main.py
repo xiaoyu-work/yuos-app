@@ -16,7 +16,7 @@ NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,126}$")
 JOB_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,126}-[0-9]+$")
 MEDIA_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$")
 SIDES = frozenset({"one-sided", "two-sided-long-edge", "two-sided-short-edge"})
-TIMEOUT_SECS = int(os.environ.get("CLAW_PRINTER_MANAGER_TIMEOUT", "600"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_PRINTER_MANAGER_TIMEOUT", "600"))
 
 
 def _cos_binary() -> str | None:

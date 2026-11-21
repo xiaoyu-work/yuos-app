@@ -76,7 +76,7 @@ python3 tools/native_build.py notifications build
 python3 products/notifications/native/test_process.py
 ```
 
-The process fixture accepts `--binary`, `--source`, and `--cos-binary` for
+The process fixture accepts `--binary`, `--source`, and `--yuos-binary` for
 immutable OS-composed source and the actual CLI. Without the last option it
 uses a fixture-only wire CLI and canned broker responses, not an OS provider
 copy. `--fixture-root` selects a fresh private directory under `build/` for

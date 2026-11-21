@@ -1,6 +1,6 @@
 qt_add_executable(quickshell main.cpp)
 
-qt_add_resources(quickshell "claw_qt_paths"
+qt_add_resources(quickshell "yuos_qt_paths"
     PREFIX "/qt/etc"
     FILES qt.conf
 )

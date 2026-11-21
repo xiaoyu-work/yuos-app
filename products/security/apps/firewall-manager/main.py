@@ -15,7 +15,7 @@ from yuos_runtime import policy  # noqa: E402
 
 ID_RE = re.compile(r"^[0-9A-Fa-f]{32}$")
 IFACE_RE = re.compile(r"^[A-Za-z0-9_.:-]{1,15}$")
-TIMEOUT_SECS = int(os.environ.get("CLAW_FIREWALL_MANAGER_TIMEOUT", "180"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_FIREWALL_MANAGER_TIMEOUT", "180"))
 ACTIONS = frozenset({"allow", "deny"})
 DIRECTIONS = frozenset({"input", "output"})
 PROTOCOLS = frozenset({"tcp", "udp"})

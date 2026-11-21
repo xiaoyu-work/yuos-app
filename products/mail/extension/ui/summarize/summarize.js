@@ -9,8 +9,8 @@
 // background menu click, `storage.local.pending.messageIds[0]` carries
 // the seed id.
 
-const { aiCall, showBusy, clearBusy, showError, el, localiseDom, copyToClipboard } = window.ClawUI;
-const { getBody, getDisplayedMessage } = window.ClawMessages;
+const { aiCall, showBusy, clearBusy, showError, el, localiseDom, copyToClipboard } = window.YuOsUI;
+const { getBody, getDisplayedMessage } = window.YuOsMessages;
 
 let lastResult = null;
 
@@ -66,7 +66,7 @@ async function run() {
 
   meta.textContent = `${body.from || ""}  •  ${body.subject || ""}`;
 
-  const settings = await ClawUI.getSettings();
+  const settings = await YuOsUI.getSettings();
   const res = await aiCall("summarize", {
     body: body.plain,
     subject: body.subject,

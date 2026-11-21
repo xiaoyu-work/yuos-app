@@ -19,7 +19,7 @@ URL = "https://example.test/resource"
 
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_net_main",
+    "yuos_test_net_main",
     clear_modules=("_shared",),
 )
 

@@ -15,7 +15,7 @@ from yuos_runtime import policy  # noqa: E402
 RUNTIMES = frozenset({"docker", "podman", "podman-root", "containerd"})
 SIGNALS = frozenset({"TERM", "KILL", "HUP", "INT", "USR1", "USR2"})
 IDENTIFIER_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,254}$")
-TIMEOUT_SECS = int(os.environ.get("CLAW_CONTAINER_MANAGER_TIMEOUT", "300"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_CONTAINER_MANAGER_TIMEOUT", "300"))
 
 
 def _cos_binary() -> str | None:

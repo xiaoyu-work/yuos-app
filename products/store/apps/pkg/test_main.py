@@ -16,7 +16,7 @@ from test_support import authenticated_mcp_params, load_local_module
 APP_DIR = pathlib.Path(__file__).parent
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_pkg_main",
+    "yuos_test_pkg_main",
     clear_modules=("_shared",),
 )
 DEFAULT_SEARCH_LIMIT = main.DEFAULT_SEARCH_LIMIT
@@ -354,7 +354,7 @@ def test_relocated_server_dispatches_all_manifest_operations(
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
         os.environ, {"YUOS_APP_MANIFEST": str(APP_DIR / "app.json")}
     ), mock.patch.object(mcp.App, "serve", autospec=True) as serve:
-        load_local_module(APP_DIR / "server.py", "claw_test_pkg_server")
+        load_local_module(APP_DIR / "server.py", "yuos_test_pkg_server")
     app = serve.call_args.args[0]
     manifest = json.loads((APP_DIR / "app.json").read_text(encoding="utf-8"))
     listed = app._handle_request("tools/list", {}, True)

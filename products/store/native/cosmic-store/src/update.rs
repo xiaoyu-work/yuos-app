@@ -177,7 +177,7 @@ impl App {
                 self.refresh_error = result.err();
                 return self.update_backends(true);
             }
-            Message::ClawCatalog(result) => {
+            Message::YuOsCatalog(result) => {
                 self.yuos_catalog = Some(result);
             }
             Message::UpdateQueryFailed(backend, error) => {

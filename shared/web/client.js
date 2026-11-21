@@ -72,6 +72,6 @@
     return matches.length === 1 ? matches[0] : null;
   }
 
-  window.ClawApp = Object.freeze({ ready, call, unwrap, tool });
+  window.YuOsApp = Object.freeze({ ready, call, unwrap, tool });
   window.parent.postMessage({ protocol, type: "ready" }, "*");
 }());

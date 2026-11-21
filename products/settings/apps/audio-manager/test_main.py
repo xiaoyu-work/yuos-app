@@ -13,7 +13,7 @@ from test_support import authenticated_mcp_params, load_local_module
 APP_DIR = pathlib.Path(__file__).parent
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_audio_manager_main",
+    "yuos_test_audio_manager_main",
     clear_modules=("_shared",),
 )
 
@@ -167,7 +167,7 @@ def test_commands_use_expected_capability_and_argv(
             with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
                 os.environ, {"YUOS_APP_MANIFEST": str(APP_DIR / "app.json")}
             ):
-                server = load_local_module(APP_DIR / "server.py", "claw_test_audio_manager_server")
+                server = load_local_module(APP_DIR / "server.py", "yuos_test_audio_manager_server")
                 manifest = json.loads((APP_DIR / "app.json").read_text(encoding="utf-8"))
                 assert "operations" not in manifest
                 tools = {tool["name"]: tool for tool in manifest["mcp"]["tools"]}

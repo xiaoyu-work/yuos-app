@@ -23,7 +23,7 @@ MAX_SEARCH_LIMIT = 100
 
 # Retained package requests and bounded metadata queries use separate deadlines.
 QUERY_TIMEOUT_SECS = 60
-INSTALL_TIMEOUT_SECS = int(os.environ.get("CLAW_PKG_INSTALL_TIMEOUT", "900"))
+INSTALL_TIMEOUT_SECS = int(os.environ.get("YUOS_PKG_INSTALL_TIMEOUT", "900"))
 PACKAGE_NAME_RE = re.compile(
     r"^[a-z0-9][a-z0-9+.-]*(?::[a-z0-9][a-z0-9-]*)?$"
 )

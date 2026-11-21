@@ -16,7 +16,7 @@ upstream `helium-bin` runtime.
 | `apps/web/test_main.py` | URL canonicalization, MCP dispatch and existing engine/AI behavior |
 | `apps/browser-attached/` | Ten attached-browser MCP tools and a compatibility launcher for the OS transport |
 | `extension/` | MV3 service worker, top-frame DOM helpers and native browser chat side panel |
-| `packaging/claw-browser-host` | Unprivileged executable selecting the versioned OS browser transport |
+| `packaging/yuos-browser-host` | Unprivileged executable selecting the versioned OS browser transport |
 | `package.json` | Product-owned staging and test inputs |
 
 Use the immutable platform dependency for SDK/runtime and
@@ -42,8 +42,8 @@ separately approved HTTP path.
 
 `package.json` binds both `installed_assets` to `browser-attached`. The same
 staging contract used by the independent `yuos-app-browser` Debian package
-installs the complete extension at `/usr/share/claw/extensions/claw-agent-browser`
-and the executable `/usr/lib/yuos/claw-browser-host`. That launcher selects the
+installs the complete extension at `/usr/share/yuos/extensions/yuos-agent-browser`
+and the executable `/usr/lib/yuos/yuos-browser-host`. That launcher selects the
 OS-owned `/usr/lib/yuos/browser-native-host.py` with isolated system Python.
 The old package-local `native_host.py` is only a compatibility launcher, not a
 socket server or authority implementation. `yuos-browser-bridge-v1 (= 1)`

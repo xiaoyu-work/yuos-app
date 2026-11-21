@@ -34,7 +34,7 @@ DEFAULT_FIND_LIMIT = 10
 DEFAULT_RECENT_LIMIT = 20
 MAX_URI_COUNT = 32
 MAX_URI_BYTES = 4096
-BROKER_TIMEOUT_SECS = int(os.environ.get("CLAW_LAUNCHER_BROKER_TIMEOUT", "120"))
+BROKER_TIMEOUT_SECS = int(os.environ.get("YUOS_LAUNCHER_BROKER_TIMEOUT", "120"))
 APP_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,254}$")
 URI_SCHEME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
 
