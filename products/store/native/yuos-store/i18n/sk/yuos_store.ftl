@@ -74,13 +74,13 @@ installed-apps = Nainštalované aplikácie
 updates = Aktualizácie
 
 ## Applets page
-enable-flathub-cosmic = Povoliť Flathub a Yu OS Flatpak pre zobrazenie dostupných miniaplikácií.
+enable-applet-sources = Povoliť Flathub a Yu OS Flatpak pre zobrazenie dostupných miniaplikácií.
 manage-repositories = Spravovať repozitáre
 
 # Explore Pages
 editors-choice = Výber redaktora
 popular-apps = Populárne aplikácie
-made-for-cosmic = Vytvorené pre Yu OS
+made-for-yuos = Vytvorené pre Yu OS
 new-apps = Nové aplikácie
 recently-updated = Nedávno aktualizované
 development-tools = Vývojárske nástroje

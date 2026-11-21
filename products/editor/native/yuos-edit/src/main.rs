@@ -1100,7 +1100,7 @@ impl App {
             None => "No Open File".to_string(),
         };
 
-        let window_title = format!("{title} - {}", fl!("cosmic-text-editor"));
+        let window_title = format!("{title} - {}", fl!("text-editor-name"));
         Task::batch([
             if let Some(window_id) = self.core.main_window_id() {
                 self.set_window_title(window_title, window_id)
@@ -1797,7 +1797,7 @@ impl Application for App {
         }
 
         let about = About::default()
-            .name(fl!("cosmic-text-editor"))
+            .name(fl!("text-editor-name"))
             .icon(icon::from_name(Self::APP_ID))
             .version(env!("CARGO_PKG_VERSION"))
             .author("System76")

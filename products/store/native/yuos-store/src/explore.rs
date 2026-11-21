@@ -8,7 +8,7 @@ use crate::nav::Category;
 pub enum ExplorePage {
     EditorsChoice,
     PopularApps,
-    MadeForCosmic,
+    MadeForYuOs,
     NewApps,
     RecentlyUpdated,
     DevelopmentTools,
@@ -27,7 +27,7 @@ impl ExplorePage {
         &[
             Self::EditorsChoice,
             Self::PopularApps,
-            Self::MadeForCosmic,
+            Self::MadeForYuOs,
             //TODO: Self::NewApps,
             Self::RecentlyUpdated,
             Self::DevelopmentTools,
@@ -46,7 +46,7 @@ impl ExplorePage {
         match self {
             Self::EditorsChoice => fl!("editors-choice"),
             Self::PopularApps => fl!("popular-apps"),
-            Self::MadeForCosmic => fl!("made-for-cosmic"),
+            Self::MadeForYuOs => fl!("made-for-yuos"),
             Self::NewApps => fl!("new-apps"),
             Self::RecentlyUpdated => fl!("recently-updated"),
             Self::DevelopmentTools => fl!("development-tools"),

@@ -30,7 +30,7 @@ updates = Actualizaciones
 # Explore Pages
 editors-choice = Selección del editor
 popular-apps = Aplicaciones populares
-made-for-cosmic = Hecho para Yu OS
+made-for-yuos = Hecho para Yu OS
 new-apps = Nuevas aplicaciones
 recently-updated = Actualizadas recientemente
 development-tools = Herramientas de desarrollo
@@ -112,7 +112,7 @@ adding = Añadiendo...
 remove = Eliminar
 removing = Quitando...
 applets = Miniaplicaciones
-enable-flathub-cosmic = Por favor habilite los repositorios Flathub y Yu OS Flatpak para ver las miniaplicaciones disponibles.
+enable-applet-sources = Por favor habilite los repositorios Flathub y Yu OS Flatpak para ver las miniaplicaciones disponibles.
 manage-repositories = Gestionar repositorios
 cancelled = Canceladas
 operations = Operaciones

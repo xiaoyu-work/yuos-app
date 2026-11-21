@@ -1,1 +1,1 @@
-cosmic-text-editor = KOSMIK Tekstredaktilo
+text-editor-name = KOSMIK Tekstredaktilo

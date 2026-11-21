@@ -1,4 +1,4 @@
-cosmic-terminal = 终端
+terminal-name = 终端
 new-terminal = 新建终端
 
 # Context Pages

@@ -1,4 +1,4 @@
-cosmic-terminal = Teirminéal Yu OS
+terminal-name = Teirminéal Yu OS
 new-terminal = Teirminéal nua
 
 # Context Pages

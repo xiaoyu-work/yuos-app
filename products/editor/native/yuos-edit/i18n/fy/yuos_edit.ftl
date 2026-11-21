@@ -1,4 +1,4 @@
-cosmic-text-editor = Tekstbewurker
+text-editor-name = Tekstbewurker
 new-document = Nij dokumint
 open-project = Iepenje projekt
 support = Stipe

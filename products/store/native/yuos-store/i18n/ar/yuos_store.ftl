@@ -70,12 +70,12 @@ updates = التحديثات
 
 ## Applets page
 
-enable-flathub-cosmic = يرجى تفعيل Flathub و Yu OS Flatpak لرؤية البريمجات المتاحة.
+enable-applet-sources = يرجى تفعيل Flathub و Yu OS Flatpak لرؤية البريمجات المتاحة.
 manage-repositories = أدِر المستودعات
 # Explore Pages
 editors-choice = اختيار المحرِر
 popular-apps = التطبيقات الشائعة
-made-for-cosmic = صنع من أجل Yu OS
+made-for-yuos = صنع من أجل Yu OS
 new-apps = التطبيقات الجديدة
 recently-updated = المحدثة حديثًا
 development-tools = أدوات التطوير

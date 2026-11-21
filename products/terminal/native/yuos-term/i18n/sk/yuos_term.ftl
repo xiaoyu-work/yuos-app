@@ -1,4 +1,4 @@
-cosmic-terminal = Terminál Yu OS
+terminal-name = Terminál Yu OS
 comment = Emulátor terminálu pre pracovné prostredie Yu OS
 keywords = Príkaz;Shell;Terminál;Konzola;
 new-terminal = Nový terminál

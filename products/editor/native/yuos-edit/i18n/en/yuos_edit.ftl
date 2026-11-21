@@ -1,4 +1,4 @@
-cosmic-text-editor = Text Editor
+text-editor-name = Text Editor
 comment = Text editor for the Yu OS desktop
 new-document = New document
 open-project = Open project

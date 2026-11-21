@@ -1,4 +1,4 @@
-cosmic-text-editor = Penyunting Teks Yu OS
+text-editor-name = Penyunting Teks Yu OS
 new-document = Dokumen baru
 cancel = Batalkan
 open-project = Buka proyek

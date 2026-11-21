@@ -4,7 +4,7 @@ use xdgen::{App, Context, FluentString};
 fn main() {
     let id = "com.yuos.Edit";
     let ctx = Context::new("i18n", env::var("CARGO_PKG_NAME").unwrap()).unwrap();
-    let app = App::new(FluentString("cosmic-text-editor"))
+    let app = App::new(FluentString("text-editor-name"))
         .comment(FluentString("comment"))
         .keywords(FluentString("keywords"));
     let output = PathBuf::from("target/xdgen");

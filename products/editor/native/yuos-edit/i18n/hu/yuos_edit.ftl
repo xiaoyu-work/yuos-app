@@ -1,4 +1,4 @@
-cosmic-text-editor = Szövegszerkesztő
+text-editor-name = Szövegszerkesztő
 comment = Szövegszerkesztő a Yu OS asztali környezethez
 new-document = Új dokumentum
 open-project = Projekt megnyitása

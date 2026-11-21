@@ -1,4 +1,4 @@
-cosmic-terminal = เทอร์มินัล Yu OS
+terminal-name = เทอร์มินัล Yu OS
 new-terminal = เทอร์มินัลใหม่
 
 # Context Pages

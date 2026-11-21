@@ -1062,7 +1062,7 @@ impl App {
                                 column = column.push(
                                     widget::column::with_children(vec![
                                         widget::space::vertical().height(space_m).into(),
-                                        widget::text(fl!("enable-flathub-cosmic")).into(),
+                                        widget::text(fl!("enable-applet-sources")).into(),
                                         widget::space::vertical().height(space_m).into(),
                                         widget::button::standard(fl!("manage-repositories"))
                                             .on_press(Message::ToggleContextPage(

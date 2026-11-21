@@ -1,4 +1,4 @@
-cosmic-text-editor = Текстовый редактор
+text-editor-name = Текстовый редактор
 comment = Текстовый редактор для среды Yu OS
 new-document = Новый документ
 open-project = Открыть проект

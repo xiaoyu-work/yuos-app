@@ -1,4 +1,4 @@
-cosmic-text-editor = Editor de text Yu OS
+text-editor-name = Editor de text Yu OS
 new-document = Document nou
 open-project = Deschide proiect
 todo = TODO

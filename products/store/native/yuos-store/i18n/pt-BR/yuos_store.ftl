@@ -69,12 +69,12 @@ updates = Atualizações
 
 ## Applets page
 
-enable-flathub-cosmic = Por favor, habilite o Flathub e o Yu OS Flatpak para ver os miniaplicativos disponíveis.
+enable-applet-sources = Por favor, habilite o Flathub e o Yu OS Flatpak para ver os miniaplicativos disponíveis.
 manage-repositories = Gerenciar repositórios
 # Explore Pages
 editors-choice = Escolha dos editores
 popular-apps = Aplicativos populares
-made-for-cosmic = Feitos para o Yu OS
+made-for-yuos = Feitos para o Yu OS
 new-apps = Novos aplicativos
 recently-updated = Atualizados recentemente
 development-tools = Ferramentas de desenvolvimento

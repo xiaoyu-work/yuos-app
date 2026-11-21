@@ -1,4 +1,4 @@
-cosmic-text-editor = Texteditor
+text-editor-name = Texteditor
 new-document = Neues Dokument
 open-project = Projekt öffnen
 todo = TODO

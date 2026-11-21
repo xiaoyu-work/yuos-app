@@ -803,7 +803,7 @@ impl App {
                     Some(-(info.monthly_downloads as i64))
                 })
             }
-            ExplorePage::MadeForCosmic => {
+            ExplorePage::MadeForYuOs => {
                 let provide = AppProvide::Id("com.yuos.Application".to_string());
                 Self::generic_search(apps, backends, |_id, info, _installed| {
                     if !matches!(info.kind, AppKind::DesktopApplication) {

@@ -1,4 +1,4 @@
-cosmic-text-editor = محرِّر نصوص Yu OS
+text-editor-name = محرِّر نصوص Yu OS
 comment = محرِّر نصوص لسطح مكتب Yu OS
 new-document = مستند جديد
 open-project = افتح مشروعًا

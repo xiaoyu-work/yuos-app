@@ -1,4 +1,4 @@
-cosmic-terminal = Терминал
+terminal-name = Терминал
 comment = Эмулятор терминала для рабочей среды Yu OS
 keywords = Команда;Оболочка;Терминал;Консоль;
 new-terminal = Новый терминал

@@ -1,6 +1,6 @@
 name = Pavadinimas
 delete = Ištrinti
-cosmic-terminal = Terminal
+terminal-name = Terminal
 new-terminal = Naujas terminalas
 repository = Saugykla
 support = Palaikymas

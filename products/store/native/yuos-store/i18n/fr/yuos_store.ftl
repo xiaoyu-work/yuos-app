@@ -35,7 +35,7 @@ updates = Mises à jour
 # Explore Pages
 editors-choice = Choix de l'éditeur
 popular-apps = Applis populaires
-made-for-cosmic = Applis faites pour Yu OS
+made-for-yuos = Applis faites pour Yu OS
 new-apps = Nouvelles applis
 recently-updated = Récemment mis à jour
 development-tools = Outils de développement
@@ -123,7 +123,7 @@ repository-remove-body =
 dock = Dock
 version = Version { $version }
 removing = Suppression...
-enable-flathub-cosmic = Activez les dépôts Flathub et les Flatpak Yu OS pour voir les applets disponibles.
+enable-applet-sources = Activez les dépôts Flathub et les Flatpak Yu OS pour voir les applets disponibles.
 manage-repositories = Gérer les dépôts
 view-more = Voir plus
 import-flatpakrepo = Importer un fichier .flatpakrepo pour ajouter une source personnalisée

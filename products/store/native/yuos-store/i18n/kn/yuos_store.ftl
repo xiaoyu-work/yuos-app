@@ -34,7 +34,7 @@ updates = ನವೀಕರಣಗಳು
 # Explore Pages
 editors-choice = ಸಂಪಾದಕರ ಆಯ್ಕೆ
 popular-apps = ಜನಪ್ರಿಯ ಅಪ್ಲಿಕೇಶನ್‌ಗಳು
-made-for-cosmic = ಕಾಸ್ಮಿಕ್‌ಗೆ ಮಾಡಲಾದ
+made-for-yuos = ಕಾಸ್ಮಿಕ್‌ಗೆ ಮಾಡಲಾದ
 new-apps = ಹೊಸ ಅಪ್ಲಿಕೇಶನ್‌ಗಳು
 recently-updated = ಇತ್ತೀಚೆಗೆ ನವೀಕರಿಸಲಾಗಿದೆ
 development-tools = ಅಭಿವೃದ್ಧಿ ಸಾಧನಗಳು

@@ -1,4 +1,4 @@
-cosmic-text-editor = Textový editor Yu OS
+text-editor-name = Textový editor Yu OS
 comment = Textový editor pre pracovné prostredie Yu OS
 new-document = Nový dokument
 open-project = Otvoriť projekt

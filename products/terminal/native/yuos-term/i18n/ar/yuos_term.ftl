@@ -1,4 +1,4 @@
-cosmic-terminal = طرفية Yu OS
+terminal-name = طرفية Yu OS
 comment = محاكي طرفي لسطح مكتب Yu OS
 keywords = cli;طرفية;أوامر;صدفة;أمر;
 new-terminal = طرفية جديدة

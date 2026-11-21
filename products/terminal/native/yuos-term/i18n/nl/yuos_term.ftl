@@ -1,4 +1,4 @@
-cosmic-terminal = Terminal
+terminal-name = Terminal
 new-terminal = Nieuwe terminal
 
 # Context Pages

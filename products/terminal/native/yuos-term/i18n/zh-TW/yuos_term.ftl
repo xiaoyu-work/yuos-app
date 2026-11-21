@@ -1,4 +1,4 @@
-cosmic-terminal = 終端機
+terminal-name = 終端機
 new-terminal = 新建終端機
 
 # Context Pages

@@ -1,4 +1,4 @@
-cosmic-terminal = Uçbirim
+terminal-name = Uçbirim
 new-terminal = Yeni uçbirim
 
 # Context Pages

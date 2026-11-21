@@ -35,7 +35,7 @@ updates = アップデート情報
 # Explore Pages
 editors-choice = おすすめ
 popular-apps = 人気アプリ
-made-for-cosmic = Yu OS限定アプリ
+made-for-yuos = Yu OS限定アプリ
 new-apps = 新着アプリ
 recently-updated = 最近アップデートされたアプリ
 development-tools = 開発ツール
@@ -113,7 +113,7 @@ adding = 追加中…
 remove = 削除
 removing = 削除中…
 applets = アプレット
-enable-flathub-cosmic = 利用可能なアプレットを表示するには、FlathubとYu OS Flatpakを有効にしてください。
+enable-applet-sources = 利用可能なアプレットを表示するには、FlathubとYu OS Flatpakを有効にしてください。
 manage-repositories = リポジトリを管理
 recommended-flatpak-sources = おすすめのFlatpakソース
 custom-flatpak-sources = カスタムFlatpakソース

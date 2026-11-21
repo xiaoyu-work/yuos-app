@@ -1,4 +1,4 @@
-cosmic-terminal = Yu OSin pääte
+terminal-name = Yu OSin pääte
 new-terminal = Uusi pääte
 
 # Context Pages

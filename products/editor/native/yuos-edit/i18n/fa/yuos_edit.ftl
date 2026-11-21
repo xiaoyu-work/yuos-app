@@ -1,4 +1,4 @@
-cosmic-text-editor = ویرایشگر متن Yu OS
+text-editor-name = ویرایشگر متن Yu OS
 new-document = سند جدید
 open-project = باز کردن پروژه
 todo = لیست کارها

@@ -1,4 +1,4 @@
-cosmic-text-editor = Текстов редактор
+text-editor-name = Текстов редактор
 new-document = Нов документ
 open-project = Отваряне на проект
 todo = Задачи

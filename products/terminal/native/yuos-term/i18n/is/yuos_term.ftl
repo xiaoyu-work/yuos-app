@@ -1,4 +1,4 @@
-cosmic-terminal = Skjáhermir
+terminal-name = Skjáhermir
 new-terminal = Nýr skjáhermir
 support = Stuðningur
 color-schemes = Litastef

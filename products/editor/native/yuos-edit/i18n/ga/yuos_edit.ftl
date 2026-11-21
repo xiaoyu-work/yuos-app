@@ -1,4 +1,4 @@
-cosmic-text-editor = Eagarthóir Téacs Yu OS
+text-editor-name = Eagarthóir Téacs Yu OS
 new-document = Doiciméad nua
 open-project = Oscail tionscadal
 todo = LE DÉANAMH

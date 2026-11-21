@@ -1,4 +1,4 @@
-cosmic-terminal = Terminale Yu OS
+terminal-name = Terminale Yu OS
 comment = Emulatore di terminale di Yu OS
 keywords = Comando;Shell;Terminale;Console;
 new-terminal = Nuovo terminale

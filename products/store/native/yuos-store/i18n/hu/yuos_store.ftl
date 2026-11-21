@@ -70,12 +70,12 @@ updates = Frissítések
 
 ## Applets page
 
-enable-flathub-cosmic = Engedélyezd a Flathubot és a Yu OS Flatpakot, hogy lásd az elérhető kisalkalmazásokat.
+enable-applet-sources = Engedélyezd a Flathubot és a Yu OS Flatpakot, hogy lásd az elérhető kisalkalmazásokat.
 manage-repositories = Tárolók kezelése
 # Explore Pages
 editors-choice = A szerkesztő választása
 popular-apps = Népszerű alkalmazások
-made-for-cosmic = Yu OS-ra tervezve
+made-for-yuos = Yu OS-ra tervezve
 new-apps = Új alkalmazások
 recently-updated = Nemrég frissített
 development-tools = Fejlesztői eszközök

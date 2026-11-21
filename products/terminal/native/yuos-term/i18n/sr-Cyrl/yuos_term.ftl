@@ -1,4 +1,4 @@
-cosmic-terminal = Терминал
+terminal-name = Терминал
 new-terminal = Нови терминал
 
 # Context Pages

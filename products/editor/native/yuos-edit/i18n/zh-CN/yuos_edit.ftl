@@ -1,4 +1,4 @@
-cosmic-text-editor = 文本编辑器
+text-editor-name = 文本编辑器
 new-document = 新建文件
 open-project = 打开项目
 todo = 待办事项

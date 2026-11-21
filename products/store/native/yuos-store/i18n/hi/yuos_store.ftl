@@ -31,7 +31,7 @@ updates = अपडेट्स
 # Explore Pages
 editors-choice = संपादक की पसंद
 popular-apps = लोकप्रिय ऐप्स
-made-for-cosmic = कॉस्मिक के लिए बनाए गए
+made-for-yuos = कॉस्मिक के लिए बनाए गए
 new-apps = नए ऐप्स
 recently-updated = हाल ही में अपडेट किए गए
 development-tools = विकास उपकरण

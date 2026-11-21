@@ -1,4 +1,4 @@
-cosmic-terminal = Terminal de Yu OS
+terminal-name = Terminal de Yu OS
 new-terminal = Nueva terminal
 
 # Context Pages

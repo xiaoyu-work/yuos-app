@@ -1,4 +1,4 @@
-cosmic-text-editor = Metin Düzenleyici
+text-editor-name = Metin Düzenleyici
 new-document = Yeni belge
 open-project = Proje aç
 todo = TODO

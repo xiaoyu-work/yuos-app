@@ -1,4 +1,4 @@
-cosmic-terminal = Τερματικό Yu OS
+terminal-name = Τερματικό Yu OS
 new-terminal = Νέο τερματικό
 
 # Context Pages
