@@ -11,7 +11,8 @@
   "runtime": "binary",
   "entry": "bin/yuos-term",
   "desktop": {
-    "exec": "--gui"
+    "exec": "--gui",
+    "needs": []
   },
   "mcp": {
     "entry": "bin/yuos-term",
