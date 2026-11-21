@@ -13,7 +13,7 @@ Searcher {
 
     readonly property string currentNamePath: `${Paths.state}/wallpaper/path.txt`
     readonly property list<string> smartArg: GlobalConfig.services.smartScheme ? [] : ["--no-smart"]
-    readonly property string fallback: Quickshell.shellPath("assets/wallpaper.webp")
+    readonly property string systemWallpaper: "/usr/share/backgrounds/claw-os/yuos-default.jpg"
 
     property bool showPreview: false
     readonly property string current: showPreview ? previewPath : actualCurrent
@@ -88,19 +88,27 @@ Searcher {
         printErrors: false
         onFileChanged: reload()
         onLoaded: {
-            let wall = text().trim();
-            if (!wall) {
-                wall = root.fallback;
-                Quickshell.execDetached(["caelestia", "wallpaper", "-f", root.fallback, ...root.smartArg]);
+            const wall = text().trim();
+            // Older releases could persist the bundled default as a selection.
+            if (wall === Quickshell.shellPath("assets/wallpaper.webp")) {
+                root.actualCurrent = root.systemWallpaper;
+                // Let FileView finish its read before starting a write.
+                Qt.callLater(() => {
+                    if (root.actualCurrent === root.systemWallpaper && text().trim() === wall)
+                        setText(root.systemWallpaper);
+                });
+            } else if (wall) {
+                root.actualCurrent = wall;
+            } else {
+                root.setWallpaper(root.systemWallpaper);
             }
-            root.actualCurrent = wall;
             root.previewColourLock = false;
         }
         onLoadFailed: {
-            root.actualCurrent = root.fallback;
+            root.setWallpaper(root.systemWallpaper);
             root.previewColourLock = false;
-            Quickshell.execDetached(["caelestia", "wallpaper", "-f", root.fallback, ...root.smartArg]);
         }
+        onSaveFailed: error => console.warn("Could not migrate the bundled default wallpaper:", error)
     }
 
     FileSystemModel {

@@ -132,7 +132,7 @@ def stage(prefix, destination):
     for name in ("plugins", "qml"):
         shutil.copytree(prefix / name, qt / name, ignore=ignore_runtime_copy)
     for required in ("lib/libQt6Core.so.6", "plugins/sqldrivers/libqsqlite.so",
-                     "plugins/imageformats/libqwebp.so",
+                     "plugins/imageformats/libqjpeg.so", "plugins/imageformats/libqwebp.so",
                      "qml/QtQuick/qmldir", "qml/QtQuick/Controls/qmldir"):
         if not (qt / required).is_file():
             raise ValueError(f"Private Qt runtime is incomplete: {required}")

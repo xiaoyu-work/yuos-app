@@ -60,6 +60,12 @@ Replacing the visual shell must not replace those services with upstream
 notification history, raw system commands or a second permission mechanism.
 Ordinary Apps do not need to be rewritten in QML.
 
+The desktop uses the OS-owned `/usr/share/backgrounds/claw-os/yuos-default.jpg`
+as its default wallpaper, shared with the boot and login screens. The common
+Host exposes it read-only under `/usr`. The Shell migrates only the exact
+saved path to its retired bundled default; custom selections still take
+precedence. The wallpaper fills each display with an aspect-preserving crop.
+
 The top Dock reads public desktop entries for labels and original SVG
 artwork. Hover labels are single-line, click-through and sit below the bar.
 It starts one `yu __desktop-events` connection per Shell, with an
@@ -146,9 +152,9 @@ FFTW and lm-sensors development files. The pinned libcava DSP core is built
 in-tree; the unrelated distribution `cava` terminal program is not a library
 substitute or a runtime dependency. Its build adapter does not authorize audio
 capture or bypass the OS resource boundary.
-The pinned Qt stage includes the SQLite, Wayland platform, and WebP plugins
-and upstream notices. The WebP plugin decodes the bundled wallpaper using
-Debian's `libwebp`. The ELF search paths are package-relative: Caelestia's
+The pinned Qt stage includes the SQLite, Wayland platform, JPEG, and WebP
+plugins and upstream notices. The JPEG plugin decodes the OS wallpaper; WebP
+uses Debian's `libwebp`. The ELF search paths are package-relative: Caelestia's
 QML plugins find their backing libraries in `Caelestia/lib` and share the
 App's private Qt. Qt's installed test modules and static object files are
 excluded. No distribution Qt package or ambient plugin directory supplies
