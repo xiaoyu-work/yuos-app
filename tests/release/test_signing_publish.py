@@ -13,7 +13,7 @@ from release_signing import Signing
 
 def test_pinned_public_key_matches_the_parent_installer_contract(tmp_path):
     with Signing(tmp_path / "public-only") as signing:
-        assert signing.fingerprint == "ADBA1957E712B6C80B4CC8736C044D6F411416AF"
+        assert signing.fingerprint == "298947DD10F7AA7B826CB5E955F6681DBB421765"
         with pytest.raises(ValueError, match="Unsigned"):
             signing.sign(tmp_path / "not-created", tmp_path / "not-signed")
 

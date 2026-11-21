@@ -9,7 +9,7 @@
   "rust_toolchain": "1.98.0",
   "state_branch": "yuos-apt",
   "validity_days": 14,
-  "signing_fingerprint": "ADBA1957E712B6C80B4CC8736C044D6F411416AF",
+  "signing_fingerprint": "298947DD10F7AA7B826CB5E955F6681DBB421765",
   "signing_key": "packaging/apt/archive-key.asc",
   "runtime_dependency": "yuos-app-runtime-v1 (>= 0.1.0)",
   "support_abi": 1,

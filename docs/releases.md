@@ -815,12 +815,12 @@ Before dispatching the first release:
 5. Configure dedicated secrets `YUOS_APPS_APT_SIGNING_PRIVATE_KEY` and
    `YUOS_APPS_APT_SIGNING_PASSPHRASE`. Use a signing-enabled key matching
    [`archive-key.asc`](../packaging/apt/archive-key.asc) and fingerprint
-   `ADBA1957E712B6C80B4CC8736C044D6F411416AF`. Never put private material in a
+   `298947DD10F7AA7B826CB5E955F6681DBB421765`. Never put private material in a
    repository, command argument, log, workflow artifact or release asset.
 6. Set `YUOS_APPS_PROVENANCE_SIGNING_PRIVATE_KEY` to the approved Ed25519
-   private key JSON with `"schema": "yuos.signing-key/v1"`. If reusing the
-   approved key, update only that field in your private copy; the key bytes
-   and `key_id` must continue to match the public publisher entry.
+   private key JSON with `"schema": "yuos.signing-key/v1"`. Its `key_id` and
+   public key must match the App-only publisher configured in
+   `YUOS_APPS_PROVENANCE_PUBLISHER_JSON` and shipped by Yu OS.
 7. Restrict the `app-release` environment to reviewed `main` deployments.
    Its scheduled metadata refresh must not stall behind unattended mandatory
    approvals until `Valid-Until` expires. The Pages deployment uses
