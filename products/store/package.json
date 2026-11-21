@@ -1,14 +1,14 @@
 {
-  "web_ui": {"source": "web", "apps": ["pkg", "cosmic-store"]},
-  "apps": ["apps/pkg", "apps/cosmic-store"],
+  "web_ui": {"source": "web", "apps": ["pkg", "yuos-store"]},
+  "apps": ["apps/pkg", "apps/yuos-store"],
   "tests": ["native/test_build.py"],
-  "native": {"cosmic-store": "native/cosmic-store"},
+  "native": {"yuos-store": "native/yuos-store"},
   "native_kind": "binary",
-  "native_payload": {"app": "cosmic-store", "program": "cosmic-store"},
-  "native_packages": ["cosmic-store", "flathub-stats"],
+  "native_payload": {"app": "yuos-store", "program": "yuos-store"},
+  "native_packages": ["yuos-store", "flathub-stats"],
   "native_assets": {
-    "cosmic-store": {
-      "app.json": "apps/cosmic-store/app.json",
+    "yuos-store": {
+      "app.json": "apps/yuos-store/app.json",
       "catalog_backend.py": "apps/pkg/main.py"
     }
   }

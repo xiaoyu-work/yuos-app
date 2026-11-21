@@ -31,7 +31,7 @@ def line(process, timeout=15):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--binary", type=Path, default=ROOT / "build/native-target/debug/cosmic-screenshot")
+    parser.add_argument("--binary", type=Path, default=ROOT / "build/native-target/debug/yuos-screenshot")
     parser.add_argument("--source", type=Path, default=ROOT / "build/capture-native")
     options = parser.parse_args()
     fixture = ROOT / "build/capture-process-fixture"
@@ -46,7 +46,7 @@ def main():
             "prefix=/usr", f"bin-src={options.binary.resolve()}", "install",
         ]
         subprocess.run(installer, check=True, capture_output=True, text=True)
-        binary = installed / "usr/bin/cosmic-screenshot"
+        binary = installed / "usr/bin/yuos-screenshot"
         assert os.access(binary, os.X_OK)
         for resource in (native / "resources").rglob("*"):
             if resource.is_file():
@@ -150,9 +150,9 @@ print(json.dumps({'ok':True,'wire_version':1,'data':data}))
             "DBUS_SESSION_BUS_ADDRESS": f"unix:path={fixture}/no-user-bus",
             "DISPLAY": "", "WAYLAND_DISPLAY": "", "HOME": str(fixture / "home"),
             "XDG_CONFIG_HOME": str(fixture / "config"), "XDG_DATA_HOME": str(fixture / "data"),
-            "TMPDIR": str(fixture), "YUOS_MCP_SERVER": "1", "YUOS_APP_ID": "cosmic-screenshot",
+            "TMPDIR": str(fixture), "YUOS_MCP_SERVER": "1", "YUOS_APP_ID": "yuos-screenshot",
             "YUOS_SESSION": "broker-session",
-            "YUOS_APP_MANIFEST": str(installed / "usr/lib/yuos/apps/cosmic-screenshot/app.json"),
+            "YUOS_APP_MANIFEST": str(installed / "usr/lib/yuos/apps/yuos-screenshot/app.json"),
             "YUOS_KERNEL_BIN": str(broker), "YUOS_OWNER_HOME": str(fixture),
         }
         process = subprocess.Popen(
@@ -220,7 +220,7 @@ print(json.dumps({'ok':True,'wire_version':1,'data':data}))
             (fixture / permission).touch()
         calls = [json.loads(value) for value in (fixture / "calls").read_text().splitlines()]
         assert all(value["args"][1] == "__capture" for value in calls)
-        assert all(value["app"] == "cosmic-screenshot" and value["session"] == "broker-session" for value in calls)
+        assert all(value["app"] == "yuos-screenshot" and value["session"] == "broker-session" for value in calls)
         assert all(value["stderr_terminal"] is False for value in calls)
 
         human_env = {key: value for key, value in env.items() if key != "YUOS_MCP_SERVER"}

@@ -20,19 +20,19 @@ def main():
     process = None
     try:
         installed = fixture / "installed"
-        stage("store", installed, ["cosmic-store"])
+        stage("store", installed, ["yuos-store"])
         libraries = prepare_exports(download=False)
         python = stage_shared(installed)
         shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)
         shutil.copytree(libraries["python-runtime"] / "yuos_runtime", python / "yuos_runtime", ignore=IGNORE)
         subprocess.run([
             "just", "--justfile", str(ROOT / "build/store-native/justfile"),
-            f"rootdir={installed}", f"bin-src={ROOT / 'build/native-target/debug/cosmic-store'}",
+            f"rootdir={installed}", f"bin-src={ROOT / 'build/native-target/debug/yuos-store'}",
             "install",
         ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-        binary = installed / "usr/bin/cosmic-store"
+        binary = installed / "usr/bin/yuos-store"
         assert binary.stat().st_mode & 0o777 == 0o755
-        assert "Exec=cosmic-store" in (installed / "usr/share/applications/com.yuos.Store.desktop").read_text()
+        assert "Exec=yuos-store" in (installed / "usr/share/applications/com.yuos.Store.desktop").read_text()
         assert (installed / "usr/share/metainfo/com.yuos.Store.metainfo.xml").is_file()
         assert (installed / "usr/share/icons/hicolor/scalable/apps/com.yuos.Store.svg").is_file()
         assert (ROOT / "build/native-target/debug/flathub-stats").is_file()
@@ -47,7 +47,7 @@ def main():
             "if (root/'deny').exists():\n"
             " print(json.dumps({'wire_version':1,'ok':False,'error':{'code':'denied','message':'fixture denied'}}));sys.exit(1)\n"
             "if args[1]=='__policy':data={'decision':'allow','verb':args[3]}\n"
-            "elif args[1]=='__desktop':data={'launched':True,'app_id':'com.yuos.Store','launcher':'/usr/bin/cosmic-store'}\n"
+            "elif args[1]=='__desktop':data={'launched':True,'app_id':'com.yuos.Store','launcher':'/usr/bin/yuos-store'}\n"
             "elif args[1]=='__package_query':\n"
             " with (root/'queries').open('a') as f:f.write(json.dumps(args[2:])+'\\n')\n"
             " if (root/'query-error').exists():\n"
@@ -77,10 +77,10 @@ def main():
             "--ro-bind", str(Path("/usr/bin/python3").resolve()), "/usr/bin/python3",
             "--ro-bind", str(installed / "usr/lib/yuos"), "/usr/lib/yuos",
             "--ro-bind", str(broker), "/usr/local/bin/yu",
-            "--ro-bind", str(binary), "/usr/bin/cosmic-store",
+            "--ro-bind", str(binary), "/usr/bin/yuos-store",
         ]
         for name, value in {
-            "YUOS_MCP_SERVER": "1", "YUOS_APP_MANIFEST": "/usr/lib/yuos/apps/cosmic-store/app.json",
+            "YUOS_MCP_SERVER": "1", "YUOS_APP_MANIFEST": "/usr/lib/yuos/apps/yuos-store/app.json",
             "YUOS_SESSION": "worker-session", "YUOS_DATA_DIR": namespace + "/data",
             "HOME": namespace, "TMPDIR": namespace, "YUOS_KERNEL_BIN": "/usr/local/bin/yu",
             "YUOS_BIN": "/untrusted/must-not-execute", "OPENAI_API_KEY": "synthetic-scrub-me",
@@ -88,7 +88,7 @@ def main():
         }.items():
             command += ["--setenv", name, value]
         process = subprocess.Popen(
-            [*command, "--", "/usr/bin/cosmic-store"],
+            [*command, "--", "/usr/bin/yuos-store"],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
         )
         selector = selectors.DefaultSelector()

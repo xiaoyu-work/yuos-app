@@ -42,7 +42,7 @@ def test_all_identities_have_exactly_one_headless_or_desktop_package_owner():
     assert len(desktop) == 12
     assert not set(agent).intersection(desktop)
     assert len(set(agent) | set(desktop)) == 63
-    assert desktop["cosmic-files"] == "yuos-app-files-desktop"
+    assert desktop["yuos-files"] == "yuos-app-files-desktop"
     assert agent["db"] == agent["kv"] == "yuos-cap-storage-sdk"
     (headless_set,) = release.packages_for("sets")
     assert headless_set["package"] == "yuos-apps-agent"
@@ -158,7 +158,7 @@ def test_native_packages_refuse_a_placeholder_or_wrong_architecture(tmp_path, mo
     entry = release.packages_for("capture")[0]
     entry["architecture"] = run(["dpkg", "--print-architecture"]).stdout.decode().strip()
     root = tmp_path / "installed"
-    binary = root / "usr/lib/yuos/apps/cosmic-screenshot/bin/cosmic-screenshot"
+    binary = root / "usr/lib/yuos/apps/yuos-screenshot/bin/yuos-screenshot"
     binary.parent.mkdir(parents=True)
     binary.write_bytes(b"not an executable")
     binary.chmod(0o755)

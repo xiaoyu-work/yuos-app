@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Files
+Comment=File manager for the Yu OS desktop
+Exec=yuos-files %U
+Terminal=false
+Type=Application
+StartupNotify=true
+Icon=com.yuos.Files
+Categories=X-YuOS;Utility;FileManager;
+Keywords=Folder;Manager;
+MimeType=inode/directory;

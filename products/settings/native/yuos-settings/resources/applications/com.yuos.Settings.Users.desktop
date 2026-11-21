@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Users
+Comment=Authentication and user accounts.
+Type=Application
+Exec=yuos-settings users
+Terminal=false
+Categories=YuOS
+Keywords=Yu OS;User;Account;
+NoDisplay=true
+OnlyShowIn=COSMIC
+Icon=preferences-users
+StartupNotify=true

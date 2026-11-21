@@ -1,7 +1,7 @@
 # Native Store provenance
 
 `cosmic-store/` preserves the complete 138 tracked-file fork and executable
-modes from `claw-os/desktop/store` at OS revision
+modes from `desktop/store` at OS revision
 `036f4f8cbdd19f4f3a827e328a6a631af1093c39`.
 Upstream is [pop-os/cosmic-store](https://github.com/pop-os/cosmic-store)
 at `2c705e725e31`, with the original GPL-3.0 license and copyright notices.

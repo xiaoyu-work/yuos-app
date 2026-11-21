@@ -13,7 +13,7 @@ from release_development import (
 )
 
 FORMAT = "yuos.app-interfaces/v1"
-COMPONENT = "cosmic-notifications"
+COMPONENT = "yuos-notifications"
 EXPORTS = {"cosmic-notifications-config", "cosmic-notifications-util"}
 INTEGRATION_STATUS = "compatibility-only-pending-generic-contract"
 

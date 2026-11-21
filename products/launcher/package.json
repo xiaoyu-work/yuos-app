@@ -2,7 +2,7 @@
   "web_ui": {"source": "web", "apps": ["launcher", "yuos-launcher"]},
   "apps": ["apps/launcher", "apps/yuos-launcher"],
   "tests": [],
-  "native": {"yuos-launcher": "native/cosmic-launcher"},
+  "native": {"yuos-launcher": "native/yuos-launcher"},
   "native_kind": "binary",
   "native_payload": {"app": "yuos-launcher", "program": "yuos-launcher"},
   "native_assets": {

@@ -129,7 +129,7 @@ def test_installed_notify_mcp_sdk_errors_cancellation_and_untouched_history(tmp_
         assert len(listed["notifications"]) == 1
         valid_count = count()
         for ident, tool, args in [
-            (4, "notify.send", {"message": "Hi", "source": "app:cosmic-notifications"}),
+            (4, "notify.send", {"message": "Hi", "source": "app:yuos-notifications"}),
             (5, "notify.list", {"limit": True}), (6, "notify.send", {"message": ""}),
         ]:
             assert call(ident, tool, args)["result"]["isError"] is True

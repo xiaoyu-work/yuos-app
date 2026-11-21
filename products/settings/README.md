@@ -53,15 +53,15 @@ OS-owned.
 
 Wayland, AT-SPI and PipeWire/WirePlumber execution and user-session validation remain behind
 the Yu OS broker. All eleven assigned management App sources have moved,
-and the complete native `cosmic-settings` UI/workspace now lives in
-`native/cosmic-settings`, including every page/subscription crate, original
+and the complete native `yuos-settings` UI/workspace now lives in
+`native/yuos-settings`, including every page/subscription crate, original
 default features, toolkit patches, translations, resources and packaging.
 This product is not a super-privileged Settings process: its twelve identities
 retain independent authority and do not call other Apps.
 
 Native MCP exposes page listing, search, opening a page and four owner-scoped
 permission tools: list, show, request restoration and revoke. Opening uses
-the fixed OS Settings target under the existing `proc.spawn:cosmic-settings`
+the fixed OS Settings target under the existing `proc.spawn:yuos-settings`
 grant, never the management Apps' device/account permissions. The OS activates
 the fixed GUI through the owner's independent user service manager, without
 relaxing daemon/worker isolation. Applications UI and MCP share the SDK

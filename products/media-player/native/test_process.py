@@ -41,7 +41,7 @@ def receive(stream, size):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--binary", type=Path, default=ROOT / "build/native-target/debug/cosmic-player")
+    parser.add_argument("--binary", type=Path, default=ROOT / "build/native-target/debug/yuos-player")
     parser.add_argument("--source", type=Path, default=ROOT / "build/media-player-native")
     parser.add_argument("--fixture-binary", type=Path, default=ROOT / "build/native-target/debug/examples/media-player-mpris-fixture")
     parser.add_argument("--yuos-binary", type=Path)
@@ -68,7 +68,7 @@ def main():
             f"bin-src={options.binary.resolve()}", "prefix=/usr", "install",
         ], capture_output=True, text=True)
         assert installation.returncode == 0, installation.stderr
-        binary = installed / "usr/bin/cosmic-player"
+        binary = installed / "usr/bin/yuos-player"
         assert binary.stat().st_mode & 0o777 == 0o755
         for source, target in [
             ("target/xdgen/com.yuos.Player.desktop", "applications/com.yuos.Player.desktop"),
@@ -78,7 +78,7 @@ def main():
         ]:
             assert (installed / "usr/share" / target).read_bytes() == (native / source).read_bytes()
         desktop = (installed / "usr/share/applications/com.yuos.Player.desktop").read_text()
-        assert "Exec=cosmic-player" in desktop and "Name[fr]=" in desktop
+        assert "Exec=yuos-player" in desktop and "Name[fr]=" in desktop
         address = f"unix:path={fixture}/bus"
         bus = subprocess.Popen([
             "dbus-daemon", "--session", "--nofork", "--nopidfile", "--nosyslog",
@@ -200,13 +200,13 @@ def main():
             "--ro-bind", "/lib64", "/lib64", "--proc", "/proc", "--dev", "/dev",
             "--tmpfs", "/run", "--tmpfs", "/work", "--dir", "/run/yuos",
             "--ro-bind", str(options.yu_binary.resolve() if options.yu_binary else cli), "/usr/local/bin/yu",
-            "--ro-bind", str(binary), "/work/cosmic-player",
-            "--ro-bind", str(installed / "usr/lib/yuos/apps/cosmic-player/app.json"), "/work/app.json",
+            "--ro-bind", str(binary), "/work/yuos-player",
+            "--ro-bind", str(installed / "usr/lib/yuos/apps/yuos-player/app.json"), "/work/app.json",
             "--ro-bind", str(fixture / "broker.sock"), "/run/yuos/yuosd.sock",
             "--chdir", "/work",
         ]
         for name, value in {
-            "YUOS_MCP_SERVER": "1", "YUOS_APP_ID": "cosmic-player",
+            "YUOS_MCP_SERVER": "1", "YUOS_APP_ID": "yuos-player",
             "YUOS_APP_MANIFEST": "/work/app.json", "YUOS_SESSION": "worker-session",
             "YUOS_WORKER_SANDBOX": "1", "YUOS_RUNTIME_DIR": "/run/yuos",
             "YUOS_DATA_DIR": "/work/data", "HOME": "/work",
@@ -214,7 +214,7 @@ def main():
             "TMPDIR": "/work", "PATH": "/usr/sbin:/usr/bin:/sbin:/bin",
         }.items():
             command += ["--setenv", name, value]
-        process = subprocess.Popen([*command, "--", "/work/cosmic-player"],
+        process = subprocess.Popen([*command, "--", "/work/yuos-player"],
                                    stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE, text=True)
         processes.append(process)
@@ -262,14 +262,14 @@ def main():
         process.stdin.flush()
         tools = request("tools/list", {})["result"]["tools"]
         assert {tool["name"] for tool in tools} == {f"player.{name}" for name in ACTIONS}
-        wrong = json.loads((installed / "usr/lib/yuos/apps/cosmic-player/app.json").read_text())
+        wrong = json.loads((installed / "usr/lib/yuos/apps/yuos-player/app.json").read_text())
         wrong["id"] = "wrong-identity"
         (fixture / "wrong.json").write_text(json.dumps(wrong))
         wrong_identity = subprocess.run([
             *command, "--ro-bind", str(fixture / "wrong.json"), "/work/wrong.json",
-            "--setenv", "YUOS_APP_MANIFEST", "/work/wrong.json", "--", "/work/cosmic-player",
+            "--setenv", "YUOS_APP_MANIFEST", "/work/wrong.json", "--", "/work/yuos-player",
         ], input="", capture_output=True, text=True, timeout=10)
-        assert wrong_identity.returncode != 0 and "cosmic-player" in wrong_identity.stderr
+        assert wrong_identity.returncode != 0 and "yuos-player" in wrong_identity.stderr
         denied(request("tools/call", {"name": "player.status", "arguments": {}}))
         for action, arguments, context in [
             ("status", {"player": "org.mpris.MediaPlayer2.OtherFixture"}, {}),

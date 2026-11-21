@@ -10,7 +10,7 @@ import pytest
 from test_support import authenticated_mcp_params, load_local_module
 
 PRODUCT = Path(__file__).resolve().parents[2]
-NATIVE = PRODUCT / "native/cosmic-launcher"
+NATIVE = PRODUCT / "native/yuos-launcher"
 MANIFEST = Path(__file__).with_name("app.json")
 
 

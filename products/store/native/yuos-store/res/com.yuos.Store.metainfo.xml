@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.yuos.Store</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <project_group>Yu OS</project_group>
+  <developer_name>Yu OS</developer_name>
+  <update_contact>jeremy@system76.com</update_contact>
+  <url type="homepage">https://github.com/pop-os/cosmic-store</url>
+  <url type="bugtracker">https://github.com/pop-os/cosmic-store</url>
+  <name>Yu OS Store</name>
+  <summary>Application store for Yu OS</summary>
+  <description>
+      <p>Application store for Yu OS</p>
+      <p xml:lang="ar">متجر تطبيقات لسطح مكتب Yu OS</p>
+      <p xml:lang="cs">Obchod s aplikacemi pro pracovní prostředí Yu OS</p>
+      <p xml:lang="pl">Sklep z aplikacjami pulpitu Yu OS</p>
+      <p xml:lang="hu">Alkalmazásáruház a Yu OS asztali környezethez</p>
+      <p xml:lang="pt_BR">Loja de aplicativos do desktop Yu OS</p>
+      <p xml:lang="pt">Loja de aplicativos do desktop Yu OS</p>
+      <p xml:lang="sk">Obchod s aplikáciami pre pracovné prostredie Yu OS</p>
+      <p xml:lang="es">Tienda de aplicaciones para el escritorio Yu OS</p>
+      <p xml:lang="it">App Store di Yu OS</p>
+      <p xml:lang="sv">Programbutik för skrivbordsmiljön Yu OS</p>
+  </description>
+  <keywords>
+    <keyword>App</keyword>
+    <keyword>Software</keyword>
+    <keyword>Store</keyword>
+    <keyword>Shop</keyword>
+  </keywords>
+  <launchable type="desktop-id">com.yuos.Store.desktop</launchable>
+  <icon type="stock">com.yuos.Store</icon>
+  <provides>
+    <id>com.yuos.Application</id>
+    <binaries>
+      <binary>yuos-store</binary>
+    </binaries>
+    <mimetypes>
+        <mimetype>application/x-debian-package</mimetype>
+        <mimetype>application/vnd.debian.binary-package</mimetype>
+        <mimetype>application/vnd.flatpak.ref</mimetype>
+    </mimetypes>
+  </provides>
+</component>

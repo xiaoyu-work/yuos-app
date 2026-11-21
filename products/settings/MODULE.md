@@ -8,7 +8,7 @@ two location/timezone tools, plus `network-manager`'s eleven network tools,
 `power-manager`'s seven status/power tools and `printer-manager`'s five
 discovery/queue/printing tools, and `user-manager`'s twelve identity tools.
 All eleven management App sources assigned to Settings have moved.
-The complete native `cosmic-settings` workspace, UI, MCP and resources also live
+The complete native `yuos-settings` workspace, UI, MCP and resources also live
 here, retaining its separate twelfth identity and original default pages.
 Native owner preferences now consume the generic bounded OS
 `system.desktop-preferences.control` service through the published SDK's
@@ -107,15 +107,15 @@ configuration file or run inference inside the sandbox.
 | `apps/user-manager/main.py`, `server.py` | Validated `yu __users` requests and SDK handlers; no password plaintext |
 | `apps/user-manager/test_main.py` | All direct/SDK routes, optional creation fields, group/token normalization and destructive confirmation |
 | `package.json` | Product-owned staging and test inputs |
-| `native/cosmic-settings/` | Entire independent GPL workspace, lock, all page/subscription crates and resource/config/translation inputs |
-| `native/cosmic-settings/cosmic-settings/src/mcp.rs` | Static page catalog/search and fixed OS Settings activation |
-| `native/cosmic-settings/cosmic-settings/src/permissions.rs`, `src/pages/applications/permissions.rs` | OS permission client and Applications UI for lasting owner choices |
-| `native/cosmic-settings/cosmic-settings/src/regional_settings.rs`, `src/pages/time/region.rs`, `src/pages/system/about.rs` | Public SDK regional client and pending/error/partial-result UI; locale, owner language and static hostname setters remain OS-owned |
-| `native/cosmic-settings/cosmic-settings/src/user_settings.rs`, `src/pages/system/users/mod.rs` | Local Users UI with protected UID targets, private password input, and exact icon-source paths |
-| `native/cosmic-settings/subscriptions/network-manager/`, `cosmic-settings/src/pages/networking/` | Typed metadata/profile clients, original wired/Wi-Fi/VPN presentations, independent credential-reference use/export and no native bus/secret-agent/management executable |
-| `native/cosmic-settings/subscriptions/bluetooth/`, `cosmic-settings/src/pages/bluetooth/` | Root metadata/control, finite scans, exact pairing correlations and independent exact-unit startup |
-| `native/cosmic-settings/cosmic-settings/src/pages/power/backend/`, `src/subscription/daytime.rs` | Confirmed Root power/profile state and opt-in city-level solar scheduling; no raw UPower/location portal |
-| `native/cosmic-settings/cosmic-settings/src/yuos_glue.rs`, `src/human.rs`, `human_bridge.py` | Human-only controlled filesystem/process/policy/snapshot adapters and SDK Agent context; no App dispatch |
+| `native/yuos-settings/` | Entire independent GPL workspace, lock, all page/subscription crates and resource/config/translation inputs |
+| `native/yuos-settings/yuos-settings/src/mcp.rs` | Static page catalog/search and fixed OS Settings activation |
+| `native/yuos-settings/yuos-settings/src/permissions.rs`, `src/pages/applications/permissions.rs` | OS permission client and Applications UI for lasting owner choices |
+| `native/yuos-settings/yuos-settings/src/regional_settings.rs`, `src/pages/time/region.rs`, `src/pages/system/about.rs` | Public SDK regional client and pending/error/partial-result UI; locale, owner language and static hostname setters remain OS-owned |
+| `native/yuos-settings/yuos-settings/src/user_settings.rs`, `src/pages/system/users/mod.rs` | Local Users UI with protected UID targets, private password input, and exact icon-source paths |
+| `native/yuos-settings/subscriptions/network-manager/`, `yuos-settings/src/pages/networking/` | Typed metadata/profile clients, original wired/Wi-Fi/VPN presentations, independent credential-reference use/export and no native bus/secret-agent/management executable |
+| `native/yuos-settings/subscriptions/bluetooth/`, `yuos-settings/src/pages/bluetooth/` | Root metadata/control, finite scans, exact pairing correlations and independent exact-unit startup |
+| `native/yuos-settings/yuos-settings/src/pages/power/backend/`, `src/subscription/daytime.rs` | Confirmed Root power/profile state and opt-in city-level solar scheduling; no raw UPower/location portal |
+| `native/yuos-settings/yuos-settings/src/yuos_glue.rs`, `src/human.rs`, `human_bridge.py` | Human-only controlled filesystem/process/policy/snapshot adapters and SDK Agent context; no App dispatch |
 | `native/test_build.py`, `native/test_process.py` | Workspace/default graph, synthetic human adapters, installed resources, authenticated stdio MCP and clean-environment native permission client |
 
 Preserve the installed App identity. Status requires `sys.observe` scope
@@ -192,7 +192,7 @@ Settings organizes interfaces, not a union of authority. Each provider must
 retain its own App identity, scope checks and consent boundary. Apps do not
 call one another. Native MCP preserves `settings.list_pages`, `settings.search`
 and `settings.open`. The first two require no device authority; opening uses
-only `proc.spawn:cosmic-settings` at the fixed OS Settings target. Optional page
+only `proc.spawn:yuos-settings` at the fixed OS Settings target. Optional page
 ids are checked against the native CLI's page commands before crossing the
 service boundary, including its existing magnifier and dock/panel-applet pages.
 The OS activates this fixed target through the authenticated owner's independent
@@ -306,7 +306,7 @@ separate gates; a source build or an OS response is not a new grant.
 
 Focused Rust tests are `regional_settings`, `pages::time::region` and
 `pages::system::about`, plus `users_service` in the independent
-`cosmic-settings` binary package,
+`yuos-settings` binary package,
 prepared through `tools/native_build.prepare` and the digest-verified published
 platform loader. Do not combine upstream native packages or import an OS tree.
 
@@ -336,7 +336,7 @@ These are fixture inputs only: they neither change the platform lock nor
 authorize an unpublished SDK for production release. Candidate process checks
 do not approve the existing polkit payload or establish live Wayland acceptance.
 
-`native_payload` selects one real `bin/cosmic-settings` for signed primary
+`native_payload` selects one real `bin/yuos-settings` for signed primary
 and MCP entrypoints. The compatibility command uses the existing common Host;
 page selectors remain arguments, not executable paths or authority.
 The native parser removes one leading `--gui` only in SDK-observed GUI mode,

@@ -1,13 +1,13 @@
 {
-  "web_ui": {"source": "web", "apps": ["exec", "cosmic-term"]},
-  "apps": ["apps/exec", "apps/cosmic-term"],
+  "web_ui": {"source": "web", "apps": ["exec", "yuos-term"]},
+  "apps": ["apps/exec", "apps/yuos-term"],
   "tests": ["native/test_build.py"],
-  "native": {"cosmic-term": "native/cosmic-term"},
+  "native": {"yuos-term": "native/yuos-term"},
   "native_kind": "binary",
-  "native_payload": {"app": "cosmic-term", "program": "cosmic-term"},
+  "native_payload": {"app": "yuos-term", "program": "yuos-term"},
   "native_assets": {
-    "cosmic-term": {
-      "app.json": "apps/cosmic-term/app.json",
+    "yuos-term": {
+      "app.json": "apps/yuos-term/app.json",
       "exec_backend.py": "apps/exec/main.py"
     }
   }

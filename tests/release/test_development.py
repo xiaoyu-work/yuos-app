@@ -57,13 +57,13 @@ def test_notifications_do_not_export_undeclared_product_libraries(tmp_path):
     archive = tmp_path / "archives" / record["filename"]
     manifest = verify_archive(archive, record, plan)
     assert manifest["native_interfaces"] == {}
-    assert set(manifest["apps"]) == {"notify", "cosmic-notifications"}
+    assert set(manifest["apps"]) == {"notify", "yuos-notifications"}
     root = tmp_path / "extracted"
     extract(archive, root)
     assert not (root / "interfaces").exists()
     assert not (root / "products/notifications/native").exists()
     assert not (root / "tools/native_build.py").exists()
-    assert not (root / "payload/usr/bin/cosmic-notifications").exists()
+    assert not (root / "payload/usr/bin/yuos-notifications").exists()
 
 
 @pytest.mark.parametrize("injection", ["declaration", "payload"])

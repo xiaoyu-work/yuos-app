@@ -298,7 +298,7 @@ def test_catalog_verification_reads_its_private_snapshot_after_authentication(
     }
 
 
-@pytest.mark.parametrize("app_id", ["cosmic-settings", "pkg", "arbitrary-app"])
+@pytest.mark.parametrize("app_id", ["yuos-settings", "pkg", "arbitrary-app"])
 def test_absolute_mcp_entry_has_no_product_or_language_exemption(tmp_path, runtime, signing, app, app_id):
     _, sign = runtime
     root = sign(app(app_id, entry="/usr/bin/outside-snapshot"))
@@ -511,7 +511,7 @@ def test_operation_and_gui_entries_need_the_same_signed_binding(
     assert not (tmp_path / "entrypoint-executed").exists()
 
 
-@pytest.mark.parametrize("app_id", ["mail-ai", "cosmic-settings", "unrelated-app"])
+@pytest.mark.parametrize("app_id", ["mail-ai", "yuos-settings", "unrelated-app"])
 def test_main_entry_has_no_identity_or_origin_exemption(tmp_path, runtime, signing, app, app_id):
     _, sign = runtime
     root = app(app_id)
@@ -714,7 +714,7 @@ def test_real_native_package_local_signed_acceptance(
     source_digest = digest(native)
     resource_scope = "The original Notifications installer ships only its real ELF."
     if product == "settings":
-        resources = ROOT / "products/settings/native/cosmic-settings/resources"
+        resources = ROOT / "products/settings/native/yuos-settings/resources"
         for origin, target in (
             ("icons", "usr/share/icons/hicolor"),
             ("default_schema", "usr/share/cosmic"),

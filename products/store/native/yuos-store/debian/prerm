@@ -1,0 +1,15 @@
+#!/bin/sh
+# prerm script for yuos-store
+
+set -e
+
+if [ "$1" = "remove" ] || [ "$1" = "deconfigure" ] ; then
+	update-alternatives --remove gstreamer-codec-install \
+			    /usr/bin/yuos-store || true
+
+fi
+
+#DEBHELPER#
+
+exit 0
+

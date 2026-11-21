@@ -20,7 +20,7 @@ def main():
     process = None
     try:
         installed = fixture / "installed"
-        stage("files", installed, ["cosmic-files"])
+        stage("files", installed, ["yuos-files"])
         libraries = prepare_exports(download=False)
         python = stage_shared(installed)
         shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)
@@ -84,7 +84,7 @@ def main():
             "--ro-bind", str(broker), "/usr/local/bin/yu",
             "--ro-bind", str(recoll), "/usr/bin/recollq",
             "--setenv", "YUOS_MCP_SERVER", "1",
-            "--setenv", "YUOS_APP_MANIFEST", "/usr/lib/yuos/apps/cosmic-files/app.json",
+            "--setenv", "YUOS_APP_MANIFEST", "/usr/lib/yuos/apps/yuos-files/app.json",
             "--setenv", "YUOS_OWNER_HOME", namespace + "/owner",
             "--setenv", "YUOS_DATA_DIR", namespace + "/data",
             "--setenv", "TMPDIR", namespace,
@@ -92,7 +92,7 @@ def main():
             "--setenv", "YUOS_BIN", "/untrusted/must-not-execute",
             "--setenv", "DISPLAY", "", "--setenv", "WAYLAND_DISPLAY", "",
             "--", str(Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else
-                       ROOT / "build/native-target/debug/cosmic-files"),
+                       ROOT / "build/native-target/debug/yuos-files"),
         ]
         process = subprocess.Popen(
             command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
@@ -171,14 +171,14 @@ def main():
         calls = [json.loads(line) for line in (fixture / "calls").read_text().splitlines()]
         assert all("app" not in args for args in calls)
         ai_calls = [args for args in calls if "ai" in args]
-        assert ai_calls and all(args[args.index("--app") + 1] == "cosmic-files" for args in ai_calls)
+        assert ai_calls and all(args[args.index("--app") + 1] == "yuos-files" for args in ai_calls)
         assert all(args[args.index("--origin") + 1] == "external-content" for args in ai_calls)
         prompts = [json.loads(line) for line in (fixture / "prompts").read_text().splitlines()]
         assert all(prompt["document"] == "untrusted document" for prompt in prompts)
         recoll_calls = [json.loads(line) for line in (fixture / "recoll-calls").read_text().splitlines()]
         assert all(home == namespace + "/owner" for _, home in recoll_calls)
         memories = [json.loads(line) for line in (fixture / "memory").read_text().splitlines()]
-        assert all(memory["source"] == "cosmic-files" for memory in memories)
+        assert all(memory["source"] == "yuos-files" for memory in memories)
         assert (fixture / "work/a.txt").read_text() == "untrusted document"
         print("Files binary: 7 authenticated tools, exact denials, AI identity, shared parser/Recoll passed")
     finally:

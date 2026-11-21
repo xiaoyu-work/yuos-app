@@ -1,9 +1,9 @@
 # Mail Source Provenance
 
-The product tree moved from `xiaoyu-work/claw-os` commit
+The product tree moved from `xiaoyu-work/Yu-OS` commit
 `0492ea6c13cca3213b1b1bafabeed5e6074ebb44` into `xiaoyu-work/yuos-app`.
 The initial `comm/` subtree is byte-identical to the upstream tree below.
-First-party AI/UI/build code retains the original Claw OS root license;
+First-party AI/UI/build code retains the original OS source license;
 that license does not replace Thunderbird or dependency licenses.
 
 ## Thunderbird import

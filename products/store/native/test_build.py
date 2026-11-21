@@ -10,18 +10,18 @@ from test_support import load_local_module
 
 PRODUCT = Path(__file__).resolve().parents[1]
 ROOT = PRODUCT.parents[1]
-NATIVE = PRODUCT / "native/cosmic-store"
+NATIVE = PRODUCT / "native/yuos-store"
 
 
 def test_native_staging_preserves_all_files_and_modes(tmp_path):
     stage = load_local_module(ROOT / "tools/stage_native.py", "store_stage_native")
-    assert stage.stage("store", tmp_path) == ["cosmic-store"]
+    assert stage.stage("store", tmp_path) == ["yuos-store"]
     for path in NATIVE.rglob("*"):
         if path.is_file():
-            output = tmp_path / "cosmic-store" / path.relative_to(NATIVE)
+            output = tmp_path / "yuos-store" / path.relative_to(NATIVE)
             assert output.read_bytes() == path.read_bytes()
             assert output.stat().st_mode == path.stat().st_mode
-    assert (tmp_path / "cosmic-store/catalog_backend.py").read_bytes() == (PRODUCT / "apps/pkg/main.py").read_bytes()
+    assert (tmp_path / "yuos-store/catalog_backend.py").read_bytes() == (PRODUCT / "apps/pkg/main.py").read_bytes()
 
 
 def test_original_default_graph_and_nested_workspace(tmp_path):

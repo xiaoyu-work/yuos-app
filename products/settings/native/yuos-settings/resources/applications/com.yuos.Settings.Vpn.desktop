@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=VPN
+Comment=VPN connections and connection profiles.
+Type=Application
+Exec=yuos-settings vpn
+Terminal=false
+Categories=YuOS
+Keywords=Yu OS;VPN;Network;Connection;OpenVPN;OpenConnect;
+NoDisplay=true
+OnlyShowIn=COSMIC
+Icon=preferences-vpn
+StartupNotify=true

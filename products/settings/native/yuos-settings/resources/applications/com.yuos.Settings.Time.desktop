@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Time & Language
+Comment=Manage system date, time, region, and language.
+Type=Application
+Exec=yuos-settings time
+Terminal=false
+Categories=YuOS
+Keywords=Yu OS;System;Time;Date;Region;Language;
+NoDisplay=true
+OnlyShowIn=COSMIC
+Icon=preferences-time-and-language
+StartupNotify=true

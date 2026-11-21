@@ -1,9 +1,9 @@
 # Notifications
 
-This product owns the complete native `cosmic-notifications` Layer Shell
+This product owns the complete native `yuos-notifications` Layer Shell
 daemon, MCP, configuration/util libraries and original build/provenance inputs,
 plus the complete Python `notify` facade and its tests.
-The installed binary remains `/usr/bin/cosmic-notifications`, with identity
+The installed binary remains `/usr/bin/yuos-notifications`, with identity
 `com.yuos.Notifications`; the independent native package is
 `yuos-app-notifications-desktop`.
 

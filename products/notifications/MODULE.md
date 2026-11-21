@@ -2,19 +2,19 @@
 
 | Path | Responsibility |
 | --- | --- |
-| `apps/cosmic-notifications/app.json` | Two MCP tools, preserved identity/`ui.notify` grant and explicit durable-ID compatibility |
+| `apps/yuos-notifications/app.json` | Two MCP tools, preserved identity/`ui.notify` grant and explicit durable-ID compatibility |
 | `apps/notify/` | Complete Python send/list facade, bounded validation, shared SDK client, separate grants and manifest-dispatch/history-preservation tests |
 | `test_notify_process.py` | Installed Python MCP in an empty-root/no-bus sandbox, actual SDK wire decoding, explicit errors and cancellation (canned responses only) |
-| `native/cosmic-notifications/src/app.rs` | Complete original Layer Shell UI, popup timers, configuration and presentation |
-| `native/cosmic-notifications/src/mcp.rs` | Bounded post/close intent via the fixed installed SDK CLI; no session bus |
-| `native/cosmic-notifications/src/subscriptions/` | Freedesktop server, sender-bound numeric handles and private human panel interaction |
-| `native/cosmic-notifications/src/subscriptions/managed.rs` | Published-SDK GUI resource client, real UI acceptance, plain-text cards and exact presentation actions |
-| `native/cosmic-notifications/cosmic-notifications-config/` | Private product preferences and existing storage schema |
-| `native/cosmic-notifications/cosmic-notifications-util/` | Private notification, markup and image presentation implementation |
-| `native/cosmic-notifications/src/presentation.rs` | App-owned adaptation to the OS-defined rendering/preferences contract |
-| `native/cosmic-notifications/src/presentation/images.rs` | App-owned theme lookup, bounded raster/vector preparation and normalized pixels/masks |
-| `native/cosmic-notifications/test/unit/` | Actual MCP validation, UI model/timers and sender ownership |
-| `native/cosmic-notifications/examples/notification-presentation-fixture.rs` | Headless use of the real native subscription on an explicit private bus |
+| `native/yuos-notifications/src/app.rs` | Complete original Layer Shell UI, popup timers, configuration and presentation |
+| `native/yuos-notifications/src/mcp.rs` | Bounded post/close intent via the fixed installed SDK CLI; no session bus |
+| `native/yuos-notifications/src/subscriptions/` | Freedesktop server, sender-bound numeric handles and private human panel interaction |
+| `native/yuos-notifications/src/subscriptions/managed.rs` | Published-SDK GUI resource client, real UI acceptance, plain-text cards and exact presentation actions |
+| `native/yuos-notifications/cosmic-notifications-config/` | Private product preferences and existing storage schema |
+| `native/yuos-notifications/cosmic-notifications-util/` | Private notification, markup and image presentation implementation |
+| `native/yuos-notifications/src/presentation.rs` | App-owned adaptation to the OS-defined rendering/preferences contract |
+| `native/yuos-notifications/src/presentation/images.rs` | App-owned theme lookup, bounded raster/vector preparation and normalized pixels/masks |
+| `native/yuos-notifications/test/unit/` | Actual MCP validation, UI model/timers and sender ownership |
+| `native/yuos-notifications/examples/notification-presentation-fixture.rs` | Headless use of the real native subscription on an explicit private bus |
 | `native/test_process.py` | Original installer, isolated actual native MCP, typed wire intent, cancellation and explicit failures |
 | `package.json` | Complete standalone workspace, separately built private packages and installed descriptor |
 
@@ -62,7 +62,7 @@ schema remains private to App HOME; no owner configuration mount or implicit
 legacy import is introduced. Legacy `notify` JSON is explicitly preserved in place and
 excluded from new service lists, not imported or replayed. New sends/lists use
 only the owner's distinct `app:notify` OS producer; native close stays
-bound to `app:cosmic-notifications`. Other authenticated Apps may use the same
+bound to `app:yuos-notifications`. Other authenticated Apps may use the same
 OS service with their own explicit capabilities and source, never this product's
 history or producer identity. See [README.md](README.md) for response/state compatibility
 and the actual legacy data namespace.
@@ -95,7 +95,7 @@ invalid authority/configuration fields, image snapshots and unavailable channels
 Standard builds use the existing companion and stdin transport from verified
 published platform 0.2.1, never a sibling OS source dependency or new pin.
 
-`native_payload` prepares the real `bin/cosmic-notifications` as the signed
+`native_payload` prepares the real `bin/yuos-notifications` as the signed
 primary/MCP entry with original licenses and all installer resources.
 The legacy primary command enters the common Host. GUI startup refuses an
 unmanaged invocation rather than opening an owner bus. The signed surface

@@ -1,13 +1,13 @@
 {
-  "web_ui": {"source": "web", "apps": ["cosmic-player"]},
-  "apps": ["apps/cosmic-player"],
+  "web_ui": {"source": "web", "apps": ["yuos-player"]},
+  "apps": ["apps/yuos-player"],
   "tests": [],
-  "native": {"cosmic-player": "native/cosmic-player"},
+  "native": {"yuos-player": "native/yuos-player"},
   "native_kind": "binary",
-  "native_payload": {"app": "cosmic-player", "program": "cosmic-player"},
+  "native_payload": {"app": "yuos-player", "program": "yuos-player"},
   "native_examples": ["media-player-mpris-fixture"],
   "native_process_test": "native/test_process.py",
   "native_assets": {
-    "cosmic-player": {"app.json": "apps/cosmic-player/app.json"}
+    "yuos-player": {"app.json": "apps/yuos-player/app.json"}
   }
 }

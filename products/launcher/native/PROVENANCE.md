@@ -1,9 +1,9 @@
 # Native Launcher provenance
 
-`cosmic-launcher/` is the complete Claw OS fork of
+`yuos-launcher/` is the complete Yu OS fork of
 [`pop-os/cosmic-launcher`](https://github.com/pop-os/cosmic-launcher),
 upstream revision `1e57708e5af9`, GPL-3.0. It was relocated from
-`claw-os/desktop/launcher` at OS revision
+`desktop/launcher` at OS revision
 `8b5a323ddb84d7cf896d6514904f38f9b503f2f8`.
 The original `LICENSE.md`, translations, resources, packaging, modes and
 upstream development files are retained.

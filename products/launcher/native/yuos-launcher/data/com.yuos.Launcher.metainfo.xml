@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ashley Wulber 2019 <ashley@system76.com> -->
+<component type="desktop-application">
+  <id>com.yuos.Launcher</id>
+  <metadata_license>CC0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <name>Yu Launcher</name>
+  <name xml:lang="zh-CN">Yu OS 启动器</name>
+  <name xml:lang="ar">مُشَغِّلُ Yu OS</name>
+  <name xml:lang="cs">Spouštěč Yu OS</name>
+  <name xml:lang="hu">Yu OS Indító</name>
+  <name xml:lang="pt">Lançador</name>
+  <name xml:lang="pt_BR">Lançador</name>
+  <name xml:lang="sk">Spúšťač Yu OS</name>
+  <name xml:lang="sv">Yu OS Programstartare</name>
+  <name xml:lang="it">Launcher Yu OS</name>
+  <summary>Application launcher for Yu OS</summary>
+  <summary xml:lang="ar">واجِهَةُ Yu OS لِمُشَغِّلِ بْوب</summary>
+  <summary xml:lang="cs">Spouštěč aplikací pro prostředí Yu OS</summary>
+  <summary xml:lang="hu">Yu OS felület a Pop Launcherhez</summary>
+  <summary xml:lang="pt">Botão de inicialização do Yu OS</summary>
+  <summary xml:lang="pt_BR">Botão de inicialização do Yu OS</summary>
+  <summary xml:lang="sk">Spúšťač aplikácií pre prostredie Yu OS</summary>
+  <summary xml:lang="sv">Programstartare för skrivbordsmiljön Yu OS</summary>
+  <summary xml:lang="it">Frontend Yu OS di Pop Launcher</summary>
+  <description>
+    <p>Launch applications on Yu OS</p>
+    <p xml:lang="ar">واجِهَةُ Yu OS لِمُشَغِّلِ بْوب</p>
+    <p xml:lang="cs">Spouštěč aplikací pro prostředí Yu OS</p>
+    <p xml:lang="hu">Yu OS felület a Pop Launcherhez</p>
+    <p xml:lang="pt">Botão de inicialização do Yu OS</p>
+    <p xml:lang="pt_BR">Botão de inicialização do Yu OS</p>
+    <p xml:lang="sk">Spúšťač aplikácií pre prostredie Yu OS</p>
+    <p xml:lang="sv">Programstartaren för skrivbordsmiljön Yu OS</p>
+    <p xml:lang="it">Frontend Yu OS di Pop Launcher</p>
+  </description>
+  <url type="homepage">https://github.com/pop-os/cosmic-launcher</url>
+  <url type="bugtracker">https://github.com/pop-os/cosmic-launcher/issues</url>
+  <content_rating type="oars-1.0" />
+  <releases>
+    <release version="0.1.0" date="2023-01-01" />
+  </releases>
+  <kudos>
+    <kudo>ModernToolkit</kudo>
+    <kudo>HiDpiIcon</kudo>
+  </kudos>
+  <developer_name>Ashley Wulber</developer_name>
+  <update_contact>ashley@system76.com</update_contact>
+  <translation type="gettext">yuos-launcher</translation>
+  <launchable type="desktop-id">com.yuos.Launcher.desktop</launchable>
+  <icon type="stock">com.yuos.Launcher</icon>
+</component>

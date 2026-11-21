@@ -9,21 +9,21 @@ from test_support import load_local_module
 
 PRODUCT = Path(__file__).resolve().parents[1]
 ROOT = PRODUCT.parents[1]
-NATIVE = PRODUCT / "native/cosmic-term"
+NATIVE = PRODUCT / "native/yuos-term"
 
 
 def test_native_staging_preserves_every_file_and_mode(tmp_path):
     native = load_local_module(ROOT / "tools/stage_native.py", "terminal_native_stage")
-    assert native.stage("terminal", tmp_path) == ["cosmic-term"]
+    assert native.stage("terminal", tmp_path) == ["yuos-term"]
     for path in NATIVE.rglob("*"):
         relative = path.relative_to(NATIVE)
         if path.is_file():
-            assert (tmp_path / "cosmic-term" / relative).read_bytes() == path.read_bytes()
-            assert (tmp_path / "cosmic-term" / relative).stat().st_mode == path.stat().st_mode
+            assert (tmp_path / "yuos-term" / relative).read_bytes() == path.read_bytes()
+            assert (tmp_path / "yuos-term" / relative).stat().st_mode == path.stat().st_mode
     for source, target in [
-        ("apps/cosmic-term/app.json", "app.json"), ("apps/exec/main.py", "exec_backend.py"),
+        ("apps/yuos-term/app.json", "app.json"), ("apps/exec/main.py", "exec_backend.py"),
     ]:
-        assert (tmp_path / "cosmic-term" / target).read_bytes() == (PRODUCT / source).read_bytes()
+        assert (tmp_path / "yuos-term" / target).read_bytes() == (PRODUCT / source).read_bytes()
 
 
 def test_standalone_keeps_original_renderer_filechooser_and_lock(tmp_path):
@@ -43,8 +43,8 @@ def test_standalone_keeps_original_renderer_filechooser_and_lock(tmp_path):
         },
     }
     assert (destination / "Cargo.lock").read_bytes() == (NATIVE / "Cargo.lock").read_bytes()
-    assert "Exec=cosmic-term" in (destination / "res/com.yuos.Term.desktop").read_text()
-    assert (destination / "i18n/en/cosmic_term.ftl").is_file()
+    assert "Exec=yuos-term" in (destination / "res/com.yuos.Term.desktop").read_text()
+    assert (destination / "i18n/en/yuos_term.ftl").is_file()
 
 
 def test_ui_and_mcp_do_not_invoke_apps_or_merge_process_state():

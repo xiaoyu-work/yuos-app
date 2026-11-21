@@ -49,14 +49,14 @@ def main():
         broker.chmod(0o755)
         env = {
             **os.environ, "YUOS_MCP_SERVER": "1",
-            "YUOS_APP_MANIFEST": str(fixture / "installed/usr/lib/yuos/apps/cosmic-edit/app.json"),
+            "YUOS_APP_MANIFEST": str(fixture / "installed/usr/lib/yuos/apps/yuos-edit/app.json"),
             "YUOS_KERNEL_BIN": str(broker), "TMPDIR": str(fixture),
             "XDG_CONFIG_HOME": str(fixture / "config"),
             "XDG_DATA_HOME": str(fixture / "data"),
             "DISPLAY": "", "WAYLAND_DISPLAY": "",
         }
         process = subprocess.Popen(
-            [str(ROOT / "build/native-target/debug/cosmic-edit")],
+            [str(ROOT / "build/native-target/debug/yuos-edit")],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             text=True, env=env, cwd=fixture,
         )
@@ -137,7 +137,7 @@ def main():
         assert all("app" not in args for args in calls)
         ai = [args for args in calls if args[1] == "ai"]
         assert len(ai) == 3
-        assert all(args[args.index("--app") + 1] == "cosmic-edit" for args in ai)
+        assert all(args[args.index("--app") + 1] == "yuos-edit" for args in ai)
         assert all(args[args.index("--origin") + 1] == "external-content" for args in ai)
         assert any("file:///work/a%20%23%C3%A9.txt" in args for args in calls)
         prompts = [json.loads(line) for line in (fixture / "prompts").read_text().splitlines()]

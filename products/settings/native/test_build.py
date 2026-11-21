@@ -10,14 +10,14 @@ from test_support import load_local_module
 
 PRODUCT = Path(__file__).resolve().parents[1]
 ROOT = PRODUCT.parents[1]
-NATIVE = PRODUCT / "native/cosmic-settings"
+NATIVE = PRODUCT / "native/yuos-settings"
 
 
 def test_native_staging_preserves_all_sources_resources_and_modes(tmp_path):
     stage = load_local_module(ROOT / "tools/stage_native.py", "settings_stage_native")
-    assert stage.stage("settings", tmp_path) == ["cosmic-settings"]
+    assert stage.stage("settings", tmp_path) == ["yuos-settings"]
     for path in NATIVE.rglob("*"):
-        output = tmp_path / "cosmic-settings" / path.relative_to(NATIVE)
+        output = tmp_path / "yuos-settings" / path.relative_to(NATIVE)
         if path.is_symlink():
             assert output.is_symlink() and os.readlink(output) == os.readlink(path)
         elif path.is_file():
@@ -30,28 +30,28 @@ def test_original_nested_workspace_patches_and_full_default_graph(tmp_path):
     output = tmp_path / "settings"
     native.prepare("settings", tmp_path / "platform/desktop/toolkit", output)
     cargo = tomllib.loads((output / "Cargo.toml").read_text())
-    assert cargo["workspace"]["members"] == ["cosmic-settings", "crates/*", "page", "pages/*", "subscriptions/*"]
-    assert cargo["workspace"]["default-members"] == ["cosmic-settings"]
+    assert cargo["workspace"]["members"] == ["yuos-settings", "crates/*", "page", "pages/*", "subscriptions/*"]
+    assert cargo["workspace"]["default-members"] == ["yuos-settings"]
     patches = cargo["patch"]
     assert patches["https://github.com/pop-os/libcosmic"]["libcosmic"]["path"] == str(tmp_path / "platform/desktop/toolkit")
     assert patches["https://github.com/pop-os/cosmic-protocols"]["cosmic-protocols"]["rev"] == "d0e95be"
     assert patches["crates-io"]["atspi"]["git"] == "https://github.com/wash2/atspi"
-    main = tomllib.loads((output / "cosmic-settings/Cargo.toml").read_text())
+    main = tomllib.loads((output / "yuos-settings/Cargo.toml").read_text())
     assert main["features"]["default"] == ["a11y", "linux", "single-instance", "wgpu"]
     assert len([feature for feature in main["features"]["linux"] if feature.startswith("page-")]) == 16
     for library in ("yuos-sdk", "yuos-runtime"):
         assert main["dependencies"][library]["path"] == str(tmp_path / "platform" / library / "rust")
     assert (output / "Cargo.lock").read_bytes() == (NATIVE / "Cargo.lock").read_bytes()
-    for path in ("i18n/en/cosmic_settings.ftl", "page/src/lib.rs", "pages/wallpapers/src/lib.rs",
+    for path in ("i18n/en/yuos_settings.ftl", "page/src/lib.rs", "pages/wallpapers/src/lib.rs",
                  "subscriptions/sound/src/lib.rs", "resources/default_schema", "debian/copyright"):
         assert (output / path).exists(), path
 
 
 def test_permission_restoration_has_no_app_owned_approval_transport():
     sources = [
-        NATIVE / "cosmic-settings/src/permissions.rs",
-        NATIVE / "cosmic-settings/src/pages/applications/permissions.rs",
-        NATIVE / "cosmic-settings/src/mcp.rs",
+        NATIVE / "yuos-settings/src/permissions.rs",
+        NATIVE / "yuos-settings/src/pages/applications/permissions.rs",
+        NATIVE / "yuos-settings/src/mcp.rs",
     ]
     for source in sources:
         text = source.read_text()
@@ -61,9 +61,9 @@ def test_permission_restoration_has_no_app_owned_approval_transport():
     client = sources[0].read_text()
     assert "yu_call_json_with_binary" in client
     assert '"/usr/local/bin/yu"' in client and '"__app-permissions"' in client
-    cargo = tomllib.loads((NATIVE / "cosmic-settings/Cargo.toml").read_text())
+    cargo = tomllib.loads((NATIVE / "yuos-settings/Cargo.toml").read_text())
     assert "yuosd-client" not in cargo["dependencies"]
-    labels = (NATIVE / "i18n/en/cosmic_settings.ftl").read_text()
+    labels = (NATIVE / "i18n/en/yuos_settings.ftl").read_text()
     assert "app-permissions-approve =" not in labels
     assert "app-permissions-deny =" not in labels
     assert "app-permissions-review-in-os =" in labels
@@ -71,7 +71,7 @@ def test_permission_restoration_has_no_app_owned_approval_transport():
 
 
 def test_permission_manifest_preserves_request_only_tools_and_signed_ceiling():
-    manifest = json.loads((PRODUCT / "apps/cosmic-settings/app.json").read_text())
+    manifest = json.loads((PRODUCT / "apps/yuos-settings/app.json").read_text())
     tools = {tool["name"]: tool for tool in manifest["mcp"]["tools"]}
     assert set(tools) == {
         "settings.list_pages", "settings.search", "settings.open",
@@ -91,8 +91,8 @@ def test_permission_manifest_preserves_request_only_tools_and_signed_ceiling():
 
 
 def test_native_users_have_one_protected_transport_without_app_owned_authority():
-    page = (NATIVE / "cosmic-settings/src/pages/system/users/mod.rs").read_text()
-    client = (NATIVE / "cosmic-settings/src/user_settings.rs").read_text()
+    page = (NATIVE / "yuos-settings/src/pages/system/users/mod.rs").read_text()
+    client = (NATIVE / "yuos-settings/src/user_settings.rs").read_text()
     for operation in ("FullName", "Rename", "Icon", "AccountType", "Password", "Delete", "Create"):
         assert f"Change::{operation}" in page, operation
     for forbidden in ("zbus::", "accounts_zbus", "polkit", "check_authorization",
@@ -107,7 +107,7 @@ def test_native_users_have_one_protected_transport_without_app_owned_authority()
     assert '["__system-settings", "--request-stdin"], &request.input' in client
     assert "self.pending.complete(generation)" in page
     assert "self.pending.revision()" in page
-    labels = (NATIVE / "i18n/en/cosmic_settings.ftl").read_text()
+    labels = (NATIVE / "i18n/en/yuos_settings.ftl").read_text()
     assert "asks for administrator authentication separately" in labels and "at most 1 MiB" in labels
 
 
@@ -115,7 +115,7 @@ def test_system_authority_is_never_installed_or_removed_by_the_product():
     installer = (NATIVE / "justfile").read_text()
     debian = (NATIVE / "debian/install").read_text()
     assert "polkit" not in installer
-    for path in ("rules.d/cosmic-settings.rules", "actions/com.yuos.Settings.Users.policy"):
+    for path in ("rules.d/yuos-settings.rules", "actions/com.yuos.Settings.Users.policy"):
         assert not (NATIVE / "resources/polkit-1" / path).exists()
         assert f"/usr/share/polkit-1/{path}" not in debian
     forbidden = (
@@ -124,14 +124,14 @@ def test_system_authority_is_never_installed_or_removed_by_the_product():
         ".set_hostname(", ".set_static_hostname(", "org.freedesktop.ModemManager1",
         "com.yuos.Settings.Users.Admin",
     )
-    for group in ("cosmic-settings/src", "crates", "pages", "subscriptions"):
+    for group in ("yuos-settings/src", "crates", "pages", "subscriptions"):
         for source in (NATIVE / group).rglob("*.rs"):
             text = source.read_text()
             for operation in forbidden:
                 assert operation not in text, (source, operation)
-    keyboard = (NATIVE / "cosmic-settings/src/pages/input/keyboard/mod.rs").read_text()
+    keyboard = (NATIVE / "yuos-settings/src/pages/input/keyboard/mod.rs").read_text()
     assert 'config.set("xkb_config", xkb)' in keyboard
-    regional = (NATIVE / "cosmic-settings/src/regional_settings.rs").read_text()
+    regional = (NATIVE / "yuos-settings/src/regional_settings.rs").read_text()
     assert "yu_call_json_async_with_binary" in regional
     assert '"__regional-settings"' in regional
 

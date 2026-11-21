@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Terminal
+Comment=Terminal emulator for the Yu OS desktop
+Exec=yuos-term
+Terminal=false
+Type=Application
+StartupNotify=true
+Icon=com.yuos.Term
+Categories=X-YuOS;System;TerminalEmulator;
+Keywords=Command;Shell;Terminal;CLI;

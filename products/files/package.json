@@ -1,15 +1,15 @@
 {
-  "web_ui": {"source": "web", "apps": ["fs", "docs", "cosmic-files"]},
-  "apps": ["apps/fs", "apps/docs", "apps/cosmic-files"],
+  "web_ui": {"source": "web", "apps": ["fs", "docs", "yuos-files"]},
+  "apps": ["apps/fs", "apps/docs", "apps/yuos-files"],
   "tests": ["apps/fs/test_file_plans.py"],
-  "native": {"cosmic-files": "native/cosmic-files"},
+  "native": {"yuos-files": "native/yuos-files"},
   "native_kind": "binary",
-  "native_payload": {"app": "cosmic-files", "program": "cosmic-files", "auxiliary_programs": ["cosmic-files-applet"]},
-  "native_packages": ["cosmic-files", "cosmic-files-applet"],
+  "native_payload": {"app": "yuos-files", "program": "yuos-files", "auxiliary_programs": ["yuos-files-applet"]},
+  "native_packages": ["yuos-files", "yuos-files-applet"],
   "python_library": {"name": "yuos_files", "path": "python/yuos_files", "apps": ["fs", "docs"]},
   "native_assets": {
-    "cosmic-files": {
-      "app.json": "apps/cosmic-files/app.json",
+    "yuos-files": {
+      "app.json": "apps/yuos-files/app.json",
       "fs_backend.py": "apps/fs/main.py",
       "recoll_backend.py": "apps/docs/main.py",
       "document_backend.py": "python/yuos_files/document.py"

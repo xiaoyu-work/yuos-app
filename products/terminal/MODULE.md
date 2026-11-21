@@ -11,10 +11,10 @@ registry remain separate; this source move does not consolidate sessions.
 | `apps/exec/main.py` | Bounded capture, script invocation and background process registry |
 | `apps/exec/server.py` | Existing manifest operation-to-MCP adapter |
 | `apps/exec/test_main.py` | Scratch isolation, shell scope, execution and service regressions |
-| `apps/cosmic-term/` | Native descriptor and independent three-tool/grant contracts |
-| `native/cosmic-term/` | Full terminal renderer, PTYs, configuration, resources, packaging and tests |
-| `native/cosmic-term/src/cli.rs`, `native/cosmic-term/test/unit/cli.rs` | Native option/command parsing and bounded GUI argv regressions |
-| `native/cosmic-term/src/product.rs` | Compiled-in shared command adapter and controlled OS filesystem/desktop clients |
+| `apps/yuos-term/` | Native descriptor and independent three-tool/grant contracts |
+| `native/yuos-term/` | Full terminal renderer, PTYs, configuration, resources, packaging and tests |
+| `native/yuos-term/src/cli.rs`, `native/yuos-term/test/unit/cli.rs` | Native option/command parsing and bounded GUI argv regressions |
+| `native/yuos-term/src/product.rs` | Compiled-in shared command adapter and controlled OS filesystem/desktop clients |
 | `native/test_process.py` | Real authenticated stdio binary with isolated command and OS-service fixtures |
 | `package.json` | Product-owned staging and test inputs |
 
@@ -31,7 +31,7 @@ children retain environment scrubbing and the native Host sandbox/grants.
 UI state writes use controlled filesystem snapshots with separately authorized
 missing parents. MCP cannot use the human UI write adapter. New Window and
 `term.open` use the fixed OS Terminal target under the existing
-`proc.spawn:cosmic-term` grant, not a widened desktop capability.
+`proc.spawn:yuos-term` grant, not a widened desktop capability.
 Ask Yu OS's bounded anonymous context transport, existing configurable
 shell Copilot integration, PTY startup, renderer fallback and password-manager
 integration are retained. No credentials, histories or user state are moved.
@@ -62,8 +62,8 @@ including `--gui` and option-like values. Working-directory OS bytes are
 preserved; shell strings retain the existing terminal backend conversion.
 The included Rust parser regressions use the `cli::tests::` filter.
 
-The native payload now selects one real `bin/cosmic-term` for primary GUI and
+The native payload now selects one real `bin/yuos-term` for primary GUI and
 MCP, with original resources/licenses in the App snapshot. Its legacy command
-routes through `yu app cosmic-term --gui`, preserving argument boundaries and
+routes through `yu app yuos-term --gui`, preserving argument boundaries and
 Host errors. PTY, argument and resource acceptance remains separate; see
 [native payloads](../../docs/native-payloads.md).

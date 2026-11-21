@@ -2,13 +2,13 @@
 
 | Path | Responsibility |
 | --- | --- |
-| `apps/cosmic-screenshot/app.json` | One MCP tool, fixed native identity and separate screen/output grants |
-| `native/cosmic-screenshot/src/main.rs` | Original interactive/modal/notify CLI and translations; shared non-interactive OS client |
-| `native/cosmic-screenshot/src/gui.rs` | Published-SDK generic clients for private per-window OS portal status and source-bound notifications; no user bus or file access from returned metadata |
-| `native/cosmic-screenshot/src/mcp.rs` | Strict pre-service arguments and manifest-bound authenticated MCP |
-| `native/cosmic-screenshot/src/localize.rs` | Original embedded notifications in 72 locales |
-| `native/cosmic-screenshot/test/unit/` | CLI, strict correlated GUI outcomes, argument validation and localization regressions |
-| `native/cosmic-screenshot/test/support/portal.rs` | Fixture-only private D-Bus portal; no display or live capture |
+| `apps/yuos-screenshot/app.json` | One MCP tool, fixed native identity and separate screen/output grants |
+| `native/yuos-screenshot/src/main.rs` | Original interactive/modal/notify CLI and translations; shared non-interactive OS client |
+| `native/yuos-screenshot/src/gui.rs` | Published-SDK generic clients for private per-window OS portal status and source-bound notifications; no user bus or file access from returned metadata |
+| `native/yuos-screenshot/src/mcp.rs` | Strict pre-service arguments and manifest-bound authenticated MCP |
+| `native/yuos-screenshot/src/localize.rs` | Original embedded notifications in 72 locales |
+| `native/yuos-screenshot/test/unit/` | CLI, strict correlated GUI outcomes, argument validation and localization regressions |
+| `native/yuos-screenshot/test/support/portal.rs` | Fixture-only private D-Bus portal; no display or live capture |
 | `native/test_process.py` | Real installed resources/binary and published-SDK MCP/GUI/notification clients against an isolated fake OS wire, with no user bus |
 | `package.json` | Descriptor/native source, fixture example and process-test declarations |
 
@@ -65,8 +65,8 @@ The process runner also accepts `--binary <built-binary> --source <native-inputs
 to exercise an OS-composed build from the same immutable source.
 
 The native payload binds both declared surfaces to real
-`bin/cosmic-screenshot`, retaining resources/licenses. Its compatibility
-command enters `yu app cosmic-screenshot --gui`, never the ELF directly.
+`bin/yuos-screenshot`, retaining resources/licenses. Its compatibility
+command enters `yu app yuos-screenshot --gui`, never the ELF directly.
 The native Clap parser consumes one leading Host selector only in GUI mode,
 preserving its original defaults, boolean/value syntax, save-path bytes,
 help/version, errors and MCP-first ordering. CLI early exits precede localization;

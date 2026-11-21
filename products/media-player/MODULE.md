@@ -2,17 +2,17 @@
 
 | Path | Responsibility |
 | --- | --- |
-| `apps/cosmic-player/app.json` | Seven tools and separate exact observation/control grants |
-| `native/cosmic-player/src/main.rs` | Original GStreamer/libcosmic UI and authoritative playback state |
-| `native/cosmic-player/src/argparse.rs`, `native/cosmic-player/test/unit/argparse.rs` | Native media/thumbnail arguments, bounded Host GUI selector adaptation and parser regressions |
-| `native/cosmic-player/src/playback.rs` | Shared native state snapshots and typed UI commands |
-| `native/cosmic-player/src/managed.rs` | Published generic SDK exchange for the exact managed GUI; commands and status go through the original UI event loop |
-| `native/cosmic-player/src/access.rs` | Independent protected file reads and atomic thumbnail write/create selections through the published GUI SDK |
-| `native/cosmic-player/src/mpris_backend.rs` | Original MPRIS implementation, corrected name/Stop/status and live UI publication |
-| `native/cosmic-player/src/mpris.rs` | Native subscription connecting the MPRIS backend to the existing UI event loop |
-| `native/cosmic-player/src/mcp.rs` | Authenticated MCP, strict empty arguments, deadlines/cancellation and explicit installed OS client |
-| `native/cosmic-player/test/unit/` | Actual backend commands, state/metadata and UI message mapping |
-| `native/cosmic-player/test/support/mpris.rs` | Fixture-only private bus endpoints and synthetic native state |
+| `apps/yuos-player/app.json` | Seven tools and separate exact observation/control grants |
+| `native/yuos-player/src/main.rs` | Original GStreamer/libcosmic UI and authoritative playback state |
+| `native/yuos-player/src/argparse.rs`, `native/yuos-player/test/unit/argparse.rs` | Native media/thumbnail arguments, bounded Host GUI selector adaptation and parser regressions |
+| `native/yuos-player/src/playback.rs` | Shared native state snapshots and typed UI commands |
+| `native/yuos-player/src/managed.rs` | Published generic SDK exchange for the exact managed GUI; commands and status go through the original UI event loop |
+| `native/yuos-player/src/access.rs` | Independent protected file reads and atomic thumbnail write/create selections through the published GUI SDK |
+| `native/yuos-player/src/mpris_backend.rs` | Original MPRIS implementation, corrected name/Stop/status and live UI publication |
+| `native/yuos-player/src/mpris.rs` | Native subscription connecting the MPRIS backend to the existing UI event loop |
+| `native/yuos-player/src/mcp.rs` | Authenticated MCP, strict empty arguments, deadlines/cancellation and explicit installed OS client |
+| `native/yuos-player/test/unit/` | Actual backend commands, state/metadata and UI message mapping |
+| `native/yuos-player/test/support/mpris.rs` | Fixture-only private bus endpoints and synthetic native state |
 | `native/test_process.py` | Installed binary/resources, isolated stdio MCP and fixture broker/native-MPRIS acceptance |
 | `package.json` | Descriptor, native inputs, fixture executable and process-test declarations |
 
@@ -27,9 +27,9 @@ the versioned SDK, not OS providers or other Apps. Native state is projected
 from the UI, never a second MCP-only cache.
 
 The OS playback service accepts other independently authorized clients without
-requiring the caller to be `cosmic-player`. The native product keeps its own
-identity and manifest; its exact `desktop.media.observe:cosmic-player` and
-`desktop.media.control:cosmic-player` scopes name the fixed playback target.
+requiring the caller to be `yuos-player`. The native product keeps its own
+identity and manifest; its exact `desktop.media.observe:yuos-player` and
+`desktop.media.control:yuos-player` scopes name the fixed playback target.
 The provider selects the actual running signed GUI instance and applies each
 calling App's own live grants and denial policy before releasing a command and
 returning a reply. Status is sampled by that same native UI, not a worker-owned
@@ -69,7 +69,7 @@ actual installed-path CLI against its private broker fixture. The OS repository
 owns provider/authority and authenticated dispatch tests. Fixtures never
 open user files, start playback devices, or connect to a live desktop bus.
 
-`native_payload` selects the real `bin/cosmic-player` for GUI/MCP and preserves
+`native_payload` selects the real `bin/yuos-player` for GUI/MCP and preserves
 the original resources, thumbnailer metadata and licenses. The primary legacy
 command enters the common Host; it does not bypass admission for thumbnailing.
 After the existing MCP dispatch, the App-owned `yuos-app-gui-argv` library removes

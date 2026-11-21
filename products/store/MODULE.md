@@ -1,7 +1,7 @@
 # Yu OS Store Product
 
 Own the `pkg` App's thirteen existing CLI operations and matching MCP adapter,
-and the complete native `cosmic-store` fork, including Flatpak/PackageKit UI,
+and the complete native `yuos-store` fork, including Flatpak/PackageKit UI,
 translations, assets, original Cargo graph and `flathub-stats` workspace member.
 
 | Path | Responsibility |
@@ -11,12 +11,12 @@ translations, assets, original Cargo graph and `flathub-stats` workspace member.
 | `apps/pkg/server.py` | Runtime adapter from manifest operations to SDK MCP |
 | `apps/pkg/test_main.py` | Catalog client validation, scoped broker requests and all MCP operation routes |
 | `package.json` | Product-owned staging and test inputs |
-| `apps/cosmic-store/app.json` | Unchanged four-tool native descriptor and independent grants |
-| `native/cosmic-store/src/mcp.rs` | Three catalog queries and fixed Store activation |
-| `native/cosmic-store/src/argparse.rs`, `native/cosmic-store/test/unit/argparse.rs` | Native search/helper arguments, bounded Host GUI selector adaptation and parser regressions |
-| `native/cosmic-store/src/product.rs`, `product_bridge.py` | Controlled OS catalog reads; embedded human filesystem/snapshot and fixed desktop adapters |
-| `native/cosmic-store/src/yuos_apps.rs` | Yu Apps navigation, official release versions and exact install/update actions |
-| `native/cosmic-store/src/package.rs`, `backend/{packagekit,flatpak}.rs` | Exact Debian and Flatpak intents, retained Root handoff, status and read-only recovery; controlled catalog, inventory and update queries |
+| `apps/yuos-store/app.json` | Unchanged four-tool native descriptor and independent grants |
+| `native/yuos-store/src/mcp.rs` | Three catalog queries and fixed Store activation |
+| `native/yuos-store/src/argparse.rs`, `native/yuos-store/test/unit/argparse.rs` | Native search/helper arguments, bounded Host GUI selector adaptation and parser regressions |
+| `native/yuos-store/src/product.rs`, `product_bridge.py` | Controlled OS catalog reads; embedded human filesystem/snapshot and fixed desktop adapters |
+| `native/yuos-store/src/yuos_apps.rs` | Yu Apps navigation, official release versions and exact install/update actions |
+| `native/yuos-store/src/package.rs`, `backend/{packagekit,flatpak}.rs` | Exact Debian and Flatpak intents, retained Root handoff, status and read-only recovery; controlled catalog, inventory and update queries |
 | `native/test_process.py` | Real binary/resource installation and authenticated synthetic stdio fixture |
 
 Preserve the installed `pkg` identity and existing permissions. The OS package
@@ -89,7 +89,7 @@ uses isolated system Python with installed OS SDK/runtime and App-owned common
 support from `/usr/lib/yuos/python`; it never invokes another App entrypoint.
 Human-only Flatpak data cleanup checks `fs.delete` and snapshots before removal;
 ref-file reads check `fs.read`. Both adapters reject MCP use. New Window and
-`store.open` use a fixed broker target under `proc.spawn:cosmic-store`.
+`store.open` use a fixed broker target under `proc.spawn:yuos-store`.
 Native Debian install/remove/purge/update actions now submit one exact single
 or bounded batch intent to the existing Root package controller. The GUI declares
 only ordinary `sys.observe:packages` as mandatory, settled through the normal
@@ -177,7 +177,7 @@ installed-data migration, full-image integration and remaining interactive,
 resource and hardware acceptance remain separate gates. It does not approve
 publication, an SDK freeze or adoption of a new App pin.
 
-The native payload binds GUI and MCP to the real `bin/cosmic-store`, preserving
+The native payload binds GUI and MCP to the real `bin/yuos-store`, preserving
 resources and licenses. Its compatibility command enters the existing common
 Host rather than invoking the relocated ELF directly. The App-owned
 `yuos-app-gui-argv` library removes one exact argv[1] `--gui` only in SDK GUI mode,

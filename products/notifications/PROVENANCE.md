@@ -1,8 +1,8 @@
 # Notifications provenance
 
-The complete original 40-file Claw OS fork, together with its newly added
+The complete original 40-file Yu OS fork, together with its newly added
 native tests/presentation fixture and `apps/cosmic-notifications/app.json`,
-was copied from `xiaoyu-work/claw-os` commit
+was copied from `xiaoyu-work/Yu-OS` commit
 `f7ffabf329ab8e1ec46e131ddd1ed2800060d13a`, `desktop/notifications/`.
 
 Upstream is `https://github.com/pop-os/cosmic-notifications`, originally
@@ -10,11 +10,11 @@ vendored at `a899bfbc6715`. The original GPL-3.0 license/copyright text,
 executable modes, nested configuration/util crates, standalone Cargo lock,
 optional/default graph, Debian/Nix/hook/build metadata and upstream repository
 files are preserved. `native/LICENSE` is byte-identical to the original
-`native/cosmic-notifications/LICENSE.md`.
+`native/yuos-notifications/LICENSE.md`.
 One extra trailing blank line in the upstream PR template was normalized for
 repository diff checks; its content is unchanged.
 
-Claw-specific changes replace isolated MCP's unusable direct session bus with
+Yu OS changes replace isolated MCP's unusable direct session bus with
 bounded OS notification intent, bind native desktop handles to their senders,
 correct close signals/replacement timers, reclaim retired presentation handles,
 support sender-local connection lifetime, and expose real headless native
@@ -22,9 +22,8 @@ presentation for OS integration tests. The original libcosmic Layer Shell UI,
 settings and freedesktop daemon are not replaced by a launcher or applet stub.
 No OS provider implementation or user notification data is copied.
 
-The public desktop identity remains `com.yuos.Notifications`; native
-crate/binary/App identity remains `cosmic-notifications`. The OS pins the
-published product revision and ships native payloads in `claw-os-desktop`.
+The public desktop identity remains `com.yuos.Notifications`. The independent
+native App uses `yuos-notifications` for its App ID, crate and binary.
 System76/COSMIC trademarks are not licensed for unrestricted reuse.
 
 The four original Python `apps/notify/` files (`app.json`, `main.py`, `server.py`,
@@ -32,6 +31,6 @@ The four original Python `apps/notify/` files (`app.json`, `main.py`, `server.py
 `3e0c6f01aa7c49b70064b71e45b80d8496d31795`. Its business/storage facade and tests
 were then updated for the versioned OS service, with a shared SDK client and
 installed-process coverage added. No standalone asset or license file existed
-in that App directory. Installed identity remains `notify` in `claw-os-agent`.
+in that App directory. The independent delivery App keeps the `notify` ID.
 No historical notification file, OS provider or authority implementation was
 copied. JSON history is deliberately preserved, not imported or replayed.

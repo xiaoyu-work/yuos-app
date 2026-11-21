@@ -26,7 +26,7 @@ def main():
     for directory in (build_root, target_dir):
         if directory == ROOT / "build" or not directory.is_relative_to(ROOT / "build"):
             parser.error("Fixture build and target directories must be explicit paths under build/")
-    if not (build_root / "Cargo.toml").is_file() or not (target_dir / "debug/cosmic-settings").is_file():
+    if not (build_root / "Cargo.toml").is_file() or not (target_dir / "debug/yuos-settings").is_file():
         parser.error("Build the prepared Settings candidate and its matching debug binary first")
     environment = {**os.environ, "CARGO_TARGET_DIR": str(target_dir)}
     fixture = ROOT / "build/settings-process-fixture"
@@ -34,17 +34,17 @@ def main():
     process = None
     try:
         installed = fixture / "installed"
-        stage("settings", installed, ["cosmic-settings"])
+        stage("settings", installed, ["yuos-settings"])
         subprocess.run([
             "just", "--justfile", str(build_root / "justfile"),
-            f"rootdir={installed}", f"bin-src={target_dir / 'debug/cosmic-settings'}",
+            f"rootdir={installed}", f"bin-src={target_dir / 'debug/yuos-settings'}",
             "install",
         ], check=True, env=environment, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-        binary = installed / "usr/bin/cosmic-settings"
+        binary = installed / "usr/bin/yuos-settings"
         assert binary.stat().st_mode & 0o777 == 0o755
         resources = installed / "usr/share"
         desktop = resources / "applications/com.yuos.Settings.desktop"
-        assert "Exec=cosmic-settings" in desktop.read_text()
+        assert "Exec=yuos-settings" in desktop.read_text()
         assert "Name[fr]=" in desktop.read_text()
         entries = list((resources / "applications").glob("com.yuos.Settings*.desktop"))
         assert len(entries) == 32
@@ -82,7 +82,7 @@ def main():
             "assert args[5:] in ([],['--uri','settings://wireless'],['--uri','settings://accessibility-magnifier'],['--uri','settings://dock-applet'],['--uri','settings://panel-applet']),args\n"
             "if (root/'deny').exists():\n"
             " print(json.dumps({'wire_version':1,'ok':False,'code':'PERMISSION_DENIED','error':'fixture denied'}));sys.exit(1)\n"
-            "data={'launched':True,'app_id':'com.yuos.Settings','launcher':'/usr/bin/cosmic-settings'}\n"
+            "data={'launched':True,'app_id':'com.yuos.Settings','launcher':'/usr/bin/yuos-settings'}\n"
             "if (root/'wrong-target').exists():data['app_id']='com.yuos.Store'\n"
             "print(json.dumps({'wire_version':1,'ok':True,'data':data}))\n"
         )
@@ -93,12 +93,12 @@ def main():
             "--bind", str(fixture), namespace,
             "--ro-bind", str(Path("/usr/bin/python3").resolve()), "/usr/bin/python3",
             "--ro-bind", str(broker), "/usr/local/bin/yu",
-            "--ro-bind", str(binary), "/usr/bin/cosmic-settings",
+            "--ro-bind", str(binary), "/usr/bin/yuos-settings",
             "--chdir", namespace,
         ]
         for name, value in {
             "YUOS_MCP_SERVER": "1",
-            "YUOS_APP_MANIFEST": namespace + "/installed/usr/lib/yuos/apps/cosmic-settings/app.json",
+            "YUOS_APP_MANIFEST": namespace + "/installed/usr/lib/yuos/apps/yuos-settings/app.json",
             "YUOS_SESSION": "worker-session", "YUOS_DATA_DIR": namespace + "/data",
             "HOME": namespace, "XDG_CONFIG_HOME": namespace + "/config",
             "XDG_DATA_HOME": namespace + "/data", "XDG_CACHE_HOME": namespace + "/cache",
@@ -109,7 +109,7 @@ def main():
         }.items():
             command += ["--setenv", name, value]
         process = subprocess.Popen(
-            [*command, "--", "/usr/bin/cosmic-settings"],
+            [*command, "--", "/usr/bin/yuos-settings"],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
         )
         selector = selectors.DefaultSelector()
@@ -252,13 +252,13 @@ def main():
         artifacts = subprocess.run([
             "cargo", "test", "--locked", "--no-run", "--message-format=json",
             "--manifest-path", str(build_root / "Cargo.toml"),
-            "--target-dir", str(target_dir), "--package", "cosmic-settings",
+            "--target-dir", str(target_dir), "--package", "yuos-settings",
         ], check=True, env=environment, stdout=subprocess.PIPE, text=True)
         tests = [
             entry["executable"]
             for entry in map(json.loads, artifacts.stdout.splitlines())
             if entry.get("reason") == "compiler-artifact" and entry.get("executable")
-            and entry["target"]["name"] == "cosmic-settings" and entry["profile"]["test"]
+            and entry["target"]["name"] == "yuos-settings" and entry["profile"]["test"]
         ]
         assert len(tests) == 1, tests
         human = subprocess.run([

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Region & Language
+Comment=Format dates, times, and numbers based on your region.
+Type=Application
+Exec=yuos-settings region-language
+Terminal=false
+Categories=YuOS
+Keywords=Yu OS;Region;Language;Date;Format;Time;Locale;Localization;
+NoDisplay=true
+OnlyShowIn=COSMIC
+Icon=preferences-region-and-language
+StartupNotify=true

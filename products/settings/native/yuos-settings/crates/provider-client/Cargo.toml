@@ -1,0 +1,10 @@
+[package]
+name = "yuos-settings-provider-client"
+version = "0.1.0"
+edition = "2024"
+license = "MPL-2.0"
+publish = false
+
+[dependencies]
+yuos-sdk = { path = "../../../../../yuos-sdk/rust" }
+serde_json = "1"

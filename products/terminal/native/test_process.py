@@ -20,7 +20,7 @@ def main():
     process = None
     try:
         installed = fixture / "installed"
-        stage("terminal", installed, ["cosmic-term"])
+        stage("terminal", installed, ["yuos-term"])
         libraries = prepare_exports(download=False)
         python = stage_shared(installed)
         shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)
@@ -38,7 +38,7 @@ def main():
             "if (root/'deny').exists():\n"
             " print(json.dumps({'wire_version':1,'ok':False,'error':{'code':'denied','message':'fixture denied'}}));sys.exit(1)\n"
             "if args[1]=='__policy':data={'decision':'allow','verb':args[3]}\n"
-            "elif args[1]=='__desktop':data={'launched':True,'app_id':'com.yuos.Term','launcher':'/usr/bin/cosmic-term'}\n"
+            "elif args[1]=='__desktop':data={'launched':True,'app_id':'com.yuos.Term','launcher':'/usr/bin/yuos-term'}\n"
             "else:raise SystemExit(99)\n"
             "if (root/'wrong-target').exists():data['app_id']='com.yuos.Edit'\n"
             "print(json.dumps({'wire_version':1,'ok':True,'data':data}))\n"
@@ -70,7 +70,7 @@ def main():
             "--ro-bind", str(broker), "/usr/local/bin/yu",
             "--ro-bind", str(child), "/usr/bin/fixture-command",
             "--setenv", "YUOS_MCP_SERVER", "1",
-            "--setenv", "YUOS_APP_MANIFEST", "/usr/lib/yuos/apps/cosmic-term/app.json",
+            "--setenv", "YUOS_APP_MANIFEST", "/usr/lib/yuos/apps/yuos-term/app.json",
             "--setenv", "YUOS_DATA_DIR", namespace + "/data",
             "--setenv", "YUOS_SESSION", "worker-session",
             "--setenv", "HOME", namespace + "/owner",
@@ -81,7 +81,7 @@ def main():
             "--setenv", "PATH", "/usr/bin",
             "--setenv", "DISPLAY", "", "--setenv", "WAYLAND_DISPLAY", "",
             "--", str(Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else
-                       ROOT / "build/native-target/debug/cosmic-term"),
+                       ROOT / "build/native-target/debug/yuos-term"),
         ]
         process = subprocess.Popen(
             command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,

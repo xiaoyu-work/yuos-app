@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Displays
+Comment=Manage display configuration settings.
+Type=Application
+Exec=yuos-settings displays
+Terminal=false
+Categories=YuOS
+Keywords=Yu OS;Display;
+NoDisplay=true
+OnlyShowIn=COSMIC
+Icon=preferences-displays
+StartupNotify=true

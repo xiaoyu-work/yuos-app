@@ -1,16 +1,16 @@
 # Editor Product
 
-Own the complete `cosmic-edit` native UI, MCP handlers, AI presentation,
+Own the complete `yuos-edit` native UI, MCP handlers, AI presentation,
 resources, translations, build inputs and descriptor.
 
 | Path | Responsibility |
 | --- | --- |
-| `apps/cosmic-edit/app.json` | Seven tools, exact file scopes, fixed desktop launch and AI budget |
-| `native/cosmic-edit/src/main.rs` | Native editor UI and unsaved-buffer AI requests |
-| `native/cosmic-edit/src/cli.rs`, `native/cosmic-edit/test/unit/cli.rs` | OS-native startup paths and bounded GUI argv regressions |
-| `native/cosmic-edit/src/mcp.rs` | Authenticated MCP handlers |
-| `native/cosmic-edit/src/yuos_glue/ai.rs` | Shared SDK AI requests; document content remains untrusted |
-| `native/cosmic-edit/test/unit/mcp.rs` | Handler and UI AI regression with fake OS services |
+| `apps/yuos-edit/app.json` | Seven tools, exact file scopes, fixed desktop launch and AI budget |
+| `native/yuos-edit/src/main.rs` | Native editor UI and unsaved-buffer AI requests |
+| `native/yuos-edit/src/cli.rs`, `native/yuos-edit/test/unit/cli.rs` | OS-native startup paths and bounded GUI argv regressions |
+| `native/yuos-edit/src/mcp.rs` | Authenticated MCP handlers |
+| `native/yuos-edit/src/yuos_glue/ai.rs` | Shared SDK AI requests; document content remains untrusted |
+| `native/yuos-edit/test/unit/mcp.rs` | Handler and UI AI regression with fake OS services |
 | `native/test_process.py` | Real binary stdio authentication and service-error coverage |
 | `native/PROVENANCE.md` | Fork origins and preserved dependency boundary |
 
@@ -22,7 +22,7 @@ Interactive reload/save and New Window use controlled filesystem and fixed
 desktop services instead of the Files/Terminal Apps. Hot-path direct reads
 remain inside the common sandbox. A denied save stays unsaved and cannot retry
 through App-owned `pkexec`/`tee`; authority and consent stay OS-owned.
-The existing git-pinned `cosmic-files` library is a file chooser dependency,
+The existing git-pinned `yuos-files` library is a file chooser dependency,
 not invocation or migration of the Files App.
 The coordinated 0.2.1 GUI requires only owner-relative Home metadata for its
 file chooser, with separate protected owner/window browsing consent. Content
@@ -88,8 +88,8 @@ actual lifetime. Only unmanaged Unix launches retain upstream daemonization;
 this mode choice grants no authority.
 The included Rust parser tests use the `cli::tests::` filter.
 
-`native_payload` prepares the real `bin/cosmic-edit` for both signed primary
+`native_payload` prepares the real `bin/yuos-edit` for both signed primary
 and MCP entries, preserving resources/licenses. The legacy command enters
-`yu app cosmic-edit --gui`; file arguments remain forwarded, not silently
+`yu app yuos-edit --gui`; file arguments remain forwarded, not silently
 discarded or executed outside the Host. Native argv/resource admission remains
 gated as described in [native payloads](../../docs/native-payloads.md).

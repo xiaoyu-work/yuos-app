@@ -1,0 +1,11 @@
+/.cargo/
+/debian/*debhelper*
+/debian/yuos-term.substvars
+/debian/yuos-term/
+/debian/files
+/target/
+/vendor.tar
+/vendor/
+/.direnv/
+/.idea/
+nohup.out

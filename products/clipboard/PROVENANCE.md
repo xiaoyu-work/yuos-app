@@ -1,9 +1,9 @@
 # Clipboard provenance
 
 The `panel-clipboard` launcher, manifest and complete native
-`claw-applet-clipboard` library were moved from Claw OS commit
+`yuos-applet-clipboard` library were moved from Yu OS commit
 `53ea0ff7aa9f8ff858588deab6dae1fec58cdee8`.
-The native code is a GPL-3.0-only Claw OS addition to its COSMIC applets fork,
+The native code is a GPL-3.0-only Yu OS addition to its COSMIC applets fork,
 originally based on `pop-os/cosmic-applets` commit `89a149034d06`.
 The original GPL license is preserved verbatim in [`native/LICENSE`](native/LICENSE),
 along with source SPDX notices.
@@ -21,5 +21,5 @@ Native development uses only the immutable shared toolkit source specified in
 through [`tools/native_build.py`](../../tools/native_build.py) and the original
 [toolkit patches](../../tools/native-patches.toml), carried by the standalone
 manifest. Installed identity, data and grants remain unchanged. The independent
-native App package requires `claw-os-applet-services-v1 (= 1)` and contains its
+native App package requires `yuos-applet-services-v1 (= 1)` and contains its
 actual compiled binary and resources, not an OS shell symlink.

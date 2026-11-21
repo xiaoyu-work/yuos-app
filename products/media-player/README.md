@@ -1,14 +1,14 @@
 # Media Player
 
-The complete native `cosmic-player` product: the original GStreamer video/audio
+The complete native `yuos-player` product: the original GStreamer video/audio
 UI, navigation, repeat/seek/volume/subtitle controls, thumbnailer, portal
 integration, 72 locales, resources and seven MCP tools.
 
 UI and MCP operate the same live native playback session. MCP calls the
 versioned OS `system.media-player.control` service using the installed
 `/usr/local/bin/yu`, not another App or a direct session bus. Status requires
-`desktop.media.observe:cosmic-player`; the six controls require
-`desktop.media.control:cosmic-player`. Neither grant implies the other.
+`desktop.media.observe:yuos-player`; the six controls require
+`desktop.media.control:yuos-player`. Neither grant implies the other.
 Both require explicit consent and can be revoked through Settings.
 
 The OS authenticates the owner, installed native executable, PID and unique

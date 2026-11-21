@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Dock
+Comment=An optional bar for apps and applets.
+Type=Application
+Exec=yuos-settings dock
+Terminal=false
+Categories=YuOS
+Keywords=Yu OS;Dock;Panel;Applet
+NoDisplay=true
+OnlyShowIn=COSMIC
+Icon=preferences-dock
+StartupNotify=true

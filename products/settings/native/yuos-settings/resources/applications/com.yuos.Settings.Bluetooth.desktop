@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Bluetooth
+Comment=Manage Bluetooth devices.
+Type=Application
+Exec=yuos-settings bluetooth
+Terminal=false
+Categories=YuOS
+Keywords=Yu OS;Bluetooth;
+NoDisplay=true
+OnlyShowIn=COSMIC
+Icon=preferences-bluetooth
+StartupNotify=true

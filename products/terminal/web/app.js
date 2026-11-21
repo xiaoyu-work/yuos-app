@@ -3,7 +3,7 @@ YuOsApp.ready.then((app) => {
   const ui = YuOsUi;
   const $ = (selector) => document.querySelector(selector);
   const has = (command) => Boolean(YuOsApp.tool(app, command));
-  const native = app.id === "cosmic-term";
+  const native = app.id === "yuos-term";
   let busy = false;
   let jobs = [];
   let jobsGeneration = 0;

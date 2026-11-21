@@ -134,7 +134,7 @@ jobs:
           fi
           python3 tools/native_build.py notifications build
           cargo check --locked --manifest-path build/notifications-native/Cargo.toml \
-            --target-dir build/native-target -p cosmic-notifications --no-default-features
+            --target-dir build/native-target -p yuos-notifications --no-default-features
           python3 products/notifications/native/test_process.py
       - name: Build and exercise native Media Player executable
         if: matrix.product == 'media-player'

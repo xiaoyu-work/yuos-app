@@ -41,7 +41,7 @@ def receive(stream, size):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--binary", type=Path, default=ROOT / "build/native-target/debug/cosmic-notifications")
+    parser.add_argument("--binary", type=Path, default=ROOT / "build/native-target/debug/yuos-notifications")
     parser.add_argument("--source", type=Path, default=ROOT / "build/notifications-native")
     parser.add_argument("--yuos-binary", type=Path)
     parser.add_argument("--fixture-root", type=Path, default=ROOT / "build/nf-process")
@@ -60,26 +60,26 @@ def main():
     calls, failures = [], []
     try:
         installed = fixture / "installed"
-        stage("notifications", installed, ["cosmic-notifications"])
+        stage("notifications", installed, ["yuos-notifications"])
         native = options.source.resolve()
         installation = subprocess.run([
             "just", "--justfile", str(native / "justfile"), f"rootdir={installed}",
             f"bin-src={options.binary.resolve()}", "prefix=/usr", "install",
         ], capture_output=True, text=True)
         assert installation.returncode == 0, installation.stderr
-        binary = installed / "usr/bin/cosmic-notifications"
-        manifest = installed / "usr/lib/yuos/apps/cosmic-notifications/app.json"
+        binary = installed / "usr/bin/yuos-notifications"
+        manifest = installed / "usr/lib/yuos/apps/yuos-notifications/app.json"
         assert binary.stat().st_mode & 0o777 == 0o755
         assert binary.read_bytes() == options.binary.read_bytes()
-        assert manifest.read_bytes() == (ROOT / "products/notifications/apps/cosmic-notifications/app.json").read_bytes()
+        assert manifest.read_bytes() == (ROOT / "products/notifications/apps/yuos-notifications/app.json").read_bytes()
         assert {str(path.relative_to(installed)) for path in installed.rglob("*") if path.is_file()} == {
-            "usr/bin/cosmic-notifications", "usr/lib/yuos/apps/cosmic-notifications/app.json",
-            "usr/lib/yuos/apps/cosmic-notifications/web-ui.json",
-            "usr/lib/yuos/apps/cosmic-notifications/web/index.html",
-            "usr/lib/yuos/apps/cosmic-notifications/web/app.js",
-            "usr/lib/yuos/apps/cosmic-notifications/web/shared/client.js",
-            "usr/lib/yuos/apps/cosmic-notifications/web/shared/ui.js",
-            "usr/lib/yuos/apps/cosmic-notifications/web/shared/ui.css",
+            "usr/bin/yuos-notifications", "usr/lib/yuos/apps/yuos-notifications/app.json",
+            "usr/lib/yuos/apps/yuos-notifications/web-ui.json",
+            "usr/lib/yuos/apps/yuos-notifications/web/index.html",
+            "usr/lib/yuos/apps/yuos-notifications/web/app.js",
+            "usr/lib/yuos/apps/yuos-notifications/web/shared/client.js",
+            "usr/lib/yuos/apps/yuos-notifications/web/shared/ui.js",
+            "usr/lib/yuos/apps/yuos-notifications/web/shared/ui.css",
         }
 
         listener = socket.socket(socket.AF_UNIX)
@@ -185,12 +185,12 @@ def main():
             "--proc", "/proc", "--dev", "/dev", "--tmpfs", "/run", "--tmpfs", "/work",
             "--dir", "/run/yuos",
             "--ro-bind", str(options.yu_binary.resolve() if options.yu_binary else cli), "/usr/local/bin/yu",
-            "--ro-bind", str(binary), "/work/cosmic-notifications",
+            "--ro-bind", str(binary), "/work/yuos-notifications",
             "--ro-bind", str(manifest), "/work/app.json",
             "--ro-bind", str(fixture / "broker.sock"), "/run/yuos/yuosd.sock", "--chdir", "/work",
         ]
         for name, value in {
-            "YUOS_MCP_SERVER": "1", "YUOS_APP_ID": "cosmic-notifications",
+            "YUOS_MCP_SERVER": "1", "YUOS_APP_ID": "yuos-notifications",
             "YUOS_APP_MANIFEST": "/work/app.json", "YUOS_SESSION": "worker-session",
             "YUOS_WORKER_SANDBOX": "1", "YUOS_RUNTIME_DIR": "/run/yuos",
             "YUOS_DATA_DIR": "/work/data", "HOME": "/work",
@@ -198,7 +198,7 @@ def main():
             "TMPDIR": "/work", "PATH": "/usr/sbin:/usr/bin:/sbin:/bin",
         }.items():
             command += ["--setenv", name, value]
-        process = subprocess.Popen([*command, "--", "/work/cosmic-notifications"],
+        process = subprocess.Popen([*command, "--", "/work/yuos-notifications"],
                                    stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE, text=True)
         processes.append(process)
@@ -259,7 +259,7 @@ def main():
             ]:
                 probe = subprocess.run([
                     *command, "--setenv", "YUOS_APP_GUI", gui,
-                    "--", "/work/cosmic-notifications", *arguments,
+                    "--", "/work/yuos-notifications", *arguments,
                 ], input=discovery, capture_output=True, text=True, timeout=15)
                 assert probe.returncode == 0, (gui, arguments, probe.stderr)
                 messages = [json.loads(value) for value in probe.stdout.splitlines()]
@@ -272,9 +272,9 @@ def main():
         refused = subprocess.run([
             *command, "--ro-bind", str(fixture / "wrong.json"), "/work/wrong.json",
             "--setenv", "YUOS_APP_MANIFEST", "/work/wrong.json",
-            "--setenv", "YUOS_APP_GUI", "1", "--", "/work/cosmic-notifications", "--gui", "--help",
+            "--setenv", "YUOS_APP_GUI", "1", "--", "/work/yuos-notifications", "--gui", "--help",
         ], input="", capture_output=True, text=True, timeout=10)
-        assert refused.returncode != 0 and "cosmic-notifications" in refused.stderr
+        assert refused.returncode != 0 and "yuos-notifications" in refused.stderr
         denied(request("tools/call", {"name": "notify.post", "arguments": {"summary": "No context"}}))
         for arguments in [
             {}, {"summary": ""}, {"summary": " "}, {"summary": "界" * 241},

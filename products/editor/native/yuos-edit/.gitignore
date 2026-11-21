@@ -1,0 +1,8 @@
+/.cargo/
+/debian/*debhelper*
+/debian/yuos-edit.substvars
+/debian/yuos-edit/
+/debian/files
+/target/
+/vendor.tar
+/vendor/

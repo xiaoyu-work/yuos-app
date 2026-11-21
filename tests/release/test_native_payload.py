@@ -261,7 +261,7 @@ def test_native_plan_refuses_bad_explicit_manifest_entries(entry, tmp_path, monk
 
 
 @pytest.mark.parametrize("path", (
-    "usr/share/polkit-1/rules.d/cosmic-settings.rules",
+    "usr/share/polkit-1/rules.d/yuos-settings.rules",
     "usr/share/polkit-1/actions/com.yuos.Settings.Users.policy",
     "etc/yuos/permissions.json",
 ))
@@ -280,20 +280,20 @@ def test_settings_authority_payload_is_rejected_not_stripped_or_exempted(path, i
 def test_files_auxiliary_elf_exports_only_its_explicit_common_host_entry(installer, tmp_path):
     selected, installed = installer("files")
     result = native_payload.prepare(selected, installed, tmp_path / "app", ARCHITECTURE)
-    assert (result.root / "bin/cosmic-files-applet").read_bytes() == (
-        installed / "usr/bin/cosmic-files-applet"
+    assert (result.root / "bin/yuos-files-applet").read_bytes() == (
+        installed / "usr/bin/yuos-files-applet"
     ).read_bytes()
-    assert result.entrypoints == ("bin/cosmic-files", "bin/cosmic-files-applet")
+    assert result.entrypoints == ("bin/yuos-files", "bin/yuos-files-applet")
     desktop = installed / "usr/share/applications/files-applet.desktop"
     desktop.parent.mkdir()
-    desktop.write_text("[Desktop Entry]\nExec=cosmic-files-applet\nTryExec=/usr/bin/cosmic-files-applet\n")
+    desktop.write_text("[Desktop Entry]\nExec=yuos-files-applet\nTryExec=/usr/bin/yuos-files-applet\n")
     destination = tmp_path / "installed"
     binaries = native_payload.install(selected, installed, destination, ARCHITECTURE)
     assert set(binaries) == {destination / selected.installed_app / entry for entry in result.entrypoints}
-    assert (destination / "usr/bin/cosmic-files-applet").read_bytes() == (
-        b'#!/bin/sh\nexec /usr/local/bin/yu app cosmic-files --gui:applet "$@"\n'
+    assert (destination / "usr/bin/yuos-files-applet").read_bytes() == (
+        b'#!/bin/sh\nexec /usr/local/bin/yu app yuos-files --gui:applet "$@"\n'
     )
-    assert (destination / "usr/bin/cosmic-files").read_bytes() == native_payload.compatibility_launcher(selected)
+    assert (destination / "usr/bin/yuos-files").read_bytes() == native_payload.compatibility_launcher(selected)
     assert (destination / desktop.relative_to(installed)).read_bytes() == desktop.read_bytes()
     with pytest.raises(ValueError, match="explicitly declared GUI entry"):
         native_payload.compatibility_launcher(selected, gui_entry="unknown")
@@ -310,7 +310,7 @@ def test_auxiliary_exports_require_unique_explicit_declared_binary_binding(
         target = source / relative / "app.json"
         target.parent.mkdir(parents=True)
         shutil.copy2(product / relative / "app.json", target)
-    app = source / "apps/cosmic-files"
+    app = source / "apps/yuos-files"
     manifest = json.loads(selected.manifest_bytes)
     additional = manifest["desktop"]["entries"]
     if binding == "missing":
@@ -330,7 +330,7 @@ def test_auxiliary_exports_require_unique_explicit_declared_binary_binding(
 @pytest.mark.parametrize("failure", ("missing", "script", "wrong_architecture", "nonexecutable", "symlink"))
 def test_additional_gui_elf_is_not_a_trusted_helper(failure, installer, tmp_path):
     selected, installed = installer("files")
-    binary = installed / "usr/bin/cosmic-files-applet"
+    binary = installed / "usr/bin/yuos-files-applet"
     if failure == "missing":
         binary.unlink()
     elif failure == "script":
@@ -396,7 +396,7 @@ def test_additional_gui_declaration_cannot_authorize_dbus_activation(relative, i
     selected, installed = installer("files")
     service = installed / relative
     service.parent.mkdir(parents=True)
-    service.write_text("[D-BUS Service]\nName=org.freedesktop.FileManager1\nExec=cosmic-files-applet\n")
+    service.write_text("[D-BUS Service]\nName=org.freedesktop.FileManager1\nExec=yuos-files-applet\n")
     with pytest.raises(ValueError, match="explicit OS installation contract|authenticated Host contract"):
         native_payload.install(selected, installed, tmp_path / "rejected", ARCHITECTURE)
     assert not (tmp_path / "rejected").exists()
@@ -459,7 +459,7 @@ def test_native_builder_composes_original_installer_with_local_app_stager(app_on
 def test_native_plan_cli_does_not_build_or_fetch_and_refuses_host_output_roots():
     command = [sys.executable, ROOT / "tools/native_payload.py", "notifications"]
     result = run([*command, "--plan"])
-    assert json.loads(result.stdout)["entrypoints"] == ["bin/cosmic-notifications"]
+    assert json.loads(result.stdout)["entrypoints"] == ["bin/yuos-notifications"]
     result = run([*command, "--installed-root", "/", "--app-root", "/", "--architecture", ARCHITECTURE], check=False)
     assert result.returncode != 0
     assert b"explicit directories under build/" in result.stderr

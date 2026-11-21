@@ -1,9 +1,9 @@
 # Native Editor provenance
 
-`cosmic-edit/` preserves the complete Claw OS fork of
+`yuos-edit/` preserves the complete Yu OS fork of
 [`pop-os/cosmic-edit`](https://github.com/pop-os/cosmic-edit),
 upstream revision `7bbe82ec3f2b`, GPL-3.0-only as declared in its Cargo manifest.
-It was relocated from `claw-os/desktop/edit` at OS revision
+It was relocated from `desktop/edit` at OS revision
 `8f226f08b7e18ae476a7a5655c111d35d99be1d7`.
 The original license, copyright notices, translations, icons, screenshots,
 Debian packaging, development files and executable modes are retained.

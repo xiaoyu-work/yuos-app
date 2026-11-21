@@ -1,0 +1,270 @@
+{
+  "id": "yuos-player",
+  "version": "0.1.0",
+  "schema_version": 2,
+  "name": {
+    "en": "Media Player"
+  },
+  "summary": {
+    "en": "Read and control this owner's running Media Player through the OS playback service."
+  },
+  "icon": "🎵",
+  "runtime": "binary",
+  "entry": "bin/yuos-player",
+  "desktop": {
+    "exec": "--gui",
+    "needs": [
+      {
+        "verb": "fs.meta",
+        "scope": {"kind": "owner-path", "path": "**"},
+        "why": {"en": "Browse Home media names and metadata in this player window; file content and thumbnail output need separate protected selections."}
+      },
+      {
+        "verb": "device.audio",
+        "scope": {"kind": "fixed", "scope": {"kind": "name", "value": "output"}},
+        "why": {"en": "Send playback audio to the OS-owned output-only PCM service, without microphone or raw PipeWire access."}
+      },
+      {
+        "verb": "ui.prompt",
+        "scope": {"kind": "fixed", "scope": {"kind": "wild"}},
+        "why": {"en": "Open the OS-owned human file chooser; its selected filename never grants file-content access."}
+      }
+    ],
+    "optional_needs": [
+      {
+        "verb": "fs.read",
+        "scope": {"kind": "owner-path", "path": "**"},
+        "why": {"en": "Read the media you separately select for this player window."}
+      },
+      {
+        "verb": "fs.write",
+        "scope": {"kind": "owner-path", "path": "**"},
+        "why": {"en": "Save a thumbnail through a separate protected output selection."}
+      }
+    ]
+  },
+  "mcp": {
+    "entry": "bin/yuos-player",
+    "transport": "stdio",
+    "lifecycle": "lazy",
+    "tools": [
+      {
+        "name": "player.play",
+        "summary": {
+          "en": "Resume playback in Media Player."
+        },
+        "args": [],
+        "needs": [
+          {
+            "verb": "desktop.media.control",
+            "scope": {
+              "kind": "fixed",
+              "scope": {
+                "kind": "name",
+                "value": "yuos-player"
+              }
+            },
+            "why": {
+              "en": "Control playback in this owner's native Media Player."
+            }
+          }
+        ],
+        "effects": [
+          {
+            "kind": "update",
+            "label": {
+              "en": "Resume playback in Media Player."
+            },
+            "recovery": "unknown"
+          }
+        ]
+      },
+      {
+        "name": "player.pause",
+        "summary": {
+          "en": "Pause playback in Media Player."
+        },
+        "args": [],
+        "needs": [
+          {
+            "verb": "desktop.media.control",
+            "scope": {
+              "kind": "fixed",
+              "scope": {
+                "kind": "name",
+                "value": "yuos-player"
+              }
+            },
+            "why": {
+              "en": "Control playback in this owner's native Media Player."
+            }
+          }
+        ],
+        "effects": [
+          {
+            "kind": "update",
+            "label": {
+              "en": "Pause playback in Media Player."
+            },
+            "recovery": "unknown"
+          }
+        ]
+      },
+      {
+        "name": "player.stop",
+        "summary": {
+          "en": "Stop Media Player playback and reset seekable tracks."
+        },
+        "args": [],
+        "needs": [
+          {
+            "verb": "desktop.media.control",
+            "scope": {
+              "kind": "fixed",
+              "scope": {
+                "kind": "name",
+                "value": "yuos-player"
+              }
+            },
+            "why": {
+              "en": "Control playback in this owner's native Media Player."
+            }
+          }
+        ],
+        "effects": [
+          {
+            "kind": "update",
+            "label": {
+              "en": "Stop Media Player playback and reset seekable tracks."
+            },
+            "recovery": "unknown"
+          }
+        ]
+      },
+      {
+        "name": "player.next",
+        "summary": {
+          "en": "Skip to the next track in Media Player."
+        },
+        "args": [],
+        "needs": [
+          {
+            "verb": "desktop.media.control",
+            "scope": {
+              "kind": "fixed",
+              "scope": {
+                "kind": "name",
+                "value": "yuos-player"
+              }
+            },
+            "why": {
+              "en": "Control playback in this owner's native Media Player."
+            }
+          }
+        ],
+        "effects": [
+          {
+            "kind": "update",
+            "label": {
+              "en": "Skip to the next track in Media Player."
+            },
+            "recovery": "unknown"
+          }
+        ]
+      },
+      {
+        "name": "player.previous",
+        "summary": {
+          "en": "Return to the previous track in Media Player."
+        },
+        "args": [],
+        "needs": [
+          {
+            "verb": "desktop.media.control",
+            "scope": {
+              "kind": "fixed",
+              "scope": {
+                "kind": "name",
+                "value": "yuos-player"
+              }
+            },
+            "why": {
+              "en": "Control playback in this owner's native Media Player."
+            }
+          }
+        ],
+        "effects": [
+          {
+            "kind": "update",
+            "label": {
+              "en": "Return to the previous track in Media Player."
+            },
+            "recovery": "unknown"
+          }
+        ]
+      },
+      {
+        "name": "player.toggle",
+        "summary": {
+          "en": "Toggle play and pause in Media Player."
+        },
+        "args": [],
+        "needs": [
+          {
+            "verb": "desktop.media.control",
+            "scope": {
+              "kind": "fixed",
+              "scope": {
+                "kind": "name",
+                "value": "yuos-player"
+              }
+            },
+            "why": {
+              "en": "Control playback in this owner's native Media Player."
+            }
+          }
+        ],
+        "effects": [
+          {
+            "kind": "update",
+            "label": {
+              "en": "Toggle play and pause in Media Player."
+            },
+            "recovery": "unknown"
+          }
+        ]
+      },
+      {
+        "name": "player.status",
+        "summary": {
+          "en": "Read live Media Player playback status and current track metadata."
+        },
+        "args": [],
+        "needs": [
+          {
+            "verb": "desktop.media.observe",
+            "scope": {
+              "kind": "fixed",
+              "scope": {
+                "kind": "name",
+                "value": "yuos-player"
+              }
+            },
+            "why": {
+              "en": "Read playback status and track metadata from this owner's native Media Player."
+            }
+          }
+        ],
+        "effects": [
+          {
+            "kind": "read",
+            "label": {
+              "en": "Read live Media Player playback status and current track metadata."
+            },
+            "recovery": "unknown"
+          }
+        ]
+      }
+    ]
+  }
+}

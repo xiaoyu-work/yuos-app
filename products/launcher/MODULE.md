@@ -10,8 +10,8 @@ Own the Python `launcher` App's five MCP tools and the complete native
 | `apps/launcher/server.py` | Direct SDK list/find/open/recent/is-running handlers |
 | `apps/launcher/test_main.py` | Desktop parsing, scopes, URI/path safety, broker errors, recent state and SDK dispatch |
 | `apps/yuos-launcher/` | Signed native identity, permissions and authenticated adapter contracts |
-| `native/cosmic-launcher/` | Complete GPL UI, compiled-in MCP adapter, upstream packaging/resources and Rust tests |
-| `native/cosmic-launcher/src/argparse.rs`, `native/cosmic-launcher/test/unit/argparse.rs` | Native subcommands, bounded Host GUI selector adaptation and parser regressions |
+| `native/yuos-launcher/` | Complete GPL UI, compiled-in MCP adapter, upstream packaging/resources and Rust tests |
+| `native/yuos-launcher/src/argparse.rs`, `native/yuos-launcher/test/unit/argparse.rs` | Native subcommands, bounded Host GUI selector adaptation and parser regressions |
 | `native/PROVENANCE.md` | Source origin, license and shared OS backend ownership |
 | `package.json` | Product-owned staging and test inputs |
 

@@ -1,7 +1,7 @@
 # Native Capture provenance
 
 `cosmic-screenshot/` preserves every native file from
-`claw-os/desktop/screenshot` at
+the OS `desktop/screenshot` directory at
 `59aa74cdaef9d0408dc3ac27ffc7116fb7256b23`:
 the standalone Cargo manifest/lock and release profile, complete portal client
 and localization code, 72 Fluent locales, desktop entry, seven raster icons,

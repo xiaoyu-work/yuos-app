@@ -15,7 +15,7 @@ public SDK, AI consent/budget/provider/audit authority and memory remain OS-owne
 
 The parser/converter remains the single
 [`products/files/python/yuos_files/document.py`](../../products/files/python/yuos_files/document.py)
-implementation. No call to `fs`, `docs` or `cosmic-files` is involved. Tests
+implementation. No call to `fs`, `docs` or `yuos-files` is involved. Tests
 resolve its named export and the immutable OS SDK/runtime dependency, never a
 sibling checkout. Doc-only staging installs `doc` and `yuos_files`, not the
 Files Apps or any native UI. Files/Doc co-staging refuses conflicting libraries.

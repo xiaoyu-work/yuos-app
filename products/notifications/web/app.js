@@ -3,7 +3,7 @@ YuOsApp.ready.then((app) => {
   const ui = YuOsUi;
   const $ = (selector) => document.querySelector(selector);
   const has = (command) => Boolean(YuOsApp.tool(app, command));
-  const native = app.id === "cosmic-notifications";
+  const native = app.id === "yuos-notifications";
   const durableId = /^notif-[a-fA-F0-9]{32}$/;
   let busy = false;
   let records = [];

@@ -385,7 +385,7 @@ Terminal retains
 its original upstream toolkit/file-chooser and renderer graph. Native MCP
 embeds the canonical Terminal command library for bounded run/PATH lookup;
 native launch and UI snapshots go through controlled OS services, not Apps.
-`cosmic-term` and `exec` retain independent grants and process state, and caller
+`yuos-term` and `exec` retain independent grants and process state, and caller
 metadata never substitutes the worker's authenticated broker session.
 Files retains its
 original locked toolkit patches and workspace, including the applet executable.
@@ -393,7 +393,7 @@ Its private native bridge embeds the canonical product filesystem/Recoll and
 document parsing sources, calling only system-installed SDK/runtime authority.
 The pure document parsing/conversion library also ships in the headless Files package
 for the Document Engine capability client; native builds embed the same source rather
-than loading mutable App scripts. Summary memory belongs to `cosmic-files`,
+than loading mutable App scripts. Summary memory belongs to `yuos-files`,
 metadata's tag sidecar needs an exact parent read, and reveal is the fixed OS
 Files target. Existing UI hot-path/cache/backend consolidation is separate.
 Editor retains its original

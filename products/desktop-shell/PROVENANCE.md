@@ -30,7 +30,7 @@ or Git LFS pointer substitutions.
 
 Existing whitespace in imported upstream files is retained through file-scoped
 `.gitattributes` exceptions rather than rewriting the imported source or
-license text. Claw-owned files retain the normal repository checks.
+license text. Yu OS-owned files retain the normal repository checks.
 
 The complete 590-file Quickshell source is bundled with the Desktop Shell
 product, not supplied by an OS-private runtime. Its narrow entry adapter consumes
@@ -40,16 +40,16 @@ cpptrace build dependency is pinned to the exact 1.0.4 commit. Rendering and AI
 authority are not moved into the engine. Quickshell, Qt and other dependencies
 retain their original licenses; `native/LICENSE` preserves the shell's GPL terms.
 
-Subsequent Claw modifications remain subject to the applicable source
+Subsequent Yu OS modifications remain subject to the applicable source
 licenses. Distribution must preserve notices and provide corresponding source
 and other required materials; importing the source does not grant trademark
 rights or permission to publish a release.
 
-Claw modified the Shell presentation on 2026-11-19: the Quiet design replaces
+Yu OS modified the Shell presentation on 2026-11-19: the Quiet design replaces
 the upstream left bar and integrated launcher. The retained Caelestia code
 and its adaptations are distributed under the original GPL-3.0 terms.
 
-The Claw CMake adapter builds only libcava's original `cavacore.c` into the
+The Yu OS CMake adapter builds only libcava's original `cavacore.c` into the
 native UI plugin, with FFTW. It does not build the terminal program or its raw
 audio-input backends, download a library during configure, or substitute a
 different Cava implementation. Retained library files and licenses keep their

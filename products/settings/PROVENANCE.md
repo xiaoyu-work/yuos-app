@@ -1,7 +1,7 @@
 # Settings provenance
 
 The complete native workspace in `native/cosmic-settings` was moved from
-`xiaoyu-work/claw-os` commit `0323fb58e9e668dc0447bd966830ca1f6c5a4de9`,
+`xiaoyu-work/Yu-OS` commit `0323fb58e9e668dc0447bd966830ca1f6c5a4de9`,
 formerly `desktop/settings`. Its upstream is
 [`pop-os/cosmic-settings`](https://github.com/pop-os/cosmic-settings), recorded
 upstream revision `703a934b096b` in the OS provenance table.

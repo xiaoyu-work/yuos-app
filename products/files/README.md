@@ -16,14 +16,14 @@ and configuration. It uses the owner's existing `~/.recoll` state, with
 Recoll remains an external system dependency; its background index service is
 OS-owned. The product does not duplicate that service or add semantic search.
 
-The complete native `cosmic-files` UI, file-chooser library and
-`cosmic-files-applet` companion now live under `native/cosmic-files`.
+The complete native `yuos-files` UI, file-chooser library and
+`yuos-files-applet` companion now live under `native/yuos-files`.
 Their source, assets, localization, licenses and original locked toolkit
 graph are preserved. UI and MCP share embedded filesystem/Recoll business
 libraries, shared multi-format document parsing and the SDK AI gate, never
 another App. Native reveal uses the OS's fixed `com.yuos.Files` target.
 Metadata explicitly requires the sibling tag directory read scope; summary
-memory uses only `self:cosmic-files`, not another App's namespace.
+memory uses only `self:yuos-files`, not another App's namespace.
 
 The shared parser is staged into the Agent package as `yuos_files.document`
 for the remaining Document App too. Native binaries embed it at build time.

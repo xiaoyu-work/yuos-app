@@ -3,7 +3,7 @@
 The native source is [cosmic-screenshot](native/cosmic-screenshot/README.md),
 forked from [pop-os/cosmic-screenshot](https://github.com/pop-os/cosmic-screenshot)
 at `b917c631d155`. The complete 99 tracked native files and two App descriptor
-files were relocated from `claw-os` revision
+files were relocated from `xiaoyu-work/Yu-OS` revision
 `59aa74cdaef9d0408dc3ac27ffc7116fb7256b23`.
 See [native/PROVENANCE.md](native/PROVENANCE.md).
 

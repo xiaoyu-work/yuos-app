@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Panel
+Comment=Primary system bar for menus and applets.
+Type=Application
+Exec=yuos-settings panel
+Terminal=false
+Categories=YuOS
+Keywords=Yu OS;Panel;Applet
+NoDisplay=true
+OnlyShowIn=COSMIC
+Icon=preferences-panel
+StartupNotify=true

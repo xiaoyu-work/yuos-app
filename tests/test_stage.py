@@ -165,7 +165,7 @@ def test_calendar_stage_is_separate_and_preserves_its_manifest(tmp_path):
 
 def test_files_stage_preserves_the_direct_mcp_contract(tmp_path):
     assert "files" in stage.products()
-    assert stage.stage("files", tmp_path) == ["fs", "docs", "cosmic-files"]
+    assert stage.stage("files", tmp_path) == ["fs", "docs", "yuos-files"]
     for app_id in ("fs", "docs"):
         app = tmp_path / "usr/lib/yuos/apps" / app_id
         source = ROOT / "products/files/apps" / app_id
@@ -475,7 +475,7 @@ def test_shared_library_costages_once_without_merging_trees(tmp_path, order):
         stage.stage(name, tmp_path, kind="capability" if name == "document-engine" else "product")
     assert sorted(path.name for path in (tmp_path / "usr/lib/yuos/python").iterdir()) == ["yuos_files"]
     assert sorted(path.name for path in (tmp_path / "usr/lib/yuos/apps").iterdir()) == [
-        "cosmic-files", "doc", "docs", "fs",
+        "doc", "docs", "fs", "yuos-files",
     ]
 
 
@@ -743,7 +743,7 @@ def test_normal_staging_never_overwrites_a_conflicting_installed_asset(tmp_path)
 
 def test_terminal_stage_preserves_exec_without_process_services(tmp_path):
     assert "terminal" in stage.products()
-    assert stage.stage("terminal", tmp_path) == ["exec", "cosmic-term"]
+    assert stage.stage("terminal", tmp_path) == ["exec", "yuos-term"]
     app = tmp_path / "usr/lib/yuos/apps/exec"
     source = ROOT / "products/terminal/apps/exec"
     for filename in ("app.json", "main.py", "server.py"):
@@ -756,7 +756,7 @@ def test_terminal_stage_preserves_exec_without_process_services(tmp_path):
 @pytest.mark.parametrize(("product", "app_ids"), [
     ("containers", ["container-manager"]),
     ("backup-recovery", ["backup-center", "system-snapshot"]),
-    ("store", ["pkg", "cosmic-store"]),
+    ("store", ["pkg", "yuos-store"]),
     ("diagnostics", ["hardware-center", "crash-doctor", "netdiag"]),
     ("storage", ["storage-manager"]),
     ("security", ["security-center", "firewall-manager", "usb-guard"]),
@@ -764,7 +764,7 @@ def test_terminal_stage_preserves_exec_without_process_services(tmp_path):
     ("events-audit", ["event-center", "log"]),
     ("launcher", ["launcher", "yuos-launcher"]),
     ("clipboard", ["clipboard-manager", "panel-clipboard"]),
-    ("settings", ["accessibility-manager", "audio-manager", "bluetooth-manager", "camera-manager", "display-manager", "desktop-manager", "location-manager", "network-manager", "power-manager", "printer-manager", "user-manager", "cosmic-settings"]),
+    ("settings", ["accessibility-manager", "audio-manager", "bluetooth-manager", "camera-manager", "display-manager", "desktop-manager", "location-manager", "network-manager", "power-manager", "printer-manager", "user-manager", "yuos-settings"]),
 ])
 def test_broker_products_stage_without_os_services(tmp_path, product, app_ids):
     assert product in stage.products()
@@ -772,7 +772,7 @@ def test_broker_products_stage_without_os_services(tmp_path, product, app_ids):
     for app_id in app_ids:
         app = tmp_path / "usr/lib/yuos/apps" / app_id
         source = ROOT / "products" / product / "apps" / app_id
-        filenames = (("app.json",) if app_id in ("yuos-launcher", "cosmic-store", "cosmic-settings", "panel-clipboard") else
+        filenames = (("app.json",) if app_id in ("yuos-launcher", "yuos-store", "yuos-settings", "panel-clipboard") else
                      ("app.json", "main.py", "server.py"))
         for filename in filenames:
             assert (app / filename).read_bytes() == (source / filename).read_bytes()

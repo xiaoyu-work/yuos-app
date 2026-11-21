@@ -7,7 +7,7 @@ YuOsApp.ready.then((app) => {
     "accessibility-manager": "Accessibility", "audio-manager": "Audio", "bluetooth-manager": "Bluetooth",
     "camera-manager": "Camera", "display-manager": "Displays", "desktop-manager": "Desktop Windows",
     "location-manager": "Location", "network-manager": "Network", "power-manager": "Power",
-    "printer-manager": "Printers", "user-manager": "Users and Groups", "cosmic-settings": "Settings and App Permissions",
+    "printer-manager": "Printers", "user-manager": "Users and Groups", "yuos-settings": "Settings and App Permissions",
   };
   let busy = false;
   let reviewing = false;
@@ -545,7 +545,7 @@ YuOsApp.ready.then((app) => {
       if (typeof selectedPage !== "string" || !selectedPage) throw new Error("Select a page returned by the native catalog first.");
       review("open", { page: selectedPage }, "Open native Settings page", "Activate only the fixed OS Settings target. Native page and launch admission can still fail; no device operation is performed by selection.");
     });
-    button(pages, "Open native Settings...", () => review("open", {}, "Open native Settings", "Explicitly launch the fixed native Settings target under proc.spawn:cosmic-settings."));
+    button(pages, "Open native Settings...", () => review("open", {}, "Open native Settings", "Explicitly launch the fixed native Settings target under proc.spawn:yuos-settings."));
 
     const catalog = section("Verified installed Apps", "Permission management uses sys.permissions:manage only. Inspecting another App's declarations never invokes that App or borrows its grants.");
     const catalogEvidence = ui.node("div", null, { class: "stack" }); catalog.append(catalogEvidence);
@@ -624,7 +624,7 @@ YuOsApp.ready.then((app) => {
     case "power-manager": power(); break;
     case "printer-manager": printers(); break;
     case "user-manager": users(); break;
-    case "cosmic-settings": nativeSettings(); break;
+    case "yuos-settings": nativeSettings(); break;
     default: root.append(ui.node("p", "This identity has no supported Settings interface. No other entry's tools are exposed.", { class: "empty" }));
   }
 }).catch((error) => {

@@ -1,13 +1,13 @@
 {
-  "web_ui": {"source": "web", "apps": ["cosmic-screenshot"]},
-  "apps": ["apps/cosmic-screenshot"],
+  "web_ui": {"source": "web", "apps": ["yuos-screenshot"]},
+  "apps": ["apps/yuos-screenshot"],
   "tests": [],
-  "native": {"cosmic-screenshot": "native/cosmic-screenshot"},
+  "native": {"yuos-screenshot": "native/yuos-screenshot"},
   "native_kind": "binary",
-  "native_payload": {"app": "cosmic-screenshot", "program": "cosmic-screenshot"},
+  "native_payload": {"app": "yuos-screenshot", "program": "yuos-screenshot"},
   "native_examples": ["capture-portal-fixture"],
   "native_process_test": "native/test_process.py",
   "native_assets": {
-    "cosmic-screenshot": {"app.json": "apps/cosmic-screenshot/app.json"}
+    "yuos-screenshot": {"app.json": "apps/yuos-screenshot/app.json"}
   }
 }

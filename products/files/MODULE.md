@@ -14,11 +14,11 @@ product tests. The OS owns filesystem authority, sandbox mounts and snapshots.
 | `apps/docs/main.py`, `apps/docs/server.py` | Owner-scoped Recoll queries, indexing, status and configuration |
 | `apps/docs/test_main.py` | Canonical owner home, subprocess, config and capability regressions |
 | `package.json` | Product-owned App staging and test inputs |
-| `apps/cosmic-files/` | Seven native MCP tools and authority/staging regressions |
-| `native/cosmic-files/` | Complete native UI/library and companion executable, original toolkit graph and resources |
-| `native/cosmic-files/src/cli.rs`, `native/cosmic-files/test/unit/cli.rs` | Primary Files argv parsing and path/URI regressions |
-| `native/cosmic-files/src/yuos_glue/` | Shared product bridge, SDK AI and fixed OS reveal |
-| `native/cosmic-files/product_bridge.py` | Private compiled-in adapter over canonical filesystem/Recoll/parser libraries |
+| `apps/yuos-files/` | Seven native MCP tools and authority/staging regressions |
+| `native/yuos-files/` | Complete native UI/library and companion executable, original toolkit graph and resources |
+| `native/yuos-files/src/cli.rs`, `native/yuos-files/test/unit/cli.rs` | Primary Files argv parsing and path/URI regressions |
+| `native/yuos-files/src/yuos_glue/` | Shared product bridge, SDK AI and fixed OS reveal |
+| `native/yuos-files/product_bridge.py` | Private compiled-in adapter over canonical filesystem/Recoll/parser libraries |
 | `python/yuos_files/document.py` | Named shared descriptor-safe parsing/conversion export, also consumed by the Document Engine capability client |
 | `native/test_process.py` | Authenticated real-binary fixture against synthetic OS/model/Recoll services |
 
@@ -126,12 +126,12 @@ injected canonicalization and a real local file URL. The auxiliary applet
 and GIO examples do not use this adaptation.
 
 `native_payload` binds the default GUI, operations and MCP to the real
-`bin/cosmic-files`. `desktop.entries.applet` explicitly selects the separate
-`bin/cosmic-files-applet` with its own literal `--gui` selector, localized name
+`bin/yuos-files`. `desktop.entries.applet` explicitly selects the separate
+`bin/yuos-files-applet` with its own literal `--gui` selector, localized name
 and filesystem needs. Both are signed executable entries under the same
-`cosmic-files` identity, owner data and audit; the original separate Cargo
+`yuos-files` identity, owner data and audit; the original separate Cargo
 feature/renderer graphs remain unchanged. The compatibility applet command is
-only `yu app cosmic-files --gui:applet "$@"`; the main command is unchanged.
+only `yu app yuos-files --gui:applet "$@"`; the main command is unchanged.
 
 Each GUI declares only `fs.meta` as a required filesystem need. Content read,
 watch, write and delete are separate `desktop.optional_needs`; their acquisition

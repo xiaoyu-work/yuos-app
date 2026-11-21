@@ -1,0 +1,782 @@
+use crate::subscriptions::notifications;
+use cosmic::app::{Core, Settings};
+use cosmic::cosmic_config::{Config, CosmicConfigEntry};
+use cosmic::iced::platform_specific::runtime::wayland::layer_surface::{
+    IcedMargin, IcedOutput, SctkLayerSurfaceSettings,
+};
+use cosmic::iced::platform_specific::shell::wayland::commands::{
+    activation,
+    layer_surface::{Anchor, KeyboardInteractivity, destroy_layer_surface, get_layer_surface},
+};
+use cosmic::iced::widget::{column, rich_text, row, space};
+use cosmic::iced::window::Id as SurfaceId;
+use cosmic::iced::{self, Length, Limits, Subscription, id};
+use cosmic::surface;
+use cosmic::widget::{autosize, button, container, icon, text};
+use cosmic::{Application, Element, app::Task};
+use cosmic_notifications_config::NotificationsConfig;
+use cosmic_notifications_util::markup::html_to_spans;
+use cosmic_notifications_util::{ActionId, CloseReason, Notification};
+use cosmic_panel_config::{CosmicPanelConfig, CosmicPanelOuput, PanelAnchor};
+use iced::Alignment;
+use std::borrow::Cow;
+use std::collections::VecDeque;
+use std::time::Duration;
+use tokio::sync::mpsc;
+
+static NOTIFICATIONS_APPLET: &str = "com.yuos.AppletNotifications";
+
+pub fn run() -> cosmic::iced::Result {
+    cosmic::app::run::<YuOsNotifications>(
+        Settings::default()
+            .antialiasing(true)
+            .client_decorations(true)
+            .debug(false)
+            .default_text_size(16.0)
+            .scale_factor(1.0)
+            .no_main_window(true)
+            .exit_on_close(false),
+        (),
+    )?;
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    include!(concat!(env!("CARGO_MANIFEST_DIR"), "/test/unit/app.rs"));
+}
+
+struct YuOsNotifications {
+    core: Core,
+    active_surface: bool,
+    autosize_id: iced::id::Id,
+    window_id: SurfaceId,
+    cards: Vec<Notification>,
+    hidden: VecDeque<Notification>,
+    notifications_id: id::Id,
+    notifications_tx: Option<mpsc::Sender<notifications::Input>>,
+    config: NotificationsConfig,
+    dock_config: CosmicPanelConfig,
+    panel_config: CosmicPanelConfig,
+    anchor: Option<(Anchor, Option<String>)>,
+}
+
+#[derive(Debug, Clone)]
+enum Message {
+    ActivateNotification(u32),
+    ActivationToken(Option<String>, u32, Option<ActionId>),
+    Dismissed(u32),
+    Notification(notifications::Event),
+    Timeout(u32, std::time::SystemTime),
+    Config(NotificationsConfig),
+    PanelConfig(CosmicPanelConfig),
+    DockConfig(CosmicPanelConfig),
+    Ignore,
+    Surface(surface::Action),
+}
+
+impl YuOsNotifications {
+    fn presented(&self, id: u32) -> Task<Message> {
+        if !crate::subscriptions::managed::enabled() {
+            return Task::none();
+        }
+        let sender = self.notifications_tx.clone();
+        Task::future(async move {
+            if let Some(sender) = sender {
+                let _ = sender.send(notifications::Input::Presented(id)).await;
+            }
+            cosmic::Action::App(Message::Ignore)
+        })
+    }
+
+    fn expire(&mut self, i: u32) {
+        let Some((c_pos, _)) = self.cards.iter().enumerate().find(|(_, n)| n.id == i) else {
+            return;
+        };
+
+        let notification = self.cards.remove(c_pos);
+        self.sort_notifications();
+        self.group_notifications();
+        self.hidden.push_front(notification);
+        while self.hidden.len() > 200 {
+            if let Some(retired) = self.hidden.pop_back() {
+                self.signal_closed(retired.id, CloseReason::Expired);
+            }
+        }
+    }
+
+    fn signal_closed(&self, id: u32, reason: CloseReason) {
+        if let Some(sender) = &self.notifications_tx {
+            let sender = sender.clone();
+            tokio::spawn(async move {
+                _ = sender.send(notifications::Input::Closed(id, reason)).await;
+            });
+        }
+    }
+
+    fn close(&mut self, i: u32, reason: CloseReason) -> Option<Task<Message>> {
+        let c_pos = self.cards.iter().position(|n| n.id == i);
+        let notification = c_pos.map(|c_pos| self.cards.remove(c_pos)).or_else(|| {
+            self.hidden
+                .iter()
+                .position(|n| n.id == i)
+                .and_then(|pos| self.hidden.remove(pos))
+        })?;
+
+        if self.cards.is_empty() {
+            self.cards.shrink_to(50);
+        }
+
+        self.sort_notifications();
+        self.group_notifications();
+        self.signal_closed(notification.id, reason);
+
+        if self.cards.is_empty() && self.active_surface {
+            self.active_surface = false;
+            Some(destroy_layer_surface(self.window_id))
+        } else {
+            Some(Task::none())
+        }
+    }
+
+    fn anchor_for_notification_applet(&self) -> (Anchor, Option<String>) {
+        self.panel_config
+            .plugins_left()
+            .iter()
+            .find_map(|p| {
+                if p.iter().any(|s| s == NOTIFICATIONS_APPLET) {
+                    return Some((
+                        match self.panel_config.anchor {
+                            PanelAnchor::Top => Anchor::TOP.union(Anchor::LEFT),
+                            PanelAnchor::Bottom => Anchor::BOTTOM.union(Anchor::LEFT),
+                            PanelAnchor::Left => Anchor::LEFT.union(Anchor::TOP),
+                            PanelAnchor::Right => Anchor::RIGHT.union(Anchor::TOP),
+                        },
+                        match self.panel_config.output {
+                            CosmicPanelOuput::Name(ref n) => Some(n.clone()),
+                            _ => None,
+                        },
+                    ));
+                }
+                None
+            })
+            .or_else(|| {
+                self.panel_config.plugins_right().iter().find_map(|p| {
+                    if p.iter().any(|s| s == NOTIFICATIONS_APPLET) {
+                        return Some((
+                            match self.panel_config.anchor {
+                                PanelAnchor::Top => Anchor::TOP.union(Anchor::RIGHT),
+                                PanelAnchor::Bottom => Anchor::BOTTOM.union(Anchor::RIGHT),
+                                PanelAnchor::Left => Anchor::LEFT.union(Anchor::BOTTOM),
+                                PanelAnchor::Right => Anchor::RIGHT.union(Anchor::BOTTOM),
+                            },
+                            match self.panel_config.output {
+                                CosmicPanelOuput::Name(ref n) => Some(n.clone()),
+                                _ => None,
+                            },
+                        ));
+                    }
+                    None
+                })
+            })
+            .or_else(|| {
+                self.panel_config.plugins_center().iter().find_map(|p| {
+                    if p.iter().any(|s| s == NOTIFICATIONS_APPLET) {
+                        return Some((
+                            match self.panel_config.anchor {
+                                PanelAnchor::Top => Anchor::TOP,
+                                PanelAnchor::Bottom => Anchor::BOTTOM,
+                                PanelAnchor::Left => Anchor::LEFT,
+                                PanelAnchor::Right => Anchor::RIGHT,
+                            },
+                            match self.panel_config.output {
+                                CosmicPanelOuput::Name(ref n) => Some(n.clone()),
+                                _ => None,
+                            },
+                        ));
+                    }
+                    None
+                })
+            })
+            .or_else(|| {
+                self.dock_config.plugins_left().iter().find_map(|p| {
+                    if p.iter().any(|s| s == NOTIFICATIONS_APPLET) {
+                        return Some((
+                            match self.dock_config.anchor {
+                                PanelAnchor::Top => Anchor::TOP.union(Anchor::LEFT),
+                                PanelAnchor::Bottom => Anchor::BOTTOM.union(Anchor::LEFT),
+                                PanelAnchor::Left => Anchor::LEFT.union(Anchor::TOP),
+                                PanelAnchor::Right => Anchor::RIGHT.union(Anchor::TOP),
+                            },
+                            match self.dock_config.output {
+                                CosmicPanelOuput::Name(ref n) => Some(n.clone()),
+                                _ => None,
+                            },
+                        ));
+                    }
+                    None
+                })
+            })
+            .or_else(|| {
+                self.dock_config.plugins_right().iter().find_map(|p| {
+                    if p.iter().any(|s| s == NOTIFICATIONS_APPLET) {
+                        return Some((
+                            match self.dock_config.anchor {
+                                PanelAnchor::Top => Anchor::TOP.union(Anchor::RIGHT),
+                                PanelAnchor::Bottom => Anchor::BOTTOM.union(Anchor::RIGHT),
+                                PanelAnchor::Left => Anchor::TOP.union(Anchor::BOTTOM),
+                                PanelAnchor::Right => Anchor::RIGHT.union(Anchor::BOTTOM),
+                            },
+                            match self.dock_config.output {
+                                CosmicPanelOuput::Name(ref n) => Some(n.clone()),
+                                _ => None,
+                            },
+                        ));
+                    }
+                    None
+                })
+            })
+            .or_else(|| {
+                self.dock_config.plugins_center().iter().find_map(|p| {
+                    if p.iter().any(|s| s == NOTIFICATIONS_APPLET) {
+                        return Some((
+                            match self.dock_config.anchor {
+                                PanelAnchor::Top => Anchor::TOP,
+                                PanelAnchor::Bottom => Anchor::BOTTOM,
+                                PanelAnchor::Left => Anchor::LEFT,
+                                PanelAnchor::Right => Anchor::RIGHT,
+                            },
+                            match self.dock_config.output {
+                                CosmicPanelOuput::Name(ref n) => Some(n.clone()),
+                                _ => None,
+                            },
+                        ));
+                    }
+                    None
+                })
+            })
+            .unwrap_or((Anchor::TOP, None))
+    }
+
+    fn push_notification(
+        &mut self,
+        notification: Notification,
+    ) -> Task<<YuOsNotifications as cosmic::app::Application>::Message> {
+        let mut timeout = u32::try_from(notification.expire_timeout).unwrap_or(3000);
+        let max_timeout = if notification.urgency() == 2 {
+            self.config.max_timeout_urgent
+        } else if notification.urgency() == 1 {
+            self.config.max_timeout_normal
+        } else {
+            self.config.max_timeout_low
+        }
+        .unwrap_or(u32::try_from(notification.expire_timeout).unwrap_or(3000));
+        timeout = timeout.min(max_timeout);
+
+        let mut tasks = vec![if timeout > 0 {
+            iced::Task::perform(
+                tokio::time::sleep(Duration::from_millis(timeout as u64)),
+                move |_| cosmic::action::app(Message::Timeout(notification.id, notification.time)),
+            )
+        } else {
+            iced::Task::none()
+        }];
+
+        if self.cards.is_empty() && !self.active_surface && !self.config.do_not_disturb {
+            let (anchor, _output) = self.anchor.clone().unwrap_or((Anchor::TOP, None));
+            self.active_surface = true;
+            tasks.push(get_layer_surface(SctkLayerSurfaceSettings {
+                id: self.window_id,
+                anchor,
+                exclusive_zone: 0,
+                keyboard_interactivity: KeyboardInteractivity::None,
+                namespace: "notifications".to_string(),
+                margin: IcedMargin {
+                    top: 8,
+                    right: 8,
+                    bottom: 8,
+                    left: 8,
+                },
+                size: Some((Some(300), Some(1))),
+                output: IcedOutput::Active, // TODO should we only create the notification on the output the applet is on?
+                size_limits: Limits::NONE
+                    .min_width(300.0)
+                    .min_height(1.0)
+                    .max_height(1920.0)
+                    .max_width(300.0),
+                ..Default::default()
+            }));
+        };
+
+        self.sort_notifications();
+
+        let mut insert_sorted =
+            |notification: Notification| match self.cards.binary_search_by(|a| {
+                match a.urgency().cmp(&notification.urgency()) {
+                    std::cmp::Ordering::Equal => a.time.cmp(&notification.time),
+                    other => other,
+                }
+            }) {
+                Ok(pos) => {
+                    self.cards[pos] = notification;
+                }
+                Err(pos) => {
+                    self.cards.insert(pos, notification);
+                }
+            };
+        insert_sorted(notification);
+        self.group_notifications();
+
+        iced::Task::batch(tasks)
+    }
+
+    fn group_notifications(&mut self) {
+        if self.config.max_per_app == 0 {
+            return;
+        }
+
+        let mut extra_per_app = Vec::new();
+        let mut cur_count = 0;
+        let Some(mut cur_id) = self.cards.first().map(|n| n.app_name.clone()) else {
+            return;
+        };
+        self.cards = self
+            .cards
+            .drain(..)
+            .filter(|n| {
+                if n.app_name == cur_id {
+                    cur_count += 1;
+                } else {
+                    cur_count = 1;
+                    cur_id = n.app_name.clone();
+                }
+                if cur_count > self.config.max_per_app {
+                    extra_per_app.push(n.clone());
+                    false
+                } else {
+                    true
+                }
+            })
+            .collect();
+
+        for n in extra_per_app {
+            if self.cards.len() < self.config.max_notifications as usize {
+                self.insert_sorted(n);
+            } else {
+                self.cards.push(n);
+            }
+        }
+    }
+
+    fn insert_sorted(&mut self, notification: Notification) {
+        match self
+            .cards
+            .binary_search_by(|a| match notification.urgency().cmp(&a.urgency()) {
+                std::cmp::Ordering::Equal => notification.time.cmp(&a.time),
+                other => other,
+            }) {
+            Ok(pos) => {
+                self.cards[pos] = notification;
+            }
+            Err(pos) => {
+                self.cards.insert(pos, notification);
+            }
+        }
+    }
+
+    fn sort_notifications(&mut self) {
+        self.cards
+            .sort_by(|a, b| match a.urgency().cmp(&b.urgency()) {
+                std::cmp::Ordering::Equal => a.time.cmp(&b.time),
+                other => other,
+            });
+    }
+
+    fn replace_notification(&mut self, notification: Notification) -> Task<Message> {
+        self.cards.retain(|n| n.id != notification.id);
+        self.hidden.retain(|n| n.id != notification.id);
+        self.push_notification(notification)
+    }
+
+    fn request_activation(&mut self, i: u32, action: Option<ActionId>) -> Task<Message> {
+        if crate::subscriptions::managed::enabled() {
+            // The controlled default action acknowledges a record, not an App launch.
+            return self
+                .activate_notification(String::new(), i, action)
+                .unwrap_or_else(Task::none);
+        }
+        activation::request_token(Some(String::from(Self::APP_ID)), Some(self.window_id)).map(
+            move |token| cosmic::Action::App(Message::ActivationToken(token, i, action.clone())),
+        )
+    }
+
+    fn activate_notification(
+        &mut self,
+        token: String,
+        id: u32,
+        action: Option<ActionId>,
+    ) -> Option<Task<Message>> {
+        if let Some(tx) = self.notifications_tx.as_ref() {
+            let c_pos = self.cards.iter().position(|n| n.id == id);
+            let notification = c_pos.map(|c_pos| &self.cards[c_pos]).or_else(|| {
+                self.hidden
+                    .iter()
+                    .position(|n| n.id == id)
+                    .map(|pos| &self.hidden[pos])
+            })?;
+
+            let maybe_action = if action
+                .as_ref()
+                .is_some_and(|a| notification.actions.iter().any(|(b, _)| b == a))
+            {
+                action.clone().map(|a| a.to_string())
+            } else if notification
+                .actions
+                .iter()
+                .any(|a| matches!(a.0, ActionId::Default))
+            {
+                Some(ActionId::Default.to_string())
+            } else {
+                notification.actions.first().map(|a| a.0.to_string())
+            };
+
+            let Some(action) = maybe_action else {
+                return self.close(id, CloseReason::Dismissed);
+            };
+            let tx = tx.clone();
+            tracing::info!("action for {id} {action}");
+            Some(Task::future(async move {
+                _ = tx
+                    .send(notifications::Input::Activated { token, id, action })
+                    .await;
+                tracing::trace!("sent action to sub");
+                cosmic::Action::App(Message::Dismissed(id))
+            }))
+        } else {
+            tracing::error!("Failed to activate notification. No channel.");
+            None
+        }
+    }
+}
+
+impl cosmic::Application for YuOsNotifications {
+    type Message = Message;
+    type Executor = cosmic::executor::single::Executor;
+    type Flags = ();
+    const APP_ID: &'static str = "com.yuos.Notifications";
+
+    fn init(core: Core, _flags: ()) -> (Self, Task<Message>) {
+        let helper = Config::new(
+            cosmic_notifications_config::ID,
+            NotificationsConfig::VERSION,
+        )
+        .ok();
+
+        let config: NotificationsConfig = helper
+            .as_ref()
+            .map(|helper| {
+                NotificationsConfig::get_entry(helper).unwrap_or_else(|(errors, config)| {
+                    for err in errors {
+                        if err.is_err() {
+                            tracing::error!("{:?}", err);
+                        }
+                    }
+                    config
+                })
+            })
+            .unwrap_or_default();
+        (
+            YuOsNotifications {
+                core,
+                active_surface: false,
+                autosize_id: iced::id::Id::new("autosize"),
+                window_id: SurfaceId::unique(),
+                anchor: None,
+                config,
+                dock_config: CosmicPanelConfig::default(),
+                panel_config: CosmicPanelConfig::default(),
+                notifications_id: id::Id::new("Notifications"),
+                notifications_tx: None,
+                cards: Vec::with_capacity(50),
+                hidden: VecDeque::new(),
+            },
+            Task::none(),
+        )
+    }
+
+    fn core(&self) -> &Core {
+        &self.core
+    }
+
+    fn core_mut(&mut self) -> &mut Core {
+        &mut self.core
+    }
+
+    fn view(&self) -> Element<'_, Self::Message> {
+        unimplemented!();
+    }
+
+    #[allow(clippy::too_many_lines)]
+    fn update(&mut self, message: Message) -> Task<Self::Message> {
+        match message {
+            Message::ActivateNotification(id) => {
+                tracing::trace!("requesting token for {id}");
+                return self.request_activation(id, None);
+            }
+            Message::ActivationToken(token, id, action) => {
+                tracing::trace!("token for {id}");
+                if let Some(token) = token {
+                    return self
+                        .activate_notification(token, id, action)
+                        .unwrap_or(Task::none());
+                } else {
+                    tracing::error!("Failed to get activation token for clicked notification.");
+                }
+            }
+            Message::Notification(e) => match e {
+                notifications::Event::Notification(n) => {
+                    let id = n.id;
+                    let update = self.push_notification(n);
+                    return Task::batch([update, self.presented(id)]);
+                }
+                notifications::Event::Replace(n) => {
+                    let id = n.id;
+                    let update = self.replace_notification(n);
+                    return Task::batch([update, self.presented(id)]);
+                }
+                notifications::Event::ReplaceHandle {
+                    previous,
+                    notification,
+                } => {
+                    self.cards.retain(|card| card.id != previous);
+                    self.hidden.retain(|card| card.id != previous);
+                    let id = notification.id;
+                    let update = self.push_notification(notification);
+                    self.signal_closed(previous, CloseReason::CloseNotification);
+                    return Task::batch([update, self.presented(id)]);
+                }
+                notifications::Event::CloseNotification(id) => {
+                    if let Some(c) = self.close(id, CloseReason::CloseNotification) {
+                        return c;
+                    }
+                }
+                notifications::Event::Ready(tx) => {
+                    self.notifications_tx = Some(tx);
+                }
+                notifications::Event::DismissNotification(id) => {
+                    return self
+                        .close(id, CloseReason::Dismissed)
+                        .unwrap_or_else(Task::none);
+                }
+                notifications::Event::Preferences(preferences) => {
+                    self.config.do_not_disturb = preferences.muted;
+                }
+                notifications::Event::Unavailable(error) => {
+                    tracing::error!(%error, "native notification Host resource unavailable");
+                    std::process::exit(1);
+                }
+                notifications::Event::AppletActivated { id, action } => {
+                    tracing::trace!("requesting token for {id}");
+                    return self.request_activation(id, Some(action));
+                }
+            },
+            Message::Dismissed(id) => {
+                if let Some(c) = self.close(id, CloseReason::Dismissed) {
+                    return c;
+                }
+            }
+            Message::Timeout(id, time) => {
+                if self.cards.iter().any(|n| n.id == id && n.time == time) {
+                    self.expire(id);
+                }
+                if self.cards.is_empty() && self.active_surface {
+                    self.active_surface = false;
+                    return destroy_layer_surface(self.window_id);
+                }
+            }
+            Message::Config(config) => {
+                if self.config.do_not_disturb != config.do_not_disturb {
+                    if let Some(tx) = self.notifications_tx.clone() {
+                        let preferences =
+                            yuos_notification_presentation::Preferences::new(config.do_not_disturb);
+                        tokio::spawn(async move {
+                            if let Err(error) = tx
+                                .send(notifications::Input::PresentationPreferencesChanged(
+                                    preferences,
+                                ))
+                                .await
+                            {
+                                tracing::error!(
+                                    "Failed to publish changed presentation preferences: {error}"
+                                );
+                            }
+                        });
+                    }
+                }
+                self.config = config;
+            }
+            Message::PanelConfig(c) => {
+                self.panel_config = c;
+                self.anchor = Some(self.anchor_for_notification_applet());
+            }
+            Message::DockConfig(c) => {
+                self.dock_config = c;
+                self.anchor = Some(self.anchor_for_notification_applet());
+            }
+            Message::Ignore => {}
+            Message::Surface(a) => {
+                return cosmic::task::message(cosmic::Action::Cosmic(
+                    cosmic::app::Action::Surface(a),
+                ));
+            }
+        }
+        Task::none()
+    }
+
+    #[allow(clippy::too_many_lines)]
+    fn view_window(&self, _: SurfaceId) -> Element<'_, Message> {
+        if self.cards.is_empty() {
+            return container(space::vertical().height(Length::Fixed(1.0)))
+                .center_x(Length::Fixed(1.0))
+                .center_y(Length::Fixed(1.0))
+                .into();
+        }
+
+        // Yu OS Glass spacing tokens — generous, token-driven rhythm.
+        let spacing = cosmic::theme::spacing();
+
+        let (ids, notif_elems): (Vec<_>, Vec<_>) = self
+            .cards
+            .iter()
+            .rev()
+            .map(|n| {
+                // App-name / meta line — turned into a brand-blue accent moment
+                // (Yu OS Glass forbids dead gray meta text).
+                let app_name = text::caption(if n.app_name.len() > 24 {
+                    Cow::from(format!(
+                        "{:.26}...",
+                        n.app_name.lines().next().unwrap_or_default()
+                    ))
+                } else {
+                    Cow::from(&n.app_name)
+                })
+                .width(Length::Fill)
+                .class(cosmic::theme::Text::Custom(|t| {
+                    cosmic::iced::widget::text::Style {
+                        color: Some(t.cosmic().accent_color().into()),
+                    }
+                }));
+
+                // Quiet glass close control; emphasis comes on hover via theme.
+                let close_notif = button::custom(
+                    icon::from_name("window-close-symbolic")
+                        .size(16)
+                        .symbolic(true),
+                )
+                .on_press(Message::Dismissed(n.id))
+                .class(cosmic::theme::Button::Text);
+
+                // Header: leading app icon anchor · accent app-name · close.
+                let header = if let Some(icon) = n.notification_icon() {
+                    row![icon.size(20), app_name, close_notif]
+                        .spacing(spacing.space_xs)
+                        .align_y(Alignment::Center)
+                } else {
+                    row![app_name, close_notif]
+                        .spacing(spacing.space_xs)
+                        .align_y(Alignment::Center)
+                };
+
+                // Content: prominent semibold title (summary) over muted body.
+                let content = column![
+                    text::heading(n.summary.lines().next().unwrap_or_default()).width(Length::Fill),
+                    Element::from(
+                        rich_text(if crate::subscriptions::managed::enabled() {
+                            crate::subscriptions::managed::body_spans(n)
+                        } else {
+                            html_to_spans(&n.body)
+                        })
+                        .size(12.0)
+                    )
+                    .map(|_: ()| Message::Ignore)
+                ]
+                .spacing(spacing.space_xxxs)
+                .width(Length::Fill);
+
+                // Frosted Yu OS Glass toast card: radius_l, blue hairline, soft
+                // shadow, generous padding.
+                let e = Element::from(
+                    container(
+                        column![header, content]
+                            .spacing(spacing.space_xs)
+                            .width(Length::Fill),
+                    )
+                    .padding(spacing.space_m)
+                    .width(Length::Fill)
+                    .class(crate::glass::card_class()),
+                );
+                (n.id, e)
+            })
+            .take(self.config.max_notifications as usize)
+            .unzip();
+
+        let card_list = cosmic::widget::cards(
+            self.notifications_id.clone(),
+            notif_elems,
+            Message::Ignore,
+            None::<fn(bool) -> Message>,
+            Some(move |id| Message::ActivateNotification(ids[id])),
+            "",
+            "",
+            "",
+            None,
+            true,
+        )
+        .width(Length::Fixed(300.));
+
+        autosize::autosize(card_list, self.autosize_id.clone())
+            .min_width(200.)
+            .min_height(100.)
+            .max_width(300.)
+            .max_height(1920.)
+            .into()
+    }
+
+    fn subscription(&self) -> Subscription<Message> {
+        Subscription::batch(vec![
+            self.core
+                .watch_config(cosmic_notifications_config::ID)
+                .map(|u| {
+                    for why in u
+                        .errors
+                        .into_iter()
+                        .filter(cosmic::cosmic_config::Error::is_err)
+                    {
+                        tracing::error!(?why, "config load error");
+                    }
+                    Message::Config(u.config)
+                }),
+            self.core.watch_config("com.yuos.Panel.Panel").map(|u| {
+                for why in u
+                    .errors
+                    .into_iter()
+                    .filter(cosmic::cosmic_config::Error::is_err)
+                {
+                    tracing::error!(?why, "panel config load error");
+                }
+                Message::PanelConfig(u.config)
+            }),
+            self.core.watch_config("com.yuos.Panel.Dock").map(|u| {
+                for why in u
+                    .errors
+                    .into_iter()
+                    .filter(cosmic::cosmic_config::Error::is_err)
+                {
+                    tracing::error!(?why, "dock config load error");
+                }
+                Message::DockConfig(u.config)
+            }),
+            notifications::notifications().map(Message::Notification),
+        ])
+    }
+}

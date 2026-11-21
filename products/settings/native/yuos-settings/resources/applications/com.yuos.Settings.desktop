@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Settings
+Comment=Settings application for Yu OS.
+Type=Application
+Exec=yuos-settings
+Terminal=false
+Categories=YuOS
+Keywords=Yu OS;Settings;
+OnlyShowIn=COSMIC
+Icon=com.yuos.Settings
+StartupNotify=true

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=About
+Comment=Device name, hardware information, operating system defaults.
+Type=Application
+Exec=yuos-settings about
+Terminal=false
+Categories=YuOS
+Keywords=Yu OS;About
+NoDisplay=true
+OnlyShowIn=COSMIC
+Icon=preferences-about
+StartupNotify=true

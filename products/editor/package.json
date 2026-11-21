@@ -1,11 +1,11 @@
 {
-  "web_ui": {"source": "web", "apps": ["cosmic-edit"]},
-  "apps": ["apps/cosmic-edit"],
+  "web_ui": {"source": "web", "apps": ["yuos-edit"]},
+  "apps": ["apps/yuos-edit"],
   "tests": [],
-  "native": {"cosmic-edit": "native/cosmic-edit"},
+  "native": {"yuos-edit": "native/yuos-edit"},
   "native_kind": "binary",
-  "native_payload": {"app": "cosmic-edit", "program": "cosmic-edit"},
+  "native_payload": {"app": "yuos-edit", "program": "yuos-edit"},
   "native_assets": {
-    "cosmic-edit": {"app.json": "apps/cosmic-edit/app.json"}
+    "yuos-edit": {"app.json": "apps/yuos-edit/app.json"}
   }
 }

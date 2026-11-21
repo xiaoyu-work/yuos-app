@@ -9,7 +9,7 @@ Privileged package execution, transaction serialization, audit and rollback
 remain OS-owned. This move does not alter the installed package database or
 APT update mechanism.
 
-The complete native `cosmic-store` fork now lives in `native/cosmic-store`,
+The complete native `yuos-store` fork now lives in `native/yuos-store`,
 including its original default renderer, Flatpak/PackageKit UI, translations,
 resources, nested `flathub-stats` helper and locked dependency graph.
 Its four MCP tools retain independent native grants. Read-only queries embed

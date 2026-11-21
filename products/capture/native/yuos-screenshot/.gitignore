@@ -1,0 +1,8 @@
+/.cargo/
+/debian/*debhelper*
+/debian/yuos-screenshot.substvars
+/debian/yuos-screenshot/
+/debian/files
+/target/
+/vendor.tar
+/vendor/

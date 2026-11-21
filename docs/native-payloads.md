@@ -67,7 +67,7 @@ python3 tools/native_payload.py notifications --plan
 # Uses the real published platform.lock.json and the original product installer.
 python3 tools/native_build.py notifications build --release \
   --target-dir build/native-package-target \
-  --app-root build/prepared/cosmic-notifications
+  --app-root build/prepared/yuos-notifications
 
 # Alternatively, consume an explicit original installer output under build/.
 python3 tools/native_payload.py notifications \
@@ -80,7 +80,7 @@ Preparation is explicitly **unsigned**. It does not invent `.provenance.json`,
 change trust roots or supply a signer pin. Use the existing public provenance
 CLI and an authorized App publisher key; pass each `entrypoints` value returned
 by the plan once through `--entrypoint`. Normally that is just `bin/<program>`;
-Files also declares `bin/cosmic-files-applet`. The existing
+Files also declares `bin/yuos-files-applet`. The existing
 `yuos.provenance/v1` signer inventories all files,
 including full ELF bytes, resources and licenses. Named resource declarations,
 when supplied, use that existing format and confer no mounts or grants.
@@ -191,7 +191,7 @@ It is not a physical-device, KMS or complete installed-image qualification.
 | --- | --- |
 | End-to-end GUI execution | Actual signed native software lanes cover authenticated GUI bootstrap, real configured pixels/PTYs, original argv/resources, Capture modes and protected Player thumbnail overwrite/create. The OS retains exact instance and checked process/resource/PAM retirement; no App is executed through a compatibility wrapper outside the Host. |
 | GUI permissions | Mandatory and optional needs use the ordinary exact-owner flow and live revocation. Protected file read/write/create and OS FileChooser metadata remain separate. Layer-shell requires explicit `ui.panel`; MCP needs are never unioned and neither a returned filename nor installation grants authority. |
-| Files companion | The separate signed `cosmic-files-applet` uses its explicit `desktop.entries.applet` and `ui.panel`/Desktop metadata needs. Default Files has real Home-metadata window acceptance; the auxiliary uses the independently checked generic entry/role boundary. The OS FileManager1 facade owns URI transport, without raw App owner-bus access. Physical desktop layout remains deployment qualification. |
+| Files companion | The separate signed `yuos-files-applet` uses its explicit `desktop.entries.applet` and `ui.panel`/Desktop metadata needs. Default Files has real Home-metadata window acceptance; the auxiliary uses the independently checked generic entry/role boundary. The OS FileManager1 facade owns URI transport, without raw App owner-bus access. Physical desktop layout remains deployment qualification. |
 | Settings authority ownership | Desktop/first-boot policy remains OS-owned. Native owner config, regional and device flows use closed Root providers with independent named capabilities, while file/folder/save decisions use the shared protected picker and selected-file resources. Empty mandatory startup and every optional right ungranted are verified, without an App permission store or owner-tree mount. |
 | Installed resources and state | Signed read-only resources use `YUOS_APP_RESOURCE_DIR`/`XDG_DATA_DIRS`. Global catalogs use public `/usr`; existing owner config uses typed Root services and pinned files. `YUOS_OWNER_HOME` is path context, not a grant. App data stays private and persists across checked Host/UID replacement; no user-state migration is performed. |
 | Provider/helper executable identity | Capture uses authenticated descriptor-pinned OS portal helpers. Media uses its actual signed live UI and a Root-held output-only sound helper, never an owner bus or wrapper identity. Notifications uses the public bounded presentation contract and one Root delivery consumer. Cancellation, logout, no-clobber publication and checked cleanup remain enforced; uncertain effects are never automatic replay. |
