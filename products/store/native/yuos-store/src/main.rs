@@ -1904,17 +1904,6 @@ impl App {
                 },
                 requires: Vec::new(),
             });
-            sources.push(Source {
-                backend_name: BackendName::FlatpakUser,
-                id: "cosmic".to_string(),
-                name: "COSMIC Flatpak".to_string(),
-                kind: SourceKind::Recommended {
-                    data: include_bytes!("../res/cosmic.flatpakrepo"),
-                    enabled: false,
-                },
-                //TODO: can this be defined in flatpakrepo file?
-                requires: vec!["flathub".to_string()],
-            });
         }
 
         //TODO: check source URL?
