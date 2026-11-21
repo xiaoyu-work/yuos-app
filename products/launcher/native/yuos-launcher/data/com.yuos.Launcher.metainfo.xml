@@ -34,8 +34,8 @@
     <p xml:lang="sv">Programstartaren för skrivbordsmiljön Yu OS</p>
     <p xml:lang="it">Frontend Yu OS di Pop Launcher</p>
   </description>
-  <url type="homepage">https://github.com/pop-os/cosmic-launcher</url>
-  <url type="bugtracker">https://github.com/pop-os/cosmic-launcher/issues</url>
+  <url type="homepage">https://github.com/xiaoyu-work/yuos-app/tree/main/products/launcher</url>
+  <url type="bugtracker">https://github.com/xiaoyu-work/yuos-app/issues</url>
   <content_rating type="oars-1.0" />
   <releases>
     <release version="0.1.0" date="2023-01-01" />

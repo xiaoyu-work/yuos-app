@@ -323,12 +323,11 @@ digest/size/control mismatches fail rather than selecting snapshot delivery.
 Composition retains all previous immutable package tuples/digests and advances
 generation without allowing version regression.
 
-`packaging/release.json` lists retired Store identities in `retired_store_apps`.
+`packaging/release.json` can list retired Store identities in `retired_store_apps`.
 Compose and the scheduled signed metadata refresh remove those exact discovery
 entries and refuse new releases that contain them. The original `.deb` files,
 APT inventory tuples, tags and release assets remain available as historical
-records. `cosmic-launcher` is retired; `yuos-launcher` appears once a signed
-release containing the replacement is published.
+records.
 
 The release order deliberately separates tested inputs from final publication:
 

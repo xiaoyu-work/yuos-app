@@ -6,8 +6,8 @@
   <project_group>Yu OS</project_group>
   <developer_name>Yu OS</developer_name>
   <update_contact>jeremy@system76.com</update_contact>
-  <url type="homepage">https://github.com/pop-os/cosmic-edit</url>
-  <url type="bugtracker">https://github.com/pop-os/cosmic-edit</url>
+  <url type="homepage">https://github.com/xiaoyu-work/yuos-app/tree/main/products/editor</url>
+  <url type="bugtracker">https://github.com/xiaoyu-work/yuos-app/issues</url>
   <name>Text Editor</name>
   <summary>Text editor for Yu OS</summary>
   <description>

@@ -85,10 +85,9 @@ The installed `yuos-launcher` command enters `yu app yuos-launcher --gui`; this 
 grant desktop transport, catalog/history access or activate resources. See
 [native payloads](../../docs/native-payloads.md).
 
-The same `yuos-app-launcher-desktop` package replaces the former native
-identity and command. `com.yuos.Launcher` and the separate `launcher` App
-stay unchanged. The new signed identity does not inherit grants or private
-App data from `cosmic-launcher`.
+`yuos-app-launcher-desktop` delivers the signed `yuos-launcher` App.
+`com.yuos.Launcher` is its desktop entry; the separate `launcher` App has
+its own grants and private data.
 
 After the existing MCP dispatch, the native parser uses the App-owned
 `yuos-app-gui-argv` library to remove one exact `--gui` at argv[1] only when the

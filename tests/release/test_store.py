@@ -149,18 +149,17 @@ def test_store_refresh_keeps_artifacts_and_advances_signed_freshness(
     tmp_path, public_signer, signing, app, deb, monkeypatch,
 ):
     verifier, sign = public_signer
-    roots = [sign(web_app(app())), sign(web_app(app("cosmic-launcher")))]
+    roots = [sign(web_app(app())), sign(web_app(app("retired-app")))]
     snapshots.build_catalog(roots, tmp_path / "snapshots", release_version="1.0.0",
                             architecture="all", provenance=verifier, signing=signing)
     package = app_deb(deb, roots)
     historical = digest(package)
     output = tmp_path / "store"
-    with monkeypatch.context() as original:
-        original.setattr(store, "retired_ids", set)
-        initial = store.compose([tmp_path / "snapshots"], output, verifier, signing, packages=[package])
-        assert store.refresh(output, signing)["apps"] == initial["apps"]
+    initial = store.compose([tmp_path / "snapshots"], output, verifier, signing, packages=[package])
+    assert store.refresh(output, signing)["apps"] == initial["apps"]
+    monkeypatch.setattr(store, "retired_ids", lambda: {"retired-app"})
     refreshed = store.refresh(output, signing)
-    assert refreshed["apps"] == [record for record in initial["apps"] if record["app_id"] != "cosmic-launcher"]
+    assert refreshed["apps"] == [record for record in initial["apps"] if record["app_id"] != "retired-app"]
     assert len(initial["apps"]) == 2
     assert refreshed["packages"] == initial["packages"]
     assert refreshed["packages"][0]["sha256"] == digest(package) == historical

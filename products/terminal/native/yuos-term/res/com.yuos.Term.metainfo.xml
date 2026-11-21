@@ -6,8 +6,8 @@
   <project_group>Yu OS</project_group>
   <developer_name>Yu OS</developer_name>
   <update_contact>jeremy@system76.com</update_contact>
-  <url type="homepage">https://github.com/pop-os/cosmic-term</url>
-  <url type="bugtracker">https://github.com/pop-os/cosmic-term</url>
+  <url type="homepage">https://github.com/xiaoyu-work/yuos-app/tree/main/products/terminal</url>
+  <url type="bugtracker">https://github.com/xiaoyu-work/yuos-app/issues</url>
   <name>Terminal</name>
   <summary>Terminal emulator for Yu OS</summary>
   <description>

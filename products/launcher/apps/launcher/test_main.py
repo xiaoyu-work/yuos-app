@@ -404,14 +404,14 @@ def test_user_desktop_entry_shadows_system_entry(
     )
     monkeypatch.setenv("XDG_DATA_HOME", str(user))
     monkeypatch.setenv("XDG_DATA_DIRS", str(system))
-    monkeypatch.setenv("XDG_CURRENT_DESKTOP", "COSMIC")
+    monkeypatch.setenv("XDG_CURRENT_DESKTOP", "Hyprland:X-YuOS")
     monkeypatch.setenv("LANG", "C")
     apps = main._scan_apps(gate=False)
     assert apps[APP_ID]["name"] == "User Editor"
     assert apps[APP_ID]["exec_binary"] == "user-editor"
 
 
-def test_owner_home_and_cosmic_default_drive_user_app_discovery(
+def test_owner_home_and_yuos_default_drive_user_app_discovery(
     tmp_path: pathlib.Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -420,9 +420,9 @@ def test_owner_home_and_cosmic_default_drive_user_app_discovery(
     applications.mkdir(parents=True)
     (applications / f"{APP_ID}.desktop").write_text(
         "[Desktop Entry]\n"
-        "Name=Cosmic Editor\n"
-        "Exec=cosmic-editor\n"
-        "OnlyShowIn=COSMIC;\n",
+        "Name=Editor\n"
+        "Exec=editor\n"
+        "OnlyShowIn=X-YuOS;\n",
         encoding="utf-8",
     )
     monkeypatch.delenv("XDG_DATA_HOME", raising=False)
@@ -433,8 +433,8 @@ def test_owner_home_and_cosmic_default_drive_user_app_discovery(
 
     apps = main._scan_apps(gate=False)
 
-    assert apps[APP_ID]["name"] == "Cosmic Editor"
-    assert apps[APP_ID]["exec_binary"] == "cosmic-editor"
+    assert apps[APP_ID]["name"] == "Editor"
+    assert apps[APP_ID]["exec_binary"] == "editor"
 
 
 @pytest.mark.parametrize(
@@ -851,7 +851,7 @@ def test_catalog_launch_and_history_round_trip_with_defaults(
     )
     monkeypatch.setenv("XDG_DATA_HOME", str(data))
     monkeypatch.setenv("XDG_DATA_DIRS", str(tmp_path / "absent-system"))
-    monkeypatch.setenv("XDG_CURRENT_DESKTOP", "COSMIC")
+    monkeypatch.setenv("XDG_CURRENT_DESKTOP", "Hyprland:X-YuOS")
     monkeypatch.setenv("LANG", "C")
     monkeypatch.delenv("LC_MESSAGES", raising=False)
     monkeypatch.delenv("LC_ALL", raising=False)

@@ -63,12 +63,12 @@ def test_github_transport_failure_is_not_treated_as_an_absent_repository(monkeyp
         args, 1, b"", b"network unavailable",
     ))
     with pytest.raises(ValueError, match="transport"):
-        GitHub().api("git/ref/heads/app-apt", allowed=(200, 404))
+        GitHub().api("git/ref/heads/yuos-apt", allowed=(200, 404))
     monkeypatch.setattr(release_publish, "run", lambda *args, **kwargs: subprocess.CompletedProcess(
         args, 1, b"HTTP/2.0 403 Forbidden\r\n\r\n{}", b"forbidden",
     ))
     with pytest.raises(ValueError, match="403"):
-        GitHub().api("git/ref/heads/app-apt", allowed=(200, 404))
+        GitHub().api("git/ref/heads/yuos-apt", allowed=(200, 404))
     with pytest.raises(ValueError, match=f"{REPO_SETTINGS_TOKEN}.*Administration: read"):
         GitHub().api("immutable-releases")
 

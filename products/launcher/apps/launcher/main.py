@@ -193,7 +193,7 @@ def _scan_apps(
     gate: bool = True,
 ) -> dict[str, DesktopEntry]:
     locale_chain = _locale_chain()
-    current_desktop_raw = os.environ.get("XDG_CURRENT_DESKTOP") or "COSMIC"
+    current_desktop_raw = os.environ.get("XDG_CURRENT_DESKTOP") or "Hyprland:X-YuOS"
     current_desktops = {
         item for item in current_desktop_raw.split(":") if item
     }
