@@ -1135,10 +1135,14 @@ save = Save
 ## Agent
 
 agent = Agent
-    .desc = Configure the language, voice, and embedding providers used by the on-device assistant
+    .desc = Configure the language, decision, voice, image, and embedding models used by your Agent
 
 agent-llm = Language model
     .desc = The conversational LLM that powers the chat assistant
+agent-decision = Decision model
+    .desc = A separate local model for choosing, classifying, and scoring
+agent-decision-local-help = Enter the alias of a running local System One model. Saving does not download the model or start its service. Test connection checks local inference.
+agent-decision-status-unavailable = Configured, local service unavailable
 agent-tts = Text to speech
     .desc = Voice used when the assistant speaks back
 agent-stt = Speech to text

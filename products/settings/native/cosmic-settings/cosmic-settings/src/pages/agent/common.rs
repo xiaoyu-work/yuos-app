@@ -42,6 +42,7 @@ use crate::pages;
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum Modality {
     Llm,
+    Decision,
     Tts,
     Stt,
     Imagegen,
@@ -49,8 +50,9 @@ pub enum Modality {
 }
 
 impl Modality {
-    pub const ALL: [Modality; 5] = [
+    pub const ALL: [Modality; 6] = [
         Modality::Llm,
+        Modality::Decision,
         Modality::Tts,
         Modality::Stt,
         Modality::Imagegen,
@@ -60,6 +62,7 @@ impl Modality {
     pub const fn as_arg(self) -> &'static str {
         match self {
             Modality::Llm => "text",
+            Modality::Decision => "decision",
             Modality::Tts => "tts",
             Modality::Stt => "stt",
             Modality::Imagegen => "imagegen",
@@ -70,6 +73,7 @@ impl Modality {
     pub const fn page_id(self) -> &'static str {
         match self {
             Modality::Llm => "agent-llm",
+            Modality::Decision => "agent-decision",
             Modality::Tts => "agent-tts",
             Modality::Stt => "agent-stt",
             Modality::Imagegen => "agent-imagegen",
@@ -80,6 +84,7 @@ impl Modality {
     pub const fn icon_name(self) -> &'static str {
         match self {
             Modality::Llm => "user-available-symbolic",
+            Modality::Decision => "view-list-symbolic",
             Modality::Tts => "audio-speakers-symbolic",
             Modality::Stt => "audio-input-microphone-symbolic",
             Modality::Imagegen => "image-x-generic-symbolic",
@@ -90,6 +95,7 @@ impl Modality {
     pub fn title(self) -> String {
         match self {
             Modality::Llm => crate::fl!("agent-llm"),
+            Modality::Decision => crate::fl!("agent-decision"),
             Modality::Tts => crate::fl!("agent-tts"),
             Modality::Stt => crate::fl!("agent-stt"),
             Modality::Imagegen => crate::fl!("agent-imagegen"),
@@ -100,6 +106,7 @@ impl Modality {
     pub fn description(self) -> String {
         match self {
             Modality::Llm => crate::fl!("agent-llm", "desc"),
+            Modality::Decision => crate::fl!("agent-decision", "desc"),
             Modality::Tts => crate::fl!("agent-tts", "desc"),
             Modality::Stt => crate::fl!("agent-stt", "desc"),
             Modality::Imagegen => crate::fl!("agent-imagegen", "desc"),
@@ -193,6 +200,8 @@ pub struct Status {
     pub api_key_env: Option<String>,
     #[serde(default)]
     pub config_path: Option<String>,
+    #[serde(default)]
+    pub configured: bool,
     #[serde(default)]
     pub ready: bool,
     #[serde(default)]
@@ -1092,11 +1101,17 @@ async fn providers(modality: Modality) -> Result<ProvidersDoc, String> {
 }
 
 async fn status(modality: Modality) -> Result<Status, String> {
+    if modality == Modality::Decision {
+        return decision_settings("decision-status", None).await;
+    }
     let stdout = cos_setup(&[modality.as_arg(), "--status"], None).await?;
     serde_json::from_str(&stdout).map_err(|e| format!("invalid status JSON: {e}"))
 }
 
 async fn apply(modality: Modality, args: ApplyArgs) -> Result<ApplyResult, String> {
+    if modality == Modality::Decision {
+        return decision_settings("decision-apply", Some(&args.model)).await;
+    }
     let provider = args.provider;
     let model = args.model;
     let modality_arg = modality.as_arg();
@@ -1137,14 +1152,46 @@ async fn apply(modality: Modality, args: ApplyArgs) -> Result<ApplyResult, Strin
 }
 
 async fn test(modality: Modality) -> Result<TestResult, String> {
+    if modality == Modality::Decision {
+        return decision_settings("decision-test", None).await;
+    }
     let stdout = cos_setup(&[modality.as_arg(), "test"], None).await?;
     serde_json::from_str(&stdout).map_err(|e| format!("invalid test JSON: {e}"))
 }
 
 async fn reset(modality: Modality) -> Result<(), String> {
+    if modality == Modality::Decision {
+        return decision_settings::<ApplyResult>("decision-reset", None)
+            .await
+            .map(|_| ());
+    }
     cos_setup(&[modality.as_arg(), "--reset"], None)
         .await
         .map(|_| ())
+}
+
+async fn decision_settings<T: serde::de::DeserializeOwned>(
+    action: &str,
+    model: Option<&str>,
+) -> Result<T, String> {
+    let mut request = serde_json::json!({"action": action});
+    if let Some(model) = model {
+        request["decision_model"] = serde_json::json!(model);
+    }
+    let bytes = serde_json::to_vec(&request).map_err(|error| error.to_string())?;
+    let value = claw_os_sdk::cos_call_json_async_with_stdin_binary(
+        "/usr/local/bin/yu",
+        "decision-settings",
+        "control",
+        ["__system-settings", "--request-stdin"],
+        &bytes,
+    )
+    .await
+    .map_err(|error| error.to_string())?;
+    if value["modality"] != "decision" {
+        return Err("Invalid Decision settings response".into());
+    }
+    serde_json::from_value(value).map_err(|error| error.to_string())
 }
 
 // ---------------------------------------------------------------------------
@@ -1408,6 +1455,8 @@ fn status_view(state: &State) -> Element<'_, Message> {
     if let Some(status) = &state.status {
         let badge_label = if status.ready {
             crate::fl!("agent-status-ready")
+        } else if state.modality == Modality::Decision && status.configured {
+            crate::fl!("agent-decision-status-unavailable")
         } else {
             crate::fl!("agent-status-not-ready")
         };
@@ -1472,6 +1521,9 @@ fn configuration_view(state: &State) -> Element<'_, Message> {
         .flex_control(provider_dropdown.apply(Element::from));
 
     let mut col = column::with_capacity(8).spacing(12).push(provider_row);
+    if state.modality == Modality::Decision {
+        col = col.push(text::body(crate::fl!("agent-decision-local-help")));
+    }
 
     if let Some(provider) = state.selected_provider() {
         // Model picker. If we have a curated list, render a dropdown; the

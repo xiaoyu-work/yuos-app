@@ -5,6 +5,7 @@
 // non-interactive subcommands. See `common.rs` for the shared form.
 
 pub mod common;
+pub mod decision;
 pub mod embed;
 pub mod imagegen;
 pub mod llm;
@@ -37,6 +38,7 @@ impl page::AutoBind<crate::pages::Message> for Page {
         page: page::Insert<crate::pages::Message>,
     ) -> page::Insert<crate::pages::Message> {
         page.sub_page::<llm::Page>()
+            .sub_page::<decision::Page>()
             .sub_page::<tts::Page>()
             .sub_page::<stt::Page>()
             .sub_page::<imagegen::Page>()

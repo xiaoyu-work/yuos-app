@@ -475,6 +475,11 @@ impl cosmic::Application for SettingsApp {
                             return page.update(message).map(Into::into);
                         }
                     }
+                    agent::Modality::Decision => {
+                        if let Some(page) = self.pages.page_mut::<agent::decision::Page>() {
+                            return page.update(message).map(Into::into);
+                        }
+                    }
                     agent::Modality::Tts => {
                         if let Some(page) = self.pages.page_mut::<agent::tts::Page>() {
                             return page.update(message).map(Into::into);

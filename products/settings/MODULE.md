@@ -65,6 +65,11 @@ from the system-launched Settings window. The App displays confirmed state;
 automatic login, signed APT, administrator authentication, and restart
 decisions remain OS-owned. These controls are not exposed through MCP.
 
+**Agent → Decision model** is a separate local model page. The system-launched
+Settings window reads, saves, tests and resets the owner's Decision selection
+through the closed OS Settings interface. The App does not read the owner's
+configuration file or run inference inside the sandbox.
+
 | Path | Responsibility |
 | --- | --- |
 | `apps/accessibility-manager/app.json` | Separate observation/control scopes and closed toggle/filter choices |
