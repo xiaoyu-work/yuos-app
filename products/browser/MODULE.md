@@ -14,7 +14,7 @@ upstream `helium-bin` runtime.
 | `apps/web/app.json` | Existing five-operation CLI and matching MCP schemas |
 | `apps/web/main.py`, `apps/web/server.py` | Headless reads, scraping, screenshots, forms and gated AI summaries |
 | `apps/web/test_main.py` | URL canonicalization, MCP dispatch and existing engine/AI behavior |
-| `apps/browser-attached/` | Ten attached-browser MCP tools and a compatibility launcher for the OS transport |
+| `apps/browser-attached/` | Attached-browser MCP tools and a compatibility launcher for the OS transport |
 | `extension/` | MV3 service worker, top-frame DOM helpers and native browser chat side panel |
 | `packaging/claw-browser-host` | Unprivileged executable selecting the versioned OS browser transport |
 | `package.json` | Product-owned staging and test inputs |
@@ -73,3 +73,8 @@ The side panel uses a separate OS-owned Native Messaging host in the Desktop
 package for the existing Claw Agent. Its opt-in tab context contains only the
 tab ID and origin; the panel does not read page bodies, cookies, or model
 credentials. Browser package upgrades do not require Desktop for MCP or CLI.
+
+The optional decision path uses an active-tab `links` snapshot and follows one
+fresh same-origin link reference after the ordinary App and OS checks. The App
+does not invoke inference; the system Agent may rank the returned labels with
+its configured owner-local decision model.

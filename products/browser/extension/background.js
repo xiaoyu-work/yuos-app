@@ -182,6 +182,30 @@ async function requireActiveExpectedOrigin(windowId, tabId, expectedOrigin) {
   }
 }
 
+function verifyNavigation(tab, destination) {
+  return new Promise((resolve) => {
+    const finish = (verified) => {
+      chrome.tabs.onUpdated.removeListener(onUpdated);
+      clearTimeout(timeout);
+      resolve({ verified });
+    };
+    const check = (current) => {
+      if (!current.active || current.windowId !== tab.windowId
+        || (current.url !== tab.url && current.url !== destination)) {
+        finish(false);
+      } else if (current.url === destination && current.status === "complete") {
+        finish(true);
+      }
+    };
+    const onUpdated = (id, _changes, current) => {
+      if (id === tab.id) check(current);
+    };
+    const timeout = setTimeout(() => finish(false), 2000);
+    chrome.tabs.onUpdated.addListener(onUpdated);
+    chrome.tabs.get(tab.id).then(check, () => finish(false));
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Verb handlers
 // ---------------------------------------------------------------------------
@@ -216,6 +240,15 @@ const HANDLERS = {
     return { navigated: id, url };
   },
 
+  "nav.follow": async ({ id, ref, expected_origin }) => {
+    const tab = await requireExpectedOrigin(id, expected_origin);
+    if (!tab.active) throw new Error("target tab is no longer active");
+    const { destination } = await sendToContent(id, {
+      kind: "followLink", ref, expected_origin,
+    });
+    return verifyNavigation(tab, destination);
+  },
+
   "dom.query": async ({ id, selector, expected_origin }) => {
     await requireExpectedOrigin(id, expected_origin);
     return sendToContent(id, {
@@ -242,7 +275,8 @@ const HANDLERS = {
   },
 
   "page.snapshot": async ({ id, kind, expected_origin }) => {
-    await requireExpectedOrigin(id, expected_origin);
+    const tab = await requireExpectedOrigin(id, expected_origin);
+    if (kind === "links" && !tab.active) throw new Error("target tab is no longer active");
     return sendToContent(id, {
       kind: "snapshot",
       snapshot_kind: kind || "ax",

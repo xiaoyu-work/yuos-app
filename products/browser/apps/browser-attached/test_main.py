@@ -24,7 +24,7 @@ class ManifestContractTests(unittest.TestCase):
 
     def test_manifest_is_mcp_only(self) -> None:
         self.assertNotIn("operations", self.manifest)
-        self.assertEqual(len(self.manifest["mcp"]["tools"]), 10)
+        self.assertEqual(len(self.manifest["mcp"]["tools"]), 11)
         server = (APP_DIR / "server.py").read_text(encoding="utf-8")
         self.assertIn("App.from_manifest()", server)
         self.assertNotIn("serve_manifest_operations", server)
@@ -34,6 +34,7 @@ class ManifestContractTests(unittest.TestCase):
         tools = {tool["name"]: tool for tool in self.manifest["mcp"]["tools"]}
         for name in (
             "browser-attached.nav.go",
+            "browser-attached.nav.follow",
             "browser-attached.dom.query",
             "browser-attached.dom.click",
             "browser-attached.dom.fill",
@@ -108,6 +109,18 @@ class BrowserOperationTests(unittest.TestCase):
             tab_id=9,
             page_url="https://Example.COM/path",
             selector="main",
+        )
+
+    @mock.patch("main.browser_bridge.request", return_value={"verified": False})
+    @mock.patch("main.policy.require", autospec=True)
+    def test_follow_uses_same_origin_navigation_scope_without_automatic_retry(
+        self, require: mock.Mock, request: mock.Mock,
+    ) -> None:
+        origin = "https://Example.COM/path"
+        self.assertEqual(main.follow_link(9, "doc#fixture:link#1", origin), {"verified": False})
+        require.assert_called_once_with("browser.nav", host="example.com:443")
+        request.assert_called_once_with(
+            "nav.follow", tab_id=9, page_url=origin, reference="doc#fixture:link#1",
         )
 
     @mock.patch("main.memory.remember")

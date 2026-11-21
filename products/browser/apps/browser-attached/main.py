@@ -108,6 +108,20 @@ def navigate(tab_id: int, url: str) -> dict[str, object]:
     return result
 
 
+def follow_link(tab_id: int, reference: str, page_url: str) -> dict[str, object]:
+    result = _page_action(
+        "nav.follow",
+        "browser.nav",
+        tab_id,
+        page_url,
+        reference=_required_text(reference, "reference"),
+    )
+    verified = result.get("verified")
+    if not isinstance(verified, bool):
+        raise RuntimeError("browser bridge returned an invalid link navigation result")
+    return {"verified": verified}
+
+
 def dom_query(tab_id: int, selector: str, page_url: str) -> dict[str, object]:
     return _page_action(
         "dom.query",
@@ -169,8 +183,8 @@ def page_snapshot(
     page_url: str,
     kind: str = "ax",
 ) -> dict[str, object]:
-    if kind not in {"ax", "text"}:
-        raise ValueError("kind must be `ax` or `text`")
+    if kind not in {"ax", "text", "links"}:
+        raise ValueError("kind must be `ax`, `text`, or `links`")
     return _page_action(
         "page.snapshot",
         "browser.dom.read",

@@ -5,6 +5,7 @@ from main import (
     dom_fill,
     dom_fill_secret,
     dom_query,
+    follow_link,
     navigate,
     page_eval,
     page_screenshot,
@@ -30,6 +31,15 @@ def browser_tabs_activate(tab_id: int) -> dict[str, object]:
 @app.tool("browser-attached.nav.go")
 def browser_navigate(tab_id: int, url: str) -> dict[str, object]:
     return navigate(tab_id, url)
+
+
+@app.tool("browser-attached.nav.follow")
+def browser_follow_link(
+    tab_id: int,
+    reference: str,
+    page_url: str,
+) -> dict[str, object]:
+    return follow_link(tab_id, reference, page_url)
 
 
 @app.tool("browser-attached.dom.query")

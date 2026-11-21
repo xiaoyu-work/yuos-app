@@ -13,6 +13,9 @@
   crypto.getRandomValues(refNonce);
   const REF_PREFIX =
     "doc#" + Array.from(refNonce, (byte) => byte.toString(16).padStart(2, "0")).join("") + ":el#";
+  const LINK_REF_PREFIX = REF_PREFIX.replace(":el#", ":link#");
+  const MAX_LINKS = 16;
+  const LINK_REF_TTL_MS = 5000;
   // axTree caps — protect callers from pathological pages.
   const AX_MAX_NODES = 10_000;
   const AX_MAX_BYTES = 5 * 1024 * 1024;
@@ -21,6 +24,7 @@
   const PRUNE_INTERVAL_MS = 30_000;
   let nextRef = 1;
   const table = new Map(); // refId -> WeakRef<Element>
+  const observedLinks = new Map();
 
   function originScope() {
     const parsed = new URL(window.location.href);
@@ -367,6 +371,55 @@
     }
   }
 
+  function linkEvidence(el) {
+    if (!(el instanceof HTMLAnchorElement) || !el.isConnected || !visible(el)
+      || el.hasAttribute("download") || el.closest("[inert], [aria-hidden='true'], [aria-disabled='true']")
+      || (el.hasAttribute("role") && el.getAttribute("role") !== "link")
+      || (el.getAttribute("target") && el.getAttribute("target").toLowerCase() !== "_self")) {
+      return null;
+    }
+    const rect = el.getBoundingClientRect();
+    const left = Math.max(0, rect.left);
+    const right = Math.min(innerWidth, rect.right);
+    const top = Math.max(0, rect.top);
+    const bottom = Math.min(innerHeight, rect.bottom);
+    if (left >= right || top >= bottom
+      || !el.contains(document.elementFromPoint((left + right) / 2, (top + bottom) / 2))) {
+      return null;
+    }
+    let url;
+    try {
+      url = new URL(el.href);
+    } catch {
+      return null;
+    }
+    if (url.origin !== location.origin || !["http:", "https:"].includes(url.protocol)
+      || url.username || url.password || url.href === location.href) {
+      return null;
+    }
+    const label = (explicitAccessibleName(el) || safeRenderedText(el, 120))
+      .replace(/\s+/g, " ").trim().slice(0, 120);
+    return label ? { label, url: url.href } : null;
+  }
+
+  function linkSnapshot() {
+    if (document.visibilityState !== "visible") throw new Error("target page is not visible");
+    observedLinks.clear();
+    const links = [];
+    const source = location.href;
+    const expires = performance.now() + LINK_REF_TTL_MS;
+    const elements = document.links;
+    for (let i = 0; i < Math.min(elements.length, 500) && links.length < MAX_LINKS; i++) {
+      const el = elements[i];
+      const evidence = linkEvidence(el);
+      if (!evidence) continue;
+      const ref = LINK_REF_PREFIX + nextRef++;
+      observedLinks.set(ref, { el, source, expires, ...evidence });
+      links.push({ ref, label: evidence.label });
+    }
+    return { kind: "links", links };
+  }
+
   // ---------------------------------------------------------------------
   // Verb dispatch
   // ---------------------------------------------------------------------
@@ -392,6 +445,22 @@
       if (typeof el.click === "function") el.click();
       else el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
       return { ref, clicked: true };
+    },
+
+    followLink({ ref }) {
+      const previous = observedLinks.get(ref);
+      observedLinks.clear();
+      if (!previous || performance.now() >= previous.expires
+        || document.visibilityState !== "visible" || location.href !== previous.source) {
+        throw new Error("observed link is stale");
+      }
+      const current = linkEvidence(previous.el);
+      if (current?.label !== previous.label || current?.url !== previous.url) {
+        throw new Error("observed link changed before navigation");
+      }
+      // Navigate to the witnessed URL without running a DOM click handler.
+      location.assign(previous.url);
+      return { destination: previous.url };
     },
 
     fill({ ref, value, allow_secret }) {
@@ -421,6 +490,7 @@
     },
 
     snapshot({ snapshot_kind }) {
+      if (snapshot_kind === "links") return linkSnapshot();
       if (snapshot_kind === "text") {
         return {
           kind: "text",

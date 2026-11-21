@@ -150,6 +150,54 @@
         ]
       },
       {
+        "name": "browser-attached.nav.follow",
+        "summary": {
+          "en": "Follow one fresh same-origin link reference from a links snapshot in the active tab."
+        },
+        "args": [
+          {
+            "name": "tab_id",
+            "kind": "integer",
+            "required": true,
+            "binding": "positional"
+          },
+          {
+            "name": "reference",
+            "kind": "text",
+            "required": true,
+            "binding": "positional"
+          },
+          {
+            "name": "page_url",
+            "kind": "text",
+            "required": true,
+            "binding": "flag"
+          }
+        ],
+        "needs": [
+          {
+            "verb": "browser.nav",
+            "scope": {
+              "kind": "from-arg",
+              "arg": "page_url",
+              "transform": "url-host"
+            },
+            "why": {
+              "en": "Follow a previously observed link on the declared origin."
+            }
+          }
+        ],
+        "effects": [
+          {
+            "kind": "update",
+            "label": {
+              "en": "Navigate the active tab to the observed link."
+            },
+            "recovery": "unknown"
+          }
+        ]
+      },
+      {
         "name": "browser-attached.dom.query",
         "summary": {
           "en": "Find page elements by CSS selector after binding the request to the tab's current URL."
@@ -356,7 +404,7 @@
       {
         "name": "browser-attached.page.snapshot",
         "summary": {
-          "en": "Return a bounded accessibility or text snapshot from the declared page host."
+          "en": "Return bounded accessibility, text, or same-origin link candidates from the declared page host."
         },
         "args": [
           {
@@ -373,7 +421,8 @@
             "default": "ax",
             "choices": [
               "ax",
-              "text"
+              "text",
+              "links"
             ]
           },
           {
@@ -400,7 +449,7 @@
           {
             "kind": "read",
             "label": {
-              "en": "Return a bounded accessibility or text snapshot from the declared page host."
+              "en": "Return bounded accessibility, text, or same-origin link candidates from the declared page host."
             },
             "recovery": "unknown"
           }

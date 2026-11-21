@@ -28,6 +28,7 @@ immediately before acting.
 | `tabs.list` | `browser.tabs.read` | wild |
 | `tabs.activate` | `browser.tabs.read` | wild |
 | `nav.go` | `browser.nav` + `memory.write` | URL host + App self-ref |
+| `nav.follow` | `browser.nav` | `page_url` host |
 | `dom.query` | `browser.dom.read` | `page_url` host |
 | `dom.click` | `browser.dom.write` | `page_url` host |
 | `dom.fill` | `browser.dom.write` | `page_url` host |
@@ -38,6 +39,12 @@ immediately before acting.
 
 Use the URL returned by `tabs.list` as `--page-url` for tab-content tools.
 `dom.fill_secret` and `eval` remain admin-only and approval-gated.
+
+Use `page.snapshot` with `kind: "links"` to get visible same-origin link
+labels and one-use references from the active tab. `nav.follow` rechecks the
+source document and link before navigating; `verified: false` means inspect
+the current tab instead of repeating the request. An updated OS browser
+bridge is needed for these two opt-in paths; existing browsing is unchanged.
 
 ## Files
 
