@@ -13,7 +13,7 @@ own HTTP and permission path. Summaries still use the SDK AI gate.
 `browser-attached` provides ten tools for logged-in Helium tabs. Its Native
 Messaging launcher and full MV3 extension source live here too. `yuosd` remains
 the authority for page origins, secret/eval capabilities and socket access.
-Pin and click the installed Claw Agent extension to open chat in Helium's
+Pin and click the installed Yu OS Agent extension to open chat in Helium's
 side panel. It uses the desktop Agent's model and permissions. **Use current
 tab** shares only the tab ID and site origin; actual page reads and actions
 still go through the authorized Browser tools. The installer registers the

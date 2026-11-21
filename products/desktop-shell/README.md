@@ -1,6 +1,6 @@
-# Claw desktop shell
+# Yu OS desktop shell
 
-The editable source baseline for Claw's Quickshell-based desktop interface.
+The editable source baseline for Yu OS's Quickshell-based desktop interface.
 It contains the complete Caelestia shell, matching CLI and Material shape
 library, not an Omarchy distribution or a replacement Agent.
 

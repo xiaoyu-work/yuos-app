@@ -64,20 +64,20 @@ impl App {
                 return self.update_config();
             }
 
-            Message::AskClaw => {
+            Message::AskYu => {
                 let outcome = if let Some(selected) = &self.selected_opt {
-                    crate::claw_glue::ask_claw_app(selected.id.raw(), &selected.info.name)
+                    crate::claw_glue::ask_yu_app(selected.id.raw(), &selected.info.name)
                 } else if let Some(page) = self.explore_page_opt {
-                    crate::claw_glue::ask_claw_explore(&format!("{page:?}"))
+                    crate::claw_glue::ask_yu_explore(&format!("{page:?}"))
                 } else {
-                    crate::claw_glue::ask_claw_home()
+                    crate::claw_glue::ask_yu_home()
                 };
                 if let Err(err) = outcome {
-                    log::error!("failed to open Ask Claw overlay: {err}");
+                    log::error!("failed to open Ask Yu OS overlay: {err}");
                 }
             }
 
-            Message::AskClawSearch => {
+            Message::AskYuSearch => {
                 // The Store's literal search misses fuzzy / NL queries
                 // like "screen recording app" — keyword-match has no way
                 // to bridge concept→appstream-id. Hand the raw query to
@@ -86,8 +86,8 @@ impl App {
                 // result.
                 let query = self.search_input.trim().to_string();
                 if !query.is_empty() {
-                    if let Err(err) = crate::claw_glue::ask_claw_search(&query) {
-                        log::error!("failed to open Ask Claw overlay: {err}");
+                    if let Err(err) = crate::claw_glue::ask_yu_search(&query) {
+                        log::error!("failed to open Ask Yu OS overlay: {err}");
                     }
                 }
             }

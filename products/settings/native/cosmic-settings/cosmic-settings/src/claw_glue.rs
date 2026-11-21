@@ -18,7 +18,7 @@ use std::os::unix::process::ExitStatusExt;
 use std::path::Path;
 use std::process::{ExitStatus, Output};
 
-use yuos_runtime::{BridgeError, ask_claw};
+use yuos_runtime::{BridgeError, ask_yu};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
@@ -102,7 +102,7 @@ struct SettingsPageContext<'a> {
     title: &'a str,
 }
 
-impl ask_claw::Context for SettingsPageContext<'_> {
+impl ask_yu::Context for SettingsPageContext<'_> {
     const APP_ID: &'static str = "cosmic-settings";
 }
 
@@ -112,16 +112,16 @@ struct SettingsSearchContext<'a> {
     query: &'a str,
 }
 
-impl ask_claw::Context for SettingsSearchContext<'_> {
+impl ask_yu::Context for SettingsSearchContext<'_> {
     const APP_ID: &'static str = "cosmic-settings";
 }
 
-pub fn ask_claw_page(page: &str, title: &str) -> Result<(), ask_claw::LaunchError> {
-    ask_claw::launch(&SettingsPageContext { page, title })
+pub fn ask_yu_page(page: &str, title: &str) -> Result<(), ask_yu::LaunchError> {
+    ask_yu::launch(&SettingsPageContext { page, title })
 }
 
-pub fn ask_claw_search(query: &str) -> Result<(), ask_claw::LaunchError> {
-    ask_claw::launch(&SettingsSearchContext {
+pub fn ask_yu_search(query: &str) -> Result<(), ask_yu::LaunchError> {
+    ask_yu::launch(&SettingsSearchContext {
         mode: "search",
         query,
     })

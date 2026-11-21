@@ -144,7 +144,7 @@ async fn main() {
         return;
     }
 
-    let args = Args::parse_from(claw_app_gui_argv::normalize(
+    let args = Args::parse_from(yuos_app_gui_argv::normalize(
         std::env::args_os(),
         yuos_sdk::gui::is_gui_launch(),
         std::ffi::OsStr::new("--gui"),

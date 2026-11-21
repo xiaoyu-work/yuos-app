@@ -8,7 +8,7 @@ where
     I: IntoIterator<Item = T>,
     T: Into<OsString>,
 {
-    Args::try_parse_from(claw_app_gui_argv::normalize(
+    Args::try_parse_from(yuos_app_gui_argv::normalize(
         argv.into_iter().map(Into::into),
         gui,
         OsStr::new("--gui"),

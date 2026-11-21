@@ -27,7 +27,7 @@ fn parse_from<I>(argv: I, gui_launch: bool) -> Result<Cli, clap::Error>
 where
     I: IntoIterator<Item = OsString>,
 {
-    Cli::try_parse_from(claw_app_gui_argv::normalize(
+    Cli::try_parse_from(yuos_app_gui_argv::normalize(
         argv,
         gui_launch,
         OsStr::new("--gui"),

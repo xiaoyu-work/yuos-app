@@ -1,11 +1,11 @@
 // Copyright 2023 System76 <info@system76.com>
 // SPDX-License-Identifier: GPL-3.0-only
 
-//! Claw Glass — surface treatments for the notifications daemon toasts.
+//! Yu OS Glass — surface treatments for the notifications daemon toasts.
 //!
 //! The shared toolkit/theme foundation provides blue-tinted glass colors, Inter
 //! typography and brand-blue accents for free. These helpers add the
-//! *structural* Claw Glass treatment the daemon is responsible for: a frosted
+//! *structural* Yu OS Glass treatment the daemon is responsible for: a frosted
 //! notification card at `radius_l` (16) with a translucent component fill, a 1px
 //! blue-tinted hairline and a soft downward drop shadow — depth from blur +
 //! shadow, not heavy borders.
@@ -34,7 +34,7 @@ fn hairline(theme: &cosmic::Theme) -> Color {
 
 /// Frosted glass notification card: `radius_l` (16) corners, translucent
 /// component fill, a 1px blue-tinted hairline and a soft drop shadow. This is
-/// the Claw Glass treatment for a single notification toast.
+/// the Yu OS Glass treatment for a single notification toast.
 pub fn card_class() -> theme::Container<'static> {
     theme::Container::custom(|theme| {
         let cosmic = theme.cosmic();

@@ -57,7 +57,7 @@ ExternalProject_Add(desktop-presentation
         "-DCMAKE_INSTALL_PREFIX=${presentation_payload}/usr"
         -DVERSION=1.0.0
         "-DGIT_REVISION=${GIT_REVISION}"
-        -DDISTRIBUTOR=Claw
+        -DDISTRIBUTOR=Yu OS
         "-DENABLE_MODULES=plugin|shell"
         "-DINSTALL_QMLDIR=${qml_directory}"
         -DINSTALL_QSCONFDIR=share/yuos-desktop-shell
@@ -74,7 +74,7 @@ ExternalProject_Add(desktop-engine
     UPDATE_COMMAND ""
     CMAKE_ARGS ${common_args}
         -DCMAKE_INSTALL_PREFIX=/usr
-        -DDISTRIBUTOR=Claw
+        -DDISTRIBUTOR=Yu OS
         -DX11=OFF
         -DI3=OFF
         -DHYPRLAND_IPC=OFF

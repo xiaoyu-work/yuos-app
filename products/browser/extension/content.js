@@ -443,7 +443,7 @@
   };
 
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-    if (!msg || !msg.claw_agent || !msg.kind) return false;
+    if (!msg || !msg.yuos_agent || !msg.kind) return false;
     const handler = VERBS[msg.kind];
     if (!handler) {
       sendResponse({ error: `unknown content verb: ${msg.kind}` });

@@ -1,16 +1,16 @@
 // Copyright 2023 System76 <info@system76.com>
 // SPDX-License-Identifier: GPL-3.0-only
 
-//! Claw Glass — app-level surface treatments for the Store.
+//! Yu OS Glass — app-level surface treatments for the Store.
 //!
 //! The shared toolkit/theme foundation gives us blue-tinted glass colors,
 //! Inter typography and brand-blue selection for free. These helpers add the
-//! *structural* Claw Glass treatments this app is responsible for: frosted
+//! *structural* Yu OS Glass treatments this app is responsible for: frosted
 //! cards at `radius_l` (16), an accent-tinted featured hero, and rounded
 //! screenshot frames — with 1px blue-tinted hairlines and soft shadows instead
 //! of heavy borders.
 //!
-//! Note: the toolkit's `Container::Card` uses `radius_s` (6); per the Claw Glass
+//! Note: the toolkit's `Container::Card` uses `radius_s` (6); per the Yu OS Glass
 //! spec large surfaces/cards must be `radius_l` (16), so the Store defines its
 //! own glass card here rather than mutating the shared toolkit.
 
@@ -31,7 +31,7 @@ fn hairline(theme: &cosmic::Theme, alpha: f32) -> Color {
 }
 
 /// Frosted glass card: `radius_l` (16) corners, translucent component fill, a
-/// 1px blue-tinted hairline and a soft drop shadow. This is the Claw Glass
+/// 1px blue-tinted hairline and a soft drop shadow. This is the Yu OS Glass
 /// treatment for app cards, grid items and grouped surfaces.
 pub fn card_class() -> theme::Container<'static> {
     theme::Container::custom(|theme| {

@@ -29,7 +29,7 @@ fn native_cli_preserves_original_interactive_modal_and_notification_defaults() {
 }
 
 fn launch_args(argv: &[&str], gui: bool) -> Result<Args, clap::Error> {
-    Args::try_parse_from(claw_app_gui_argv::normalize(
+    Args::try_parse_from(yuos_app_gui_argv::normalize(
         argv.iter().map(std::ffi::OsString::from),
         gui,
         std::ffi::OsStr::new("--gui"),
@@ -98,7 +98,7 @@ fn native_gui_argv_preserves_non_utf8_save_paths() {
     use std::os::unix::ffi::OsStringExt;
 
     let path = OsString::from_vec(b"shots-\xff".to_vec());
-    let args = Args::try_parse_from(claw_app_gui_argv::normalize(
+    let args = Args::try_parse_from(yuos_app_gui_argv::normalize(
         [
             OsString::from("cosmic-screenshot"),
             OsString::from("--gui"),

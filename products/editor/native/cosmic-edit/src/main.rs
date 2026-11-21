@@ -94,9 +94,9 @@ pub fn monospace_attrs() -> cosmic_text::Attrs<'static> {
 }
 
 //
-// Claw Glass chrome styling (app-level).
+// Yu OS Glass chrome styling (app-level).
 //
-// These small helpers translate the Claw Glass design language to the editor's
+// These small helpers translate the Yu OS Glass design language to the editor's
 // app chrome. Surface colors are pulled from the inherited theme tokens (never
 // hardcoded hex) so light/dark + compositor blur are inherited automatically;
 // we only apply translucency, brand-blue accents, hairlines, and the documented
@@ -313,7 +313,7 @@ impl AiVerb {
 pub enum Action {
     Todo,
     About,
-    AiAskClaw,
+    AiAskYu,
     AiCustom,
     AiExplain,
     AiRewrite,
@@ -368,7 +368,7 @@ impl Action {
         match self {
             Self::Todo => Message::Todo,
             Self::About => Message::ToggleContextPage(ContextPage::About),
-            Self::AiAskClaw => Message::AiAskClaw,
+            Self::AiAskYu => Message::AiAskYu,
             Self::AiCustom => Message::AiCustomOpen,
             Self::AiExplain => Message::AiRun(AiVerb::Explain),
             Self::AiRewrite => Message::AiRun(AiVerb::Rewrite),
@@ -474,7 +474,7 @@ enum NewTab {
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub enum Message {
-    AiAskClaw,
+    AiAskYu,
     AiCustomChanged(String),
     AiCustomOpen,
     AiCustomRun,
@@ -2091,13 +2091,13 @@ impl Application for App {
             };
         }
         match message {
-            Message::AiAskClaw => {
+            Message::AiAskYu => {
                 let file = self.active_tab().and_then(|tab| match tab {
                     Tab::Editor(t) => t.path_opt.as_deref(),
                     _ => None,
                 });
-                if let Err(err) = crate::claw_glue::ask_claw_overlay(file) {
-                    log::error!("failed to open Ask Claw overlay: {err}");
+                if let Err(err) = crate::claw_glue::ask_yu_overlay(file) {
+                    log::error!("failed to open Ask Yu OS overlay: {err}");
                 }
             }
             Message::AiRun(verb) => {
@@ -3477,7 +3477,7 @@ impl Application for App {
 
         let mut tab_column = widget::column::with_capacity(3).padding([space_none, space_xxs]);
 
-        // Claw Glass tab strip: tab bar (brand-blue active tab, inherited from the
+        // Yu OS Glass tab strip: tab bar (brand-blue active tab, inherited from the
         // shared toolkit style) + a glass new-file button, hosted on a frosted
         // strip with a single hairline for quiet structure.
         let tab_strip = widget::row::with_capacity(2)
@@ -3608,7 +3608,7 @@ impl Application for App {
                                     "", new_line, text
                                 )))
                                 .style(|theme| {
-                                    // Claw Glass: themed success glass wash, not a
+                                    // Yu OS Glass: themed success glass wash, not a
                                     // hardcoded pure-green field.
                                     let cosmic = theme.cosmic();
                                     let mut bg = cosmic.success.base;
@@ -3625,7 +3625,7 @@ impl Application for App {
                                     old_line, "", text
                                 )))
                                 .style(|theme| {
-                                    // Claw Glass: themed destructive glass wash.
+                                    // Yu OS Glass: themed destructive glass wash.
                                     let cosmic = theme.cosmic();
                                     let mut bg = cosmic.destructive.base;
                                     bg.alpha *= 0.18;

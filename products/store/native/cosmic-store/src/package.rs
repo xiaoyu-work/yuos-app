@@ -170,7 +170,7 @@ impl Intent {
                     && value.len() <= 128 && value.as_bytes()[0].is_ascii_digit()
                     && value.bytes().all(|byte| byte.is_ascii_alphanumeric() || b".+~-:".contains(&byte)))
             {
-                return Err(io::Error::other("Expected one Claw App and its exact Debian release"));
+                return Err(io::Error::other("Expected one Yu OS App and its exact Debian release"));
             }
         } else if self.version.is_some() {
             return Err(io::Error::other("This package action does not accept a version"));

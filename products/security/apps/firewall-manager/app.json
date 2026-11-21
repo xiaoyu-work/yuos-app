@@ -34,7 +34,7 @@
               }
             },
             "why": {
-              "en": "Read Claw's dedicated nftables table and detect drift."
+              "en": "Read Yu OS's dedicated nftables table and detect drift."
             }
           }
         ],
@@ -188,7 +188,7 @@
               }
             },
             "why": {
-              "en": "Remove every rule from Claw's dedicated table."
+              "en": "Remove every rule from Yu OS's dedicated table."
             }
           }
         ],

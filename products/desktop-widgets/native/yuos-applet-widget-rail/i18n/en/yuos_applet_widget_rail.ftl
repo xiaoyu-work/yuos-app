@@ -1,4 +1,4 @@
-rail-eyebrow = CLAWOS DESKTOP
+rail-eyebrow = YU OS DESKTOP
 rail-title = Widgets
 today-title = Today
 tasks-title = AI Tasks

@@ -33,7 +33,7 @@ MAX_PACKAGE_BYTES = 1024**3
 def retired_ids():
     values = config().get("retired_store_apps", [])
     if not isinstance(values, list) or any(not app_id(value) for value in values) or len(set(values)) != len(values):
-        raise ValueError("Claw Store retirements require unique exact App identities")
+        raise ValueError("Yu OS Store retirements require unique exact App identities")
     return set(values)
 
 

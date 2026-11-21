@@ -170,14 +170,14 @@ fn button_appearance(
                 appearance.text_color = Some(Color::from(cosmic.on_accent_color()));
             }
         } else {
-            // Claw Glass: selection is a brand-blue translucent fill, never gray.
+            // Yu OS Glass: selection is a brand-blue translucent fill, never gray.
             let mut selection = cosmic.accent_color();
             selection.alpha = 0.22;
             appearance.background = Some(Color::from(selection).into());
         }
     } else if highlighted {
         if accent {
-            // Claw Glass: hover is a faint brand-blue wash, never gray.
+            // Yu OS Glass: hover is a faint brand-blue wash, never gray.
             let mut hover = cosmic.accent_color();
             hover.alpha = 0.10;
             appearance.background = Some(Color::from(hover).into());
@@ -189,7 +189,7 @@ fn button_appearance(
                 appearance.text_color = Some(Color::from(cosmic.on_bg_component_color()));
             }
         } else {
-            // Claw Glass: hover is a faint brand-blue wash, never gray.
+            // Yu OS Glass: hover is a faint brand-blue wash, never gray.
             let mut hover = cosmic.accent_color();
             hover.alpha = 0.10;
             appearance.background = Some(Color::from(hover).into());
@@ -7059,7 +7059,7 @@ fn text_editor_class(
                     radius: cosmic.corner_radii.radius_m.into(),
                     width: 2.0,
                     color: {
-                        // Claw Glass: brand-blue translucent hairline, never gray.
+                        // Yu OS Glass: brand-blue translucent hairline, never gray.
                         let mut c = cosmic.accent.base;
                         c.alpha = 0.30;
                         c.into()

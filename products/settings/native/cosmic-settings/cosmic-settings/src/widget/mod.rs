@@ -51,7 +51,7 @@ pub fn color_picker_context_view<'a, Message: Clone + 'static>(
         .apply(Element::from)
 }
 
-/// A settings section whose list card uses the Claw Glass elevated material.
+/// A settings section whose list card uses the Yu OS Glass elevated material.
 ///
 /// `settings::section()` defaults to `Container::List`, which fills with
 /// `component.base` and carries no border or shadow. On the YuOS light

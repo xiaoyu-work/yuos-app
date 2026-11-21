@@ -17,7 +17,7 @@ pub mod ai;
 use std::io;
 use std::path::Path;
 
-use yuos_runtime::{BridgeError, ask_claw, desktop, filesystem};
+use yuos_runtime::{BridgeError, ask_yu, desktop, filesystem};
 use serde::Serialize;
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq)]
@@ -116,12 +116,12 @@ struct EditContext<'a> {
     file: Option<&'a str>,
 }
 
-impl ask_claw::Context for EditContext<'_> {
+impl ask_yu::Context for EditContext<'_> {
     const APP_ID: &'static str = "cosmic-edit";
 }
 
-/// Open Ask Claw with the optional active document path.
-pub fn ask_claw_overlay(file: Option<&Path>) -> Result<(), ask_claw::LaunchError> {
+/// Open Ask Yu OS with the optional active document path.
+pub fn ask_yu_overlay(file: Option<&Path>) -> Result<(), ask_yu::LaunchError> {
     let file = file.and_then(Path::to_str);
-    ask_claw::launch(&EditContext { file })
+    ask_yu::launch(&EditContext { file })
 }

@@ -81,7 +81,7 @@ def signing():
     base = ["gpg", "--no-options", "--batch", "--homedir", home]
     try:
         run([*base, "--pinentry-mode", "loopback", "--passphrase-fd", "0",
-             "--quick-generate-key", "Claw App Release Fixture", "ed25519", "sign", "1d"],
+             "--quick-generate-key", "Yu OS App Release Fixture", "ed25519", "sign", "1d"],
             input=phrase + b"\n")
         fingerprint = primary_fingerprints(run([*base, "--with-colons", "--list-keys"]).stdout)[0]
         public = root / "archive-key.asc"

@@ -344,7 +344,7 @@ async function sendToContent(tabId, message) {
     const response = await chrome.tabs.sendMessage(
       tabId,
       {
-        claw_agent: true,
+        yuos_agent: true,
         ...message,
       },
       { frameId: 0 }

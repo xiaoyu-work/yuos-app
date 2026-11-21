@@ -156,7 +156,7 @@ pub fn context_menu<'a>(
         menu_item(fl!("select-all"), Action::SelectAll),
     ))
     .padding(1)
-    // Claw Glass popover: frosted surface, large radius, blue-tinted hairline.
+    // Yu OS Glass popover: frosted surface, large radius, blue-tinted hairline.
     .style(|theme| {
         let cosmic = theme.cosmic();
         let component = &cosmic.background.component;
@@ -295,7 +295,7 @@ pub fn menu_bar<'a>(
                 (
                     (fl!("ai")),
                     vec![
-                        MenuItem::Button(fl!("ai-ask-claw"), None, Action::AiAskClaw),
+                        MenuItem::Button(fl!("ai-ask-yu"), None, Action::AiAskYu),
                         MenuItem::Divider,
                         MenuItem::Button(fl!("ai-custom"), None, Action::AiCustom),
                         MenuItem::Divider,

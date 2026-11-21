@@ -7,7 +7,7 @@ use cosmic::{
     theme,
 };
 
-/// Fill for an elevated Claw Glass card.
+/// Fill for an elevated Yu OS Glass card.
 ///
 /// YuOS light puts `component.base` (`#D7DAE1`) *below* the page background
 /// (`#EEF1F8`), so raising its opacity sinks a card instead of lifting it.
@@ -90,7 +90,7 @@ pub fn icon_tile() -> cosmic::theme::Container<'static> {
     })
 }
 
-/// Claw Glass — the grouped section card used inside settings pages.
+/// Yu OS Glass — the grouped section card used inside settings pages.
 ///
 /// The stock `Container::List` fills with `component.base`, which on YuOS
 /// light composites to `#DDE0E7` against the `#EEF1F8` page and carries no

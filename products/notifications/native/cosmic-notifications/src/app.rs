@@ -642,7 +642,7 @@ impl cosmic::Application for CosmicNotifications {
                 .into();
         }
 
-        // Claw Glass spacing tokens — generous, token-driven rhythm.
+        // Yu OS Glass spacing tokens — generous, token-driven rhythm.
         let spacing = cosmic::theme::spacing();
 
         let (ids, notif_elems): (Vec<_>, Vec<_>) = self
@@ -651,7 +651,7 @@ impl cosmic::Application for CosmicNotifications {
             .rev()
             .map(|n| {
                 // App-name / meta line — turned into a brand-blue accent moment
-                // (Claw Glass forbids dead gray meta text).
+                // (Yu OS Glass forbids dead gray meta text).
                 let app_name = text::caption(if n.app_name.len() > 24 {
                     Cow::from(format!(
                         "{:.26}...",
@@ -703,7 +703,7 @@ impl cosmic::Application for CosmicNotifications {
                 .spacing(spacing.space_xxxs)
                 .width(Length::Fill);
 
-                // Frosted Claw Glass toast card: radius_l, blue hairline, soft
+                // Frosted Yu OS Glass toast card: radius_l, blue hairline, soft
                 // shadow, generous padding.
                 let e = Element::from(
                     container(

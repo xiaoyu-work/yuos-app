@@ -8,9 +8,9 @@ install = 安装
 no-installed-applications = 没有已安装的应用程序。
 no-updates = 所有已安装的应用程序都是最新的。
 no-results = 找不到 "{ $search }" 的结果。
-ai-search-ask-claw = 让 Claw 帮你找应用
-ai-search-ask-claw-q = 让 Claw 帮你查找 "{ $query }"
-ai-search-ask-claw-hint = 描述你想做什么 — Claw 会用 AI 在商店里搜索。
+ai-search-ask-yu = 让 Yu OS 帮你找应用
+ai-search-ask-yu-q = 让 Yu OS 帮你查找 "{ $query }"
+ai-search-ask-yu-hint = 描述你想做什么 — Yu OS 会用 AI 在商店里搜索。
 notification-in-progress = 正在进行安装和更新。
 open = 打开
 see-all = 查看全部
@@ -73,7 +73,7 @@ updates = 更新
 
 enable-flathub-cosmic = 请启用 Flathub 和 Yu OS Flatpak 远程仓库即可查看可用小部件。
 manage-repositories = 管理远程仓库
-ask-claw = 问 Claw…
+ask-yu = 问 Yu OS…
 # Explore Pages
 editors-choice = 编辑推荐
 popular-apps = 热门应用

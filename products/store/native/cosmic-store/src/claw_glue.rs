@@ -2,7 +2,7 @@
 //! Package effects use the retained Root service, never provider dialogs.
 
 use std::{io, path::Path};
-use yuos_runtime::{ask_claw, BridgeError, policy};
+use yuos_runtime::{ask_yu, BridgeError, policy};
 use serde::Serialize;
 
 pub fn user_message(err: &BridgeError) -> String {
@@ -49,7 +49,7 @@ struct StoreViewContext<'a> {
     name: Option<&'a str>,
 }
 
-impl ask_claw::Context for StoreViewContext<'_> {
+impl ask_yu::Context for StoreViewContext<'_> {
     const APP_ID: &'static str = "cosmic-store";
 }
 
@@ -59,22 +59,22 @@ struct StoreSearchContext<'a> {
     query: &'a str,
 }
 
-impl ask_claw::Context for StoreSearchContext<'_> {
+impl ask_yu::Context for StoreSearchContext<'_> {
     const APP_ID: &'static str = "cosmic-store";
 }
 
-pub fn ask_claw_home() -> Result<(), ask_claw::LaunchError> {
-    ask_claw::launch(&StoreViewContext { view: "home", page: None, app_id: None, name: None })
+pub fn ask_yu_home() -> Result<(), ask_yu::LaunchError> {
+    ask_yu::launch(&StoreViewContext { view: "home", page: None, app_id: None, name: None })
 }
 
-pub fn ask_claw_explore(page: &str) -> Result<(), ask_claw::LaunchError> {
-    ask_claw::launch(&StoreViewContext { view: "explore", page: Some(page), app_id: None, name: None })
+pub fn ask_yu_explore(page: &str) -> Result<(), ask_yu::LaunchError> {
+    ask_yu::launch(&StoreViewContext { view: "explore", page: Some(page), app_id: None, name: None })
 }
 
-pub fn ask_claw_app(app_id: &str, name: &str) -> Result<(), ask_claw::LaunchError> {
-    ask_claw::launch(&StoreViewContext { view: "app", page: None, app_id: Some(app_id), name: Some(name) })
+pub fn ask_yu_app(app_id: &str, name: &str) -> Result<(), ask_yu::LaunchError> {
+    ask_yu::launch(&StoreViewContext { view: "app", page: None, app_id: Some(app_id), name: Some(name) })
 }
 
-pub fn ask_claw_search(query: &str) -> Result<(), ask_claw::LaunchError> {
-    ask_claw::launch(&StoreSearchContext { mode: "search", query })
+pub fn ask_yu_search(query: &str) -> Result<(), ask_yu::LaunchError> {
+    ask_yu::launch(&StoreSearchContext { mode: "search", query })
 }

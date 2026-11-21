@@ -19,7 +19,7 @@ payloads must be built on Debian 13, not the Ubuntu preview environment.
 The pinned Qt runtime is App-owned; Debian backports supply the Wayland
 scanner and protocol XML needed to build Quickshell's background effects.
 Do not treat an upstream installer or direct executable launch as completed
-Claw runtime integration.
+Yu OS runtime integration.
 
 ## Key files
 
@@ -73,7 +73,7 @@ Right-clicking an App pins it in the Shell's private data.
 The permanent Launcher entry opens the independent
 `yuos-launcher` GUI; the Shell contains no launcher search.
 `services/DesktopMenu.qml` sends one desktop entry ID through the existing
-`desktop_review.py` and private GUI broker, never an Exec string. The Claw
+`desktop_review.py` and private GUI broker, never an Exec string. The Yu OS
 mark sends the reserved Agent UI entry to the same broker, which handles it
 only for the OS-started desktop Shell. This does not start recording or send a
 model request. A submission does not prove a window appeared. Denial or
@@ -138,7 +138,7 @@ licenses, notices, file modes and resources must remain available.
 The initial source import is checked against the Git tree IDs recorded in
 `upstream.lock.json`, including executable modes and every tracked file.
 Those are baseline identities, not hashes that should be rewritten when
-making intentional Claw modifications. Native compilation and actual
+making intentional Yu OS modifications. Native compilation and actual
 managed-GUI acceptance are separate required checks before activation.
 
 The native plugin requires Qt 6.9 or newer, libqalculate, PipeWire, Aubio,
@@ -160,7 +160,7 @@ Run from a Linux-filesystem checkout of this repository:
 ```sh
 cmake -S products/desktop-shell/native/caelestia -B build/caelestia -G Ninja \
   -DCMAKE_BUILD_TYPE=Release -DVERSION=1.0.0 \
-  -DGIT_REVISION="$(git rev-parse HEAD)" -DDISTRIBUTOR=Claw \
+  -DGIT_REVISION="$(git rev-parse HEAD)" -DDISTRIBUTOR=Yu OS \
   '-DENABLE_MODULES=plugin;shell'
 cmake --build build/caelestia --parallel 4
 cmake -S products/desktop-shell/native/m3shapes -B build/m3shapes -G Ninja \

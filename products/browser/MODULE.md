@@ -70,6 +70,6 @@ own exact grants. Live installed browser/extension acceptance remains separate
 from source, unit and package checks.
 
 The side panel uses a separate OS-owned Native Messaging host in the Desktop
-package for the existing Claw Agent. Its opt-in tab context contains only the
+package for the existing Yu OS Agent. Its opt-in tab context contains only the
 tab ID and origin; the panel does not read page bodies, cookies, or model
 credentials. Browser package upgrades do not require Desktop for MCP or CLI.

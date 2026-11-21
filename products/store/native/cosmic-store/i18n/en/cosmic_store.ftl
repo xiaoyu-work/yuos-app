@@ -24,9 +24,9 @@ install = Install
 no-installed-applications = No installed applications.
 no-updates = All installed applications are up to date.
 no-results = No results for "{$search}".
-ai-search-ask-claw = Ask Yu to find an app for you
-ai-search-ask-claw-q = Ask Yu to find an app for "{ $query }"
-ai-search-ask-claw-hint = Describe what you want to do — Yu will search the store with AI.
+ai-search-ask-yu = Ask Yu to find an app for you
+ai-search-ask-yu-q = Ask Yu to find an app for "{ $query }"
+ai-search-ask-yu-hint = Describe what you want to do — Yu will search the store with AI.
 notification-in-progress = Installations and updates are in progress.
 open = Open
 see-all = See all
@@ -103,7 +103,7 @@ updates = Updates
 ## Applets page
 enable-flathub-cosmic = Please enable Flathub and Yu OS Flatpak to see available applets.
 manage-repositories = Manage repositories
-ask-claw = Ask Yu…
+ask-yu = Ask Yu…
 
 # Explore Pages
 editors-choice = Editor's choice

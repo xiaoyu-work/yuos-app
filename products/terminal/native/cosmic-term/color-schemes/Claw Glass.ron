@@ -1,9 +1,9 @@
-// Claw Glass — deep navy-blue glass terminal theme.
+// Yu OS Glass — deep navy-blue glass terminal theme.
 // On-brand default for the Yu OS Terminal: cool-white grid on a navy glass
 // base, brand-blue (#005CFE) cursor, brand-aligned blue ANSI ramp. Tuned so the
 // terminal grid stays crisp and legible while the chrome reads as frosted glass.
 (
-    name: "Claw Glass",
+    name: "Yu OS Glass",
     foreground: "#E6EAF2",
     background: "#0A0E17",
     cursor: "#005CFE",

@@ -669,7 +669,7 @@ impl App {
                         grid_width,
                         Message::SelectSearchResult,
                     ));
-                    column = column.push(ask_claw_search_callout(input));
+                    column = column.push(ask_yu_search_callout(input));
                     column.into()
                 }
                 None => match self
@@ -1106,7 +1106,7 @@ impl App {
 }
 
 /// Accent-tinted featured spotlight for the Explore home. Showcases a single
-/// app (the first Editor's Choice pick) inside a Claw Glass hero card: large
+/// app (the first Editor's Choice pick) inside a Yu OS Glass hero card: large
 /// icon, brand-blue eyebrow label, name, summary and a filled action that opens
 /// the full Editor's Choice shelf. Clicking the card opens the app's detail.
 fn featured_hero<'a>(
@@ -1155,17 +1155,17 @@ fn featured_hero<'a>(
     .into()
 }
 
-fn ask_claw_search_callout<'a>(query: &str) -> Element<'a, Message> {
+fn ask_yu_search_callout<'a>(query: &str) -> Element<'a, Message> {
     let cosmic_theme::Spacing {
         space_xxs, space_s, ..
     } = theme::active().cosmic().spacing;
     let q = query.trim();
     let label = if q.is_empty() {
-        fl!("ai-search-ask-claw")
+        fl!("ai-search-ask-yu")
     } else {
-        fl!("ai-search-ask-claw-q", query = q)
+        fl!("ai-search-ask-yu-q", query = q)
     };
-    let hint = widget::text::caption(fl!("ai-search-ask-claw-hint"))
+    let hint = widget::text::caption(fl!("ai-search-ask-yu-hint"))
         .class(theme::Text::Custom(|t| cosmic::iced::widget::text::Style {
             color: Some(t.cosmic().accent_color().into()),
         }));
@@ -1181,7 +1181,7 @@ fn ask_claw_search_callout<'a>(query: &str) -> Element<'a, Message> {
         .align_y(Alignment::Center);
     widget::button::custom(row)
         .padding([space_xxs, space_s])
-        .on_press(Message::AskClawSearch)
+        .on_press(Message::AskYuSearch)
         .width(Length::Fill)
         .class(theme::Button::Suggested)
         .into()

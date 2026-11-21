@@ -32,7 +32,7 @@ UI state writes use controlled filesystem snapshots with separately authorized
 missing parents. MCP cannot use the human UI write adapter. New Window and
 `term.open` use the fixed OS Terminal target under the existing
 `proc.spawn:cosmic-term` grant, not a widened desktop capability.
-Ask Claw's bounded anonymous context transport, existing configurable
+Ask Yu OS's bounded anonymous context transport, existing configurable
 shell Copilot integration, PTY startup, renderer fallback and password-manager
 integration are retained. No credentials, histories or user state are moved.
 

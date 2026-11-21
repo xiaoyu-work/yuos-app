@@ -25,7 +25,7 @@ pub(super) fn parse<I>(argv: I, gui_launch: bool) -> Result<Outcome, String>
 where
     I: IntoIterator<Item = OsString>,
 {
-    let raw_args = RawArgs::new(claw_app_gui_argv::normalize(
+    let raw_args = RawArgs::new(yuos_app_gui_argv::normalize(
         argv,
         gui_launch,
         OsStr::new("--gui"),
