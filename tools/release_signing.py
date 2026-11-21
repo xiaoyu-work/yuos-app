@@ -61,10 +61,10 @@ class Signing:
         self.passphrase = passphrase
 
     def import_environment(self):
-        private = os.environ.pop("CLAW_APPS_APT_SIGNING_PRIVATE_KEY", "")
-        if "CLAW_APPS_APT_SIGNING_PASSPHRASE" not in os.environ or not private:
+        private = os.environ.pop("YUOS_APPS_APT_SIGNING_PRIVATE_KEY", "")
+        if "YUOS_APPS_APT_SIGNING_PASSPHRASE" not in os.environ or not private:
             raise ValueError("Both dedicated App APT signing secrets must be configured")
-        passphrase = os.environ.pop("CLAW_APPS_APT_SIGNING_PASSPHRASE")
+        passphrase = os.environ.pop("YUOS_APPS_APT_SIGNING_PASSPHRASE")
         self.import_key(private.encode(), passphrase.encode())
 
     def sign(self, source, destination, *, clear=False, armored=False):

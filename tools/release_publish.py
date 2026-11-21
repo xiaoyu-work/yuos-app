@@ -51,7 +51,7 @@ class GitHub:
             if settings_read and code in (401, 403):
                 raise ValueError(
                     f"GitHub could not read immutable-release settings (HTTP {code}). "
-                    f"Configure {REPO_SETTINGS_TOKEN} in the app-release environment with "
+                    f"Pass the app-release settings token as {REPO_SETTINGS_TOKEN}, with "
                     f"Administration: read access to {self.repository}."
                 )
             raise ValueError(f"GitHub {method} {endpoint} failed with HTTP {code}")

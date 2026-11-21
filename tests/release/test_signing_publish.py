@@ -48,12 +48,13 @@ def test_passphrase_is_only_stdin_never_an_argument_or_inherited_secret(tmp_path
 
 
 def test_child_commands_never_inherit_private_signing_material(monkeypatch):
-    monkeypatch.setenv("CLAW_APPS_APT_SIGNING_PRIVATE_KEY", "fixture key material")
-    monkeypatch.setenv("CLAW_APPS_APT_SIGNING_PASSPHRASE", "fixture passphrase")
+    monkeypatch.setenv("YUOS_APPS_APT_SIGNING_PRIVATE_KEY", "fixture key material")
+    monkeypatch.setenv("YUOS_APPS_APT_SIGNING_PASSPHRASE", "fixture passphrase")
     monkeypatch.setenv(REPO_SETTINGS_TOKEN, "fixture read token")
-    environment = command_environment({"CLAW_APPS_APT_SIGNING_PASSPHRASE": "also forbidden"})
-    assert "CLAW_APPS_APT_SIGNING_PRIVATE_KEY" not in environment
-    assert "CLAW_APPS_APT_SIGNING_PASSPHRASE" not in environment
+    environment = command_environment({"FIXTURE_APT_SIGNING_PASSPHRASE": "also forbidden"})
+    assert "YUOS_APPS_APT_SIGNING_PRIVATE_KEY" not in environment
+    assert "YUOS_APPS_APT_SIGNING_PASSPHRASE" not in environment
+    assert "FIXTURE_APT_SIGNING_PASSPHRASE" not in environment
     assert REPO_SETTINGS_TOKEN not in environment
 
 

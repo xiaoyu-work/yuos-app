@@ -79,7 +79,7 @@ def seal(root, output, provenance, key, *, architecture, version, revision):
 
 
 def publish(version, url, sha256, key_id):
-    signing_material = os.environ.pop("CLAW_APPS_PROVENANCE_SIGNING_PRIVATE_KEY")
+    signing_material = os.environ.pop("YUOS_APPS_PROVENANCE_SIGNING_PRIVATE_KEY")
     require_publication_contract(config())
     github = GitHub()
     github.preflight()

@@ -75,9 +75,9 @@ jobs:
       - name: Seal both native builds with the existing App publisher
         env:
           GH_TOKEN: ${{ github.token }}
-          CLAW_APPS_REPO_SETTINGS_TOKEN: ${{ secrets.CLAW_APPS_REPO_SETTINGS_TOKEN }}
-          CLAW_APPS_PROVENANCE_SIGNING_PRIVATE_KEY: ${{ secrets.CLAW_APPS_PROVENANCE_SIGNING_PRIVATE_KEY }}
-          PROVENANCE_PUBLISHER: ${{ vars.CLAW_APPS_PROVENANCE_PUBLISHER_JSON }}
+          YUOS_APPS_REPO_SETTINGS_TOKEN: ${{ secrets.CLAW_APPS_REPO_SETTINGS_TOKEN }}
+          YUOS_APPS_PROVENANCE_SIGNING_PRIVATE_KEY: ${{ secrets.CLAW_APPS_PROVENANCE_SIGNING_PRIVATE_KEY }}
+          PROVENANCE_PUBLISHER: ${{ vars.YUOS_APPS_PROVENANCE_PUBLISHER_JSON }}
           PROVENANCE_URL: ${{ inputs.provenance_cli_url }}
           PROVENANCE_SHA256: ${{ inputs.provenance_cli_sha256 }}
           PROVENANCE_KEY_ID: ${{ inputs.publisher_key_id }}

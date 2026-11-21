@@ -164,8 +164,8 @@ def test_cli_build_and_verify_use_existing_signing_contracts(
         "--pinentry-mode", "loopback", "--passphrase-fd", "0",
         "--armor", "--export-secret-keys", signing.fingerprint,
     ), input=signing.passphrase + b"\n").stdout
-    monkeypatch.setenv("CLAW_APPS_APT_SIGNING_PRIVATE_KEY", private.decode())
-    monkeypatch.setenv("CLAW_APPS_APT_SIGNING_PASSPHRASE", signing.passphrase.decode())
+    monkeypatch.setenv("YUOS_APPS_APT_SIGNING_PRIVATE_KEY", private.decode())
+    monkeypatch.setenv("YUOS_APPS_APT_SIGNING_PASSPHRASE", signing.passphrase.decode())
     monkeypatch.setattr(snapshots, "Signing", lambda workspace: type(signing)(workspace, signing.settings))
     arguments = [
         "release_snapshots.py", "build", "--app-directory", str(root), "--release-version", "1.0.0",
@@ -175,8 +175,8 @@ def test_cli_build_and_verify_use_existing_signing_contracts(
     monkeypatch.setattr(sys, "argv", arguments)
     snapshots.main()
     built = json.loads(capsys.readouterr().out)
-    assert "CLAW_APPS_APT_SIGNING_PRIVATE_KEY" not in os.environ
-    assert "CLAW_APPS_APT_SIGNING_PASSPHRASE" not in os.environ
+    assert "YUOS_APPS_APT_SIGNING_PRIVATE_KEY" not in os.environ
+    assert "YUOS_APPS_APT_SIGNING_PASSPHRASE" not in os.environ
     monkeypatch.setattr(sys, "argv", [
         "release_snapshots.py", "verify", "--output", str(output),
         "--yu", str(verifier.binary), "--yu-sha256", verifier.binary_sha256,

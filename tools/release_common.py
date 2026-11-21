@@ -8,17 +8,16 @@ import re
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
-REPO_SETTINGS_TOKEN = "CLAW_APPS_REPO_SETTINGS_TOKEN"
-SECRET_ENV = {
-    "CLAW_APPS_APT_SIGNING_PRIVATE_KEY", "CLAW_APPS_APT_SIGNING_PASSPHRASE",
-    "CLAW_APPS_PROVENANCE_SIGNING_PRIVATE_KEY",
-    REPO_SETTINGS_TOKEN,
-}
+REPO_SETTINGS_TOKEN = "YUOS_APPS_REPO_SETTINGS_TOKEN"
+SECRET_ENV_SUFFIXES = (
+    "_APT_SIGNING_PRIVATE_KEY", "_APT_SIGNING_PASSPHRASE",
+    "_PROVENANCE_SIGNING_PRIVATE_KEY", "_REPO_SETTINGS_TOKEN",
+)
 
 
 def command_environment(extra=None):
     environment = {**os.environ, **(extra or {})}
-    return {key: value for key, value in environment.items() if key not in SECRET_ENV}
+    return {key: value for key, value in environment.items() if not key.endswith(SECRET_ENV_SUFFIXES)}
 
 
 def run(arguments, *, cwd=ROOT, input=None, env=None, check=True):

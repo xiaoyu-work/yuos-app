@@ -40,7 +40,8 @@ acceptance requirements remain unchanged.
 
 Release publication additionally requires an owner-approved published `yu`
 provenance tool URL/SHA256, its App publisher key ID, the public
-`CLAW_APPS_PROVENANCE_PUBLISHER_JSON` repository variable, and the dedicated
+`YUOS_APPS_PROVENANCE_PUBLISHER_JSON` repository variable in `yuos.trust/v1`
+format, and the dedicated
 `CLAW_APPS_PROVENANCE_SIGNING_PRIVATE_KEY` secret. The public OS signer signs
 the exact tested Debian App directories; the producer does not implement a
 second signature algorithm. Its immutable snapshot assets and authenticated
