@@ -393,7 +393,7 @@ impl cosmic::Application for SettingsApp {
         match message {
             Message::AskYu => {
                 let page_info = &self.pages.info[self.active_page];
-                if let Err(err) = crate::claw_glue::ask_yu_page(&page_info.id, &page_info.title) {
+                if let Err(err) = crate::yuos_glue::ask_yu_page(&page_info.id, &page_info.title) {
                     tracing::error!(?err, "failed to open Ask Yu OS overlay");
                 }
             }
@@ -433,7 +433,7 @@ impl cosmic::Application for SettingsApp {
                 // which page to open.
                 let query = self.search_input.trim().to_string();
                 if !query.is_empty() {
-                    if let Err(err) = crate::claw_glue::ask_yu_search(&query) {
+                    if let Err(err) = crate::yuos_glue::ask_yu_search(&query) {
                         tracing::error!(?err, "failed to open Ask Yu OS overlay");
                     }
                 }

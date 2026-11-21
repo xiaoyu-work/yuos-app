@@ -418,8 +418,8 @@ owner-scoped data. A product group is a distribution unit, not a merged identity
 Packages contain no user-data payload or data-migration/deletion maintainer
 scripts.
 
-Files alone owns `/usr/lib/yuos/python/claw_files`; Document Engine depends on
-`yuos-app-files` and its exact `yuos-app-python-claw-files-v1` library ABI.
+Files alone owns `/usr/lib/yuos/python/yuos_files`; Document Engine depends on
+`yuos-app-files` and its exact `yuos-app-python-yuos-files-v1` library ABI.
 Consumers do not duplicate the export, even though standalone development
 staging can materialize the dependency. Common support similarly provides
 `yuos-app-support-v1`. Keep these ABI names while compatible; introducing a

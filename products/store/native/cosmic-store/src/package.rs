@@ -97,7 +97,7 @@ impl Intent {
             ));
         }
         let version = match op.infos.as_slice() {
-            [info] if info.source_id == super::claw_apps::SOURCE_ID
+            [info] if info.source_id == super::yuos_apps::SOURCE_ID
                 && matches!(op.kind, OperationKind::Install | OperationKind::Update) =>
             {
                 Some(info.releases.first().ok_or_else(|| io::Error::other(
@@ -165,7 +165,7 @@ impl Intent {
         self.packages.sort();
         self.packages.dedup();
         if self.action == Action::InstallRelease {
-            if self.packages.len() != 1 || !crate::product::claw_app_package(&self.packages[0])
+            if self.packages.len() != 1 || !crate::product::yuos_app_package(&self.packages[0])
                 || !self.version.as_ref().is_some_and(|value| !value.is_empty()
                     && value.len() <= 128 && value.as_bytes()[0].is_ascii_digit()
                     && value.bytes().all(|byte| byte.is_ascii_alphanumeric() || b".+~-:".contains(&byte)))
@@ -402,7 +402,7 @@ pub(crate) fn decode(intent: &Intent, value: Value) -> io::Result<State> {
 }
 
 pub fn submit(op: &Operation) -> io::Result<Tracked> {
-    crate::claw_glue::human_ui().map_err(io::Error::other)?;
+    crate::yuos_glue::human_ui().map_err(io::Error::other)?;
     let intent = Intent::for_operation(op)?;
     // Persist only correlation/intent, never authority or a cached success.
     intent.save()?;
@@ -411,7 +411,7 @@ pub fn submit(op: &Operation) -> io::Result<Tracked> {
 
 pub fn refresh(intent: &Intent, mode: Mode) -> Tracked {
     let state = (|| {
-        crate::claw_glue::human_ui().map_err(io::Error::other)?;
+        crate::yuos_glue::human_ui().map_err(io::Error::other)?;
         if intent.clone().canonical()? != *intent {
             return Err(io::Error::other("package intent is not canonical"));
         }

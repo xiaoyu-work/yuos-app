@@ -42,7 +42,7 @@ def test_content_addressed_fixture_is_deterministic_and_stages_the_complete_decl
                   "--root", staged], cwd=root, env={"PYTHONDONTWRITEBYTECODE": "1"})
     assert json.loads(result.stdout) == ["doc"]
     run([sys.executable, root / "tools/stage.py", "--shared", "--root", staged], cwd=root)
-    for relative in ("usr/lib/yuos/apps/doc/server.py", "usr/lib/yuos/python/claw_files/document.py",
+    for relative in ("usr/lib/yuos/apps/doc/server.py", "usr/lib/yuos/python/yuos_files/document.py",
                      "usr/lib/yuos/python/_shared/atomic.py", "usr/lib/yuos/python/canonical_argv.py"):
         assert (staged / relative).read_bytes() == (root / "payload" / relative).read_bytes()
     assert (root / "payload/usr/lib/yuos/python/pptx/__init__.py").is_file()

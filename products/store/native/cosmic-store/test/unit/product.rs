@@ -26,8 +26,8 @@ fn mcp_process_cannot_use_human_filesystem_adapters() {
     unsafe {
         std::env::set_var("YUOS_MCP_SERVER", "1");
     }
-    assert!(crate::claw_glue::read_bytes(std::path::Path::new("/not-accessed")).is_err());
-    assert!(crate::claw_glue::fs_rm(std::path::Path::new("/not-accessed")).is_err());
+    assert!(crate::yuos_glue::read_bytes(std::path::Path::new("/not-accessed")).is_err());
+    assert!(crate::yuos_glue::fs_rm(std::path::Path::new("/not-accessed")).is_err());
     let intent = crate::package::Intent {
         invocation_id: "a".repeat(32),
         action: crate::package::Action::Install,

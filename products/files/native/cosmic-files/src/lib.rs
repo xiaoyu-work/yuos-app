@@ -14,7 +14,7 @@ use crate::config::{Config, State};
 pub mod app;
 mod archive;
 pub mod channel;
-mod claw_glue;
+mod yuos_glue;
 mod cli;
 pub mod clipboard;
 pub mod config;

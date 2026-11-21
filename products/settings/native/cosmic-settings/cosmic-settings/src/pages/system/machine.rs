@@ -178,7 +178,7 @@ impl<const LOGIN: bool> MachinePage<LOGIN> {
     }
 
     fn view(&self) -> cosmic::Element<'_, Message> {
-        let mut content = crate::widget::claw_list_column();
+        let mut content = crate::widget::yuos_list_column();
         if let Some(error) = &self.error {
             content = content.add(text::body(error));
         }

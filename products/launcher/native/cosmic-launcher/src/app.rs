@@ -1314,7 +1314,7 @@ impl cosmic::Application for CosmicLauncher {
                     .trim()
                     .to_string();
                 if !query.is_empty()
-                    && let Err(err) = crate::claw_glue::ask_yu(&query)
+                    && let Err(err) = crate::yuos_glue::ask_yu(&query)
                 {
                     error!("failed to launch Ask Yu OS overlay: {err}");
                 }
@@ -1414,7 +1414,7 @@ impl cosmic::Application for CosmicLauncher {
                                     return Task::none();
                                 }
                                 return Task::perform(
-                                    async move { crate::claw_glue::open_desktop_entry(&entry.id).await },
+                                    async move { crate::yuos_glue::open_desktop_entry(&entry.id).await },
                                     |result| cosmic::action::app(Message::LaunchSubmitted(result)),
                                 );
                             }

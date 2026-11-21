@@ -266,8 +266,8 @@ impl Page {
                     let mut buffer = mime_apps.local_list.to_string();
                     buffer.push('\n');
 
-                    _ = crate::claw_glue::write_text(&mime_apps.config_path, &buffer);
-                    _ = crate::claw_glue::start(&["update-desktop-database"]);
+                    _ = crate::yuos_glue::write_text(&mime_apps.config_path, &buffer);
+                    _ = crate::yuos_glue::start(&["update-desktop-database"]);
                 }
             }
             Message::Update(mime_apps) => {
@@ -312,7 +312,7 @@ fn apps() -> Section<crate::pages::Message> {
             return widget::space().into();
         };
 
-        crate::widget::claw_section_with_capacity(9)
+        crate::widget::yuos_section_with_capacity(9)
             .title(&section.title)
             .add(app_item(
                 &mime_apps.apps[DROPDOWN_WEB_BROWSER],
@@ -463,7 +463,7 @@ async fn load_defaults(assocs: &BTreeMap<Arc<str>, Arc<App>>, for_mimes: &[&str]
 async fn xdg_mime_query_default(mime_type: &str) -> Option<String> {
     let mime_type = mime_type.to_owned();
     let stdout = tokio::task::spawn_blocking(move || {
-        crate::claw_glue::run_capture(&["xdg-mime", "query", "default", &mime_type], Some(5))
+        crate::yuos_glue::run_capture(&["xdg-mime", "query", "default", &mime_type], Some(5))
     })
     .await
     .ok()?

@@ -459,7 +459,7 @@ fn shortcuts() -> Section<crate::pages::Message> {
 
             // If the search input is not empty, show the category view, else the search results.
             let content = if page.search.input.is_empty() {
-                crate::widget::claw_section()
+                crate::widget::yuos_section()
                     .add(category_item(
                         Category::Accessibility,
                         &descriptions[accessibility],

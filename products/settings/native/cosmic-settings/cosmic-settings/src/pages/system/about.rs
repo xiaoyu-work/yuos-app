@@ -200,7 +200,7 @@ fn device() -> Section<crate::pages::Message> {
                 .description(&*desc[device_desc])
                 .flex_control(hostname_input);
 
-            let mut content = crate::widget::claw_list_column().add(device_name);
+            let mut content = crate::widget::yuos_list_column().add(device_name);
             if let Some(notice) = &page.notice {
                 content = content.add(text::body(notice));
             }
@@ -233,7 +233,7 @@ fn hardware() -> Section<crate::pages::Message> {
         .view::<Page>(move |_binder, page, section| {
             let desc = &section.descriptions;
 
-            let mut section_builder = crate::widget::claw_section()
+            let mut section_builder = crate::widget::yuos_section()
                 .title(&section.title)
                 .add(
                     settings::flex_item(&*desc[model], text::body(&page.info.hardware_model))
@@ -281,7 +281,7 @@ fn os() -> Section<crate::pages::Message> {
         .descriptions(descriptions)
         .view::<Page>(move |_binder, page, section| {
             let desc = &section.descriptions;
-            crate::widget::claw_section()
+            crate::widget::yuos_section()
                 .title(&section.title)
                 .add(
                     settings::flex_item(&*desc[os], text::body(&page.info.operating_system))

@@ -40,7 +40,7 @@ use std::{
 use tokio::time;
 use unicode_segmentation::UnicodeSegmentation;
 
-mod claw_glue;
+mod yuos_glue;
 mod cli;
 mod mcp;
 
@@ -283,7 +283,7 @@ async fn run_ai_doc(
     instruction: Option<String>,
 ) -> Result<String, String> {
     tokio::task::spawn_blocking(move || {
-        claw_glue::ai::transform_text(text, verb.operation(), instruction)
+        yuos_glue::ai::transform_text(text, verb.operation(), instruction)
     })
     .await
     .map_err(|e| format!("editor AI worker failed: {e}"))?
@@ -527,7 +527,7 @@ pub enum Message {
     OpenFileDialog,
     OpenFileResult(DialogResult),
     FileReadResult(PathBuf, Result<(), String>),
-    FileWriteResult(PathBuf, Result<claw_glue::FileSelection, String>),
+    FileWriteResult(PathBuf, Result<yuos_glue::FileSelection, String>),
     OpenGitDiff(PathBuf, GitDiff),
     OpenProjectDialog,
     OpenProjectResult(DialogResult),
@@ -2096,7 +2096,7 @@ impl Application for App {
                     Tab::Editor(t) => t.path_opt.as_deref(),
                     _ => None,
                 });
-                if let Err(err) = crate::claw_glue::ask_yu_overlay(file) {
+                if let Err(err) = crate::yuos_glue::ask_yu_overlay(file) {
                     log::error!("failed to open Ask Yu OS overlay: {err}");
                 }
             }
@@ -2543,7 +2543,7 @@ impl Application for App {
             }
             Message::NewWindow => {
                 //TODO: support multi-window in winit
-                if let Err(err) = crate::claw_glue::new_window() {
+                if let Err(err) = crate::yuos_glue::new_window() {
                     log::error!("failed to open editor window: {}", err);
                 }
             }
@@ -3956,7 +3956,7 @@ impl Application for App {
 }
 
 fn file_access_subscription(
-    path: PathBuf, write: bool, selection: Option<claw_glue::FileSelection>,
+    path: PathBuf, write: bool, selection: Option<yuos_glue::FileSelection>,
 ) -> Subscription<Message> {
     Subscription::run_with((path, write, selection), |(path, write, selection)| {
         let path = path.clone();
@@ -3974,8 +3974,8 @@ fn file_access_subscription(
                             .expect("file access job limiter is never closed");
                         tokio::task::spawn_blocking(move || {
                             let (id, node, create) = match current {
-                                Some(claw_glue::FileSelection::Existing(id, node)) => (Some(id), node, false),
-                                Some(claw_glue::FileSelection::Create(id, node)) => (Some(id), node, true),
+                                Some(yuos_glue::FileSelection::Existing(id, node)) => (Some(id), node, false),
+                                Some(yuos_glue::FileSelection::Create(id, node)) => (Some(id), node, true),
                                 None => {
                                     match fs::symlink_metadata(&read_path) {
                                         Ok(metadata) => (None, std::os::unix::fs::MetadataExt::ino(&metadata), false),
@@ -4001,21 +4001,21 @@ fn file_access_subscription(
                                 if reply.name != name {
                                     return Err("creation status has another target".to_string());
                                 }
-                                Ok((claw_glue::FileSelection::Create(reply.selection_id, reply.parent_node),
+                                Ok((yuos_glue::FileSelection::Create(reply.selection_id, reply.parent_node),
                                     reply.state, reply.reason))
                             } else if write {
                                 let reply = match id {
                                     Some(id) => yuos_sdk::gui::file_write_status(&id, node),
                                     None => yuos_sdk::gui::request_file_write(node),
                                 }.map_err(|error| error.to_string())?;
-                                Ok((claw_glue::FileSelection::Existing(reply.selection_id, reply.node),
+                                Ok((yuos_glue::FileSelection::Existing(reply.selection_id, reply.node),
                                     reply.state, reply.reason))
                             } else {
                                 let reply = match id {
                                     Some(id) => yuos_sdk::gui::file_read_status(&id, node),
                                     None => yuos_sdk::gui::request_file_read(node),
                                 }.map_err(|error| error.to_string())?;
-                                Ok((claw_glue::FileSelection::Existing(reply.selection_id, reply.node),
+                                Ok((yuos_glue::FileSelection::Existing(reply.selection_id, reply.node),
                                     reply.state, reply.reason))
                             }
                         }).await

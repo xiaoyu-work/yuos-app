@@ -15,7 +15,7 @@ translations, assets, original Cargo graph and `flathub-stats` workspace member.
 | `native/cosmic-store/src/mcp.rs` | Three catalog queries and fixed Store activation |
 | `native/cosmic-store/src/argparse.rs`, `native/cosmic-store/test/unit/argparse.rs` | Native search/helper arguments, bounded Host GUI selector adaptation and parser regressions |
 | `native/cosmic-store/src/product.rs`, `product_bridge.py` | Controlled OS catalog reads; embedded human filesystem/snapshot and fixed desktop adapters |
-| `native/cosmic-store/src/claw_apps.rs` | Yu Apps navigation, official release versions and exact install/update actions |
+| `native/cosmic-store/src/yuos_apps.rs` | Yu Apps navigation, official release versions and exact install/update actions |
 | `native/cosmic-store/src/package.rs`, `backend/{packagekit,flatpak}.rs` | Exact Debian and Flatpak intents, retained Root handoff, status and read-only recovery; controlled catalog, inventory and update queries |
 | `native/test_process.py` | Real binary/resource installation and authenticated synthetic stdio fixture |
 

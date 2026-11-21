@@ -138,7 +138,7 @@ pub fn visit_catalog(
     }
 }
 
-pub(crate) fn claw_app_package(name: &str) -> bool {
+pub(crate) fn yuos_app_package(name: &str) -> bool {
     name.starts_with("yuos-cap-") || name.starts_with("yuos-app-")
         && !name.starts_with("yuos-app-python-")
         && name != "yuos-app-support" && name != "yuos-app-support-v1"

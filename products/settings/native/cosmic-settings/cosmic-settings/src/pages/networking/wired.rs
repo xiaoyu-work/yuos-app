@@ -459,7 +459,7 @@ impl Page {
             .known_connections
             .iter()
             .fold(
-                crate::widget::claw_section().title(header_txt),
+                crate::widget::yuos_section().title(header_txt),
                 |networks, connection| {
                     let is_connected = nm_state.active_conns.iter().any(|conn| match conn {
                         ActiveConnectionInfo::Wired { name, .. } => {

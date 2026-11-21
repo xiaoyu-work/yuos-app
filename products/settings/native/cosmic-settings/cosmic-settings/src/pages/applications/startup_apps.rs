@@ -228,7 +228,7 @@ impl Page {
                 let directory_to_target =
                     directories.first().expect("Always at least one directory");
 
-                _ = crate::claw_glue::mkdir_all(directory_to_target.as_path());
+                _ = crate::yuos_glue::mkdir_all(directory_to_target.as_path());
 
                 if let Ok(exists) = std::fs::exists(directory_to_target.join(file_name.clone()))
                     && !exists
@@ -278,7 +278,7 @@ impl Page {
                         && exists
                     {
                         // remove_file works for both regular files & symlinks
-                        match crate::claw_glue::remove(&directory_to_target.join(file_name)) {
+                        match crate::yuos_glue::remove(&directory_to_target.join(file_name)) {
                             Ok(_) => {
                                 if let Some(ref mut cached_startup_apps) = self.cached_startup_apps
                                 {
@@ -324,7 +324,7 @@ impl Page {
     ) -> crate::pages::Element<'_> {
         let cosmic::cosmic_theme::Spacing { space_xs, .. } = cosmic::theme::spacing();
 
-        let mut list = crate::widget::claw_list_column();
+        let mut list = crate::widget::yuos_list_column();
         let search_input = &self.application_search.trim().to_lowercase();
 
         if let Some(startup_apps) = &self.cached_startup_apps {
@@ -376,7 +376,7 @@ fn apps() -> Section<crate::pages::Message> {
             if let Some(startup_apps) = &page.cached_startup_apps {
                 let order = vec![DirectoryType::User];
                 for directory_type in order {
-                    let mut section = crate::widget::claw_section();
+                    let mut section = crate::widget::yuos_section();
 
                     view = view.push(text::heading(directory_type.to_string()));
 

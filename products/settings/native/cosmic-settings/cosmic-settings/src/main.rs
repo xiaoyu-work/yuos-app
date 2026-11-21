@@ -11,7 +11,7 @@ pub mod app;
 use std::str::FromStr;
 
 pub use app::{Message, SettingsApp};
-pub mod claw_glue;
+pub mod yuos_glue;
 mod human;
 pub mod config;
 pub mod mcp;

@@ -172,8 +172,8 @@ def test_files_stage_preserves_the_direct_mcp_contract(tmp_path):
         for filename in ("app.json", "main.py", "server.py"):
             assert (app / filename).read_bytes() == (source / filename).read_bytes()
         assert not (app / "test_main.py").exists()
-    assert (tmp_path / "usr/lib/yuos/python/claw_files/document.py").read_bytes() == (
-        ROOT / "products/files/python/claw_files/document.py"
+    assert (tmp_path / "usr/lib/yuos/python/yuos_files/document.py").read_bytes() == (
+        ROOT / "products/files/python/yuos_files/document.py"
     ).read_bytes()
     assert not (tmp_path / "usr/lib/systemd").exists()
 
@@ -188,9 +188,9 @@ def test_document_engine_is_a_capability_not_a_business_product(tmp_path):
     for name in ("app.json", "main.py", "server.py"):
         assert (installed / name).read_bytes() == (source / name).read_bytes()
         assert (installed / name).stat().st_mode == (source / name).stat().st_mode
-    library = tmp_path / "usr/lib/yuos/python/claw_files"
+    library = tmp_path / "usr/lib/yuos/python/yuos_files"
     assert (library / "document.py").read_bytes() == (
-        ROOT / "products/files/python/claw_files/document.py"
+        ROOT / "products/files/python/yuos_files/document.py"
     ).read_bytes()
     assert not (tmp_path / "usr/lib/yuos/apps/fs").exists()
     assert not (tmp_path / "usr/lib/yuos/apps/docs").exists()
@@ -473,7 +473,7 @@ def test_staged_db_dispatches_with_real_sdk_and_preserves_its_data_namespace(tmp
 def test_shared_library_costages_once_without_merging_trees(tmp_path, order):
     for name in order:
         stage.stage(name, tmp_path, kind="capability" if name == "document-engine" else "product")
-    assert sorted(path.name for path in (tmp_path / "usr/lib/yuos/python").iterdir()) == ["claw_files"]
+    assert sorted(path.name for path in (tmp_path / "usr/lib/yuos/python").iterdir()) == ["yuos_files"]
     assert sorted(path.name for path in (tmp_path / "usr/lib/yuos/apps").iterdir()) == [
         "cosmic-files", "doc", "docs", "fs",
     ]
@@ -482,7 +482,7 @@ def test_shared_library_costages_once_without_merging_trees(tmp_path, order):
 @pytest.mark.parametrize("change", ["content", "mode", "extra", "symlink"])
 def test_conflicting_shared_library_is_never_overwritten_or_merged(tmp_path, change):
     stage.stage("files", tmp_path)
-    library = tmp_path / "usr/lib/yuos/python/claw_files"
+    library = tmp_path / "usr/lib/yuos/python/yuos_files"
     document = library / "document.py"
     if change == "content":
         document.write_text("different source")
@@ -580,9 +580,9 @@ def test_capability_source_symlink_escape_is_rejected(capability_package, tmp_pa
 
 
 @pytest.mark.parametrize("dependency", [
-    {"kind": "product", "name": "../files", "library": "claw_files", "apps": ["doc"]},
-    {"kind": "product", "name": "missing", "library": "claw_files", "apps": ["doc"]},
-    {"kind": "unknown", "name": "files", "library": "claw_files", "apps": ["doc"]},
+    {"kind": "product", "name": "../files", "library": "yuos_files", "apps": ["doc"]},
+    {"kind": "product", "name": "missing", "library": "yuos_files", "apps": ["doc"]},
+    {"kind": "unknown", "name": "files", "library": "yuos_files", "apps": ["doc"]},
     {"path": "../files/python"},
 ])
 def test_library_dependencies_require_declared_sources(capability_package, dependency, tmp_path):
@@ -600,12 +600,12 @@ def test_library_dependency_must_match_one_owned_export(capability_package, chan
     owner = source / "products/files"
     (owner / "apps/fs").mkdir(parents=True)
     (owner / "apps/fs/app.json").write_text('{"id":"fs"}')
-    library = owner / "python/claw_files"
+    library = owner / "python/yuos_files"
     library.mkdir(parents=True)
     (library / "__init__.py").write_text("")
-    export = {"name": "claw_files", "path": "python/claw_files", "apps": ["fs"]}
+    export = {"name": "yuos_files", "path": "python/yuos_files", "apps": ["fs"]}
     owner_package = {"apps": ["apps/fs"], "python_library": export}
-    dependency = {"kind": "product", "name": "files", "library": "claw_files", "apps": ["doc"]}
+    dependency = {"kind": "product", "name": "files", "library": "yuos_files", "apps": ["doc"]}
     package["python_dependencies"] = [dependency]
     if change == "missing":
         owner_package.pop("python_library")
@@ -640,7 +640,7 @@ def test_document_runs_with_only_the_actual_staged_library_and_platform(tmp_path
     app = tmp_path / "usr/lib/yuos/apps/doc"
     result = subprocess.run(
         [sys.executable, "-c",
-         "import json; import claw_files.document as library; import main; "
+         "import json; import yuos_files.document as library; import main; "
          "print(json.dumps({'library':library.__file__, 'result':main.run('read', "
          f"[{str(document)!r}])}}))"],
         cwd=app, capture_output=True, text=True, check=True, timeout=20,
@@ -648,7 +648,7 @@ def test_document_runs_with_only_the_actual_staged_library_and_platform(tmp_path
              "PYTHONDONTWRITEBYTECODE": "1", "YUOS_KERNEL_BIN": str(policy)},
     )
     payload = json.loads(result.stdout)
-    assert payload["library"] == str(python / "claw_files/document.py")
+    assert payload["library"] == str(python / "yuos_files/document.py")
     assert payload["result"]["content"] == "installed shared document parser"
 
 

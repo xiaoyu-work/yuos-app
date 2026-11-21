@@ -357,7 +357,7 @@ pub enum Message {
     },
     AiAssistInput(String),
     AiAssistSubmit,
-    AiAssistSearchResult(Result<Vec<crate::claw_glue::ai::SearchHit>, String>),
+    AiAssistSearchResult(Result<Vec<crate::yuos_glue::ai::SearchHit>, String>),
     AiAssistFindSimilar,
     AskYu,
     AiRewrite(Option<Entity>),
@@ -630,7 +630,7 @@ pub enum AiAssistStatus {
     #[default]
     Idle,
     Loading,
-    Ready(Vec<crate::claw_glue::ai::SearchHit>),
+    Ready(Vec<crate::yuos_glue::ai::SearchHit>),
     Error(String),
 }
 
@@ -853,7 +853,7 @@ impl Window {
 
 /// Share the Files document reader and SDK AI gate with the MCP surface.
 async fn run_ai_summarize(path: PathBuf) -> Result<String, String> {
-    crate::claw_glue::ai::summarize(path).await
+    crate::yuos_glue::ai::summarize(path).await
 }
 
 // The [`App`] stores application-specific state.
@@ -3883,7 +3883,7 @@ impl Application for App {
                     .and_then(|t| t.location.path_opt().cloned())
                     .map(|p| p.to_string_lossy().into_owned());
                 let sel_str = selected.map(|p| p.to_string_lossy().into_owned());
-                if let Err(err) = crate::claw_glue::ask_yu(cwd.as_deref(), sel_str.as_deref()) {
+                if let Err(err) = crate::yuos_glue::ask_yu(cwd.as_deref(), sel_str.as_deref()) {
                     log::error!("failed to open Ask Yu OS overlay: {err}");
                 }
             }
@@ -3916,7 +3916,7 @@ impl Application for App {
                 );
                 let work_path = path.clone();
                 let work = cosmic::Task::future(async move {
-                    let outcome = crate::claw_glue::ai::explain(work_path.clone()).await;
+                    let outcome = crate::yuos_glue::ai::explain(work_path.clone()).await;
                     cosmic::action::app(Message::AiExplainResult {
                         path: work_path,
                         outcome,
@@ -3948,7 +3948,7 @@ impl Application for App {
                 }
                 self.ai_assist_status = AiAssistStatus::Loading;
                 return cosmic::Task::future(async move {
-                    let outcome = crate::claw_glue::ai::search(query, 50).await;
+                    let outcome = crate::yuos_glue::ai::search(query, 50).await;
                     cosmic::action::app(Message::AiAssistSearchResult(outcome))
                 });
             }
@@ -3959,7 +3959,7 @@ impl Application for App {
                 };
                 self.ai_assist_status = AiAssistStatus::Loading;
                 return cosmic::Task::future(async move {
-                    let outcome = crate::claw_glue::ai::find_similar(path, 50).await;
+                    let outcome = crate::yuos_glue::ai::find_similar(path, 50).await;
                     cosmic::action::app(Message::AiAssistSearchResult(outcome))
                 });
             }
@@ -4015,7 +4015,7 @@ impl Application for App {
                 let work_instruction = instruction;
                 return cosmic::Task::future(async move {
                     let outcome =
-                        crate::claw_glue::ai::rewrite(work_path.clone(), work_instruction).await;
+                        crate::yuos_glue::ai::rewrite(work_path.clone(), work_instruction).await;
                     cosmic::action::app(Message::AiRewriteResult {
                         path: work_path,
                         outcome,
@@ -4060,7 +4060,7 @@ impl Application for App {
                 self.ai_assist_input.clear();
                 self.ai_assist_status = AiAssistStatus::Loading;
                 return cosmic::Task::future(async move {
-                    let outcome = crate::claw_glue::ai::find_similar(path, 50).await;
+                    let outcome = crate::yuos_glue::ai::find_similar(path, 50).await;
                     cosmic::action::app(Message::AiAssistSearchResult(outcome))
                 });
             }
@@ -5121,7 +5121,7 @@ impl Application for App {
                 let final_path = copy_unique_path(&base_path, &to);
 
                 // Write image data to file
-                match crate::claw_glue::write_bytes(&final_path, &contents.data) {
+                match crate::yuos_glue::write_bytes(&final_path, &contents.data) {
                     Ok(_) => {
                         log::info!("Pasted image saved to {:?}", final_path);
                     }
@@ -5156,7 +5156,7 @@ impl Application for App {
                 let final_path = copy_unique_path(&base_path, &to);
 
                 // Write video data to file
-                match crate::claw_glue::write_bytes(&final_path, &contents.data) {
+                match crate::yuos_glue::write_bytes(&final_path, &contents.data) {
                     Ok(_) => {
                         log::info!("Pasted video saved to {:?}", final_path);
                     }
@@ -5182,7 +5182,7 @@ impl Application for App {
                 let final_path = copy_unique_path(&base_path, &to);
 
                 // Write text data to file
-                match crate::claw_glue::write_bytes(&final_path, contents.data.as_bytes()) {
+                match crate::yuos_glue::write_bytes(&final_path, contents.data.as_bytes()) {
                     Ok(_) => {
                         log::info!("Pasted text saved to {:?}", final_path);
                     }
@@ -8442,7 +8442,7 @@ impl Application for App {
             && yuos_sdk::gui::is_gui_launch()
             && std::env::var("YUOS_ARGS_JSON").as_deref() == Ok("[]")
         {
-            let desktop = Subscription::run(crate::claw_glue::desktop_events);
+            let desktop = Subscription::run(crate::yuos_glue::desktop_events);
             if self.desktop_resident && self.core.main_window_id().is_none()
                 && self.windows.is_empty() && self.pending_operations.is_empty()
             {

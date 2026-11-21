@@ -1076,7 +1076,7 @@ impl Operation {
                     tokio::task::spawn_blocking(move || {
                         // User-confirmed final delete — route through
                         // the kernel's caps gate + audit log.
-                        crate::claw_glue::remove(&path)
+                        crate::yuos_glue::remove(&path)
                     })
                     .await
                     .map_err(|e| OperationError::from_err(e, &controller))?

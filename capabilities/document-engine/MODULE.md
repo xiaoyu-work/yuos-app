@@ -11,13 +11,13 @@ public SDK, AI consent/budget/provider/audit authority and memory remain OS-owne
 | `apps/doc/main.py` | Existing Doc AI presentation and dispatch over the declared parser library |
 | `apps/doc/server.py` | Owning-client manifest-operation MCP bridge through the pinned OS SDK/runtime |
 | `apps/doc/test_main.py` | Descriptor/conversion regressions and real manifest-bound SDK dispatch with fake policy/AI |
-| `package.json` | App/test selection and explicit Files `claw_files` library dependency for `doc` |
+| `package.json` | App/test selection and explicit Files `yuos_files` library dependency for `doc` |
 
 The parser/converter remains the single
-[`products/files/python/claw_files/document.py`](../../products/files/python/claw_files/document.py)
+[`products/files/python/yuos_files/document.py`](../../products/files/python/yuos_files/document.py)
 implementation. No call to `fs`, `docs` or `cosmic-files` is involved. Tests
 resolve its named export and the immutable OS SDK/runtime dependency, never a
-sibling checkout. Doc-only staging installs `doc` and `claw_files`, not the
+sibling checkout. Doc-only staging installs `doc` and `yuos_files`, not the
 Files Apps or any native UI. Files/Doc co-staging refuses conflicting libraries.
 The OS supplies SDK/runtime; the separately staged App common runtime supplies
 `canonical_argv` from the same `/usr/lib/yuos/python` import root.

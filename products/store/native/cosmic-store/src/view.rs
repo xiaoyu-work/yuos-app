@@ -690,7 +690,7 @@ impl App {
                         if let Some(error) = &self.refresh_error {
                             column = column.push(widget::text::body(fl!("claw-refresh-failed", error = error.as_str())));
                         }
-                        column.push(self.claw_apps_view(false)).into()
+                        column.push(self.yuos_apps_view(false)).into()
                     }
                     NavPage::Explore => {
                         match self.explore_page_opt {
@@ -888,7 +888,7 @@ impl App {
                             column = column.push(widget::text::body(
                                 fl!("claw-refresh-failed", error = error.as_str())));
                         }
-                        let checked = self.claw_catalog.as_ref()
+                        let checked = self.yuos_catalog.as_ref()
                             .and_then(|result| result.as_ref().ok())
                             .and_then(|catalog| catalog.checked_at.as_deref());
                         column = column.push(widget::text::caption(match checked {
@@ -896,7 +896,7 @@ impl App {
                             None => fl!("claw-not-checked"),
                         }));
                         column = column.push(widget::text::title3(NavPage::ClawApps.title()))
-                            .push(self.claw_apps_view(true))
+                            .push(self.yuos_apps_view(true))
                             .push(widget::text::title3(fl!("linux-system-updates")));
                         for (source, error) in &self.update_errors {
                             column = column.push(widget::text::body(fl!("claw-update-query-failed",

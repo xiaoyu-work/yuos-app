@@ -476,7 +476,7 @@ impl Page {
             },
         );
 
-        let controls = crate::widget::claw_list_column()
+        let controls = crate::widget::yuos_list_column()
             .add(input_fields)
             .add(keys);
 
@@ -712,7 +712,7 @@ fn shortcuts() -> Section<crate::pages::Message> {
         .descriptions(descriptions)
         .view::<Page>(move |_binder, page, _section| {
             let content = if page.model.shortcut_models.is_empty() {
-                crate::widget::claw_section()
+                crate::widget::yuos_section()
                     .add(widget::settings::item_row(vec![
                         widget::text::body(fl!("custom-shortcuts", "none")).into(),
                     ]))

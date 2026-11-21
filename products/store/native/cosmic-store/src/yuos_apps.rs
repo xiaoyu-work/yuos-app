@@ -6,7 +6,7 @@ use serde_json::json;
 
 use crate::{App, AppId, AppInfo, Message, OperationKind, backend::BackendName, fl};
 
-pub(crate) const SOURCE_ID: &str = "claw-apps";
+pub(crate) const SOURCE_ID: &str = "yuos-apps";
 
 #[derive(Clone, Debug, Deserialize)]
 pub(crate) struct Catalog {
@@ -43,11 +43,11 @@ impl App {
         check.into()
     }
 
-    pub(crate) fn claw_apps_view(&self, updates: bool) -> Element<'_, Message> {
+    pub(crate) fn yuos_apps_view(&self, updates: bool) -> Element<'_, Message> {
         let mut column = widget::column::with_capacity(4)
             .spacing(12)
             .width(Length::Fill);
-        if let Some(result) = &self.claw_catalog {
+        if let Some(result) = &self.yuos_catalog {
             match result {
                 Ok(catalog) => {
                     let query = if !updates && self.search_active {
@@ -109,7 +109,7 @@ impl App {
                         if app.installed.is_none() || app.update {
                             let info = Arc::new(AppInfo {
                                 source_id: SOURCE_ID.into(),
-                                source_name: fl!("claw-apps"),
+                                source_name: fl!("yuos-apps"),
                                 name: app.name.clone(),
                                 pkgnames: vec![app.package.clone()],
                                 releases: vec![crate::app_info::AppRelease {

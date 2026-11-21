@@ -1351,7 +1351,7 @@ where
             let state = state_of(page);
             let view: Element<'_, Message> = status_view(state);
             let wrap = wrap.clone();
-            crate::widget::claw_section()
+            crate::widget::yuos_section()
                 .title(&section.title)
                 .add(view.map(move |m| wrap(m)))
                 .into()
@@ -1369,7 +1369,7 @@ where
             let state = state_of(page);
             let view: Element<'_, Message> = configuration_view(state);
             let wrap = wrap.clone();
-            crate::widget::claw_section()
+            crate::widget::yuos_section()
                 .title(&section.title)
                 .add(view.map(move |m| wrap(m)))
                 .into()

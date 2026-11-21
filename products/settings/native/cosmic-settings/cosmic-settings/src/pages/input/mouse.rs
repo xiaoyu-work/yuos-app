@@ -60,7 +60,7 @@ fn mouse() -> Section<crate::pages::Message> {
             let descriptions = &section.descriptions;
             let input = binder.page::<super::Page>().expect("input page not found");
 
-            crate::widget::claw_section()
+            crate::widget::yuos_section()
                 .title(&section.title)
                 .add(
                     settings::flex_item(
@@ -131,7 +131,7 @@ fn scrolling() -> Section<crate::pages::Message> {
             let descriptions = &section.descriptions;
             let input = binder.page::<super::Page>().expect("input page not found");
 
-            crate::widget::claw_section()
+            crate::widget::yuos_section()
                 .title(&section.title)
                 .add(
                     settings::item::builder(&descriptions[scroll_speed])

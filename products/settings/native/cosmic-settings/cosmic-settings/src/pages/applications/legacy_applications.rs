@@ -250,7 +250,7 @@ impl Page {
                     tracing::debug!(?argv, "executing");
                     let result = tokio::task::spawn_blocking(move || {
                         let argv_refs: Vec<&str> = argv.iter().map(String::as_str).collect();
-                        crate::claw_glue::run_output(&argv_refs, Some(5)).map(|_| ())
+                        crate::yuos_glue::run_output(&argv_refs, Some(5)).map(|_| ())
                     })
                     .await
                     .unwrap_or_else(|e| Err(std::io::Error::other(e.to_string())));
@@ -285,7 +285,7 @@ pub fn legacy_application_global_shortcuts() -> Section<crate::pages::Message> {
             let title = text::body(&section.title).font(cosmic::font::bold());
             let description = text::body(&section.descriptions[desc]);
 
-            let content = crate::widget::claw_section::<'_, crate::pages::Message>()
+            let content = crate::widget::yuos_section::<'_, crate::pages::Message>()
                 .add(settings::item::builder(&section.descriptions[none]).radio(
                     EavesdroppingKeyboardMode::None,
                     Some(page.comp_config_xwayland_eavesdropping.keyboard),
@@ -344,7 +344,7 @@ pub fn legacy_application_scaling() -> Section<crate::pages::Message> {
         .descriptions(descriptions)
         .view::<Page>(move |_binder, page, section| {
             let descriptions = &section.descriptions;
-            crate::widget::claw_section()
+            crate::widget::yuos_section()
                 .title(&section.title)
                 .add(
                     widget::settings::item::builder(&descriptions[gaming])

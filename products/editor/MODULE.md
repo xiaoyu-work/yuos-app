@@ -9,7 +9,7 @@ resources, translations, build inputs and descriptor.
 | `native/cosmic-edit/src/main.rs` | Native editor UI and unsaved-buffer AI requests |
 | `native/cosmic-edit/src/cli.rs`, `native/cosmic-edit/test/unit/cli.rs` | OS-native startup paths and bounded GUI argv regressions |
 | `native/cosmic-edit/src/mcp.rs` | Authenticated MCP handlers |
-| `native/cosmic-edit/src/claw_glue/ai.rs` | Shared SDK AI requests; document content remains untrusted |
+| `native/cosmic-edit/src/yuos_glue/ai.rs` | Shared SDK AI requests; document content remains untrusted |
 | `native/cosmic-edit/test/unit/mcp.rs` | Handler and UI AI regression with fake OS services |
 | `native/test_process.py` | Real binary stdio authentication and service-error coverage |
 | `native/PROVENANCE.md` | Fork origins and preserved dependency boundary |

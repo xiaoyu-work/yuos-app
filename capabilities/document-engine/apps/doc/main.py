@@ -2,7 +2,7 @@
 
 import sys
 
-from claw_files.document import cmd_convert, cmd_info, cmd_read
+from yuos_files.document import cmd_convert, cmd_info, cmd_read
 from yuos_sdk import ai
 from yuos_runtime import memory, policy
 

@@ -221,7 +221,7 @@ fn update_config(variant: &str, font: FontConfig) {
 pub async fn set_gnome_font_name(font_name: &str) {
     let font_name = font_name.to_owned();
     let _res = tokio::task::spawn_blocking(move || {
-        crate::claw_glue::run_output(
+        crate::yuos_glue::run_output(
             &["gsettings", "set", "org.gnome.desktop.interface", "font-name", &font_name],
             Some(5),
         )

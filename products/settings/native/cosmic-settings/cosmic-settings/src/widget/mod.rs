@@ -60,13 +60,13 @@ pub fn color_picker_context_view<'a, Message: Clone + 'static>(
 /// pages opt into the branded card by building the section from a pre-styled
 /// column instead.
 #[must_use]
-pub fn claw_section<'a, Message: Clone + 'static>() -> settings::Section<'a, Message> {
+pub fn yuos_section<'a, Message: Clone + 'static>() -> settings::Section<'a, Message> {
     settings::section::with_column(list_column().style(crate::theme::section_card()))
 }
 
-/// [`claw_section`] with a pre-allocated list column.
+/// [`yuos_section`] with a pre-allocated list column.
 #[must_use]
-pub fn claw_section_with_capacity<'a, Message: Clone + 'static>(
+pub fn yuos_section_with_capacity<'a, Message: Clone + 'static>(
     capacity: usize,
 ) -> settings::Section<'a, Message> {
     settings::section::with_column(
@@ -75,9 +75,9 @@ pub fn claw_section_with_capacity<'a, Message: Clone + 'static>(
 }
 
 /// A bare list card for the places that build a section-like column by hand
-/// instead of going through [`claw_section`].
+/// instead of going through [`yuos_section`].
 #[must_use]
-pub fn claw_list_column<'a, Message: Clone + 'static>() -> widget::ListColumn<'a, Message> {
+pub fn yuos_list_column<'a, Message: Clone + 'static>() -> widget::ListColumn<'a, Message> {
     list_column().style(crate::theme::section_card())
 }
 
@@ -127,7 +127,7 @@ pub fn page_title<Message: 'static>(page: &page::Info) -> Element<'_, Message> {
 
 #[must_use]
 pub fn unimplemented_page<Message: Clone + 'static>() -> Element<'static, Message> {
-    claw_section().title("")
+    yuos_section().title("")
         .add(text::body("We haven't created that panel yet, and/or it is using a similar idea as current Pop! designs."))
         .into()
 }

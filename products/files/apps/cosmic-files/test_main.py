@@ -22,7 +22,7 @@ def bridge(monkeypatch, tmp_path):
     module.fs = load_local_module(PRODUCT / "apps/fs/main.py", "files_native_fs")
     module.recoll = load_local_module(PRODUCT / "apps/docs/main.py", "files_native_recoll")
     module.document = load_local_module(
-        PRODUCT / "python/claw_files/document.py", "files_native_document",
+        PRODUCT / "python/yuos_files/document.py", "files_native_document",
     )
     with mock.patch.object(module.policy, "require") as require:
         module.require_fixture = require
@@ -115,7 +115,7 @@ def test_stages_complete_source_both_binaries_and_package_separation(tmp_path):
     assert stage.stage("files", tmp_path / "desktop", ["cosmic-files"]) == ["cosmic-files"]
     assert not (tmp_path / "desktop/usr/lib/yuos/python").exists()
     assert stage.stage("files", tmp_path / "agent", ["fs", "docs"]) == ["fs", "docs"]
-    assert (tmp_path / "agent/usr/lib/yuos/python/claw_files/document.py").is_file()
+    assert (tmp_path / "agent/usr/lib/yuos/python/yuos_files/document.py").is_file()
 
 
 def test_document_reader_keeps_authorized_descriptor(bridge, tmp_path):

@@ -61,5 +61,5 @@ def test_packaged_doc_and_kv_use_public_mcp_and_installed_support_without_os_sou
         }
     assert json.loads(store.read_text())["kept"] == "existing owner state"
     assert not (data.parent / "doc").exists()
-    assert (root / "usr/lib/yuos/python/claw_files/document.py").is_file()
+    assert (root / "usr/lib/yuos/python/yuos_files/document.py").is_file()
     assert not (root / "usr/lib/yuos/apps/_shared").exists()

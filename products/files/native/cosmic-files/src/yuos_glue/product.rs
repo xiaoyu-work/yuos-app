@@ -61,5 +61,5 @@ pub fn call(operation: &str, arguments: Value) -> io::Result<Value> {
 
 #[cfg(test)]
 mod tests {
-    include!(concat!(env!("CARGO_MANIFEST_DIR"), "/test/unit/claw_glue/product.rs"));
+    include!(concat!(env!("CARGO_MANIFEST_DIR"), "/test/unit/yuos_glue/product.rs"));
 }

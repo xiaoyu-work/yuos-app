@@ -86,7 +86,7 @@ impl NavPage {
 
     pub fn title(&self) -> String {
         match self {
-            Self::ClawApps => fl!("claw-apps"),
+            Self::ClawApps => fl!("yuos-apps"),
             Self::Explore => fl!("linux-apps"),
             Self::Create => fl!("create"),
             Self::Work => fl!("work"),

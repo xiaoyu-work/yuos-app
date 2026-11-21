@@ -122,7 +122,7 @@ def test_real_packages_are_deterministic_and_have_nonconflicting_ownership(tmp_p
             if entry.isfile() or entry.issym():
                 assert path not in owned, (package.name, owned.get(path), path)
                 owned[path] = package.name
-    assert owned["usr/lib/yuos/python/claw_files/document.py"].startswith("yuos-app-files_")
+    assert owned["usr/lib/yuos/python/yuos_files/document.py"].startswith("yuos-app-files_")
     assert owned["usr/lib/yuos/python/pptx/__init__.py"].startswith("yuos-app-files_")
     assert owned["usr/lib/yuos/python/python_pptx-1.0.2.dist-info/LICENSE"].startswith("yuos-app-files_")
     assert owned["usr/lib/yuos/python/_shared/atomic.py"].startswith("yuos-app-support_")
@@ -136,7 +136,7 @@ def test_real_packages_are_deterministic_and_have_nonconflicting_ownership(tmp_p
     assert "yuos-app-mail (= 1.2.3)" in desktop["Depends"]
     assert "Replaces" not in desktop
     doc = fields(run(["dpkg-deb", "-f", first / "yuos-cap-document-engine_1.2.3_all.deb"]).stdout.decode().strip())
-    assert "yuos-app-files" in doc["Depends"] and "yuos-app-python-claw-files-v1" in doc["Depends"]
+    assert "yuos-app-files" in doc["Depends"] and "yuos-app-python-yuos-files-v1" in doc["Depends"]
     assert "yuos_sdk" not in repr(owned)
     assert not any("test_" in path or "Cargo.toml" in path for path in owned)
     assert "Breaks" not in doc and "Replaces" not in doc

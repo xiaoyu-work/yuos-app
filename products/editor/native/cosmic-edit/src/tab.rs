@@ -48,7 +48,7 @@ pub struct GitDiffTab {
 
 pub struct EditorTab {
     pub path_opt: Option<PathBuf>,
-    pub write_selection: Option<crate::claw_glue::FileSelection>,
+    pub write_selection: Option<crate::yuos_glue::FileSelection>,
     attrs: Attrs<'static>,
     pub editor: Mutex<ViEditor<'static, 'static>>,
     pub context_menu: Option<Point>,
@@ -146,7 +146,7 @@ impl EditorTab {
             let scroll = editor.with_buffer(|buffer| buffer.scroll());
             //TODO: save/restore more?
 
-            match crate::claw_glue::read_to_string(path) {
+            match crate::yuos_glue::read_to_string(path) {
                 Ok(file_content) => {
                     log::info!("reloaded {:?}", path);
 
@@ -220,9 +220,9 @@ impl EditorTab {
         if let Some(path) = &self.path_opt {
             let mut editor = self.editor.lock().unwrap();
             let text = editor_text(&editor);
-            match crate::claw_glue::write_text(path, &text, self.write_selection.as_ref()) {
+            match crate::yuos_glue::write_text(path, &text, self.write_selection.as_ref()) {
                 Ok(()) => {
-                    if matches!(self.write_selection, Some(crate::claw_glue::FileSelection::Create(..))) {
+                    if matches!(self.write_selection, Some(crate::yuos_glue::FileSelection::Create(..))) {
                         self.write_selection = None;
                     }
                     editor.save_point();

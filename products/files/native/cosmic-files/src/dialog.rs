@@ -1406,7 +1406,7 @@ impl Application for App {
                     match dialog_page {
                         DialogPage::NewFolder { parent, name } => {
                             let path = parent.join(name);
-                            match crate::claw_glue::mkdir_all(&path) {
+                            match crate::yuos_glue::mkdir_all(&path) {
                                 Ok(()) => {
                                     // cd to directory
                                     let message = Message::TabMessage(tab::Message::Location(

@@ -14,7 +14,7 @@ use async_trait::async_trait;
 use yuos_sdk::mcp::{App, CallContext, Tool, ToolResult};
 use serde_json::{json, Value};
 
-use crate::claw_glue;
+use crate::yuos_glue;
 
 fn req_str(input: &Value, field: &str) -> Result<String, ToolResult> {
     input
@@ -195,7 +195,7 @@ impl Tool for SummarizeTool {
             Ok(p) => p,
             Err(e) => return e,
         };
-        let result = claw_glue::ai::transform(path, "summarize", None, context).await;
+        let result = yuos_glue::ai::transform(path, "summarize", None, context).await;
         match result {
             Ok(s) => ToolResult::text(json!({"summary": s}).to_string()),
             Err(e) => ToolResult::error(format!("edit.summarize: {e}")),
@@ -218,7 +218,7 @@ impl Tool for ExplainTool {
             Ok(p) => p,
             Err(e) => return e,
         };
-        let result = claw_glue::ai::transform(path, "explain", None, context).await;
+        let result = yuos_glue::ai::transform(path, "explain", None, context).await;
         match result {
             Ok(s) => ToolResult::text(json!({"text": s}).to_string()),
             Err(e) => ToolResult::error(format!("edit.explain: {e}")),
@@ -245,7 +245,7 @@ impl Tool for RewriteTool {
             Ok(i) => i,
             Err(e) => return e,
         };
-        let result = claw_glue::ai::transform(path, "rewrite", Some(instruction), context).await;
+        let result = yuos_glue::ai::transform(path, "rewrite", Some(instruction), context).await;
         match result {
             Ok(s) => ToolResult::text(json!({"text": s}).to_string()),
             Err(e) => ToolResult::error(format!("edit.rewrite: {e}")),

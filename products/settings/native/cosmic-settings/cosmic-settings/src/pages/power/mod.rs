@@ -416,7 +416,7 @@ fn profiles() -> Section<crate::pages::Message> {
         .title(fl!("power-mode"))
         .descriptions(descriptions)
         .view::<Page>(move |_binder, page, section| {
-            let mut section = crate::widget::claw_section().title(&section.title);
+            let mut section = crate::widget::yuos_section().title(&section.title);
 
             if page.backend.is_some() {
                 let profiles = backend::get_power_profiles();
@@ -496,7 +496,7 @@ fn power_saving() -> Section<crate::pages::Message> {
                 .idle_conf
                 .suspend_on_battery_time
                 .map(|t| Duration::from_millis(t.into()));
-            let mut section = crate::widget::claw_section()
+            let mut section = crate::widget::yuos_section()
                 .title(&section.title)
                 .add(power_saving_row(
                     &descriptions[turn_off_screen_desc],

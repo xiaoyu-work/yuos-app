@@ -49,7 +49,7 @@ use config::{
     ProfileId,
 };
 mod config;
-mod claw_glue;
+mod yuos_glue;
 mod cli;
 mod mouse_reporter;
 
@@ -3266,7 +3266,7 @@ impl Application for App {
                 let cwd = self
                     .active_terminal_working_directory()
                     .map(|p| p.to_string_lossy().into_owned());
-                if let Err(err) = crate::claw_glue::ask_yu(cwd.as_deref()) {
+                if let Err(err) = crate::yuos_glue::ask_yu(cwd.as_deref()) {
                     log::error!("failed to open Ask Yu OS overlay: {err}");
                 }
             }
@@ -3279,7 +3279,7 @@ impl Application for App {
                 let snapshot = self.snapshot_active_terminal(80);
                 if let Some((scrollback, cwd)) = snapshot {
                     if let Err(err) =
-                        crate::claw_glue::explain_output(&scrollback, cwd.as_deref())
+                        crate::yuos_glue::explain_output(&scrollback, cwd.as_deref())
                     {
                         log::error!("failed to open Ask Yu OS explain overlay: {err}");
                     }

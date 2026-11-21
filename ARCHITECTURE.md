@@ -197,7 +197,7 @@ retired after the original 75-identity source relocation; their previous
 credentials and installed state are not deleted or migrated here.
 
 Document Engine declares a `python_dependencies` entry for the Files product's
-named `claw_files` export, scoped to `doc`. The same resolver supplies test
+named `yuos_files` export, scoped to `doc`. The same resolver supplies test
 imports and stages that exact library into `/usr/lib/yuos/python`, even when
 staging only Doc. Files/Doc co-staging accepts an identical library tree and
 rejects conflicting bytes, modes, symlinks or extra installed files; it never

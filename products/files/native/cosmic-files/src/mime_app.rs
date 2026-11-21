@@ -419,7 +419,7 @@ impl MimeAppCache {
 
         let mut string = list.to_string();
         string.push('\n');
-        match crate::claw_glue::write_text(&path, &string) {
+        match crate::yuos_glue::write_text(&path, &string) {
             Ok(()) => {
                 self.reload();
             }

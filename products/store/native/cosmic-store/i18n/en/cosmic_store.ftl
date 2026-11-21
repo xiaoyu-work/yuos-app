@@ -1,5 +1,5 @@
 app-name = Yu OS Store
-claw-apps = Yu Apps
+yuos-apps = Yu Apps
 linux-apps = Linux Apps
 linux-system-updates = Linux Apps and system packages
 claw-installed = Installed: { $version }
