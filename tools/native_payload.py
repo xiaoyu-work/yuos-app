@@ -51,6 +51,7 @@ class NativePlan:
     gui_entries: tuple[NativeGuiEntry, ...]
     manifest_bytes: bytes = field(repr=False)
     private_resources: tuple[str, ...] = ()
+    private_executables: tuple[str, ...] = ()
 
     def record(self):
         record = {
@@ -73,6 +74,8 @@ class NativePlan:
             }
         if self.private_resources:
             record["private_resources"] = list(self.private_resources)
+        if self.private_executables:
+            record["private_executables"] = list(self.private_executables)
         return record
 
 
@@ -93,7 +96,7 @@ def plan(product):
     if package.get("native_kind") != "binary":
         raise ValueError("A native library is not an independently runnable App payload")
     if not isinstance(declaration, dict) or (
-        set(declaration) - {"app", "program", "auxiliary_programs", "private_resources"}
+        set(declaration) - {"app", "program", "auxiliary_programs", "private_resources", "private_executables"}
         or not {"app", "program"} <= declaration.keys()
     ):
         raise ValueError("Native payload requires an explicit product-owned binary declaration")
@@ -116,6 +119,15 @@ def plan(product):
             raise ValueError("Native private resources require explicit usr/share roots")
     if len(set(private_resources)) != len(private_resources):
         raise ValueError("Native private resource roots must be distinct")
+    private_executables = declaration.get("private_executables", [])
+    if not isinstance(private_executables, list):
+        raise ValueError("Native private executables require an explicit file list")
+    for relative in private_executables:
+        path = app_path(relative)
+        if not any(path != app_path(root) and path.is_relative_to(app_path(root)) for root in private_resources):
+            raise ValueError("Native private executable must belong to a declared private resource root")
+    if len(set(private_executables)) != len(private_executables):
+        raise ValueError("Native private executables must be distinct")
     apps = stage.app_entries(source, package)
     if app_id not in apps:
         raise ValueError("Native payload App must belong to this product")
@@ -150,7 +162,7 @@ def plan(product):
         product, app_id, app, source / "native/LICENSE",
         Path("usr/lib/cos/apps") / app.relative_to(source / "apps"),
         program, tuple(auxiliary), entries, selector, gui_entries, manifest_bytes,
-        tuple(private_resources),
+        tuple(private_resources), tuple(private_executables),
     )
 
 
@@ -201,9 +213,11 @@ def _inputs(selected, installed, architecture):
             if name not in programs:
                 raise ValueError(f"Native installer produced an undeclared executable: {name}")
             validate_elf(installed / name, architecture)
+        elif name in selected.private_executables:
+            validate_elf(installed / name, architecture)
         elif not name.startswith("usr/share/") or info.st_mode & 0o111:
             raise ValueError(f"Native installer produced an unowned resource or executable: {name}")
-    for name in programs:
+    for name in programs | set(selected.private_executables):
         if name not in inventory or inventory[name]["type"] != "file":
             raise ValueError(f"Native installer did not produce its declared executable: {name}")
     return inventory

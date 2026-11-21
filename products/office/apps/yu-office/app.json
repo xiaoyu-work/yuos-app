@@ -1,0 +1,16 @@
+{
+  "id": "yu-office",
+  "version": "0.1.0",
+  "schema_version": 2,
+  "name": {"en": "Yu Office", "zh-CN": "Yu Office"},
+  "summary": {
+    "en": "An independently packaged office suite based on LibreOffice.",
+    "zh-CN": "基于 LibreOffice 的独立办公套件。"
+  },
+  "runtime": "binary",
+  "entry": "bin/yu-office",
+  "desktop": {
+    "exec": "--gui",
+    "needs": []
+  }
+}

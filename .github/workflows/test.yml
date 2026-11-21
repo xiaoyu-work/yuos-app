@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        product: [mail, calendar, files, browser, terminal, containers, backup-recovery, store, diagnostics, storage, settings, security, maintenance, events-audit, launcher, clipboard, messaging-channels, notification-delivery, home-integration, desktop-widgets, editor, capture, media-player, notifications, desktop-shell]
+        product: [mail, calendar, files, browser, terminal, containers, backup-recovery, store, diagnostics, storage, settings, security, maintenance, events-audit, launcher, clipboard, messaging-channels, notification-delivery, home-integration, desktop-widgets, editor, capture, media-player, notifications, desktop-shell, office]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
@@ -44,6 +44,9 @@ jobs:
         with:
           node-version: "22"
       - run: python3 -m pip install -r requirements-dev.txt
+      - name: Validate the Office source pin and patch series
+        if: matrix.product == 'office'
+        run: python3 products/office/source.py check
       - name: Install Mail TLS fixture dependency
         if: matrix.product == 'mail'
         run: |

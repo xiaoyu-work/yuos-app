@@ -1,0 +1,16 @@
+{
+  "apps": ["apps/yu-office"],
+  "tests": [],
+  "native": {"yu-office": "native"},
+  "native_kind": "binary",
+  "native_build_system": "cmake",
+  "native_payload": {
+    "app": "yu-office",
+    "program": "yu-office",
+    "private_resources": ["usr/share/yu-office"],
+    "private_executables": [
+      "usr/share/yu-office/program/soffice.bin",
+      "usr/share/yu-office/program/xpdfimport"
+    ]
+  }
+}

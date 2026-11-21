@@ -1,0 +1,6 @@
+The Yu Office packaging, launcher and original artwork are licensed under the
+Apache License, Version 2.0 (https://www.apache.org/licenses/LICENSE-2.0).
+
+The included LibreOffice runtime is separately licensed. Its original notices
+and license texts are included with the runtime; see the product source
+documentation for the exact upstream release and downstream patches.

@@ -80,6 +80,7 @@ already been published or that every physical device has been exercised.
 | `products/events-audit/` | Event service client and legacy JSONL activity App; event/audit authority remains OS-owned; `log` still needs typed audit-service integration rather than direct system-audit access |
 | `products/launcher/` | Complete native Launcher UI and Python/native MCP surfaces sharing product catalog/search/recent and typed launch logic; desktop execution and native UI backend service stay OS-owned |
 | `products/editor/` | Complete native Text Editor UI, seven MCP handlers and shared SDK AI presentation; controlled filesystem/snapshot, desktop and model-provider authority remain OS-owned |
+| `products/office/` | Yu Office branding, pinned LibreOffice source and patches, private native runtime and Common Host launcher; separate from distribution LibreOffice |
 | `products/capture/` | Complete native screenshot CLI/MCP/resources and managed GUI status client; portal I/O/UI, session/capture authority and durable output remain OS-owned |
 | `products/media-player/` | Complete native GStreamer UI/MPRIS/MCP/resources; live playback stays product-owned, and owner-bound observation/control authority stays OS-owned |
 | `products/notifications/` | Complete original Layer Shell UI/MCP/config/util and build; explicit signed-GUI presentation IPC resources, durable records, single desktop delivery consumer, shell descriptor and checked cleanup stay OS-owned |

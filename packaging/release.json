@@ -35,6 +35,7 @@
     "media-player": ["claw-os-media-player-v1", "pipewire-bin", "libvulkan1", "mesa-vulkan-drivers", "gstreamer1.0-plugins-base", "gstreamer1.0-plugins-good", "gstreamer1.0-libav"],
     "notifications": ["claw-os-notifications-v1"],
     "store": ["claw-os-software-store-v1 (= 1)", "appstream", "flatpak", "gir1.2-flatpak-1.0", "packagekit"],
+    "office": ["fonts-liberation"],
     "settings": ["claw-os-app-permissions-v1", "xkb-data"]
   },
   "desktop_assets": {

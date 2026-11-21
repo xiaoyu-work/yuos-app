@@ -34,6 +34,10 @@ One real primary ELF serves both surfaces without copying it twice.
 An explicit `native_payload.private_resources` list may keep named
 `usr/share/<product>/...` roots only inside the signed App's `resources/`.
 Those files are not compatibility exports or global resource activation.
+Products whose runtime needs an executable beside its libraries declare its
+exact installer path in `native_payload.private_executables`, within a declared
+private resource root. The producer checks the real ELF and keeps it private
+and signed; it does not add a command, manifest entry, or runtime grant.
 All existing authority-path, mode, architecture and inventory checks still
 apply. The native dependency scanner includes ELF libraries in those private
 roots as well as the primary executables.

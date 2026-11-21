@@ -11,6 +11,12 @@ App provenance, security-floor gates and user state. There is no additional
 privileged updater, runtime source checkout, model-controlled signing key or
 trust-root override.
 
+[Yu Office](../products/office/MODULE.md) is an independent product selection
+(`office`), not a stock LibreOffice dependency or an OS preinstall. Its desktop
+package builds the ordered patches against the checked upstream source and
+enters **Claw Apps** through this same signed APT channel. Distribution
+LibreOffice remains available separately under **Linux Apps**.
+
 ## Platform publication status
 
 App development platform `1.0.0` and `1.1.0` releases, tags and uploaded Actions

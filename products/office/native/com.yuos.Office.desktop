@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Yu Office
+Comment=Office suite based on LibreOffice
+Exec=yu-office
+Icon=com.yuos.Office
+Categories=Office;
+StartupNotify=true

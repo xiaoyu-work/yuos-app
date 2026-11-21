@@ -21,6 +21,15 @@ EXTRA_NATIVE = {
     "media-player": ["libgstreamer1.0-dev", "libgstreamer-plugins-base1.0-dev", "libglib2.0-dev"],
     "settings": ["libpipewire-0.3-dev", "libpulse-dev", "libxkbregistry-dev", "libclang-dev",
                  "gettext", "libglib2.0-dev"],
+    "office": [
+        "autoconf", "automake", "bison", "flex", "gperf", "nasm", "gettext", "ninja-build",
+        "zip", "unzip", "xsltproc", "libxml2-utils", "libxslt1-dev", "libarchive-zip-perl",
+        "python3-dev", "python3-setuptools", "librsvg2-bin", "libgtk-3-dev", "libcups2-dev",
+        "libnss3-dev", "libkrb5-dev", "libx11-dev", "libxext-dev", "libxinerama-dev",
+        "libxrandr-dev", "libxrender-dev", "libxt-dev", "libxkbfile-dev", "libgl-dev",
+        "libglu1-mesa-dev", "libavahi-client-dev", "libgstreamer1.0-dev",
+        "libgstreamer-plugins-base1.0-dev", "libicu-dev", "libcurl4-openssl-dev",
+    ],
     "desktop-shell": [
         "ninja-build", "patchelf", "libpam0g-dev", "libgl-dev", "libgles-dev",
         "libwayland-dev/trixie-backports", "wayland-protocols/trixie-backports",

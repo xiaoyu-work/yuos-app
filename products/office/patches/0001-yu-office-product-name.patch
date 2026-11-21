@@ -1,0 +1,10 @@
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
+@@ -536,5 +536,5 @@
+ AC_MSG_CHECKING([for product name])
+-PRODUCTNAME="AC_PACKAGE_NAME"
++PRODUCTNAME="Yu Office"
+ if test -n "$with_product_name" -a "$with_product_name" != no; then
+     PRODUCTNAME="$with_product_name"
+ fi
