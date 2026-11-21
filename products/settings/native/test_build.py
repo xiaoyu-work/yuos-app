@@ -102,12 +102,13 @@ def test_native_users_have_one_protected_transport_without_app_owned_authority()
         assert forbidden not in client, forbidden
     assert "cos_call_json_async_with_binary" in client
     assert '"/usr/local/bin/yu"' in client and '"__users"' in client
-    assert '"--uid"' in client and '"--credential"' in client and '"--icon"' in client
+    assert '"--uid"' in client and '"--icon"' in client
+    assert '"--credential"' not in client
+    assert '["__system-settings", "--request-stdin"], &request.input' in client
     assert "self.pending.complete(generation)" in page
     assert "self.pending.revision()" in page
-    assert "Earlier steps may have applied; no rollback was attempted" in client
     labels = (NATIVE / "i18n/en/cosmic_settings.ftl").read_text()
-    assert "not a password" in labels and "at most 1 MiB" in labels
+    assert "asks for administrator authentication separately" in labels and "at most 1 MiB" in labels
 
 
 def test_system_authority_is_never_installed_or_removed_by_the_product():
