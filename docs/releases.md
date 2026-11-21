@@ -804,7 +804,7 @@ Before dispatching the first release:
 3. Enable **immutable releases** in the App repository. The workflow verifies
    GitHub's setting before writing release content and verifies each published
    release is immutable. In the `app-release` environment, set
-   `CLAW_APPS_REPO_SETTINGS_TOKEN` to a fine-grained token for `yuos-app`
+   `YUOS_APPS_REPO_SETTINGS_TOKEN` to a fine-grained token for `yuos-app`
    with **Administration: read**. GitHub Actions' `GITHUB_TOKEN` cannot read
    the repository-level setting. The separate token is used only for that
    read by both release and refresh; release assets and state pushes still use
@@ -812,12 +812,16 @@ Before dispatching the first release:
 4. Configure GitHub Pages with **GitHub Actions** as its source. Protect `main`
    and the `yuos-apt` state branch against force pushes/deletion while allowing
    this workflow's normal state commits.
-5. Configure dedicated secrets `CLAW_APPS_APT_SIGNING_PRIVATE_KEY` and
-   `CLAW_APPS_APT_SIGNING_PASSPHRASE`. Use a signing-enabled key matching
+5. Configure dedicated secrets `YUOS_APPS_APT_SIGNING_PRIVATE_KEY` and
+   `YUOS_APPS_APT_SIGNING_PASSPHRASE`. Use a signing-enabled key matching
    [`archive-key.asc`](../packaging/apt/archive-key.asc) and fingerprint
    `ADBA1957E712B6C80B4CC8736C044D6F411416AF`. Never put private material in a
    repository, command argument, log, workflow artifact or release asset.
-6. Restrict the `app-release` environment to reviewed `main` deployments.
+6. Set `YUOS_APPS_PROVENANCE_SIGNING_PRIVATE_KEY` to the approved Ed25519
+   private key JSON with `"schema": "yuos.signing-key/v1"`. If reusing the
+   approved key, update only that field in your private copy; the key bytes
+   and `key_id` must continue to match the public publisher entry.
+7. Restrict the `app-release` environment to reviewed `main` deployments.
    Its scheduled metadata refresh must not stall behind unattended mandatory
    approvals until `Valid-Until` expires. The Pages deployment uses
    `github-pages`; publication needs `contents: write`, and deployment needs
