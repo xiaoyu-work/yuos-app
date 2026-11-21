@@ -18,7 +18,7 @@ IDENTIFIER_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,254}$")
 TIMEOUT_SECS = int(os.environ.get("YUOS_CONTAINER_MANAGER_TIMEOUT", "300"))
 
 
-def _cos_binary() -> str | None:
+def _yu_binary() -> str | None:
     return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
@@ -112,7 +112,7 @@ def _broker(
     signal: str | None = None,
     confirm: bool = False,
 ) -> dict:
-    yu_bin = _cos_binary()
+    yu_bin = _yu_binary()
     if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Container Manager broker unavailable"

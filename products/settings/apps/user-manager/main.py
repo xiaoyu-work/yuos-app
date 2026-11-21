@@ -24,7 +24,7 @@ MAX_SHELL_LENGTH = 255
 TIMEOUT_SECS = int(os.environ.get("YUOS_USER_MANAGER_TIMEOUT", "300"))
 
 
-def _cos_binary() -> str | None:
+def _yu_binary() -> str | None:
     return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
@@ -57,7 +57,7 @@ def _broker(
     token: str | None = None,
     confirm: bool = False,
 ) -> dict:
-    yu_bin = _cos_binary()
+    yu_bin = _yu_binary()
     if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; User Manager broker unavailable"

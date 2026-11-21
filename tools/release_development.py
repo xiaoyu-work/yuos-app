@@ -17,7 +17,7 @@ from package_assets import asset_entries
 import stage
 import stage_native
 
-FORMAT = "claw.app-development/v1"
+FORMAT = "yuos.app-development/v1"
 STAGING_FIELDS = {"apps", "kind", "extension", "python_library", "python_dependencies", "installed_assets", "web_ui"}
 SOURCE_IGNORE = shutil.ignore_patterns(".git", "target", "build", "node_modules", "__pycache__",
                                       ".pytest_cache", "*.pyc", "*.pyo")

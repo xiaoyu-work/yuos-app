@@ -106,7 +106,7 @@ def verify_artifacts(plan, directory):
     for architecture in jobs:
         report = json.loads((directory / f"build-record-{architecture}.json").read_text())
         wanted = [record for record in records.values() if record["architecture"] == architecture]
-        if report.get("format") != "claw.app-build/v1" or report.get("plan") != plan or (
+        if report.get("format") != "yuos.app-build/v1" or report.get("plan") != plan or (
             sorted(report["packages"], key=identity) != sorted(wanted, key=identity)
         ):
             raise ValueError("Matrix build records differ from the Debian artifacts")
@@ -215,7 +215,7 @@ def release_assets(plan, selection, packages, directory, signing, *, development
         from release_store import release_files
         snapshot_records = release_files(snapshots, target)
     metadata = {
-        "format": "claw.app-release-assets/v1", "selection": selection,
+        "format": "yuos.app-release-assets/v1", "selection": selection,
         "version": plan["version"], "source_revision": plan["source_revision"],
         "packages": sorted(selected, key=identity),
         "development": fixture,

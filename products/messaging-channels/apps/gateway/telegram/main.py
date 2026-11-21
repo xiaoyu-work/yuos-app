@@ -16,7 +16,7 @@ TG_API_HOST = "api.telegram.org"
 TG_MESSAGE_LIMIT = 4096
 
 
-def _cos_bin():
+def _yu_bin():
     return os.environ.get("YUOS_BIN", "yu")
 
 
@@ -24,7 +24,7 @@ def _load_token():
     env_token = os.environ.get("YUOS_TELEGRAM_TOKEN")
     if env_token:
         return env_token.strip()
-    token, error = safe_subprocess.safe_credential_load("telegram_bot_token", timeout=10.0, yu_bin=_cos_bin())
+    token, error = safe_subprocess.safe_credential_load("telegram_bot_token", timeout=10.0, yu_bin=_yu_bin())
     if token is None:
         raise RuntimeError(error or "telegram_bot_token not in credential store; run `yu credential store telegram_bot_token <token>` first")
     return token

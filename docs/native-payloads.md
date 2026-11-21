@@ -77,7 +77,7 @@ change trust roots or supply a signer pin. Use the existing public provenance
 CLI and an authorized App publisher key; pass each `entrypoints` value returned
 by the plan once through `--entrypoint`. Normally that is just `bin/<program>`;
 Files also declares `bin/cosmic-files-applet`. The existing
-`claw.provenance/v1` signer inventories all files,
+`yuos.provenance/v1` signer inventories all files,
 including full ELF bytes, resources and licenses. Named resource declarations,
 when supplied, use that existing format and confer no mounts or grants.
 

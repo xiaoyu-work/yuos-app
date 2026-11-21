@@ -399,7 +399,7 @@ def test_archive_is_verified_before_tar_is_opened(dependency, monkeypatch):
     ("url", "https://example.test/\nheader"), ("url", None),
     ("sha256", ""), ("sha256", "a" * 63), ("sha256", "z" * 64), ("sha256", 1),
     ("runtime_abi", 2), ("runtime_abi", True), ("runtime_abi", "1"),
-    ("schema", "claw.app-platform/v2"), ("repository", "ignored Git source"),
+    ("schema", "yuos.app-platform/v2"), ("repository", "ignored Git source"),
     ("revision", "a" * 40), ("python_sources", ["yuos-sdk/python/src"]),
 ])
 def test_lock_cannot_select_git_unpinned_or_unsupported_inputs(dependency, field, value):
@@ -475,7 +475,7 @@ def test_missing_app_support_is_not_supplied_by_os_artifact(dependency, missing)
 
 
 @pytest.mark.parametrize("field,value", [
-    ("schema", "claw.app-platform/v2"), ("version", "1.0.1"),
+    ("schema", "yuos.app-platform/v2"), ("version", "1.0.1"),
     ("runtime_abi", 2), ("runtime_abi", True), ("source_revision", "main"),
     ("exports", {**EXPORTS, "python-sdk": "core/python"}),
     ("exports", {**EXPORTS, "other": "apps/other"}), ("files", []),

@@ -16,7 +16,7 @@ xdgen = "0.1"
 
 [dependencies]
 async-trait = "0.1"
-yuos-sdk = { path = "../../../yuos-sdk/rust", version = "0.2" }
+yuos-sdk = { path = "../../../yuos-sdk/rust", version = "0.1" }
 i18n-embed-fl = "0.10"
 i18n-embed = { version = "0.16.0", features = ["fluent-system", "desktop-requester"] }
 jiff = "0.2"

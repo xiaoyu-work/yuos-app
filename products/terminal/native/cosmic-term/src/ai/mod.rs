@@ -13,16 +13,16 @@
 //!
 //! 2. **Context snapshot** ([`context`]) — when the user submits an AI prompt, we
 //!    scrape the last N grid lines + cwd and write them to
-//!    `$YUOS_AI_TMP/ac-<id>.json`. The shell function `__cos_ai` reads these files
+//!    `$YUOS_AI_TMP/ac-<id>.json`. The shell function `__yuos_ai` reads these files
 //!    and prepends the context to the Copilot CLI prompt.
 //!
 //! 3. **Shell integration** ([`shell_integration`]) — bash / zsh / fish / pwsh
-//!    snippets emitting OSC 133 markers and defining the `__cos_ai` function that
+//!    snippets emitting OSC 133 markers and defining the `__yuos_ai` function that
 //!    `exec`s `copilot -p "<prompt>" --allow-all-tools`. Sourced via shell-specific
 //!    mechanisms (`--rcfile`, `ZDOTDIR`, `--init-command`).
 //!
 //! 4. **Submission** — the middleware writes the captured prompt to
-//!    `$YUOS_AI_TMP/aq-<id>.txt`, then injects ` __cos_ai <id>\r` into the PTY so
+//!    `$YUOS_AI_TMP/aq-<id>.txt`, then injects ` __yuos_ai <id>\r` into the PTY so
 //!    the shell runs the function. The leading space keeps it out of history.
 //!
 //! Aterm relied on JS-land echo suppression to hide the injected command from

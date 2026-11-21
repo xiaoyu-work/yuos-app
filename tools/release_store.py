@@ -19,7 +19,7 @@ import release_snapshots as snapshots
 from web_ui import DESCRIPTOR, read_descriptor
 
 
-SCHEMA = "claw.app-store/v2"
+SCHEMA = "yuos.app-store/v2"
 INDEX = "index.json"
 SIGNATURE = "index.json.asc"
 RECORD_FIELDS = {
@@ -500,7 +500,7 @@ def prepare_release_snapshots(plan, packages, output, provenance, signing, key):
             shutil.rmtree(root)
             shutil.rmtree(final_root)
         write_json(prepared / "release-record.json", {
-            "format": "claw.app-authenticated-release/v1", "plan": plan,
+            "format": "yuos.app-authenticated-release/v1", "plan": plan,
             "build_packages": sorted(originals, key=identity),
             "packages": sorted(final_records, key=identity),
         })

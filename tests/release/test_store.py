@@ -25,7 +25,7 @@ def web_app(root):
     (root / "web/app.js").write_text("window.fixture = true;")
     manifest = snapshots.read_metadata(root / "app.json")
     write_json(root / "web-ui.json", {
-        "schema": "claw.web-app/v1", "app_id": manifest["id"], "source_kind": "product",
+        "schema": "yuos.web-app/v1", "app_id": manifest["id"], "source_kind": "product",
         "source_name": "fixture", "title": manifest["name"], "description": "",
         "entry": "web/index.html",
     })
@@ -35,7 +35,7 @@ def web_app(root):
 @pytest.fixture
 def public_signer(tmp_path, monkeypatch):
     """Fake the public CLI wire only; real signature integration remains in runtime."""
-    binary = tmp_path / "fake-public-cos"
+    binary = tmp_path / "fake-public-yu"
     binary.write_text("test-only public signer fixture; not a production executable\n")
     binary.chmod(0o755)
     key = tmp_path / "package-key.json"
@@ -59,10 +59,10 @@ def public_signer(tmp_path, monkeypatch):
                       "digest": "sha256:" + record["sha256"]}
                      for name, record in inventory(root).items() if record["type"] == "file"]
             envelope = {
-                "schema": "claw.provenance/v1",
+                "schema": "yuos.provenance/v1",
                 "package": {
                     "kind": "app", "id": manifest["id"], "version": manifest["version"],
-                    "manifest_schema": "cos.app-manifest/v1", "manifest_path": "app.json",
+                    "manifest_schema": "yuos.app-manifest/v1", "manifest_path": "app.json",
                     "entrypoints": entries, "files": files, "content_digest": "sha256:" + "b" * 64,
                 },
                 "signature": {"algorithm": "ed25519", "key_id": publisher,
@@ -238,7 +238,7 @@ def bundle(tmp_path, public_signer, signing, app, deb):
         shutil.copy2(path, ci / path.name)
     originals = [package_record(path) for path in sorted(ci.glob("*.deb"))]
     write_json(ci / "build-record-all.json", {
-        "format": "claw.app-build/v1", "plan": plan, "packages": originals,
+        "format": "yuos.app-build/v1", "plan": plan, "packages": originals,
         "development": {}, "interfaces": {},
     })
     packages, _, _ = release_publish.verify_artifacts(plan, ci)
@@ -309,7 +309,7 @@ def test_final_signed_debs_drive_store_snapshots_apt_and_immutable_assets(tmp_pa
 def test_store_v2_rejects_missing_ambiguous_and_conflicting_apt_bindings(bundle):
     _, _, _, _, index, _ = bundle
     mutations = [
-        lambda value: value.update(schema="claw.app-store/v1"),
+        lambda value: value.update(schema="yuos.app-store/v1"),
         lambda value: value["packages"].append(dict(value["packages"][0])),
         lambda value: value["packages"][0].update(apps=["bundle-first", "bundle-first"]),
         lambda value: value["apps"][0]["delivery"].update(package_sha256="0" * 64),

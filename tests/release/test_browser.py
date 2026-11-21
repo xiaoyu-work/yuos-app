@@ -108,7 +108,11 @@ def test_real_browser_apt_upgrade_updates_extension_and_host_together_without_re
     release.build(release.make_plan("browser", "1.0.0"), "all", tmp_path / "first")
     platform = [
         deb("yuos-app-fixture-platform", extra={
-            "Provides": "yuos-app-runtime-v1 (= 0.1.0), yuos-browser-bridge-v1 (= 1), yuos-app-support-v1, python3 (= 3.13)",
+            "Provides": (
+                "yuos-app-runtime-v1 (= 0.1.0), yuos-browser-bridge-v1 (= 1), "
+                "yuos-browser-render-v1 (= 1), helium-bin (= 0.22.1.1-1), "
+                "yuos-app-support-v1, python3 (= 3.13)"
+            ),
         }),
         deb("yuos-app-unrelated"),
     ]

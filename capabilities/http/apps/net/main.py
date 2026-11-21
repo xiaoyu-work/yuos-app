@@ -13,7 +13,7 @@ from _shared import safe_http  # noqa: E402
 from yuos_runtime import policy  # noqa: E402
 
 
-USER_AGENT = "cos/" + os.environ.get("YUOS_VERSION", "0.1.0")
+USER_AGENT = "yuos/" + os.environ.get("YUOS_VERSION", "0.1.0")
 DEFAULT_TIMEOUT = 30
 MAX_REQUEST_DATA_BYTES = 1_000_000
 MAX_RESPONSE_BYTES = 5_000_000

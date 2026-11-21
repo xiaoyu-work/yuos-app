@@ -30,7 +30,7 @@ def run(arguments, *, cwd=ROOT, input=None, env=None, check=True):
 
 def config():
     value = json.loads((ROOT / "packaging/release.json").read_text())
-    if value.get("format") != "claw.app-release/v1":
+    if value.get("format") != "yuos.app-release/v1":
         raise ValueError("Unsupported App release configuration")
     if value["architectures"] != ["amd64", "arm64"]:
         raise ValueError("The native release contract requires amd64 and arm64")

@@ -125,7 +125,7 @@ replace Host authentication and runtime capability/sandbox enforcement.
 
 [`tools/release_snapshots.py`](../tools/release_snapshots.py) packages explicitly
 selected, already prepared and signed App directories. Every directory has its
-own original `app.json` and existing `claw.provenance/v1` `.provenance.json`,
+own original `app.json` and existing `yuos.provenance/v1` `.provenance.json`,
 with package kind `app`. It does not merge identities, rewrite manifest/App
 versions, author permission summaries, grant permissions or run App entrypoints.
 Product preparation must include the complete App-owned binaries, resources and
@@ -189,7 +189,7 @@ Each successful output contains:
 | File | Contract |
 | --- | --- |
 | `yuos-app-snapshot-<sha256>.tar.gz` | Deterministic archive rooted directly at `app.json` and `.provenance.json`, preserving complete regular-file bytes, modes and empty directories |
-| `catalog.json` | `claw.app-snapshot-catalog/v1`, distribution `release_version`, `runtime_abi: 1`, and one record per selected App identity/architecture |
+| `catalog.json` | `yuos.app-snapshot-catalog/v1`, distribution `release_version`, `runtime_abi: 1`, and one record per selected App identity/architecture |
 | `catalog.json.asc` | Detached signature under the checked-in App archive OpenPGP key |
 | `SHA256SUMS`, `SHA256SUMS.asc` | Exact catalog/archive checksum set and its detached signature |
 
@@ -225,7 +225,7 @@ parsing: 8 MiB per metadata/header body, 100,000 payload nodes and a 2 GiB
 payload/catalog budget. Nested metadata, sparse/link headers, truncation and
 unindexed trailing data fail before extraction; ordinary long UTF-8 paths use
 the standard PAX/data-filter implementation.
-The current public `claw.provenance/v1` signer does not admit symlinks.
+The current public `yuos.provenance/v1` signer does not admit symlinks.
 Preparation must resolve any required delivery-layout change explicitly; the
 producer never silently dereferences, drops or invents a signed link.
 There is no `.deb` maintainer-hook execution or post-extraction installer.
@@ -279,7 +279,7 @@ Host-only compatibility launchers and the separate resource/runtime blockers.
 
 ## Official Store APT producer
 
-The separately OpenPGP-signed `store/index.json` uses **`claw.app-store/v2`**.
+The separately OpenPGP-signed `store/index.json` uses **`yuos.app-store/v2`**.
 Its existing repository, runtime ABI, monotonic generation, bounded
 `issued_at`/`expires_at`, App snapshot, raw manifest/provenance, display and
 product-owned Web bindings remain. A required `packages` array inventories
@@ -681,7 +681,7 @@ payload/usr/lib/yuos/python/
 interfaces/<explicit-native-library>/
 ```
 
-The manifest format is `claw.app-development/v1`, with
+The manifest format is `yuos.app-development/v1`, with
 `purpose: development-and-integration-fixtures`. Its `groups` record source
 kind, name, path, App IDs and `role` (`selected` or `python-dependency`).
 `groups[].source_package` preserves the original complete package declaration.

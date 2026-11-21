@@ -1,5 +1,5 @@
 {
-  "format": "claw.app-release/v1",
+  "format": "yuos.app-release/v1",
   "integration_contract": "verified-origin-neutral-app-host",
   "repository": "xiaoyu-work/yuos-app",
   "apt_url": "https://xiaoyu-work.github.io/yuos-app/",

@@ -1,4 +1,4 @@
-// Mail Assistant — chat interface backed by the cos `chat` verb of
+// Mail Assistant — chat interface backed by the yu `chat` verb of
 // apps/mail-ai. History is stored in storage.local.assistantHistory.
 // Each "send" passes the question and a fresh snapshot of recent message
 // metadata. Conversation history is local UI state, not model context.

@@ -19,7 +19,7 @@ async function loadSettings() {
   document.getElementById("triage-autoTag").checked            = !!s.triage.autoTag;
   document.getElementById("triage-autoMoveImportant").checked  = !!s.triage.autoMoveImportant;
   document.getElementById("triage-autoMoveNewsletter").checked = !!s.triage.autoMoveNewsletter;
-  document.getElementById("triage-tagPrefix").value            = s.triage.tagPrefix || "claw/";
+  document.getElementById("triage-tagPrefix").value            = s.triage.tagPrefix || "yuos/";
 
   document.getElementById("compose-defaultStyle").value       = s.compose.defaultStyle  || "formal";
   document.getElementById("translate-defaultTarget").value    = s.translate.defaultTarget || "English";
@@ -35,7 +35,7 @@ async function save() {
     autoTag:            document.getElementById("triage-autoTag").checked,
     autoMoveImportant:  document.getElementById("triage-autoMoveImportant").checked,
     autoMoveNewsletter: document.getElementById("triage-autoMoveNewsletter").checked,
-    tagPrefix:          (document.getElementById("triage-tagPrefix").value || "claw/").trim(),
+    tagPrefix:          (document.getElementById("triage-tagPrefix").value || "yuos/").trim(),
   };
 
   const compose   = { defaultStyle:    document.getElementById("compose-defaultStyle").value || "formal" };

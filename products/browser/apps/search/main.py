@@ -16,7 +16,7 @@ from yuos_runtime import memory, policy  # noqa: E402
 
 
 VERSION = os.environ.get("YUOS_VERSION", "0.1.0")
-USER_AGENT = "cos/" + VERSION
+USER_AGENT = "yuos/" + VERSION
 TIMEOUT = 15
 MAX_RESULTS_DEFAULT = 5
 MAX_RESULTS_LIMIT = 10

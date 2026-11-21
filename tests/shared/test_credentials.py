@@ -14,7 +14,7 @@ class CredentialLoaderTests(unittest.TestCase):
         self.addCleanup(self.binary.stop)
 
     @mock.patch.object(credentials.subprocess, "run")
-    def test_loads_value_from_cos_json(self, run):
+    def test_loads_value_from_yu_json(self, run):
         run.return_value = mock.MagicMock(
             returncode=0,
             stdout=json.dumps({"value": "secret-value"}),

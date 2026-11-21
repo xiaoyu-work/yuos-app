@@ -6,7 +6,7 @@ construction or a privileged updater.
 - `release.json` is the package/channel, native toolchain, public service ABI,
   Python dependency and bounded first-ownership-transfer policy.
   The approved 0.2.1 source cutover bounds former OS owners at `(<< 1:0.2.1)`
-  and requires `yuos-app-runtime-v1 (>= 0.2.1)`, not a new ABI or a new
+  and requires `yuos-app-runtime-v1 (>= 0.1.0)`, not a new ABI or a new
   production platform pin. OS production staging no longer copies App/support
   source. Missing official App APT artifacts or reintroduced shell/private-library
   links block OS release assembly. The real Desktop source links are removed;
@@ -33,7 +33,7 @@ construction or a privileged updater.
   the reviewed generic App Host/capability/resource-owner contract plus the
   selected architectures' real package, signature and publication checks.
 - `../tools/release_snapshots.py` packages complete, separately authenticated
-  `claw.provenance/v1` App directories and signs a manifest/artifact-bound catalog.
+  `yuos.provenance/v1` App directories and signs a manifest/artifact-bound catalog.
   It calls the existing pinned public verifier and has no OS-source dependency,
   root hooks, installer, permission summary or approval store. OS protected
   install/update review and activation remain prerequisites. Snapshots are
@@ -42,7 +42,7 @@ construction or a privileged updater.
   binding follows the public manifest defaults, while `needs[].why` and scope
   requests remain unchanged data for OS-owned review and enforcement.
 - `../tools/release_store.py` creates a separately signed, freshness-bounded
-  `claw.app-store/v2` index binding every App to its actual signed APT package.
+  `yuos.app-store/v2` index binding every App to its actual signed APT package.
   Publication verifies original CI records, signs App directories through the
   pinned public provenance CLI, repacks and validates final Debian bytes, then
   derives snapshots from those identical final payloads. Complete package

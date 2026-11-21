@@ -15,12 +15,12 @@ ACCURACIES = frozenset({"country", "city", "neighborhood", "street", "exact"})
 TIMEOUT_SECS = int(os.environ.get("YUOS_LOCATION_MANAGER_TIMEOUT", "45"))
 
 
-def _cos_binary():
+def _yu_binary():
     return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _broker(action, accuracy):
-    yu_bin = _cos_binary()
+    yu_bin = _yu_binary()
     if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Location Manager broker unavailable"

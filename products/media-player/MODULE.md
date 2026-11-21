@@ -64,7 +64,7 @@ python3 products/media-player/native/test_process.py
 
 The process fixture requires the existing `just`, `bubblewrap` and
 `dbus-daemon` tools. It accepts `--binary <binary> --source <native-inputs>`
-for an immutable OS-composed build, and `--yuos-binary <cos>` to exercise the
+for an immutable OS-composed build, and `--yuos-binary <yu>` to exercise the
 actual installed-path CLI against its private broker fixture. The OS repository
 owns provider/authority and authenticated dispatch tests. Fixtures never
 open user files, start playback devices, or connect to a live desktop bus.

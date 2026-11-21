@@ -14,7 +14,7 @@ from yuos_runtime import policy  # noqa: E402
 TIMEOUT_SECS = int(os.environ.get("YUOS_CAMERA_MANAGER_TIMEOUT", "180"))
 
 
-def _cos_binary() -> str | None:
+def _yu_binary() -> str | None:
     return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
@@ -27,7 +27,7 @@ def _broker(
     width: int | None = None,
     height: int | None = None,
 ) -> dict:
-    yu_bin = _cos_binary()
+    yu_bin = _yu_binary()
     if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Camera Manager broker unavailable"

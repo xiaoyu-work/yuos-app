@@ -12,7 +12,7 @@ not introduce a manifest privilege flag, merge another App's grants, or
 import an OS checkout. Native preparation uses the same UI assembly before
 binding its complete source inventory.
 
-The `claw.web-app/v1` browser transport uses an isolated, script-enabled
+The `yuos.web-app/v1` browser transport uses an isolated, script-enabled
 sandbox without same-origin privilege. The OS Host supplies the owning
 App's authenticated tool descriptions and a view-bound message nonce.
 Messages may call only that App's declared MCP tools. The Host retains the

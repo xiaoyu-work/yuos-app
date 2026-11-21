@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const protocol = "claw.web-app/v1";
+  const protocol = "yuos.web-app/v1";
   const pending = new Map();
   let context = null;
   let sequence = 0;

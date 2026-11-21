@@ -446,7 +446,7 @@ impl Terminal {
         #[cfg(target_os = "linux")]
         {
             let shell_pid = self.shell_pid?;
-            // FIXME(claw): internal /proc read for tab cwd tracking, not user action
+            // FIXME(yuos): internal /proc read for tab cwd tracking, not user action
             fs::read_link(format!("/proc/{shell_pid}/cwd")).ok()
         }
 
@@ -563,7 +563,7 @@ impl Terminal {
             return;
         }
         // Leading space → `HISTCONTROL=ignorespace` / `HIST_IGNORE_SPACE` skips it.
-        let cmd = format!(" __cos_ai {id}\r");
+        let cmd = format!(" __yuos_ai {id}\r");
         self.input_scroll(cmd.into_bytes());
     }
 

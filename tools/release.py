@@ -119,7 +119,7 @@ def make_plan(selected, release_version, *, fixtures=False):
             jobs.append({"architecture": architecture, "runner": runner,
                          "toolchain": config()["rust_toolchain"]})
     return {
-        "format": "claw.app-release-plan/v1", "version": release_version,
+        "format": "yuos.app-release-plan/v1", "version": release_version,
         "include_fixtures": fixtures,
         "source_revision": revision, "source_date_epoch": epoch,
         "selections": selected, "packages": entries, "matrix": {"include": jobs},
@@ -198,7 +198,7 @@ def write_control(root, entry, plan, extra_dependencies=()):
     (root / "DEBIAN/control").write_bytes(control_bytes(control))
     write_json(root / "usr/share/yuos-app/packages" / f"{entry['package']}.json", {
         **entry, "version": plan["version"], "source_revision": plan["source_revision"],
-        "runtime_abi": 1, "format": "claw.installed-app-package/v1",
+        "runtime_abi": 1, "format": "yuos.installed-app-package/v1",
     })
 
 
@@ -397,7 +397,7 @@ def build(plan, architecture, output):
         selection: build_archive(plan, selection, output) for selection in plan["selections"]
     } if architecture == "all" and plan["include_fixtures"] else {}
     write_json(output / f"build-record-{architecture}.json", {
-        "format": "claw.app-build/v1", "plan": plan, "packages": records,
+        "format": "yuos.app-build/v1", "plan": plan, "packages": records,
         "development": development,
         "interfaces": {},
     })

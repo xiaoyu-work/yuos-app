@@ -21,7 +21,7 @@ STORAGE_ACTIONS = frozenset({"health", "check", "mount", "unmount", "eject"})
 DIAGNOSTIC_ACTIONS = frozenset({"health", "check"})
 
 
-def _cos_binary() -> str | None:
+def _yu_binary() -> str | None:
     return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
@@ -40,7 +40,7 @@ def _canonical_device(raw: object) -> str:
 
 
 def _broker(action: str, device: str | None = None) -> dict:
-    yu_bin = _cos_binary()
+    yu_bin = _yu_binary()
     if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Storage Manager broker unavailable"

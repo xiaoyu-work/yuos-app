@@ -505,7 +505,7 @@ def cmd_ps(args):
 
 
 def run(command, args):
-    """Entry point called by cos."""
+    """Entry point called by yu."""
     handlers = {
         "run": cmd_run,
         "script": cmd_script,

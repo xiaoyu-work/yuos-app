@@ -360,7 +360,7 @@ def _validate_launch_targets(
     return uris, canonical_paths
 
 
-def _cos_binary() -> str:
+def _yu_binary() -> str:
     yu_binary = os.environ.get("YUOS_BIN") or shutil.which("yu")
     if not yu_binary:
         raise FileNotFoundError("yu binary not found; Launcher broker unavailable")
@@ -380,7 +380,7 @@ def _parse_broker_payload(payload_text: str) -> dict[str, object]:
 
 
 def _broker_launch(app_id: str, uris: list[str]) -> dict[str, object]:
-    argv = [_cos_binary(), "__desktop", "launch", "--app-id", app_id]
+    argv = [_yu_binary(), "__desktop", "launch", "--app-id", app_id]
     for uri in uris:
         argv.extend(["--uri", uri])
     try:

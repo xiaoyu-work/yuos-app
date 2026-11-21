@@ -18,11 +18,11 @@ from typing import Any
 from gateway._shared import atomic, channels, gateway_memory, safe_egress, safe_subprocess
 
 try:
-    from yuos_runtime import policy as _cos_policy
+    from yuos_runtime import policy as _yu_policy
 except ImportError:
-    _cos_policy = None
+    _yu_policy = None
 
-_POLICY_ERRORS = (_cos_policy.PolicyError,) if _cos_policy is not None else ()
+_POLICY_ERRORS = (_yu_policy.PolicyError,) if _yu_policy is not None else ()
 PLATFORM = "discord"
 VERSION = "0.3.0"
 DISCORD_API = "https://discord.com/api/v10"
@@ -177,7 +177,7 @@ def _configure(args: Any) -> dict[str, Any]:
     }
 
 
-def _cos_bin() -> str:
+def _yu_bin() -> str:
     return os.environ.get("YUOS_BIN", "yu")
 
 
@@ -185,7 +185,7 @@ def _load_token() -> str:
     env_token = os.environ.get(ENV_TOKEN)
     if env_token:
         return env_token.strip()
-    token, error = safe_subprocess.safe_credential_load("discord_bot_token", timeout=10.0, yu_bin=_cos_bin())
+    token, error = safe_subprocess.safe_credential_load("discord_bot_token", timeout=10.0, yu_bin=_yu_bin())
     if token is None:
         raise RuntimeError(error or "discord_bot_token is not configured; run `yu credential store discord_bot_token <token>`")
     return token

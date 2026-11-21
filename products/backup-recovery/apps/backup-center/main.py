@@ -18,7 +18,7 @@ TAG_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 TIMEOUT_SECS = int(os.environ.get("YUOS_BACKUP_CENTER_TIMEOUT", "10800"))
 
 
-def _cos_binary() -> str | None:
+def _yu_binary() -> str | None:
     return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
@@ -122,7 +122,7 @@ def _broker(
     keep_monthly: int | None = None,
     confirm: bool = False,
 ) -> dict:
-    yu_bin = _cos_binary()
+    yu_bin = _yu_binary()
     if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Backup Center broker unavailable"

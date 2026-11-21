@@ -1027,7 +1027,7 @@ impl Operation {
                         .check()
                         .await
                         .map_err(|s| OperationError::from_state(s, &controller))?;
-                    // FIXME(claw): inside compio runtime, can't easily
+                    // FIXME(yuos): inside compio runtime, can't easily
                     // call the sync yuos_runtime here. The user-action
                     // New Folder still hits caps indirectly through
                     // the file system, but not yet through the bridge.
@@ -1105,7 +1105,7 @@ impl Operation {
                         .check()
                         .await
                         .map_err(|s| OperationError::from_state(s, &controller))?;
-                    // FIXME(claw): inside compio runtime, can't easily
+                    // FIXME(yuos): inside compio runtime, can't easily
                     // call the sync yuos_runtime here. Follow-up: add
                     // async wrappers in yuos-sdk or dispatch to a
                     // tokio handle so user-rename hits the caps gate.

@@ -6,7 +6,7 @@
 // Hot-path read-only enumerations (listing `~/.local/share/applications/`,
 // scanning font dirs, polling `/proc` via `sysinfo`, …) intentionally
 // stay on `std::fs` / `tokio::process` and are flagged at the call site
-// with `FIXME(claw)` — funnelling those through a subprocess would be
+// with `FIXME(yuos)` — funnelling those through a subprocess would be
 // far too expensive. See the per-app migration notes for the convention.
 //
 // `BridgeError::is_denied()` is surfaced as

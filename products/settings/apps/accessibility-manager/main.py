@@ -16,12 +16,12 @@ TOGGLES = frozenset({"screen-reader", "magnifier", "invert"})
 TIMEOUT_SECS = int(os.environ.get("YUOS_ACCESSIBILITY_MANAGER_TIMEOUT", "120"))
 
 
-def _cos_binary():
+def _yu_binary():
     return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _broker(action, value=None):
-    yu_bin = _cos_binary()
+    yu_bin = _yu_binary()
     if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Accessibility Manager broker unavailable"

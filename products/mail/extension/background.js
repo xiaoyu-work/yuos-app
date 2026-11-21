@@ -41,7 +41,7 @@ const DEFAULT_SETTINGS = {
     autoTag: true,
     autoMoveImportant: false,
     autoMoveNewsletter: false,
-    tagPrefix: "claw/",
+    tagPrefix: "yuos/",
   },
   compose: {
     defaultStyle: "formal",   // formal | casual | short

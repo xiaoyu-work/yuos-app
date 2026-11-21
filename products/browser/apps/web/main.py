@@ -27,7 +27,7 @@ from yuos_runtime import browser_bridge, memory, policy  # noqa: E402
 
 TIMEOUT = int(os.environ.get("YUOS_WEB_TIMEOUT", "30"))
 DEFAULT_MAX_LENGTH = int(os.environ.get("YUOS_WEB_MAX_CONTENT_LENGTH", "50000"))
-USER_AGENT = "cos/" + os.environ.get("YUOS_VERSION", "0.1.0")
+USER_AGENT = "yuos/" + os.environ.get("YUOS_VERSION", "0.1.0")
 MAX_RENDER_TIMEOUT = 55
 MAX_SCREENSHOT = 4 * 1024 * 1024
 
@@ -461,7 +461,7 @@ def _cmd_submit(args):
 # ---------------------------------------------------------------------------
 
 def run(command, args):
-    """Entry point called by cos."""
+    """Entry point called by yu."""
     from canonical_argv import normalize_canonical_argv
     args = normalize_canonical_argv(args, bool_flags={"html", "full-page"})
     handlers = {

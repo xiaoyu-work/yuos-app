@@ -19,7 +19,7 @@ USB_ACTIONS = frozenset({"status", "authorize", "block", "unblock", "eject", "re
 USB_STATES = frozenset({"on", "off"})
 
 
-def _cos_binary() -> str | None:
+def _yu_binary() -> str | None:
     return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
@@ -54,7 +54,7 @@ def _broker(
     token: str | None = None,
     confirm: bool = False,
 ) -> dict:
-    yu_bin = _cos_binary()
+    yu_bin = _yu_binary()
     if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; USB Guard broker unavailable"

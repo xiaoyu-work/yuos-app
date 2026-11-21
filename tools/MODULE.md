@@ -240,7 +240,7 @@ protocol is OS-defined and part of the public Rust SDK artifact.
 at `app.json` and `.provenance.json`, preserving all identities, binaries and
 resources. It invokes the digest-pinned public `yu provenance verify` command,
 not OS source, and emits deterministic App archives plus an OpenPGP-signed
-`claw.app-snapshot-catalog/v1` catalog/checksum set. Exact manifest/envelope bytes
+`yuos.app-snapshot-catalog/v1` catalog/checksum set. Exact manifest/envelope bytes
 are bound to artifact digests and checked again from the completed archives.
 Operation/GUI and MCP/background entries use the public Linux runtime defaults
 or explicit package-local paths and must be declared signed regular files.

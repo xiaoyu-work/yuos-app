@@ -915,7 +915,7 @@ COMMANDS = {
 
 
 def run(command, args):
-    """Entry point called by cos."""
+    """Entry point called by yu."""
     from canonical_argv import normalize_argparse_booleans, normalize_canonical_argv
     args = (
         normalize_argparse_booleans(args, bool_flags={"confirm"})

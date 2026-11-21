@@ -17,12 +17,12 @@ COMMANDS = frozenset(
 TIMEOUT_SECS = int(os.environ.get("YUOS_HARDWARE_CENTER_TIMEOUT", "180"))
 
 
-def _cos_binary():
+def _yu_binary():
     return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _broker(action):
-    yu_bin = _cos_binary()
+    yu_bin = _yu_binary()
     if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Hardware Center broker unavailable"

@@ -12,7 +12,7 @@ from release_development import (
     copy_source, interface_roots, inventory, read_archive, source_closure, tar_entry, validate_interface,
 )
 
-FORMAT = "claw.app-interfaces/v1"
+FORMAT = "yuos.app-interfaces/v1"
 COMPONENT = "cosmic-notifications"
 EXPORTS = {"cosmic-notifications-config", "cosmic-notifications-util"}
 INTEGRATION_STATUS = "compatibility-only-pending-generic-contract"

@@ -81,7 +81,7 @@
   "feat_triage":               { "message": "Auto-triage new mail (experimental)" },
   "feat_assistant":            { "message": "Show Mail Assistant in Spaces" },
 
-  "triage_autoTag":            { "message": "Tag with category (claw/work, …)" },
+  "triage_autoTag":            { "message": "Tag with category (yuos/work, …)" },
   "triage_autoMoveImportant":  { "message": "Star messages scored ≥ 4" },
   "triage_autoMoveNewsletter": { "message": "Mark newsletters as read" },
   "triage_tagPrefix":          { "message": "Tag prefix" },

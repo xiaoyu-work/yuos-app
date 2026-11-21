@@ -37,7 +37,7 @@ def _valid_package_name(package):
     )
 
 
-def _cos_binary():
+def _yu_binary():
     explicit = os.environ.get("YUOS_BIN")
     if explicit:
         return explicit
@@ -45,7 +45,7 @@ def _cos_binary():
 
 
 def _package_query(action, *arguments):
-    binary = _cos_binary()
+    binary = _yu_binary()
     if not binary:
         return {"error": "yu binary not found; package catalog provider unavailable"}
     try:
@@ -63,7 +63,7 @@ def _package_query(action, *arguments):
 
 def _package_broker(action, package=None, version=None, packages=None):
     """Run one privileged package action through yuosd."""
-    yu_bin = _cos_binary()
+    yu_bin = _yu_binary()
     if not yu_bin:
         return {"error": "yu binary not found; privileged package broker unavailable"}
     payload_action = action not in ("update-index", "hold", "unhold")

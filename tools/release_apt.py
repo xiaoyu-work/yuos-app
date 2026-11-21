@@ -113,7 +113,7 @@ def verify_repository(root, signing, *, now=None):
             raise ValueError("Signed index sizes disagree")
         check_hash(dist, name, {"size": sha256[name][0], "sha256": sha256[name][1], "sha512": sha512[name][1]})
     catalog = json.loads((dist / "catalog.json").read_text())
-    if catalog.get("format") != "claw.app-apt/v1" or catalog.get("repository") != settings["repository"]:
+    if catalog.get("format") != "yuos.app-apt/v1" or catalog.get("repository") != settings["repository"]:
         raise ValueError("Unexpected signed package catalog")
     records = catalog["packages"]
     if not isinstance(records, list) or len({identity(record) for record in records}) != len(records):
@@ -240,7 +240,7 @@ def compose(packages, output, signing, *, previous=None, initialize=False, now=N
                 hashed.write_bytes(payload)
                 indexes[hashed.relative_to(dist).as_posix()] = expected
     write_json(dist / "catalog.json", {
-        "format": "claw.app-apt/v1", "repository": settings["repository"],
+        "format": "yuos.app-apt/v1", "repository": settings["repository"],
         "packages": records, "indexes": indexes,
     })
     release_paths.append(dist / "catalog.json")

@@ -33,7 +33,7 @@ run = main.run
 @contextmanager
 def _allow_policy():
     with mock.patch.object(main.policy, "require", lambda *a, **kw: None), mock.patch.object(
-        main, "_cos_binary", return_value="/usr/local/bin/yu"
+        main, "_yu_binary", return_value="/usr/local/bin/yu"
     ):
         yield
 

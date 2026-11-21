@@ -58,7 +58,7 @@ pub enum AiAction {
     /// User pressed Enter on a non-empty AI prompt. Caller must:
     /// 1. Write `prompt` to `$YUOS_AI_TMP/aq-<id>.txt`.
     /// 2. Snapshot context and write to `$YUOS_AI_TMP/ac-<id>.json`.
-    /// 3. Inject ` __cos_ai <id>\r` to the PTY (leading space hides from history).
+    /// 3. Inject ` __yuos_ai <id>\r` to the PTY (leading space hides from history).
     Submit { id: String, prompt: String },
 }
 
