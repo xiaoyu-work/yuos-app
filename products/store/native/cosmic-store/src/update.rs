@@ -66,11 +66,11 @@ impl App {
 
             Message::AskClaw => {
                 let outcome = if let Some(selected) = &self.selected_opt {
-                    crate::claw_glue::ask_claw_app(selected.id.raw(), &selected.info.name)
+                    crate::yuos_glue::ask_claw_app(selected.id.raw(), &selected.info.name)
                 } else if let Some(page) = self.explore_page_opt {
-                    crate::claw_glue::ask_claw_explore(&format!("{page:?}"))
+                    crate::yuos_glue::ask_claw_explore(&format!("{page:?}"))
                 } else {
-                    crate::claw_glue::ask_claw_home()
+                    crate::yuos_glue::ask_claw_home()
                 };
                 if let Err(err) = outcome {
                     log::error!("failed to open Ask Claw overlay: {err}");
@@ -86,7 +86,7 @@ impl App {
                 // result.
                 let query = self.search_input.trim().to_string();
                 if !query.is_empty() {
-                    if let Err(err) = crate::claw_glue::ask_claw_search(&query) {
+                    if let Err(err) = crate::yuos_glue::ask_claw_search(&query) {
                         log::error!("failed to open Ask Claw overlay: {err}");
                     }
                 }
@@ -622,7 +622,7 @@ impl App {
                             let data = {
                                 let path_for_read = path.clone();
                                 let join = tokio::task::spawn_blocking(move || {
-                                    crate::claw_glue::read_bytes(&path_for_read)
+                                    crate::yuos_glue::read_bytes(&path_for_read)
                                 })
                                 .await;
                                 match join {
@@ -630,7 +630,7 @@ impl App {
                                     Ok(Err(err)) => {
                                         return error_dialog(format!(
                                             "failed to read {path:?}: {}",
-                                            crate::claw_glue::user_message(&err)
+                                            crate::yuos_glue::user_message(&err)
                                         ));
                                     }
                                     Err(join_err) => {
@@ -1021,7 +1021,7 @@ impl App {
             }
             Message::WindowNew => {
                 if let Err(err) = crate::product::open(None) {
-                    log::error!("failed to open Store: {}", crate::claw_glue::user_message(&err));
+                    log::error!("failed to open Store: {}", crate::yuos_glue::user_message(&err));
                 }
             },
             Message::SelectPlacement(selection) => {

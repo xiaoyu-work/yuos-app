@@ -77,6 +77,6 @@ fn bounded_explain_context<'output, 'cwd>(
 mod tests {
     include!(concat!(
         env!("CARGO_MANIFEST_DIR"),
-        "/test/unit/claw_glue.rs"
+        "/test/unit/yuos_glue.rs"
     ));
 }

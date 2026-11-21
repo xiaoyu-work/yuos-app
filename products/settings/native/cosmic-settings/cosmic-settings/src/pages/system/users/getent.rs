@@ -5,7 +5,7 @@ use std::io::{BufRead, BufReader};
 use std::str::FromStr;
 
 pub fn passwd(range: (u64, u64)) -> Vec<PasswdUser> {
-    let stdout = match crate::claw_glue::run_capture(&["getent", "passwd"], Some(5)) {
+    let stdout = match crate::yuos_glue::run_capture(&["getent", "passwd"], Some(5)) {
         Ok(stdout) => stdout,
         Err(_) => return Vec::new(),
     };
@@ -34,7 +34,7 @@ pub fn passwd(range: (u64, u64)) -> Vec<PasswdUser> {
 }
 
 pub fn group() -> Vec<Group> {
-    let stdout = match crate::claw_glue::run_capture(&["getent", "group"], Some(5)) {
+    let stdout = match crate::yuos_glue::run_capture(&["getent", "group"], Some(5)) {
         Ok(stdout) => stdout,
         Err(_) => return Vec::new(),
     };

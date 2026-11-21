@@ -1,4 +1,4 @@
-mod claw_glue;
+mod yuos_glue;
 mod components;
 #[rustfmt::skip]
 mod config {

@@ -25,13 +25,13 @@ fn mcp_cannot_enter_human_filesystem_or_process_adapters() {
     let previous = std::env::var_os("COS_MCP_SERVER");
     unsafe { std::env::set_var("COS_MCP_SERVER", "1"); }
     let path = std::path::Path::new("/not-accessed");
-    assert!(crate::claw_glue::write_text(path, "not-written").is_err());
-    assert!(crate::claw_glue::mkdir_all(path).is_err());
-    assert!(crate::claw_glue::remove(path).is_err());
-    assert!(crate::claw_glue::rename(path, path).is_err());
-    assert!(crate::claw_glue::start(&["not-executed"]).is_err());
-    assert!(crate::claw_glue::run_capture(&["not-executed"], Some(1)).is_err());
-    assert!(crate::claw_glue::run_output(&["not-executed"], Some(1)).is_err());
+    assert!(crate::yuos_glue::write_text(path, "not-written").is_err());
+    assert!(crate::yuos_glue::mkdir_all(path).is_err());
+    assert!(crate::yuos_glue::remove(path).is_err());
+    assert!(crate::yuos_glue::rename(path, path).is_err());
+    assert!(crate::yuos_glue::start(&["not-executed"]).is_err());
+    assert!(crate::yuos_glue::run_capture(&["not-executed"], Some(1)).is_err());
+    assert!(crate::yuos_glue::run_output(&["not-executed"], Some(1)).is_err());
     assert!(crate::human::query("run", json!({})).is_err());
     unsafe {
         match previous {

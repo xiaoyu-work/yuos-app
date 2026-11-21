@@ -1,11 +1,11 @@
-# Claw OS Apps
+# Yu OS Apps
 
-Official application products for [Claw OS](https://github.com/xiaoyu-work/claw-os),
+Official application products for [Yu OS](https://github.com/xiaoyu-work/claw-os),
 developed separately from the operating system.
 
 Each product owns its UI, business implementation, Agent MCP surface,
 manifests, resources, tests and build inputs. System services and authority
-remain in Claw OS.
+remain in Yu OS.
 
 Shared capability clients are explicitly separate from business products:
 [`capabilities/document-engine`](capabilities/document-engine/MODULE.md) owns

@@ -1,6 +1,6 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi;
+  const ui = YuOsUi;
   const root = document.getElementById("workspace");
   const notice = document.getElementById("notice");
   let busy = false;
@@ -48,9 +48,9 @@ ClawApp.ready.then((app) => {
     busy = true;
     try {
       await ui.run(control, () => {
-        const tool = ClawApp.tool(app, command);
+        const tool = YuOsApp.tool(app, command);
         if (!tool) throw new Error(`This identity does not declare ${command}.`);
-        return ClawApp.call(tool.name, args);
+        return YuOsApp.call(tool.name, args);
       }, done, status);
     } finally { busy = false; }
   }

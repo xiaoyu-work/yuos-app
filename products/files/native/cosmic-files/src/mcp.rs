@@ -18,7 +18,7 @@ use claw_os_sdk::mcp::{App, CallContext, Tool, ToolResult};
 use serde_json::{json, Value};
 use walkdir::WalkDir;
 
-use crate::claw_glue;
+use crate::yuos_glue;
 
 // ---------------------------------------------------------------------------
 // files.list
@@ -40,7 +40,7 @@ impl Tool for ListTool {
             Ok(v) => v,
             Err(e) => return e,
         };
-        match claw_glue::product::call("ls", json!({"path": path})) {
+        match yuos_glue::product::call("ls", json!({"path": path})) {
             Ok(r) => {
                 ToolResult::text(json!({ "path": r["path"], "entries": r["files"] }).to_string())
             }
@@ -69,7 +69,7 @@ impl Tool for MetadataTool {
             Ok(v) => v,
             Err(e) => return e,
         };
-        match claw_glue::product::call("stat", json!({"path": path})) {
+        match yuos_glue::product::call("stat", json!({"path": path})) {
             Ok(s) => ToolResult::text(
                 json!({
                     "path": s["path"],
@@ -192,7 +192,7 @@ impl Tool for RevealTool {
             Ok(v) => v,
             Err(e) => return e,
         };
-        match claw_glue::reveal(Path::new(&path)) {
+        match yuos_glue::reveal(Path::new(&path)) {
             Ok(directory) => ToolResult::text(json!({"opened": directory}).to_string()),
             Err(e) => ToolResult::error(e),
         }
@@ -220,7 +220,7 @@ macro_rules! ai_path_tool {
                     Ok(v) => v,
                     Err(e) => return e,
                 };
-                let result = claw_glue::ai::transform(
+                let result = yuos_glue::ai::transform(
                     PathBuf::from(path), stringify!($glue), None, Some(context.clone()),
                 ).await;
                 match result {
@@ -257,7 +257,7 @@ impl Tool for FindSimilarTool {
             .and_then(|v| v.as_u64())
             .unwrap_or(20)
             .clamp(1, 200) as usize;
-        let result = claw_glue::ai::find_similar(PathBuf::from(path), limit).await;
+        let result = yuos_glue::ai::find_similar(PathBuf::from(path), limit).await;
         if let Err(error) = context.check_cancelled() {
             return ToolResult::error(error.to_string());
         }

@@ -1,6 +1,6 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi; ui.showApp(app);
+  const ui = YuOsUi; ui.showApp(app);
   const notice = document.querySelector("#notice");
   const state = document.querySelector("#result-state");
   const target = document.querySelector("#result");
@@ -43,7 +43,7 @@ ClawApp.ready.then((app) => {
       button.onclick = () => void ui.run(button, () => {
         const args = item.command === "list" ? { pattern: document.querySelector("#pattern").value } : { key: key.value };
         if (item.command === "set") args.value = value.value;
-        return ClawApp.call(item.command, args);
+        return YuOsApp.call(item.command, args);
       }, (result) => {
         if (item.command === "list") { showKeys(result); return; }
         if (item.command === "get") {
@@ -68,7 +68,7 @@ ClawApp.ready.then((app) => {
     database.oninput = () => { ++generation; document.querySelector("#tables").replaceChildren(); document.querySelector("#schema").textContent = ""; };
     document.querySelector("#query").onclick = (event) => {
       const request = generation;
-      void ui.run(event.target, () => ClawApp.call("query", { database: database.value, sql: sql.value }),
+      void ui.run(event.target, () => YuOsApp.call("query", { database: database.value, sql: sql.value }),
         (value) => { if (request === generation) output(value); }, notice);
     };
     document.querySelector("#execute").onclick = () => ui.command(app, "exec", {
@@ -80,7 +80,7 @@ ClawApp.ready.then((app) => {
       const button = ui.node("button", label);
       button.onclick = () => {
         const request = generation;
-        void ui.run(button, () => ClawApp.call(command, command === "tables" ? { database: database.value } : {}), (result) => {
+        void ui.run(button, () => YuOsApp.call(command, command === "tables" ? { database: database.value } : {}), (result) => {
           if (request !== generation) return;
           if (command === "databases") {
             ui.replace(document.querySelector("#databases"), result.databases.map((item) => {
@@ -93,7 +93,7 @@ ClawApp.ready.then((app) => {
             const choose = ui.node("button", table);
             choose.onclick = () => {
               const current = generation;
-              void ui.run(choose, () => ClawApp.call("schema", { database: result.database, table }),
+              void ui.run(choose, () => YuOsApp.call("schema", { database: result.database, table }),
                 (value) => { if (current === generation) output(value); }, notice);
             };
             return choose;

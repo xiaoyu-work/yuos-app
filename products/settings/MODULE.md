@@ -115,7 +115,7 @@ configuration file or run inference inside the sandbox.
 | `native/cosmic-settings/subscriptions/network-manager/`, `cosmic-settings/src/pages/networking/` | Typed metadata/profile clients, original wired/Wi-Fi/VPN presentations, independent credential-reference use/export and no native bus/secret-agent/management executable |
 | `native/cosmic-settings/subscriptions/bluetooth/`, `cosmic-settings/src/pages/bluetooth/` | Root metadata/control, finite scans, exact pairing correlations and independent exact-unit startup |
 | `native/cosmic-settings/cosmic-settings/src/pages/power/backend/`, `src/subscription/daytime.rs` | Confirmed Root power/profile state and opt-in city-level solar scheduling; no raw UPower/location portal |
-| `native/cosmic-settings/cosmic-settings/src/claw_glue.rs`, `src/human.rs`, `human_bridge.py` | Human-only controlled filesystem/process/policy/snapshot adapters and SDK Agent context; no App dispatch |
+| `native/cosmic-settings/cosmic-settings/src/yuos_glue.rs`, `src/human.rs`, `human_bridge.py` | Human-only controlled filesystem/process/policy/snapshot adapters and SDK Agent context; no App dispatch |
 | `native/test_build.py`, `native/test_process.py` | Workspace/default graph, synthetic human adapters, installed resources, authenticated stdio MCP and clean-environment native permission client |
 
 Preserve the installed App identity. Status requires `sys.observe` scope

@@ -51,8 +51,8 @@ mod appstream_cache;
 use backend::{BackendName, Backends, Package};
 mod backend;
 
-mod claw_glue;
-mod claw_apps;
+mod yuos_glue;
+mod yuos_apps;
 mod mcp;
 mod product;
 mod package;
@@ -289,7 +289,7 @@ pub enum Message {
     CategoryIconsLoaded(&'static [Category], Vec<(usize, widget::icon::Handle)>),
     CheckUpdates,
     SourcesRefreshed(Result<(), String>),
-    ClawCatalog(Result<claw_apps::Catalog, String>),
+    ClawCatalog(Result<yuos_apps::Catalog, String>),
     UpdateQueryFailed(BackendName, String),
     Config(Config),
     DialogCancel,
@@ -474,7 +474,7 @@ pub struct App {
     pub refreshing_sources: bool,
     pub refresh_error: Option<String>,
     pub update_errors: BTreeMap<BackendName, String>,
-    pub claw_catalog: Option<Result<claw_apps::Catalog, String>>,
+    pub claw_catalog: Option<Result<yuos_apps::Catalog, String>>,
     pub update_apps_in_progress: bool,
     /// Prevents multiple instances of `App::update_apps()` tasks
     pub update_apps_scheduled: bool,
@@ -1211,7 +1211,7 @@ impl App {
         );
         if matches!(self.mode, Mode::Normal) {
             Task::batch([backends, Task::perform(
-                async { tokio::task::spawn_blocking(claw_apps::load).await.unwrap_or_else(|error| Err(error.to_string())) },
+                async { tokio::task::spawn_blocking(yuos_apps::load).await.unwrap_or_else(|error| Err(error.to_string())) },
                 |value| action::app(Message::ClawCatalog(value)),
             )])
         } else {

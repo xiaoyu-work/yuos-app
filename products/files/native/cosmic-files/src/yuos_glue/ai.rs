@@ -103,5 +103,5 @@ fn parse_search_hits(value: &Value) -> Result<Vec<SearchHit>, String> {
 
 #[cfg(test)]
 mod tests {
-    include!(concat!(env!("CARGO_MANIFEST_DIR"), "/test/unit/claw_glue/ai.rs"));
+    include!(concat!(env!("CARGO_MANIFEST_DIR"), "/test/unit/yuos_glue/ai.rs"));
 }

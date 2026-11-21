@@ -1,6 +1,6 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi;
+  const ui = YuOsUi;
   const $ = (id) => document.getElementById(id);
   let busy = false;
   let reviewing = false;
@@ -72,9 +72,9 @@ ClawApp.ready.then((app) => {
       $("history-clear").disabled = true;
       try {
         const value = await ui.run(control, () => {
-          const tool = ClawApp.tool(app, "history.list");
+          const tool = YuOsApp.tool(app, "history.list");
           if (!tool) throw new Error("This identity does not declare history.list.");
-          return ClawApp.call(tool.name, {});
+          return YuOsApp.call(tool.name, {});
         }, show, $("notice"));
         if (value === undefined) {
           hide("History could not be loaded. The service error is shown above.");
@@ -157,9 +157,9 @@ ClawApp.ready.then((app) => {
     const version = selectionVersion;
     try {
       await ui.run(control, () => {
-        const tool = ClawApp.tool(app, command);
+        const tool = YuOsApp.tool(app, command);
         if (!tool) throw new Error(`This entry does not declare ${command}.`);
-        return ClawApp.call(tool.name, args);
+        return YuOsApp.call(tool.name, args);
       }, (value) => { if (!guardSelection || version === selectionVersion) done(value); }, status);
     } finally { busy = false; }
   }

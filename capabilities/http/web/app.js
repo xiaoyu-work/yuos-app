@@ -1,6 +1,6 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi; ui.showApp(app); const form = document.querySelector("#request");
+  const ui = YuOsUi; ui.showApp(app); const form = document.querySelector("#request");
   const notice = document.querySelector("#notice");
   function output(value) {
     document.querySelector("#response-status").textContent = `HTTP ${value.status} - ${value.url}${value.truncated ?
@@ -18,10 +18,10 @@ ClawApp.ready.then((app) => {
     if (form.elements.data.value) args.data = form.elements.data.value;
     if (form.elements.header.value.trim()) args.header = form.elements.header.value.split(/\r?\n/).filter((line) => line.trim());
     args.timeout = Number(form.elements.timeout.value);
-    void ui.run(form.querySelector("button"), () => ClawApp.call("fetch", args), output, notice);
+    void ui.run(form.querySelector("button"), () => YuOsApp.call("fetch", args), output, notice);
   };
   const download = ui.node("button", "Download to file");
-  download.disabled = !ClawApp.tool(app, "download");
+  download.disabled = !YuOsApp.tool(app, "download");
   download.onclick = () => ui.command(app, "download", { url: form.elements.url.value }, (value) => {
     document.querySelector("#download-result").textContent = `Download reported: ${value.path || value.output} - ${value.bytes} bytes`;
   }, { title: "Download to an authorized path", submitLabel: "Download", fields: {

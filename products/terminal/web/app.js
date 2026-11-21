@@ -1,8 +1,8 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi;
+  const ui = YuOsUi;
   const $ = (selector) => document.querySelector(selector);
-  const has = (command) => Boolean(ClawApp.tool(app, command));
+  const has = (command) => Boolean(YuOsApp.tool(app, command));
   const native = app.id === "cosmic-term";
   let busy = false;
   let jobs = [];
@@ -11,9 +11,9 @@ ClawApp.ready.then((app) => {
   ui.showApp(app);
 
   function call(command, args = {}) {
-    const tool = ClawApp.tool(app, command);
+    const tool = YuOsApp.tool(app, command);
     if (!tool) throw new Error(`This entry does not declare ${command}.`);
-    return ClawApp.call(tool.name, args);
+    return YuOsApp.call(tool.name, args);
   }
   function update() {
     const background = $("#mode").value === "start";
@@ -156,9 +156,9 @@ ClawApp.ready.then((app) => {
   $("#mode").onchange = update;
   $("#shell").onchange = update;
   $("#script-source").onchange = update;
-  $("#shell-option").hidden = native || !ClawApp.tool(app, "run")?.args.some((arg) => arg.name === "shell");
+  $("#shell-option").hidden = native || !YuOsApp.tool(app, "run")?.args.some((arg) => arg.name === "shell");
   if (has("start")) $("#mode").append(ui.node("option", "Start a registered background job", { value: "start" }));
-  const timeoutArg = ClawApp.tool(app, "run")?.args.find((arg) => arg.name === (native ? "timeout_secs" : "timeout"));
+  const timeoutArg = YuOsApp.tool(app, "run")?.args.find((arg) => arg.name === (native ? "timeout_secs" : "timeout"));
   $("#timeout").value = String(timeoutArg?.default ?? 30);
   if (native) $("#timeout").max = "600";
   $("#command").onsubmit = (event) => {

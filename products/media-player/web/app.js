@@ -1,16 +1,16 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi;
+  const ui = YuOsUi;
   const $ = (selector) => document.querySelector(selector);
-  const has = (command) => Boolean(ClawApp.tool(app, command));
+  const has = (command) => Boolean(YuOsApp.tool(app, command));
   let busy = false;
   let observed = false;
   ui.showApp(app);
 
   function call(command) {
-    const tool = ClawApp.tool(app, command);
+    const tool = YuOsApp.tool(app, command);
     if (!tool) throw new Error(`This entry does not declare ${command}.`);
-    return ClawApp.call(tool.name, {});
+    return YuOsApp.call(tool.name, {});
   }
   function checked(value) {
     ui.output($("#raw"), value);

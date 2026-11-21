@@ -81,7 +81,7 @@
   }
   function command(app, name, defaults, onResult, options) {
     options = options || {};
-    const tool = ClawApp.tool(app, name);
+    const tool = YuOsApp.tool(app, name);
     if (!tool) throw new Error(`This App entry does not declare ${name}.`);
     const dialog = node("dialog");
     dialog.append(node("h2", options.title || tool.name));
@@ -144,7 +144,7 @@
         notice.classList.add("error");
         return;
       }
-      void run(execute, () => ClawApp.call(tool.name, arguments_), async (result) => {
+      void run(execute, () => YuOsApp.call(tool.name, arguments_), async (result) => {
         if (onResult) await onResult(result);
         dialog.close();
       }, notice);
@@ -159,7 +159,7 @@
   function actions(target, app, names, onResult, defaults) {
     for (const item of names) {
       const name = typeof item === "string" ? item : item.command;
-      const tool = ClawApp.tool(app, name);
+      const tool = YuOsApp.tool(app, name);
       if (!tool) continue;
       const button = node("button", typeof item === "string" ? name : item.label);
       button.onclick = () => command(app, tool.name, defaults && defaults(), onResult);
@@ -196,5 +196,5 @@
     event.preventDefault();
     submitForm(control.form);
   }, true);
-  window.ClawUi = Object.freeze({ node, replace, rows, table, run, output, fields, showApp, command, actions, allTools });
+  window.YuOsUi = Object.freeze({ node, replace, rows, table, run, output, fields, showApp, command, actions, allTools });
 }());

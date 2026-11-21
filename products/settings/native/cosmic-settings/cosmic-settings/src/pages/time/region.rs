@@ -308,7 +308,7 @@ impl Page {
                 let revision = self.pending.revision();
                 return cosmic::task::future(async move {
                     _ = tokio::task::spawn_blocking(|| {
-                        crate::claw_glue::start(&[GNOME_LANGUAGE_SELECTOR])
+                        crate::yuos_glue::start(&[GNOME_LANGUAGE_SELECTOR])
                     })
                     .await;
 

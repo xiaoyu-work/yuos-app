@@ -323,7 +323,7 @@ fn format_size(bytes: u64) -> String {
 fn get_all_lspci_gpus() -> Vec<(u32, u32, String)> {
     let mut gpus = Vec::new();
 
-    let stdout = match crate::claw_glue::run_capture(&["lspci", "-nn"], Some(5)) {
+    let stdout = match crate::yuos_glue::run_capture(&["lspci", "-nn"], Some(5)) {
         Ok(stdout) => stdout,
         Err(_) => return gpus,
     };
@@ -390,7 +390,7 @@ fn get_all_lspci_gpus() -> Vec<(u32, u32, String)> {
 fn get_lspci_gpu_names() -> HashMap<u32, String> {
     let mut gpu_map = HashMap::new();
 
-    let stdout = match crate::claw_glue::run_capture(&["lspci", "-nn"], Some(5)) {
+    let stdout = match crate::yuos_glue::run_capture(&["lspci", "-nn"], Some(5)) {
         Ok(stdout) => stdout,
         Err(_) => return gpu_map,
     };

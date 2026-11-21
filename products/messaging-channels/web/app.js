@@ -1,6 +1,6 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi;
+  const ui = YuOsUi;
   const $ = (id) => document.getElementById(id);
   const platform = {
     "gateway-discord": { name: "Discord", recipient: "Channel ID", argument: "channel_id", repeatable: true, credential: "discord_bot_token" },
@@ -44,9 +44,9 @@ ClawApp.ready.then((app) => {
     busy = true;
     try {
       await ui.run(control, async () => {
-        const tool = ClawApp.tool(app, command);
+        const tool = YuOsApp.tool(app, command);
         if (!tool) throw new Error(`This entry does not declare ${command}.`);
-        const value = await ClawApp.call(tool.name, args);
+        const value = await YuOsApp.call(tool.name, args);
         if (value && value.ok === false) throw new Error(value.error || "The channel service refused the request.");
         return value;
       }, done, notice);

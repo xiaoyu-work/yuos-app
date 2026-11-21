@@ -1,10 +1,10 @@
-ClawApp.ready.then((app) => {
+YuOsApp.ready.then((app) => {
   "use strict";
-  const ui = ClawUi;
+  const ui = YuOsUi;
   ui.showApp(app);
   const path = document.querySelector("#path");
   const notice = document.querySelector("#notice");
-  const listTool = ClawApp.tool(app, app.id === "fs" ? "ls" : "list");
+  const listTool = YuOsApp.tool(app, app.id === "fs" ? "ls" : "list");
   let selection = null;
   let generation = 0;
   let editorGeneration = 0;
@@ -55,10 +55,10 @@ ClawApp.ready.then((app) => {
     actions.replaceChildren();
     const refresh = ui.node("button", "Refresh review");
     refresh.onclick = () => {
-      void ui.run(refresh, () => ClawApp.call("plan_show", { path: plan.path, plan: plan.plan_id }), showPlan, notice);
+      void ui.run(refresh, () => YuOsApp.call("plan_show", { path: plan.path, plan: plan.plan_id }), showPlan, notice);
     };
     actions.append(refresh);
-    if (ClawApp.tool(app, "plan_apply")) {
+    if (YuOsApp.tool(app, "plan_apply")) {
       const apply = ui.node("button", "Apply reviewed changes", { class: "primary" });
       apply.disabled = plan.state !== "draft" || !plan.would_change || plan.diff_truncated ||
         new Date(plan.expires_at).getTime() <= Date.now();
@@ -80,12 +80,12 @@ ClawApp.ready.then((app) => {
   function openText(item) {
     const request = ++editorGeneration;
     const filename = itemPath(item);
-    return ui.run(null, () => ClawApp.call("read", { path: filename, limit: 65536 }), (result) => {
+    return ui.run(null, () => YuOsApp.call("read", { path: filename, limit: 65536 }), (result) => {
       if (request !== editorGeneration) return;
       if (typeof result.content !== "string") throw new Error("The App returned no text to preview.");
       editingPath = result.path || filename;
       editor.value = result.content;
-      editor.readOnly = !!result.truncated || !ClawApp.tool(app, "plan_write");
+      editor.readOnly = !!result.truncated || !YuOsApp.tool(app, "plan_write");
       document.querySelector("#file-title").textContent = editingPath;
       document.querySelector("#edit-state").textContent = result.truncated ?
         "This file exceeds the 64 KiB review limit. The partial preview cannot overwrite the file." : "Loaded. Edits are not saved until reviewed and applied.";
@@ -113,24 +113,24 @@ ClawApp.ready.then((app) => {
     for (const [command, label] of [["read", "Open text"], ["stat", "Properties"], ["metadata", "Properties"],
       ["reveal", "Show on desktop"], ["summarize", "Summarize"], ["explain", "Explain"],
       ["find_similar", "Similar files"], ["plan_show", "Existing review"]]) {
-      if (!ClawApp.tool(app, command) || command === "read" && directory(item)) continue;
+      if (!YuOsApp.tool(app, command) || command === "read" && directory(item)) continue;
       const button = ui.node("button", label);
       button.onclick = () => {
         if (command === "read") { void openText(item); return; }
-        void ui.run(button, () => ClawApp.call(command, { path: itemPath(item) }),
+        void ui.run(button, () => YuOsApp.call(command, { path: itemPath(item) }),
           command === "plan_show" ? showPlan : command === "find_similar" ? display : report, notice);
       };
       actions.append(button);
     }
     for (const [command, label] of [["rename", "Rename"], ["move", "Move"], ["copy", "Copy"]]) {
-      if (!ClawApp.tool(app, command)) continue;
+      if (!YuOsApp.tool(app, command)) continue;
       const button = ui.node("button", label);
       button.onclick = () => ui.command(app, command, { src: itemPath(item) }, async (result) => {
         report(result); await load();
       }, { title: `${label} ${item.name || itemPath(item)}`, submitLabel: label, fields });
       actions.append(button);
     }
-    if (ClawApp.tool(app, "rm")) {
+    if (YuOsApp.tool(app, "rm")) {
       const remove = ui.node("button", "Delete", { class: "danger" });
       remove.onclick = () => ui.command(app, "rm", { path: itemPath(item) }, async (result) => {
         report(result); await load();
@@ -140,7 +140,7 @@ ClawApp.ready.then((app) => {
         "This removes the file. Recovery is not guaranteed." });
       actions.append(remove);
     }
-    if (ClawApp.tool(app, "tag") && !directory(item)) {
+    if (YuOsApp.tool(app, "tag") && !directory(item)) {
       const tag = ui.node("button", "Add tags");
       tag.onclick = () => ui.command(app, "tag", { path: itemPath(item) }, report,
         { title: "Add file tags", submitLabel: "Add tags", fields: {
@@ -169,7 +169,7 @@ ClawApp.ready.then((app) => {
     document.querySelector("#file-actions").replaceChildren();
     const request = ++generation;
     if (!listTool || !path.value) return;
-    return ui.run(document.querySelector("#open"), () => ClawApp.call(listTool.name, { path: path.value }),
+    return ui.run(document.querySelector("#open"), () => YuOsApp.call(listTool.name, { path: path.value }),
       (result) => { if (request === generation) display(result); }, notice);
   }
   document.querySelector("#open").disabled = !listTool;
@@ -184,9 +184,9 @@ ClawApp.ready.then((app) => {
     clearEditor();
     void load();
   };
-  document.querySelector("#search").disabled = !ClawApp.tool(app, "search");
+  document.querySelector("#search").disabled = !YuOsApp.tool(app, "search");
   document.querySelector("#search").onclick = () => {
-    if (ClawApp.tool(app, "search")) ui.command(app, "search", {
+    if (YuOsApp.tool(app, "search")) ui.command(app, "search", {
       path: path.value, root: path.value, query: document.querySelector("#query").value,
     }, display, { title: app.id === "docs" ? "Search indexed documents" : "Search files",
       submitLabel: "Search", fields: { query: { label: "Search query", type: "text" },
@@ -200,13 +200,13 @@ ClawApp.ready.then((app) => {
   document.querySelector("#prepare").onclick = (event) => {
     if (!editingPath || editor.readOnly) return;
     const request = editorGeneration;
-    void ui.run(event.target, () => ClawApp.call("plan_write", { path: editingPath, content: editor.value }),
+    void ui.run(event.target, () => YuOsApp.call("plan_write", { path: editingPath, content: editor.value }),
       (result) => { if (request === editorGeneration) showPlan(result); }, notice);
   };
   const actions = document.querySelector("#actions");
   for (const [command, label] of [["mkdir", "New folder"], ["plan_write", "New text file"],
     ["recent", "Recent files"], ["index", "Index documents"], ["status", "Index status"], ["configure", "Configure index"]]) {
-    if (!ClawApp.tool(app, command)) continue;
+    if (!YuOsApp.tool(app, command)) continue;
     const button = ui.node("button", label);
     button.onclick = () => {
       if (["mkdir", "plan_write"].includes(command)) {
@@ -214,7 +214,7 @@ ClawApp.ready.then((app) => {
           showPlan : async (result) => { report(result); await load(); },
         { title: label, submitLabel: command === "plan_write" ? "Prepare review" : "Create folder", fields });
       } else {
-        void ui.run(button, () => ClawApp.call(command),
+        void ui.run(button, () => YuOsApp.call(command),
           command === "recent" ? display : report, notice);
       }
     };

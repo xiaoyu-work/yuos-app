@@ -250,7 +250,7 @@ impl Page {
                     tracing::debug!(?argv, "executing");
                     let result = tokio::task::spawn_blocking(move || {
                         let argv_refs: Vec<&str> = argv.iter().map(String::as_str).collect();
-                        crate::claw_glue::run_output(&argv_refs, Some(5)).map(|_| ())
+                        crate::yuos_glue::run_output(&argv_refs, Some(5)).map(|_| ())
                     })
                     .await
                     .unwrap_or_else(|e| Err(std::io::Error::other(e.to_string())));
