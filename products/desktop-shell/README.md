@@ -1,6 +1,6 @@
-# Claw desktop shell
+# Yu OS desktop shell
 
-The editable source baseline for Claw's Quickshell-based desktop interface.
+The editable source baseline for Yu OS's Quickshell-based desktop interface.
 It contains the complete Caelestia shell, matching CLI and Material shape
 library, not an Omarchy distribution or a replacement Agent.
 
@@ -26,6 +26,6 @@ also requires explicit `VERSION` and `GIT_REVISION` values when built outside
 the original Git history; it must not infer them from this repository's tags.
 
 Display login, compositor authorization, capabilities, notifications and
-other authoritative services remain in `claw-os`. The frontend must use the
+other authoritative services remain in `yuos`. The frontend must use the
 same signed App Host and versioned OS interfaces as other native Apps.
 Source availability, UI identity and installation confer no authority.

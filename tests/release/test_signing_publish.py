@@ -91,8 +91,8 @@ def test_github_success_is_parsed_without_weakening_http_error_checks(monkeypatc
     assert github.api("immutable-releases") == (200, {"enabled": True})
     github.api("releases", method="POST", data={"draft": True})
     assert calls == [
-        ("repos/xiaoyu-work/clawos-app/immutable-releases", "fixture read token"),
-        ("repos/xiaoyu-work/clawos-app/releases", "fixture publish token"),
+        ("repos/xiaoyu-work/yuos-app/immutable-releases", "fixture read token"),
+        ("repos/xiaoyu-work/yuos-app/releases", "fixture publish token"),
     ]
 
 
@@ -100,8 +100,8 @@ def test_prior_immutable_versions_protect_against_regression_after_an_incomplete
     class History:
         def api(self, endpoint, **kwargs):
             return 200, [
-                {"tag_name": "app-files-v2.0.0-rc1", "draft": False, "immutable": True},
-                {"tag_name": "app-mail-v9.0.0", "draft": False, "immutable": True},
+                {"tag_name": "yuos-app-files-v2.0.0-rc1", "draft": False, "immutable": True},
+                {"tag_name": "yuos-app-mail-v9.0.0", "draft": False, "immutable": True},
             ]
 
     with pytest.raises(ValueError, match="newer immutable"):
@@ -126,7 +126,7 @@ def test_verified_empty_initial_state_is_distinct_from_lost_history(tmp_path):
     class Lost(Empty):
         def api(self, endpoint, **kwargs):
             if endpoint.startswith("releases"):
-                return 200, [{"tag_name": "app-files-v1.0.0"}]
+                return 200, [{"tag_name": "yuos-app-files-v1.0.0"}]
             return super().api(endpoint, **kwargs)
 
     with pytest.raises(ValueError, match="restore"):
@@ -149,20 +149,20 @@ def test_immutable_release_tags_cannot_be_rebound_or_mutable(tmp_path):
         existing_release(Existing("b" * 40), "app-files-v1.0.0", "a" * 40)
     with pytest.raises(ValueError, match="immutable"):
         existing_release(Existing(immutable=False), "app-files-v1.0.0", "a" * 40)
-    assert release_tag("files", "1.2.3") == "app-files-v1.2.3"
-    assert release_tag("capability:http", "1.2.3") == "cap-http-v1.2.3"
-    assert release_tag("support", "1.2.3") == "support-v1.2.3"
+    assert release_tag("files", "1.2.3") == "yuos-app-files-v1.2.3"
+    assert release_tag("capability:http", "1.2.3") == "yuos-cap-http-v1.2.3"
+    assert release_tag("support", "1.2.3") == "yuos-support-v1.2.3"
     tag = release_tag("files", "1.2.3~rc1-2")
-    assert tag == "app-files-v1.2.3-rc1-2"
+    assert tag == "yuos-app-files-v1.2.3-rc1-2"
     run(["git", "check-ref-format", f"refs/tags/{tag}"])
 
 
 def test_independent_release_assets_sign_debs_and_explicit_development_archive(tmp_path, deb, signing):
-    package = deb("claw-app-fixture")
+    package = deb("yuos-app-fixture")
     plan = {
         "version": "1.0.0", "source_revision": "a" * 40,
         "source_date_epoch": 1700000000, "selections": ["support"],
-        "packages": [{"selection": "support", "package": "claw-app-fixture"}],
+        "packages": [{"selection": "support", "package": "yuos-app-fixture"}],
     }
     record = build_archive(plan, "support", tmp_path / "input")
     assets = release_publish.release_assets(plan, "support", [package], tmp_path / "assets", signing,

@@ -3,7 +3,7 @@ YuOsApp.ready.then((app) => {
   const ui = YuOsUi;
   const $ = (selector) => document.querySelector(selector);
   const has = (command) => Boolean(YuOsApp.tool(app, command));
-  const native = app.id === "claw-launcher";
+  const native = app.id === "yuos-launcher";
   let busy = false;
   let selected = null;
   let generation = 0;

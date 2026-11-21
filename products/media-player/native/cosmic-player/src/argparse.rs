@@ -10,7 +10,7 @@ use log::warn;
 use url::Url;
 
 pub fn parse() -> Arguments {
-    match parse_from(std::env::args_os(), claw_os_sdk::gui::is_gui_launch()) {
+    match parse_from(std::env::args_os(), yuos_sdk::gui::is_gui_launch()) {
         Ok(arguments) => arguments,
         Err(DisplayRequest::Help) => print_help(),
         Err(DisplayRequest::Version) => print_version(),
@@ -27,7 +27,7 @@ fn parse_from<I>(argv: I, gui_launch: bool) -> Result<Arguments, DisplayRequest>
 where
     I: IntoIterator<Item = OsString>,
 {
-    let raw_args = RawArgs::new(claw_app_gui_argv::normalize(
+    let raw_args = RawArgs::new(yuos_app_gui_argv::normalize(
         argv,
         gui_launch,
         OsStr::new("--gui"),
@@ -164,7 +164,7 @@ pub fn print_help() -> ! {
         r#"cosmic-player {version} (git commit {git_rev})
 System76 <info@system76.com>
 
-Designed for ClawOS, cosmic-player is a
+Designed for YuOS, cosmic-player is a
 libcosmic-based multimedia player for music and videos.
 
 Project home page: https://github.com/pop-os/cosmic-player

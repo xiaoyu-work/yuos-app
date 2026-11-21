@@ -17,10 +17,10 @@ fn command() -> Command {
         "-c",
         &format!(
             "import sys, os\n\
-             sys.path[:0] = ['/usr/lib/cos/python']\n\
-             __file__ = '/usr/lib/cos/apps/claw-launcher/embedded.py'\n\
-             os.environ['COS_BIN'] = '/usr/local/bin/yu'\n\
-             os.environ['CLAW_COS_BIN'] = '/usr/local/bin/yu'\n\
+             sys.path[:0] = ['/usr/lib/yuos/python']\n\
+             __file__ = '/usr/lib/yuos/apps/yuos-launcher/embedded.py'\n\
+             os.environ['YUOS_BIN'] = '/usr/local/bin/yu'\n\
+             os.environ['YUOS_KERNEL_BIN'] = '/usr/local/bin/yu'\n\
              exec(compile({backend}, '<launcher-backend>', 'exec'))\n\
              exec(compile({server}, '<launcher-mcp>', 'exec'))\n"
         ),
@@ -30,7 +30,7 @@ fn command() -> Command {
 
 pub fn run() -> anyhow::Result<()> {
     // Replace the host child, preserving its authenticated stdio transport,
-    // sandbox, lifetime and per-identity environment (including COS_DATA_DIR).
+    // sandbox, lifetime and per-identity environment (including YUOS_DATA_DIR).
     Err(command().exec().into())
 }
 

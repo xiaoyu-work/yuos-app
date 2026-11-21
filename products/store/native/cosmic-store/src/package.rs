@@ -165,12 +165,12 @@ impl Intent {
         self.packages.sort();
         self.packages.dedup();
         if self.action == Action::InstallRelease {
-            if self.packages.len() != 1 || !crate::product::claw_app_package(&self.packages[0])
+            if self.packages.len() != 1 || !crate::product::yuos_app_package(&self.packages[0])
                 || !self.version.as_ref().is_some_and(|value| !value.is_empty()
                     && value.len() <= 128 && value.as_bytes()[0].is_ascii_digit()
                     && value.bytes().all(|byte| byte.is_ascii_alphanumeric() || b".+~-:".contains(&byte)))
             {
-                return Err(io::Error::other("Expected one Claw App and its exact Debian release"));
+                return Err(io::Error::other("Expected one Yu OS App and its exact Debian release"));
             }
         } else if self.version.is_some() {
             return Err(io::Error::other("This package action does not accept a version"));
@@ -415,7 +415,7 @@ pub fn refresh(intent: &Intent, mode: Mode) -> Tracked {
         if intent.clone().canonical()? != *intent {
             return Err(io::Error::other("package intent is not canonical"));
         }
-        let value = claw_os_sdk::cos_call_json_with_binary(
+        let value = yuos_sdk::yu_call_json_with_binary(
             "/usr/local/bin/yu", "package", "intent", intent.argv(mode),
         ).map_err(io::Error::other)?;
         decode(intent, value)
@@ -436,7 +436,7 @@ pub fn refresh(intent: &Intent, mode: Mode) -> Tracked {
 }
 
 fn history_directory() -> io::Result<PathBuf> {
-    let root = std::env::var_os("COS_DATA_DIR").map(PathBuf::from)
+    let root = std::env::var_os("YUOS_DATA_DIR").map(PathBuf::from)
         .filter(|root| root.is_absolute())
         .ok_or_else(|| io::Error::other("authenticated App data is unavailable; package intent was not dispatched"))?;
     Ok(root.join("package-handoffs"))

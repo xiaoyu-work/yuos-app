@@ -10,13 +10,13 @@ from unittest import mock
 
 import pytest
 
-from cos_runtime import mcp
+from yuos_runtime import mcp
 from test_support import authenticated_mcp_params, load_local_module
 
 APP_DIR = pathlib.Path(__file__).parent
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_pkg_main",
+    "yuos_test_pkg_main",
     clear_modules=("_shared",),
 )
 DEFAULT_SEARCH_LIMIT = main.DEFAULT_SEARCH_LIMIT
@@ -33,7 +33,7 @@ run = main.run
 @contextmanager
 def _allow_policy():
     with mock.patch.object(main.policy, "require", lambda *a, **kw: None), mock.patch.object(
-        main, "_cos_binary", return_value="/usr/local/bin/yu"
+        main, "_yu_binary", return_value="/usr/local/bin/yu"
     ):
         yield
 
@@ -102,9 +102,9 @@ class PackageInstallTests(unittest.TestCase):
         self.assertIn("error", result)
         require.assert_not_called()
 
-    def test_install_uses_hidden_clawd_broker(self):
+    def test_install_uses_hidden_yuosd_broker(self):
         payload = json.dumps({"status": "accepted", "accepted": True, "request_id": "a" * 32})
-        with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+        with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
             main.subprocess,
             "run",
             return_value=_fake_completed(stdout=payload),
@@ -122,7 +122,7 @@ class PackageInstallTests(unittest.TestCase):
 
     def test_need_submits_one_batch_before_the_requesting_app_can_be_retired(self):
         payload = json.dumps({"status": "accepted", "accepted": True, "request_id": "b" * 32})
-        with _allow_policy(), mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+        with _allow_policy(), mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
             main.subprocess, "run", return_value=_fake_completed(stdout=payload)
         ) as runner:
             result = cmd_need(["curl", "git"])
@@ -138,7 +138,7 @@ class PackageInstallTests(unittest.TestCase):
 
     def test_payload_result_without_a_root_handoff_is_not_success(self):
         payload = json.dumps({"package": "curl", "after": {"installed": True}})
-        with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+        with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
             main.subprocess, "run", return_value=_fake_completed(stdout=payload)
         ):
             installed, failed, errors, pending = _apt_install(["curl"])
@@ -149,7 +149,7 @@ class PackageInstallTests(unittest.TestCase):
 
     def test_remove_uses_exact_package_scope(self):
         payload = json.dumps({"status": "accepted", "accepted": True, "request_id": "c" * 32})
-        with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+        with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
             main.policy, "require"
         ) as require, mock.patch.object(
             main.subprocess, "run", return_value=_fake_completed(stdout=payload)
@@ -161,7 +161,7 @@ class PackageInstallTests(unittest.TestCase):
 
     def test_update_requires_wild_package_permission(self):
         payload = json.dumps({"action": "update-index"})
-        with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+        with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
             main.policy, "require"
         ) as require, mock.patch.object(
             main.subprocess, "run", return_value=_fake_completed(stdout=payload)
@@ -352,9 +352,9 @@ def test_relocated_server_dispatches_all_manifest_operations(
     command, arguments, handler, positionals
 ):
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-        os.environ, {"COS_APP_MANIFEST": str(APP_DIR / "app.json")}
+        os.environ, {"YUOS_APP_MANIFEST": str(APP_DIR / "app.json")}
     ), mock.patch.object(mcp.App, "serve", autospec=True) as serve:
-        load_local_module(APP_DIR / "server.py", "claw_test_pkg_server")
+        load_local_module(APP_DIR / "server.py", "yuos_test_pkg_server")
     app = serve.call_args.args[0]
     manifest = json.loads((APP_DIR / "app.json").read_text(encoding="utf-8"))
     listed = app._handle_request("tools/list", {}, True)

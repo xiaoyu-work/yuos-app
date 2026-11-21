@@ -308,7 +308,7 @@ fn input() -> Section<crate::pages::Message> {
             .apply(Element::from)
             .map(crate::pages::Message::from);
 
-            let mut controls = crate::widget::claw_section()
+            let mut controls = crate::widget::yuos_section()
                 .title(&section.title)
                 .add(
                     settings::item::builder(&*section.descriptions[volume])
@@ -388,7 +388,7 @@ fn output() -> Section<crate::pages::Message> {
             .apply(Element::from)
             .map(crate::pages::Message::from);
 
-            let mut controls = crate::widget::claw_section()
+            let mut controls = crate::widget::yuos_section()
                 .title(&section.title)
                 .add(
                     settings::item::builder(&*section.descriptions[volume])
@@ -469,7 +469,7 @@ fn device_profiles() -> Section<crate::pages::Message> {
                 .on_press(crate::pages::Message::Page(page.device_profiles))
                 .width(Length::Fill);
 
-            crate::widget::claw_section().add(device_profiles).into()
+            crate::widget::yuos_section().add(device_profiles).into()
         })
 }
 

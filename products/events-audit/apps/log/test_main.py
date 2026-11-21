@@ -17,15 +17,15 @@ APP_DIR = Path(__file__).parent
 MANIFEST_PATH = APP_DIR / "app.json"
 SERVER_PATH = APP_DIR / "server.py"
 
-main = load_local_module(APP_DIR / "main.py", "claw_test_log_main")
+main = load_local_module(APP_DIR / "main.py", "yuos_test_log_main")
 
 
 @pytest.fixture(params=["direct", "mcp"])
 def dispatch(request):
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-        os.environ, {"COS_APP_MANIFEST": str(MANIFEST_PATH)},
+        os.environ, {"YUOS_APP_MANIFEST": str(MANIFEST_PATH)},
     ):
-        server = load_local_module(SERVER_PATH, "claw_test_log_server")
+        server = load_local_module(SERVER_PATH, "yuos_test_log_server")
         listed = server.app._handle_request("tools/list", {}, True)
         assert {tool["name"] for tool in listed["tools"]} == {
             "log.read", "log.tail", "log.search", "log.write",

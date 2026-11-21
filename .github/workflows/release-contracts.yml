@@ -26,9 +26,6 @@ permissions:
 jobs:
   contracts:
     runs-on: ubuntu-24.04
-    env:
-      PROVENANCE_YU_URL: https://github.com/xiaoyu-work/claw-os/releases/download/sdk-v0.2.1/cos-provenance-linux-amd64
-      PROVENANCE_YU_SHA256: df30cf7d57fe3dc81532e2c5599ce61de91ad3a625d1305b2f848640f5ed2a9b
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
@@ -38,22 +35,33 @@ jobs:
         with:
           node-version: "22"
       - name: Plan the full validation selection without publishing
-        run: python3 tools/release.py plan --select all --version 0.2.1
+        run: python3 tools/release.py plan --select all --version 0.1.0
       - run: python3 tools/release_ci.py test --plan build/release-plan.json
       - name: Verify the published provenance CLI fixture
         run: |
           python3 - <<'PY'
+          import json
           import os
           from pathlib import Path
+          import re
           import sys
           sys.path.insert(0, "tools")
           from platform_dependency import _download
           from release_common import digest
+          pin = json.loads(Path("packaging/provenance-tools.lock.json").read_text())
+          version, expected = pin["version"], pin["sha256"]["amd64"]
+          if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version) or not re.fullmatch(r"[0-9a-f]{64}", expected):
+              raise ValueError("Invalid approved Yu OS provenance tool pin")
           tool = Path("build/provenance-yu")
-          _download(os.environ["PROVENANCE_YU_URL"], tool)
-          if digest(tool) != os.environ["PROVENANCE_YU_SHA256"]:
+          _download(
+              f"https://github.com/xiaoyu-work/Yu-OS/releases/download/yuos-sdk-v{version}/yu-provenance-linux-amd64",
+              tool,
+          )
+          if digest(tool) != expected:
               raise ValueError("Public provenance fixture SHA256 mismatch")
           tool.chmod(0o755)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="ascii") as environment:
+              environment.write(f"PROVENANCE_YU_SHA256={expected}\n")
           PY
       - name: Test all selected product and capability contracts together
         run: |

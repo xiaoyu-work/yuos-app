@@ -5,14 +5,14 @@ from unittest import mock
 
 import pytest
 
-from cos_runtime import mcp
+from yuos_runtime import mcp
 from test_support import authenticated_mcp_params, load_local_module
 
 
 APP_DIR = Path(__file__).parent
 web = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_web_main",
+    "yuos_test_web_main",
     clear_modules=("_shared",),
 )
 

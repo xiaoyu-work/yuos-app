@@ -10,9 +10,9 @@
   },
   "icon": "view-grid-symbolic",
   "runtime": "binary",
-  "entry": "bin/claw-applet-widget-rail",
+  "entry": "bin/yuos-applet-widget-rail",
   "mcp": {
-    "entry": "bin/claw-applet-widget-rail",
+    "entry": "bin/yuos-applet-widget-rail",
     "transport": "stdio",
     "lifecycle": "lazy",
     "tools": [

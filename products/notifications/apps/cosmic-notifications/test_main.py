@@ -48,7 +48,7 @@ def test_staging_preserves_complete_native_tree_license_modes_and_library_identi
     stage = load_local_module(ROOT / "tools/stage.py", "notifications_stage")
     native = load_local_module(ROOT / "tools/stage_native.py", "notifications_native")
     assert stage.stage("notifications", tmp_path / "installed") == ["cosmic-notifications", "notify"]
-    installed = tmp_path / "installed/usr/lib/cos/apps/cosmic-notifications"
+    installed = tmp_path / "installed/usr/lib/yuos/apps/cosmic-notifications"
     assert (installed / "app.json").read_bytes() == MANIFEST.read_bytes()
     assert not (installed / "test_main.py").exists()
     assert not (tmp_path / "installed/usr/bin").exists()
@@ -100,9 +100,9 @@ def test_original_default_and_optional_graph_remain_separate_from_os_applet_rend
     build = load_local_module(ROOT / "tools/native_build.py", "notifications_build")
     build.prepare("notifications", tmp_path / "platform/desktop/toolkit", tmp_path / "prepared")
     cargo = tomllib.loads((tmp_path / "prepared/Cargo.toml").read_text())
-    assert cargo["dependencies"]["claw-os-sdk"]["path"] == str(tmp_path / "platform/claw-os-sdk/rust")
-    assert cargo["dependencies"]["claw-notification-presentation"]["path"] == str(
-        tmp_path / "platform/claw-os-sdk/rust/notification-presentation"
+    assert cargo["dependencies"]["yuos-sdk"]["path"] == str(tmp_path / "platform/yuos-sdk/rust")
+    assert cargo["dependencies"]["yuos-notification-presentation"]["path"] == str(
+        tmp_path / "platform/yuos-sdk/rust/notification-presentation"
     )
     assert cargo["dependencies"]["libcosmic"]["git"] == "https://github.com/pop-os/libcosmic"
     assert cargo["dependencies"]["libcosmic"]["default-features"] is False
@@ -119,10 +119,10 @@ def test_original_default_and_optional_graph_remain_separate_from_os_applet_rend
 def test_mcp_is_fixed_os_intent_and_never_an_authoritative_state_or_bus_owner():
     mcp = (NATIVE / "src/mcp.rs").read_text()
     assert '"/usr/local/bin/yu"' in mcp
-    assert "cos_call_json_async_with_stdin_binary" in mcp
+    assert "yu_call_json_async_with_stdin_binary" in mcp
     assert '"__notifications"' in mcp
     assert "context.cancelled()" in mcp
-    for forbidden in ("Connection::session", "notifications.json", "rusqlite", "COS_DATA_DIR", "yu app"):
+    for forbidden in ("Connection::session", "notifications.json", "rusqlite", "YUOS_DATA_DIR", "yu app"):
         assert forbidden not in mcp
     package = json.loads((PRODUCT / "package.json").read_text())
     assert package["apps"] == ["apps/cosmic-notifications", "apps/notify"]

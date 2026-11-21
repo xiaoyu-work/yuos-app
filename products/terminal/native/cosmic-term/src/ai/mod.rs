@@ -13,16 +13,16 @@
 //!
 //! 2. **Context snapshot** ([`context`]) — when the user submits an AI prompt, we
 //!    scrape the last N grid lines + cwd and write them to
-//!    `$COS_AI_TMP/ac-<id>.json`. The shell function `__cos_ai` reads these files
+//!    `$YUOS_AI_TMP/ac-<id>.json`. The shell function `__yuos_ai` reads these files
 //!    and prepends the context to the Copilot CLI prompt.
 //!
 //! 3. **Shell integration** ([`shell_integration`]) — bash / zsh / fish / pwsh
-//!    snippets emitting OSC 133 markers and defining the `__cos_ai` function that
+//!    snippets emitting OSC 133 markers and defining the `__yuos_ai` function that
 //!    `exec`s `copilot -p "<prompt>" --allow-all-tools`. Sourced via shell-specific
 //!    mechanisms (`--rcfile`, `ZDOTDIR`, `--init-command`).
 //!
 //! 4. **Submission** — the middleware writes the captured prompt to
-//!    `$COS_AI_TMP/aq-<id>.txt`, then injects ` __cos_ai <id>\r` into the PTY so
+//!    `$YUOS_AI_TMP/aq-<id>.txt`, then injects ` __yuos_ai <id>\r` into the PTY so
 //!    the shell runs the function. The leading space keeps it out of history.
 //!
 //! Aterm relied on JS-land echo suppression to hide the injected command from
@@ -45,14 +45,14 @@ use std::io;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-/// Convert a `cos_runtime::BridgeError` to an `io::Error` so the AI module
+/// Convert a `yuos_runtime::BridgeError` to an `io::Error` so the AI module
 /// can keep a simple `io::Result` signature on its public surface.
 ///
 /// We deliberately swallow `BridgeError::BinaryNotFound` here without a
 /// special variant — the upstream caller (`build_runtime`) logs a warning
 /// and disables AI, which is the right behaviour for dev / pre-install
-/// environments where `cos` isn't on `$PATH` yet.
-pub(crate) fn bridge_to_io(e: cos_runtime::BridgeError) -> io::Error {
+/// environments where `yu` isn't on `$PATH` yet.
+pub(crate) fn bridge_to_io(e: yuos_runtime::BridgeError) -> io::Error {
     io::Error::new(io::ErrorKind::Other, e.to_string())
 }
 
@@ -72,7 +72,7 @@ pub fn build_runtime(config: &AiConfig) -> Option<crate::terminal::AiRuntime> {
         return None;
     }
     let cache_dir = cache_dir();
-    let copilot_bin = std::env::var("COS_AI_COPILOT_BIN").unwrap_or_else(|_| "copilot".to_string());
+    let copilot_bin = std::env::var("YUOS_AI_COPILOT_BIN").unwrap_or_else(|_| "copilot".to_string());
     let dirs = match ensure_integration_dirs(
         &cache_dir,
         &copilot_bin,
@@ -139,9 +139,9 @@ pub fn apply_options(
 ) {
     options
         .env
-        .insert("COS_AI_TMP".into(), runtime.tmp_dir.display().to_string());
+        .insert("YUOS_AI_TMP".into(), runtime.tmp_dir.display().to_string());
     options.env.insert(
-        "COS_AI_INTEGRATION_DIR".into(),
+        "YUOS_AI_INTEGRATION_DIR".into(),
         runtime.integration_dirs.root.display().to_string(),
     );
 
@@ -168,7 +168,7 @@ pub fn apply_options(
         "zsh" => {
             if let Ok(prev) = std::env::var("ZDOTDIR") {
                 if !prev.is_empty() {
-                    options.env.insert("COS_TERM_PREV_ZDOTDIR".into(), prev);
+                    options.env.insert("YUOS_TERM_PREV_ZDOTDIR".into(), prev);
                 }
             }
             options

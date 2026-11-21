@@ -19,9 +19,9 @@ import os
 import threading
 
 from _shared.atomic import atomic_write_bytes
-from claw_os_sdk.mcp import App
+from yuos_sdk.mcp import App
 
-DATA_DIR = os.environ.get("COS_DATA_DIR", "/var/lib/cos")
+DATA_DIR = os.environ.get("YUOS_DATA_DIR", "/var/lib/yuos")
 STORE_PATH = os.path.join(DATA_DIR, "kv.json")
 LOCK_PATH = STORE_PATH + ".lock"
 

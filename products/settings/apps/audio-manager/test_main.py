@@ -13,7 +13,7 @@ from test_support import authenticated_mcp_params, load_local_module
 APP_DIR = pathlib.Path(__file__).parent
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_audio_manager_main",
+    "yuos_test_audio_manager_main",
     clear_modules=("_shared",),
 )
 
@@ -155,7 +155,7 @@ def _completed(payload: object, returncode: int = 0) -> mock.Mock:
 def test_commands_use_expected_capability_and_argv(
     function_name, args, expected_policy, expected_argv, transport
 ):
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(
         main.subprocess, "run", return_value=_completed({"changed": True})
@@ -165,9 +165,9 @@ def test_commands_use_expected_capability_and_argv(
             result = function(*args)
         else:
             with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-                os.environ, {"COS_APP_MANIFEST": str(APP_DIR / "app.json")}
+                os.environ, {"YUOS_APP_MANIFEST": str(APP_DIR / "app.json")}
             ):
-                server = load_local_module(APP_DIR / "server.py", "claw_test_audio_manager_server")
+                server = load_local_module(APP_DIR / "server.py", "yuos_test_audio_manager_server")
                 manifest = json.loads((APP_DIR / "app.json").read_text(encoding="utf-8"))
                 assert "operations" not in manifest
                 tools = {tool["name"]: tool for tool in manifest["mcp"]["tools"]}
@@ -236,7 +236,7 @@ def test_invalid_arguments_are_rejected_before_policy(function_name, args, messa
 )
 def test_broker_payload_failures_raise(returncode, stdout, message):
     completed = mock.Mock(returncode=returncode, stdout=stdout, stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match=message):
@@ -267,7 +267,7 @@ def test_missing_broker_executable_raises():
     ],
 )
 def test_broker_launch_failures_raise(error, exception, message):
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", side_effect=error):
         with pytest.raises(exception, match=message):
@@ -275,7 +275,7 @@ def test_broker_launch_failures_raise(error, exception, message):
 
 
 def test_broker_timeout_raises():
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(
         main.subprocess,

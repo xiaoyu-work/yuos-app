@@ -27,7 +27,7 @@ def authenticated_mcp_params(params, *, call_id="test-call"):
     """Attach the same broker-owned context used by OS App contract fixtures."""
     value = dict(params or {})
     meta = dict(value.get("_meta", {}))
-    meta["claw-os.dev/call-context"] = {
+    meta["yuos.dev/call-context"] = {
         "wire_version": 1,
         "call_id": call_id,
         "trace_id": "test-trace",
@@ -51,8 +51,8 @@ def mcp_process(app_dir, *, env):
     assert manifest["runtime"] == "python"
     entry = manifest["mcp"].get("entry", "server.py")
     environment = {
-        **env, "COS_APP_ID": manifest["id"],
-        "COS_APP_MANIFEST": str(app_dir / "app.json"),
+        **env, "YUOS_APP_ID": manifest["id"],
+        "YUOS_APP_MANIFEST": str(app_dir / "app.json"),
         "PYTHONDONTWRITEBYTECODE": "1", "PYTHONNOUSERSITE": "1",
     }
     with tempfile.TemporaryFile(mode="w+t") as errors:
@@ -107,7 +107,7 @@ def mcp_process(app_dir, *, env):
 @pytest.fixture(autouse=True)
 def unit_policy_bridge(tmp_path, monkeypatch):
     """Imported only by App unit modules that use the original OS policy stub."""
-    if os.environ.get("CLAW_COS_BIN"):
+    if os.environ.get("YUOS_KERNEL_BIN"):
         return
     stub = tmp_path / "yu"
     stub.write_text(
@@ -125,7 +125,7 @@ def unit_policy_bridge(tmp_path, monkeypatch):
         'exit 99\n'
     )
     stub.chmod(0o755)
-    monkeypatch.setenv("CLAW_COS_BIN", str(stub))
+    monkeypatch.setenv("YUOS_KERNEL_BIN", str(stub))
 
 
 def load_local_module(path, name, *, clear_modules=()):
@@ -154,7 +154,7 @@ def stage_platform_python(python):
     """Compose verified SDK/runtime exports without fetching during a test."""
     platform = platform_dependency()
     exports = platform.prepare_exports(download=False)
-    for export, package in [("python-sdk", "claw_os_sdk"), ("python-runtime", "cos_runtime")]:
+    for export, package in [("python-sdk", "yuos_sdk"), ("python-runtime", "yuos_runtime")]:
         shutil.copytree(
             exports[export] / package, python / package,
             symlinks=True, ignore=platform.stage.IGNORE,

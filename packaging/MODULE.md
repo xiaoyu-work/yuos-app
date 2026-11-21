@@ -6,7 +6,7 @@ construction or a privileged updater.
 - `release.json` is the package/channel, native toolchain, public service ABI,
   Python dependency and bounded first-ownership-transfer policy.
   The approved 0.2.1 source cutover bounds former OS owners at `(<< 1:0.2.1)`
-  and requires `yuos-app-runtime-v1 (>= 0.2.1)`, not a new ABI or a new
+  and requires `yuos-app-runtime-v1 (>= 0.1.0)`, not a new ABI or a new
   production platform pin. OS production staging no longer copies App/support
   source. Missing official App APT artifacts or reintroduced shell/private-library
   links block OS release assembly. The real Desktop source links are removed;
@@ -19,7 +19,7 @@ construction or a privileged updater.
   `release_apt.py` retains and authenticates the complete repository;
   `release_publish.py` handles immutable Releases, state commits and refresh.
 - `../tools/release_desktop_shell.py` builds and signs the Desktop Shell
-  archive consumed by `claw-os-desktop`. It uses the same App publisher and
+  archive consumed by `yuos-desktop`. It uses the same App publisher and
   native payload tools but creates no App APT or Store entry.
 - `../tools/native_payload.py` consumes original native installer output,
   prepares complete package-local App executables/resources/licenses and emits
@@ -33,7 +33,7 @@ construction or a privileged updater.
   the reviewed generic App Host/capability/resource-owner contract plus the
   selected architectures' real package, signature and publication checks.
 - `../tools/release_snapshots.py` packages complete, separately authenticated
-  `claw.provenance/v1` App directories and signs a manifest/artifact-bound catalog.
+  `yuos.provenance/v1` App directories and signs a manifest/artifact-bound catalog.
   It calls the existing pinned public verifier and has no OS-source dependency,
   root hooks, installer, permission summary or approval store. OS protected
   install/update review and activation remain prerequisites. Snapshots are
@@ -42,7 +42,7 @@ construction or a privileged updater.
   binding follows the public manifest defaults, while `needs[].why` and scope
   requests remain unchanged data for OS-owned review and enforcement.
 - `../tools/release_store.py` creates a separately signed, freshness-bounded
-  `claw.app-store/v2` index binding every App to its actual signed APT package.
+  `yuos.app-store/v2` index binding every App to its actual signed APT package.
   Publication verifies original CI records, signs App directories through the
   pinned public provenance CLI, repacks and validates final Debian bytes, then
   derives snapshots from those identical final payloads. Complete package
@@ -51,7 +51,7 @@ construction or a privileged updater.
   signed resources so the system can resolve a menu selection without trusting
   the exported desktop command. Build-input digests remain distinct from authenticated
   release digests. Product Web assets and `store/index.json` remain authenticated.
-  Official Store transactions, review and runtime authority stay in `clawd`;
+  Official Store transactions, review and runtime authority stay in `yuosd`;
   this producer supplies no installer, grant or snapshot/source fallback.
   Public tool pins and signing inputs remain owner-controlled prerequisites.
 - `../tools/release_development.py` assembles the complete declared fixture

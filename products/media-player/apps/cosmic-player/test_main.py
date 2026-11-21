@@ -41,7 +41,7 @@ def test_native_staging_keeps_original_resources_modes_and_separate_renderer(tmp
     stage = load_local_module(ROOT / "tools/stage.py", "player_stage")
     native = load_local_module(ROOT / "tools/stage_native.py", "player_stage_native")
     assert stage.stage("media-player", tmp_path / "installed") == ["cosmic-player"]
-    app = tmp_path / "installed/usr/lib/cos/apps/cosmic-player"
+    app = tmp_path / "installed/usr/lib/yuos/apps/cosmic-player"
     assert (app / "app.json").read_bytes() == MANIFEST.read_bytes()
     assert not (app / "test_main.py").exists()
     assert not (tmp_path / "installed/usr/bin").exists()
@@ -64,7 +64,7 @@ def test_native_staging_keeps_original_resources_modes_and_separate_renderer(tmp
     build = load_local_module(ROOT / "tools/native_build.py", "player_native_build")
     build.prepare("media-player", tmp_path / "platform/desktop/toolkit", tmp_path / "prepared")
     cargo = tomllib.loads((tmp_path / "prepared/Cargo.toml").read_text())
-    assert cargo["dependencies"]["claw-os-sdk"]["path"] == str(tmp_path / "platform/claw-os-sdk/rust")
+    assert cargo["dependencies"]["yuos-sdk"]["path"] == str(tmp_path / "platform/yuos-sdk/rust")
     assert cargo["dependencies"]["libcosmic"]["git"] == "https://github.com/pop-os/libcosmic.git"
     assert cargo["dependencies"]["iced_video_player"]["git"] == "https://github.com/wash2/iced_video_player.git"
     assert cargo["dependencies"]["iced_video_player"]["branch"] == "iced-rebase"
@@ -79,11 +79,11 @@ def test_native_staging_keeps_original_resources_modes_and_separate_renderer(tmp
 def test_native_mcp_and_ui_share_the_fixed_live_playback_boundary():
     mcp = (NATIVE / "src/mcp.rs").read_text()
     assert '"/usr/local/bin/yu"' in mcp
-    assert "cos_call_json_async_with_binary" in mcp
+    assert "yu_call_json_async_with_binary" in mcp
     assert "spawn_blocking" not in mcp
     assert '"__media-player"' in mcp
     assert "context.cancelled()" in mcp
-    for forbidden in ("Connection::session", "ListNames", "with_player", 'yu app', "CLAW_COS_BIN"):
+    for forbidden in ("Connection::session", "ListNames", "with_player", 'yu app', "YUOS_KERNEL_BIN"):
         assert forbidden not in mcp
     backend = (NATIVE / "src/mpris_backend.rs").read_text()
     assert '&format!("com.yuos.Player.pid{}", process::id())' in backend

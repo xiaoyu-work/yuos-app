@@ -16,8 +16,8 @@ Policy
 
 We use a **denylist** rather than a strict allowlist because:
 
-* The kernel deliberately passes through several ``COS_*`` variables
-  the child needs (``COS_SESSION``, ``COS_DATA_DIR``, ``COS_BIN``).
+* The kernel deliberately passes through several ``YUOS_*`` variables
+  the child needs (``YUOS_SESSION``, ``YUOS_DATA_DIR``, ``YUOS_BIN``).
 * Locale (``LANG``, ``LC_*``), terminal (``TERM``), time zone
   (``TZ``), display (``DISPLAY``, ``WAYLAND_DISPLAY``) and similar
   benign variables are required for usable child programs, and

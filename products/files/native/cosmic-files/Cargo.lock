@@ -993,12 +993,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "claw-app-gui-argv"
+name = "yuos-app-gui-argv"
 version = "0.1.0"
 
 [[package]]
-name = "claw-os-sdk"
-version = "0.2.1"
+name = "yuos-sdk"
+version = "0.1.0"
 dependencies = [
  "async-trait",
  "base64",
@@ -1356,11 +1356,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "cos-runtime"
+name = "yuos-runtime"
 version = "0.1.0"
 dependencies = [
  "base64",
- "claw-os-sdk",
+ "yuos-sdk",
  "libc",
  "serde",
  "serde_json",
@@ -1417,10 +1417,10 @@ dependencies = [
  "atomic_float",
  "bstr",
  "bzip2",
- "claw-app-gui-argv",
- "claw-os-sdk",
+ "yuos-app-gui-argv",
+ "yuos-sdk",
  "compio",
- "cos-runtime",
+ "yuos-runtime",
  "cosmic-client-toolkit",
  "cosmic-mime-apps",
  "dirs 6.0.0",

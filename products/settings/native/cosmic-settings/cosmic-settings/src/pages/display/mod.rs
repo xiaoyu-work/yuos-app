@@ -1290,7 +1290,7 @@ pub fn display_configuration() -> Section<crate::pages::Message> {
                     > 1
                     || !active_output.enabled
                 {
-                    crate::widget::claw_list_column()
+                    crate::widget::yuos_list_column()
                         .add(
                             widget::settings::item::builder(&descriptions[enable_label])
                                 .toggler(active_output.enabled, Message::DisplayToggle),
@@ -1303,7 +1303,7 @@ pub fn display_configuration() -> Section<crate::pages::Message> {
                             ),
                         ))
                 } else {
-                    crate::widget::claw_list_column()
+                    crate::widget::yuos_list_column()
                 };
 
                 if let Some(items) = display_options {
@@ -1317,7 +1317,7 @@ pub fn display_configuration() -> Section<crate::pages::Message> {
                 content = content
                     .push(text::heading(&descriptions[options_label]))
                     .push_maybe(display_options.map(|items| {
-                        let mut column = crate::widget::claw_list_column();
+                        let mut column = crate::widget::yuos_list_column();
                         for item in items {
                             column = column.add(item);
                         }

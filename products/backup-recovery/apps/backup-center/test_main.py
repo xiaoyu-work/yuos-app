@@ -19,11 +19,11 @@ SOURCE = "/home/user/Documents"
 DESTINATION = "/home/user/restore"
 CREDENTIAL = "default/restic"
 SNAPSHOT_ID = "ABCDEF12"
-COS = "/usr/local/bin/yu"
+YU = "/usr/local/bin/yu"
 
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_backup_center_main",
+    "yuos_test_backup_center_main",
     clear_modules=("_shared",),
 )
 
@@ -52,7 +52,7 @@ def _paths(
 
 def _argv(action: str, *tail: str) -> list[str]:
     return [
-        COS,
+        YU,
         "__backup",
         action,
         "--repo",
@@ -244,7 +244,7 @@ def test_routes_use_exact_capability_order_and_broker_argv(
     argv,
 ):
     with _paths(), mock.patch.dict(
-        os.environ, {"COS_BIN": COS}
+        os.environ, {"YUOS_BIN": YU}
     ), mock.patch.object(main.policy, "require") as require, mock.patch.object(
         main.subprocess, "run", return_value=_completed({"ok": True})
     ) as run:
@@ -262,10 +262,10 @@ def test_routes_use_exact_capability_order_and_broker_argv(
 
 def test_relocated_sdk_service_lists_tools_and_dispatches_to_the_broker():
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-        os.environ, {"COS_APP_MANIFEST": str(APP_DIR / "app.json"), "COS_BIN": COS}
+        os.environ, {"YUOS_APP_MANIFEST": str(APP_DIR / "app.json"), "YUOS_BIN": YU}
     ):
         server = load_local_module(
-            APP_DIR / "server.py", "claw_test_backup_center_server"
+            APP_DIR / "server.py", "yuos_test_backup_center_server"
         )
         manifest = json.loads((APP_DIR / "app.json").read_text(encoding="utf-8"))
         listed = server.app._handle_request("tools/list", {}, True)
@@ -293,7 +293,7 @@ def test_relocated_sdk_service_lists_tools_and_dispatches_to_the_broker():
 
 def test_optional_tag_defaults_to_none_and_is_omitted():
     with _paths(), mock.patch.dict(
-        os.environ, {"COS_BIN": COS}
+        os.environ, {"YUOS_BIN": YU}
     ), mock.patch.object(main.policy, "require"), mock.patch.object(
         main.subprocess, "run", return_value=_completed({"ok": True})
     ) as run:
@@ -320,7 +320,7 @@ def test_init_and_restore_allow_missing_canonical_paths(
     argv_tail,
 ):
     with _paths(missing=missing), mock.patch.dict(
-        os.environ, {"COS_BIN": COS}
+        os.environ, {"YUOS_BIN": YU}
     ), mock.patch.object(main.policy, "require"), mock.patch.object(
         main.subprocess, "run", return_value=_completed({"ok": True})
     ) as run:
@@ -474,7 +474,7 @@ def _call_snapshots(
         else {"return_value": completed}
     )
     with _paths(), mock.patch.dict(
-        os.environ, {"COS_BIN": COS}
+        os.environ, {"YUOS_BIN": YU}
     ), mock.patch.object(main.policy, "require"), mock.patch.object(
         main.subprocess, "run", **run_options
     ):

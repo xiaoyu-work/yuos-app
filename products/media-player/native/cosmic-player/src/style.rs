@@ -1,7 +1,7 @@
 // Copyright 2024 System76 <info@system76.com>
 // SPDX-License-Identifier: GPL-3.0-only
 
-//! Claw Glass app-level styling for the Media Player.
+//! Yu OS Glass app-level styling for the Media Player.
 //!
 //! Shared frosted-glass container treatments used by the player chrome:
 //! the floating transport bar, the now-playing album-art card, and the

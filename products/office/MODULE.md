@@ -3,7 +3,7 @@
 Yu Office is a downstream LibreOffice desktop product with its own `yu-office`
 App identity, launcher and profile. It does not own the OS launcher or Agent,
 and does not replace the system `libreoffice`/`soffice` commands, profiles or
-file associations. The Claw Apps catalog delivers `claw-app-office-desktop`;
+file associations. The Yu OS Apps catalog delivers `yuos-app-office-desktop`;
 the distribution's LibreOffice remains a separate Linux Apps entry.
 
 | Path | Responsibility |

@@ -71,12 +71,12 @@ root = pathlib.Path(__file__).parent
 args = sys.argv[1:]
 request = json.load(sys.stdin)
 with (root / 'calls').open('a') as log:
-    log.write(json.dumps({'args':args,'request':request,'app':os.environ.get('COS_APP_ID'),
-        'session':os.environ.get('COS_SESSION'),'stderr_terminal':os.isatty(2)}) + '\\n')
+    log.write(json.dumps({'args':args,'request':request,'app':os.environ.get('YUOS_APP_ID'),
+        'session':os.environ.get('YUOS_SESSION'),'stderr_terminal':os.isatty(2)}) + '\\n')
 def error(message):
     print(json.dumps({'ok':False,'wire_version':1,'code':'PERMISSION_DENIED','error':message}))
     sys.exit(1)
-if not os.environ.get('COS_SESSION') and not os.isatty(2): error('no active session')
+if not os.environ.get('YUOS_SESSION') and not os.isatty(2): error('no active session')
 assert args[0] == '--wire=1'
 if args[1] == '__capture':
     assert args[2:] == ['screenshot','--request-stdin']
@@ -92,7 +92,7 @@ if args[1] == '__capture':
         with os.fdopen(fd, 'wb') as image: image.write((root / 'image.png').read_bytes())
         data['path'] = str(path)
 elif args[1] == '__gui-file-create':
-    assert args[3:] == ['--request-stdin'] and os.environ.get('COS_APP_GUI') == '1'
+    assert args[3:] == ['--request-stdin'] and os.environ.get('YUOS_APP_GUI') == '1'
     if not (root / 'write').exists(): error('exact output permission denied')
     assert request['parent_node'] == (root / 'shots').stat().st_ino
     held = root / 'held-output.json'
@@ -105,7 +105,7 @@ elif args[1] == '__gui-file-create':
     if args[2] == 'reserve':
         data = {'version':1,'reservation_id':'ss-' + 'b' * 32,
             'selection_id':'sc-' + 'a' * 32, 'parent_node':selected['parent_node'],
-            'name':'.cos-save-' + 'b' * 32,'target_name':selected['name'],'expires_in_ms':60000}
+            'name':'.yuos-save-' + 'b' * 32,'target_name':selected['name'],'expires_in_ms':60000}
     else:
         data = {'version':1,'selection_id':'sc-' + 'a' * 32,
             'parent_node':selected['parent_node'],'name':selected['name'],'access':'create',
@@ -113,8 +113,8 @@ elif args[1] == '__gui-file-create':
             'approval_request_id':'fixture-selected-output','target_display':str(target)}
 elif args[1] == '__gui-capture':
     assert args[3:] == ['--request-stdin']
-    assert os.environ.get('COS_APP_GUI') == '1'
-    assert os.environ.get('COS_SESSION')
+    assert os.environ.get('YUOS_APP_GUI') == '1'
+    assert os.environ.get('YUOS_SESSION')
     if not (root / 'screen').exists(): error('screen permission denied')
     invocation = request['request_id']
     assert len(invocation) == 32 and all(ch in '0123456789abcdef' for ch in invocation)
@@ -150,10 +150,10 @@ print(json.dumps({'ok':True,'wire_version':1,'data':data}))
             "DBUS_SESSION_BUS_ADDRESS": f"unix:path={fixture}/no-user-bus",
             "DISPLAY": "", "WAYLAND_DISPLAY": "", "HOME": str(fixture / "home"),
             "XDG_CONFIG_HOME": str(fixture / "config"), "XDG_DATA_HOME": str(fixture / "data"),
-            "TMPDIR": str(fixture), "COS_MCP_SERVER": "1", "COS_APP_ID": "cosmic-screenshot",
-            "COS_SESSION": "broker-session",
-            "COS_APP_MANIFEST": str(installed / "usr/lib/cos/apps/cosmic-screenshot/app.json"),
-            "CLAW_COS_BIN": str(broker), "COS_OWNER_HOME": str(fixture),
+            "TMPDIR": str(fixture), "YUOS_MCP_SERVER": "1", "YUOS_APP_ID": "cosmic-screenshot",
+            "YUOS_SESSION": "broker-session",
+            "YUOS_APP_MANIFEST": str(installed / "usr/lib/yuos/apps/cosmic-screenshot/app.json"),
+            "YUOS_KERNEL_BIN": str(broker), "YUOS_OWNER_HOME": str(fixture),
         }
         process = subprocess.Popen(
             [str(binary), "--portal-capture-stdout"], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
@@ -175,7 +175,7 @@ print(json.dumps({'ok':True,'wire_version':1,'data':data}))
         def call(arguments, **context):
             return request("tools/call", {
                 "name": "screenshot.capture", "arguments": arguments,
-                "_meta": {"claw-os.dev/call-context": {
+                "_meta": {"yuos.dev/call-context": {
                     "wire_version": 1, "call_id": f"fixture-{counter}", "trace_id": "fixture",
                     "session_id": "context-is-not-broker-authority", "task_id": "fixture-task",
                     "caller": {"kind": "system-agent", "id": "fixture", "owner_uid": 1000},
@@ -223,8 +223,8 @@ print(json.dumps({'ok':True,'wire_version':1,'data':data}))
         assert all(value["app"] == "cosmic-screenshot" and value["session"] == "broker-session" for value in calls)
         assert all(value["stderr_terminal"] is False for value in calls)
 
-        human_env = {key: value for key, value in env.items() if key != "COS_MCP_SERVER"}
-        human_env["COS_APP_GUI"] = "1"
+        human_env = {key: value for key, value in env.items() if key != "YUOS_MCP_SERVER"}
+        human_env["YUOS_APP_GUI"] = "1"
 
         def human(reply, *args):
             (fixture / "held-gui.json").unlink(missing_ok=True)
@@ -272,7 +272,7 @@ print(json.dumps({'ok':True,'wire_version':1,'data':data}))
         # signed PAM/FUSE acceptance, not this fake wire, covers selected output.
         assert result.returncode != 0 and "parent_node" in result.stderr, result.stderr
         assert not destination.exists()
-        terminal_env = {key: value for key, value in human_env.items() if key not in ("COS_SESSION", "COS_APP_GUI")}
+        terminal_env = {key: value for key, value in human_env.items() if key not in ("YUOS_SESSION", "YUOS_APP_GUI")}
         args = [str(binary), "--interactive=false", "--notify=false", "--save-dir", str(output)]
         result = subprocess.run(args, env=terminal_env, capture_output=True, text=True, timeout=10)
         assert result.returncode != 0 and "no active session" in result.stderr

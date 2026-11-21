@@ -1,6 +1,6 @@
 """Four native tools bound to the embedded shared product implementation."""
 
-from claw_os_sdk.mcp import App
+from yuos_sdk.mcp import App
 
 
 def _native_limit(value: int, maximum: int) -> int:
@@ -9,7 +9,7 @@ def _native_limit(value: int, maximum: int) -> int:
     return max(1, min(value, maximum))
 
 
-app = App.from_manifest(os.environ["COS_APP_MANIFEST"])
+app = App.from_manifest(os.environ["YUOS_APP_MANIFEST"])
 
 
 @app.tool("launcher.find")

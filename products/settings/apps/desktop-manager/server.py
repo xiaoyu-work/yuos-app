@@ -1,4 +1,4 @@
-from claw_os_sdk.mcp import App
+from yuos_sdk.mcp import App
 
 from main import close_window, focus_window, list_windows, restart_application
 

@@ -27,7 +27,7 @@ where
     let mut daemonize = true;
     let mut locations = Vec::new();
     let mut uris = Vec::new();
-    for arg in claw_app_gui_argv::normalize(argv, gui_launch, OsStr::new("--gui"))
+    for arg in yuos_app_gui_argv::normalize(argv, gui_launch, OsStr::new("--gui"))
         .into_iter()
         .skip(1)
     {

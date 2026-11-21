@@ -12,7 +12,7 @@ Singleton {
     property ShellRoot shellRoot
 
     readonly property var ungrantedOptionalNeeds: {
-        const raw = Quickshell.env("COS_APP_OPTIONAL_NEEDS_UNGRANTED_JSON");
+        const raw = Quickshell.env("YUOS_APP_OPTIONAL_NEEDS_UNGRANTED_JSON");
         try {
             const indexes = JSON.parse(raw);
             return Array.isArray(indexes) && indexes.every(i => Number.isInteger(i) && i >= 0)

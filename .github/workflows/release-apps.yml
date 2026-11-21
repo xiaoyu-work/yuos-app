@@ -172,8 +172,8 @@ jobs:
           name: app-debs-${{ matrix.architecture }}
           path: |
             build/release/*.deb
-            build/release/claw-app-development-*.tar.xz
-            build/release/claw-app-interfaces-*.tar.gz
+            build/release/yuos-app-development-*.tar.xz
+            build/release/yuos-app-interfaces-*.tar.gz
             build/release/build-record-*.json
           if-no-files-found: error
 
@@ -227,7 +227,7 @@ jobs:
           parsed = urlsplit(url)
           checksum = os.environ["PROVENANCE_SHA256"]
           if parsed.scheme != "https" or parsed.hostname != "github.com" or not parsed.path.startswith(
-              "/xiaoyu-work/claw-os/releases/download/"
+              "/xiaoyu-work/Yu-OS/releases/download/"
           ) or not re.fullmatch(r"[0-9a-f]{64}", checksum):
               raise ValueError("A pinned published OS provenance tool is required")
           tool = Path("build/provenance-yu")

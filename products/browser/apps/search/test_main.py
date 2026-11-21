@@ -19,7 +19,7 @@ TOOL_NAMES = ["search.web", "search.image"]
 
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_search_main",
+    "yuos_test_search_main",
     clear_modules=("_shared",),
 )
 
@@ -150,7 +150,7 @@ def test_manifest_and_handlers_are_mcp_only_and_aligned():
         }
 
     source = SERVER_PATH.read_text(encoding="utf-8")
-    assert "from claw_os_sdk.mcp import App" in source
+    assert "from yuos_sdk.mcp import App" in source
     assert "serve_manifest_operations" not in source
     bindings = _server_bindings()
     assert list(bindings) == TOOL_NAMES

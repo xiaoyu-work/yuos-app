@@ -8,7 +8,7 @@ def test_identity_and_narrow_calendar_grant_are_preserved():
     manifest = json.loads((APP / "app.json").read_text())
     assert manifest["id"] == "panel-calendar"
     assert manifest["runtime"] == "binary"
-    assert manifest["entry"] == manifest["mcp"]["entry"] == "bin/claw-applet-calendar"
+    assert manifest["entry"] == manifest["mcp"]["entry"] == "bin/yuos-applet-calendar"
     assert manifest["mcp"]["transport"] == "stdio"
     assert manifest["mcp"]["lifecycle"] == "lazy"
     assert list(manifest["operations"]) == ["open"]

@@ -6,7 +6,7 @@ pub(crate) mod product;
 use std::io;
 use std::path::Path;
 
-use cos_runtime::ask_claw;
+use yuos_runtime::ask_yu;
 use serde::Serialize;
 use serde_json::json;
 
@@ -66,7 +66,7 @@ pub fn remove(path: &Path) -> io::Result<()> {
 pub fn reveal(path: &Path) -> Result<String, String> {
     let path = std::fs::canonicalize(path).map_err(|error| error.to_string())?;
     let uri = url::Url::from_file_path(&path).map_err(|_| "invalid local path")?;
-    let value = claw_os_sdk::cos_call_json("desktop", "launch", [
+    let value = yuos_sdk::yu_call_json("desktop", "launch", [
         "__desktop", "launch", "--app-id", "com.yuos.Files", "--uri", uri.as_str(),
     ]).map_err(|error| error.to_string())?;
     if value["launched"] != true || value["app_id"] != "com.yuos.Files"
@@ -86,10 +86,10 @@ struct FilesContext<'a> {
     selection: Option<&'a str>,
 }
 
-impl ask_claw::Context for FilesContext<'_> {
+impl ask_yu::Context for FilesContext<'_> {
     const APP_ID: &'static str = "cosmic-files";
 }
 
-pub fn ask_claw(cwd: Option<&str>, selection: Option<&str>) -> Result<(), ask_claw::LaunchError> {
-    ask_claw::launch(&FilesContext { cwd, selection })
+pub fn ask_yu(cwd: Option<&str>, selection: Option<&str>) -> Result<(), ask_yu::LaunchError> {
+    ask_yu::launch(&FilesContext { cwd, selection })
 }

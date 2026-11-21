@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::time::Duration;
 
 use anyhow::{Context, Result, bail};
-use claw_notification_presentation::{Card, Icon, Preferences};
+use yuos_notification_presentation::{Card, Icon, Preferences};
 use cosmic::iced::{
     Subscription,
     futures::{self, SinkExt},
@@ -20,7 +20,7 @@ use tokio::sync::mpsc;
 use super::notifications::{Event, Input};
 
 pub fn enabled() -> bool {
-    std::env::var("COS_APP_GUI").as_deref() == Ok("1")
+    std::env::var("YUOS_APP_GUI").as_deref() == Ok("1")
 }
 
 #[derive(Debug, Deserialize)]
@@ -73,7 +73,7 @@ struct Entry {
 
 async fn exchange(event: Option<Value>) -> Result<Reply> {
     let payload = json!({"event":event}).to_string();
-    let value = claw_os_sdk::cos_call_json_async_with_stdin_binary(
+    let value = yuos_sdk::yu_call_json_async_with_stdin_binary(
         "/usr/local/bin/yu",
         "notification",
         "presentation",
@@ -220,7 +220,7 @@ async fn run(output: &mut futures::channel::mpsc::Sender<Event>) -> Result<()> {
 }
 
 fn validate_ticket(handle: u32, token: &str) -> Result<()> {
-    claw_notification_presentation::validate_handle(handle)?;
+    yuos_notification_presentation::validate_handle(handle)?;
     anyhow::ensure!(
         token.len() == 32
             && token
@@ -303,7 +303,7 @@ fn managed_card(notification: &Notification) -> Result<Card> {
     let mut card = crate::presentation::card(&display)?;
     card.body = body_spans(notification)
         .into_iter()
-        .map(|span| claw_notification_presentation::TextRun {
+        .map(|span| yuos_notification_presentation::TextRun {
             text: span.text.into_owned(),
             ..Default::default()
         })

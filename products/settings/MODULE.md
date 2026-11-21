@@ -208,7 +208,7 @@ authenticated broker session, never MCP metadata or user-provided owner
 fields. Neither client invokes the privileged approval helper, offers grant
 durations, or imports the OS review presenter.
 Permission and fixed-launch clients explicitly select `/usr/local/bin/yu`
-through the SDK's shared wire/error transport. A sanitized desktop PATH and absent `CLAW_COS_BIN` are
+through the SDK's shared wire/error transport. A sanitized desktop PATH and absent `YUOS_KERNEL_BIN` are
 supported without process-wide environment mutation or another subprocess
 implementation.
 
@@ -226,7 +226,7 @@ MCP cannot submit those direct Settings choices. The existing MCP restoration
 request remains pending until it is reviewed through the OS. Its policy
 receipt only removes a deny gate; it cannot be redeemed as execution authority.
 
-Installed Desktop requires the OS `claw-os-app-permissions-v1` service provided
+Installed Desktop requires the OS `yuos-app-permissions-v1` service provided
 by Agent. Source development against an older service fails visibly, without
 raw socket/file authority or a silent success fallback. No live device/user
 state or independent manager grants are migrated.
@@ -262,7 +262,7 @@ and hands only a bounded sealed snapshot to AccountsService. The UI explicitly
 requires an image of at most 1 MiB: it no longer silently resizes/copies to an
 unrelated temporary path with different authority. Add User and Change Password
 send one bounded password request on stdin through the private, OS-started
-Settings channel. Claw OS authenticates a local administrator separately and
+Settings channel. Yu OS authenticates a local administrator separately and
 handles the system password policy. Passwords are not placed in arguments, stored
 in the vault, or returned in results. The default icon is only presentation;
 changing it still needs exact `fs.read` on

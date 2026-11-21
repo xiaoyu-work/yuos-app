@@ -69,14 +69,14 @@ DPkg::Options {{
 
 
 def test_signed_selected_product_publish_retains_other_packages_and_prior_by_hash(tmp_path, deb, signing):
-    first = compose([deb("claw-app-alpha"), deb("claw-app-beta")],
+    first = compose([deb("yuos-app-alpha"), deb("yuos-app-beta")],
                     tmp_path / "first", signing, initialize=True)
     previous = verify_repository(first, signing)
-    second = compose([deb("claw-app-alpha", "2.0.0", b"new alpha")],
+    second = compose([deb("yuos-app-alpha", "2.0.0", b"new alpha")],
                      tmp_path / "second", signing, previous=first)
     current = verify_repository(second, signing)
     assert {(record["package"], record["version"]) for record in current["packages"]} == {
-        ("claw-app-alpha", "1.0.0"), ("claw-app-alpha", "2.0.0"), ("claw-app-beta", "1.0.0"),
+        ("yuos-app-alpha", "1.0.0"), ("yuos-app-alpha", "2.0.0"), ("yuos-app-beta", "1.0.0"),
     }
     for path, value in previous["indexes"].items():
         assert current["indexes"][path] == value
@@ -85,26 +85,26 @@ def test_signed_selected_product_publish_retains_other_packages_and_prior_by_has
 
 def test_real_apt_install_and_independent_upgrade_preserve_unrelated_packages_and_data(tmp_path, deb, signing):
     repository = tmp_path / "repository"
-    compose([deb("claw-app-alpha"), deb("claw-app-beta")], repository, signing, initialize=True)
+    compose([deb("yuos-app-alpha"), deb("yuos-app-beta")], repository, signing, initialize=True)
     apt = IsolatedApt(tmp_path / "root", repository, signing)
-    state = apt.root / "home/owner/.local/share/claw/apps/alpha/state.json"
+    state = apt.root / "home/owner/.local/share/yuos/apps/alpha/state.json"
     state.parent.mkdir(parents=True)
     state.write_bytes(b'{"private":"unchanged state and grant IDs"}\n')
     state.chmod(0o600)
     before = state.stat()
     apt.update()
-    apt.call("install", "-y", "claw-app-alpha", "claw-app-beta")
-    assert apt.installed("claw-app-alpha") == apt.installed("claw-app-beta") == "1.0.0"
-    upgraded = compose([deb("claw-app-alpha", "1.1.0", b"upgraded alpha\n")],
+    apt.call("install", "-y", "yuos-app-alpha", "yuos-app-beta")
+    assert apt.installed("yuos-app-alpha") == apt.installed("yuos-app-beta") == "1.0.0"
+    upgraded = compose([deb("yuos-app-alpha", "1.1.0", b"upgraded alpha\n")],
                        tmp_path / "next", signing, previous=repository)
     shutil.rmtree(repository)
     upgraded.rename(repository)
     apt.update()
-    apt.call("install", "--only-upgrade", "-y", "claw-app-alpha")
-    assert apt.installed("claw-app-alpha") == "1.1.0"
-    assert apt.installed("claw-app-beta") == "1.0.0"
-    assert (apt.root / "usr/share/clawos-fixture/claw-app-alpha.txt").read_bytes() == b"upgraded alpha\n"
-    assert (apt.root / "usr/share/clawos-fixture/claw-app-beta.txt").read_bytes() == b"first payload\n"
+    apt.call("install", "--only-upgrade", "-y", "yuos-app-alpha")
+    assert apt.installed("yuos-app-alpha") == "1.1.0"
+    assert apt.installed("yuos-app-beta") == "1.0.0"
+    assert (apt.root / "usr/share/yuos-fixture/yuos-app-alpha.txt").read_bytes() == b"upgraded alpha\n"
+    assert (apt.root / "usr/share/yuos-fixture/yuos-app-beta.txt").read_bytes() == b"first payload\n"
     assert state.read_bytes() == b'{"private":"unchanged state and grant IDs"}\n'
     assert state.stat().st_ino == before.st_ino and state.stat().st_mode == before.st_mode
 
@@ -133,7 +133,7 @@ def test_changed_pool_bytes_and_changed_metadata_do_not_become_an_empty_reposito
     package.write_bytes(package.read_bytes() + b"substituted payload")
     with pytest.raises(ValueError, match="digest"):
         compose([], tmp_path / "bad-payload", signing, previous=first)
-    second = compose([deb("claw-app-second")], tmp_path / "second", signing, initialize=True)
+    second = compose([deb("yuos-app-second")], tmp_path / "second", signing, initialize=True)
     (second / "dists/trixie/Release").write_text("not a signed Release")
     with pytest.raises(ValueError, match="disagree"):
         compose([], tmp_path / "bad-release", signing, previous=second)
@@ -142,7 +142,7 @@ def test_changed_pool_bytes_and_changed_metadata_do_not_become_an_empty_reposito
 def test_wrong_signatures_and_unsigned_repositories_are_rejected_by_real_apt(tmp_path, deb, signing):
     repository = compose([deb()], tmp_path / "repository", signing, initialize=True)
     signature = repository / "dists/trixie/InRelease"
-    data = signature.read_bytes().replace(b"Claw OS Applications", b"Untrusted Replaced!!", 1)
+    data = signature.read_bytes().replace(b"Yu OS Applications", b"Untrusted Replaced!!", 1)
     signature.write_bytes(data)
     with pytest.raises(subprocess.CalledProcessError):
         verify_repository(repository, signing)
@@ -160,9 +160,9 @@ def test_real_apt_rejects_mutated_package_even_with_valid_repository_metadata(tm
     apt.update()
     package = next((repository / "pool").rglob("*.deb"))
     package.write_bytes(package.read_bytes() + b"changed")
-    result = apt.call("install", "-y", "claw-app-fixture", check=False)
+    result = apt.call("install", "-y", "yuos-app-fixture", check=False)
     assert result.returncode != 0
-    assert not (apt.root / "usr/share/clawos-fixture/claw-app-fixture.txt").exists()
+    assert not (apt.root / "usr/share/yuos-fixture/yuos-app-fixture.txt").exists()
 
 
 def test_stale_metadata_is_rejected_by_verifier_and_real_apt_and_cannot_be_refreshed_silently(tmp_path, deb, signing):
@@ -190,67 +190,32 @@ def test_authenticated_refresh_changes_freshness_without_rebuilding_any_app(tmp_
 def test_initial_repository_requires_explicit_initialization_and_cannot_replace_previous(tmp_path, deb, signing):
     with pytest.raises(ValueError, match="initialization"):
         compose([deb()], tmp_path / "repository", signing)
-    repository = compose([deb("claw-app-other")], tmp_path / "repository", signing, initialize=True)
+    repository = compose([deb("yuos-app-other")], tmp_path / "repository", signing, initialize=True)
     with pytest.raises(ValueError, match="initialize"):
         compose([], tmp_path / "reset", signing, previous=repository, initialize=True)
 
 
-@pytest.mark.parametrize(("former", "target", "symlink"), [
-    ("claw-os-agent", "usr/lib/cos/apps/fixture/entry.py", False),
-    ("claw-os-desktop", "usr/bin/claw-applet-calendar", True),
-    ("claw-os-desktop", "usr/bin/claw-applet-clipboard", True),
-    ("claw-os-desktop", "usr/bin/claw-applet-widget-rail", True),
-])
-def test_bound_file_ownership_transfer_refuses_a_post_split_os_package(tmp_path, deb, signing, former, target, symlink):
-    bound = "1:0.2.1"
-    root = tmp_path / "root"
-    (root / "var/lib/dpkg").mkdir(parents=True)
-    (root / "var/lib/dpkg/status").write_text("")
-    private = root / "var/lib/cos/owners/1000/grants.json"
-    private.parent.mkdir(parents=True)
-    private.write_bytes(b"unchanged exact identity grants")
-    install = ["dpkg", "--force-not-root", f"--root={root}", f"--log={root}/dpkg.log", "--install"]
-    environment = {"PATH": os.environ["PATH"] + ":/usr/sbin:/sbin"}
-    old = deb(former, "1:0.2.0", files=(
-        {"usr/bin/cosmic-applets": b"old shared host fixture"} if symlink else {target: b"old bundled client"}
-    ), symlinks={target: "cosmic-applets"} if symlink else None)
-    run([*install, old], env=environment)
-    assert (root / target).is_symlink() == symlink
-    app = deb("claw-app-transfer", extra={
-        "Breaks": f"{former} (<< {bound})", "Replaces": f"{former} (<< {bound})",
-    }, files={target: b"independent client"})
-    assert run([*install, app], check=False, env=environment).returncode != 0
-    platform = deb(former, bound, files={"usr/share/clawos-fixture/platform": b"OS interfaces only"})
-    run([*install, platform], env=environment)
-    run([*install, app], env=environment)
-    assert (root / target).read_bytes() == b"independent client"
-    assert not (root / target).is_symlink()
-    assert private.read_bytes() == b"unchanged exact identity grants"
-    later = deb(former, "1:0.5.0", files={target: b"unrelated new OS file"})
-    assert run([*install, later], check=False, env=environment).returncode != 0
-
-
-@pytest.mark.parametrize("old_runtime", ["yuos-app-runtime-v1", "yuos-app-runtime-v1 (= 0.2.0)"])
+@pytest.mark.parametrize("old_runtime", ["yuos-app-runtime-v1", "yuos-app-runtime-v1 (= 0.0.9)"])
 def test_independent_support_requires_the_coordinated_runtime_implementation_without_a_desktop(
     tmp_path, deb, signing, old_runtime,
 ):
-    release.build(release.make_plan("support", "0.2.1"), "all", tmp_path / "packages")
-    support = tmp_path / "packages/claw-app-support_0.2.1_all.deb"
+    release.build(release.make_plan("support", "0.1.0"), "all", tmp_path / "packages")
+    support = tmp_path / "packages/yuos-app-support_0.1.0_all.deb"
     extra = {"Provides": old_runtime + ", python3 (= 3.13), python3-idna (= 3.3)"}
-    old = deb("claw-app-fixture-runtime", "0.2.0", extra=extra)
+    old = deb("yuos-app-fixture-runtime", "0.0.9", extra=extra)
     repository = compose([old, support], tmp_path / "repository", signing, initialize=True)
     apt = IsolatedApt(tmp_path / "root", repository, signing)
     apt.update()
-    assert apt.call("install", "-y", "claw-app-support", check=False).returncode != 0
-    extra["Provides"] = "yuos-app-runtime-v1 (= 0.2.1), python3 (= 3.13), python3-idna (= 3.3)"
-    current = deb("claw-app-fixture-runtime", "0.2.1", extra=extra)
+    assert apt.call("install", "-y", "yuos-app-support", check=False).returncode != 0
+    extra["Provides"] = "yuos-app-runtime-v1 (= 0.1.0), python3 (= 3.13), python3-idna (= 3.3)"
+    current = deb("yuos-app-fixture-runtime", "0.1.0", extra=extra)
     updated = compose([current], tmp_path / "updated", signing, previous=repository)
     shutil.rmtree(repository)
     updated.rename(repository)
     apt.update()
-    apt.call("install", "-y", "claw-app-support")
-    assert apt.installed("claw-app-support") == "0.2.1"
-    assert apt.installed("claw-app-fixture-runtime") == "0.2.1"
+    apt.call("install", "-y", "yuos-app-support")
+    assert apt.installed("yuos-app-support") == "0.1.0"
+    assert apt.installed("yuos-app-fixture-runtime") == "0.1.0"
     assert not (apt.root / "usr/bin/cosmic-session").exists()
 
 
@@ -261,11 +226,11 @@ def test_actual_app_catalog_metadata_survives_signed_apt_indexing(tmp_path, sign
                          tmp_path / "repository", signing, initialize=True)
     apt = IsolatedApt(tmp_path / "root", repository, signing)
     apt.update()
-    record = fields(run(["apt-cache", "show", "claw-cap-storage-sdk"], env={
+    record = fields(run(["apt-cache", "show", "yuos-cap-storage-sdk"], env={
         "APT_CONFIG": str(apt.configuration),
     }).stdout.decode().strip())
     assert record["Version"] == "1.2.3"
-    assert record["X-Claw-Product"] == "storage-sdk"
-    assert record["X-Claw-Source-Kind"] == "capability"
-    assert record["X-Claw-Variant"] == "agent"
-    assert record["X-Claw-App-Ids"] == "db, kv"
+    assert record["X-YuOS-Product"] == "storage-sdk"
+    assert record["X-YuOS-Source-Kind"] == "capability"
+    assert record["X-YuOS-Variant"] == "agent"
+    assert record["X-YuOS-App-Ids"] == "db, kv"

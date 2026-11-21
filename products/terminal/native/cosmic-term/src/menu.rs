@@ -218,11 +218,11 @@ pub fn menu_bar<'a>(
                 (
                     fl!("file"),
                     vec![
-                        MenuItem::Button(fl!("ask-claw"), None, Action::AskClaw),
+                        MenuItem::Button(fl!("ask-yu"), None, Action::AskYu),
                         MenuItem::Button(
-                            fl!("ask-claw-explain"),
+                            fl!("ask-yu-explain"),
                             None,
-                            Action::AskClawExplain,
+                            Action::AskYuExplain,
                         ),
                         MenuItem::Divider,
                         MenuItem::Button(fl!("new-tab"), None, Action::TabNew),

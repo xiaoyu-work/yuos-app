@@ -181,9 +181,9 @@ def _library_tree(root: Path, *, payload: bool = False) -> dict:
 
 
 def _library_target(path: Path, destination: Path) -> Path:
-    target = destination / "usr/lib/cos/python" / path.name
+    target = destination / "usr/lib/yuos/python" / path.name
     parents = [destination, *(destination / part for part in (
-        "usr", "usr/lib", "usr/lib/cos", "usr/lib/cos/python",
+        "usr", "usr/lib", "usr/lib/yuos", "usr/lib/yuos/python",
     ))]
     expected = _library_tree(path, payload=True)
     if (
@@ -213,7 +213,7 @@ def stage_shared(destination: Path) -> Path:
         _library_target(path, destination)
     for path in libraries:
         stage_library(path, destination)
-    return destination / "usr/lib/cos/python"
+    return destination / "usr/lib/yuos/python"
 
 
 def stage(product: str, destination: Path, app_ids: list[str] | None = None,
@@ -235,7 +235,7 @@ def stage(product: str, destination: Path, app_ids: list[str] | None = None,
         stage_library(path, destination)
     for app_id in installed:
         app = apps[app_id]
-        target = destination / "usr/lib/cos/apps" / app.relative_to(source / "apps")
+        target = destination / "usr/lib/yuos/apps" / app.relative_to(source / "apps")
         shutil.copytree(app, target, symlinks=True, ignore=IGNORE)
         stage_ui(source, package, app_id, target, kind=kind)
     extension = package.get("extension")

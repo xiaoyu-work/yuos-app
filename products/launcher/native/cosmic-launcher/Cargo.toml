@@ -6,7 +6,7 @@ edition = "2024"
 rust-version = "1.93"
 
 [[bin]]
-name = "claw-launcher"
+name = "yuos-launcher"
 path = "src/main.rs"
 
 [features]
@@ -17,9 +17,9 @@ console = ["tokio/tracing"]
 [dependencies]
 anyhow = "1"
 async-trait = "0.1"
-claw-app-gui-argv = { path = "../../../../shared/rust/gui-argv" }
-claw-os-sdk = { path = "../../../claw-os-sdk/rust" }
-cos-runtime = { path = "../../../cos-runtime/rust" }
+yuos-app-gui-argv = { path = "../../../../shared/rust/gui-argv" }
+yuos-sdk = { path = "../../../yuos-sdk/rust" }
+yuos-runtime = { path = "../../../yuos-runtime/rust" }
 console-subscriber = "0.5.0"
 futures = "0.3.31"
 i18n-embed = { version = "0.16", features = [
@@ -69,7 +69,7 @@ zbus = { version = "5.13", default-features = false, features = ["tokio"] }
 # Opt out of repo-root workspace; this crate has its own dependency graph.
 
 # Build the shell against the vendored toolkit rather than upstream libcosmic.
-# ClawOS restyles system chrome (popup shells, tooltips, menus) inside
+# YuOS restyles system chrome (popup shells, tooltips, menus) inside
 # `desktop/toolkit`; without this patch the launcher would keep resolving the
 # pinned upstream crate and render stock COSMIC grey instead.
 [patch.'https://github.com/pop-os/libcosmic']

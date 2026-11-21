@@ -25,10 +25,10 @@ def main():
     try:
         libraries = prepare_exports(download=False)
         installed = fixture / "installed"
-        stage("launcher", installed, ["claw-launcher"])
+        stage("launcher", installed, ["yuos-launcher"])
         python = stage_shared(installed)
-        shutil.copytree(libraries["python-sdk"] / "claw_os_sdk", python / "claw_os_sdk", ignore=IGNORE)
-        shutil.copytree(libraries["python-runtime"] / "cos_runtime", python / "cos_runtime", ignore=IGNORE)
+        shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)
+        shutil.copytree(libraries["python-runtime"] / "yuos_runtime", python / "yuos_runtime", ignore=IGNORE)
         applications = fixture / "applications"
         applications.mkdir()
         for name in ("Editor", "Other"):
@@ -62,20 +62,20 @@ def main():
             "--tmpfs", "/usr/local/bin",
         ]
         for library in Path("/usr/lib").iterdir():
-            if library.name != "cos":
+            if library.name != "yuos":
                 command.extend(["--ro-bind", str(library), str(library)])
         command += [
             "--bind", str(fixture), "/fixture",
-            "--ro-bind", str(installed / "usr/lib/cos"), "/usr/lib/cos",
+            "--ro-bind", str(installed / "usr/lib/yuos"), "/usr/lib/yuos",
             "--ro-bind", str(broker), "/usr/local/bin/yu",
-            "--setenv", "COS_MCP_SERVER", "1",
-            "--setenv", "COS_APP_MANIFEST", "/usr/lib/cos/apps/claw-launcher/app.json",
-            "--setenv", "COS_DATA_DIR", "/fixture/data",
+            "--setenv", "YUOS_MCP_SERVER", "1",
+            "--setenv", "YUOS_APP_MANIFEST", "/usr/lib/yuos/apps/yuos-launcher/app.json",
+            "--setenv", "YUOS_DATA_DIR", "/fixture/data",
             "--setenv", "XDG_DATA_HOME", "/fixture",
             "--setenv", "XDG_DATA_DIRS", "/fixture",
-            "--setenv", "CLAW_COS_BIN", "/untrusted/must-not-execute",
-            "--setenv", "COS_BIN", "/untrusted/must-not-execute",
-            "--", str(ROOT / "build/native-target/debug/claw-launcher"),
+            "--setenv", "YUOS_KERNEL_BIN", "/untrusted/must-not-execute",
+            "--setenv", "YUOS_BIN", "/untrusted/must-not-execute",
+            "--", str(ROOT / "build/native-target/debug/yuos-launcher"),
         ]
         # Existing host directories are never changed. Scratch mountpoints
         # live only on the namespace's fresh /run and /usr/lib filesystems.
@@ -105,7 +105,7 @@ def main():
         def call(tool, arguments):
             return request("tools/call", {
                 "name": f"launcher.{tool}", "arguments": arguments,
-                "_meta": {"claw-os.dev/call-context": {
+                "_meta": {"yuos.dev/call-context": {
                     "wire_version": 1, "call_id": f"fixture-{counter}",
                     "trace_id": "fixture", "session_id": "fixture",
                     "caller": {"kind": "system-agent", "id": "fixture", "owner_uid": 1000},

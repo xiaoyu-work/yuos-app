@@ -178,7 +178,7 @@ fn theme_resources_are_resolved_inside_the_app_not_forwarded_to_the_host() {
     std::fs::create_dir_all(&icons).unwrap();
     std::fs::write(root.join("index.theme"), "[Icon Theme]\nName=Fixture\nDirectories=scalable/apps\n[scalable/apps]\nSize=16\nType=Scalable\nMinSize=1\nMaxSize=512\nContext=Applications\n").unwrap();
     let name = format!(
-        "claw-fixture-{}-symbolic",
+        "yuos-fixture-{}-symbolic",
         fixture.root.file_name().unwrap().to_string_lossy()
     );
     let path = icons.join(format!("{name}.svg"));
@@ -188,7 +188,7 @@ fn theme_resources_are_resolved_inside_the_app_not_forwarded_to_the_host() {
         Some(Icon::Mask { .. })
     ));
     assert!(
-        named_icon("claw-fixture-definitely-missing")
+        named_icon("yuos-fixture-definitely-missing")
             .unwrap()
             .is_none()
     );

@@ -7,12 +7,12 @@ calendar, task executor, telemetry authority or persistent state owner.
 | Path | Responsibility |
 | --- | --- |
 | `apps/widget-rail/` | Existing identity, manifest-bound native GUI/MCP and exact original grants |
-| `native/claw-applet-widget-rail/src/app.rs` | Complete Today, AI Tasks, System Health and deterministic Suggestions cards |
-| `native/claw-applet-widget-rail/src/provider.rs` | Existing typed read-only callback seam and presentation records |
-| `native/claw-applet-widget-rail/src/main.rs`, `src/service.rs`, `src/mcp.rs` | MCP-first entry and shared read-only public OS SDK clients |
-| `native/claw-applet-widget-rail/build.rs`, `justfile` | Product-owned localized desktop generation and binary installation |
-| `native/claw-applet-widget-rail/i18n/`, `data/` | Original UI/desktop translations and desktop entry |
-| `native/claw-applet-widget-rail/test/unit/` | Original rendering/state helpers and provider/update regressions |
+| `native/yuos-applet-widget-rail/src/app.rs` | Complete Today, AI Tasks, System Health and deterministic Suggestions cards |
+| `native/yuos-applet-widget-rail/src/provider.rs` | Existing typed read-only callback seam and presentation records |
+| `native/yuos-applet-widget-rail/src/main.rs`, `src/service.rs`, `src/mcp.rs` | MCP-first entry and shared read-only public OS SDK clients |
+| `native/yuos-applet-widget-rail/build.rs`, `justfile` | Product-owned localized desktop generation and binary installation |
+| `native/yuos-applet-widget-rail/i18n/`, `data/` | Original UI/desktop translations and desktop entry |
+| `native/yuos-applet-widget-rail/test/unit/` | Original rendering/state helpers and provider/update regressions |
 | `native/test_build.py` | Complete native staging and independent build contract |
 | `native/Cargo.lock`, `../../tools/native_build.py` | Locked native build against the immutable shared toolkit |
 | `PROVENANCE.md`, `native/LICENSE` | Preserved origin and GPL terms |
@@ -40,7 +40,7 @@ The product imports no other App or OS implementation.
 
 ## Read-only MCP and owning Web cards
 
-The same real `bin/claw-applet-widget-rail` serves the native UI and lazy stdio
+The same real `bin/yuos-applet-widget-rail` serves the native UI and lazy stdio
 MCP. Dispatch precedes GUI initialization and the original direct `--version`
 handling; other native arguments retain their ignored behavior.
 
@@ -83,16 +83,16 @@ python3 tools/stage.py desktop-widgets --root build/widget-stage
 ```
 
 The installed identity remains `widget-rail` / `com.yuos.AppletWidgetRail`.
-The product's `just install` copies the actual `/usr/bin/claw-applet-widget-rail`
+The product's `just install` copies the actual `/usr/bin/yuos-applet-widget-rail`
 ELF and generated desktop entry. `native_payload` preserves that ELF, resources
 and original GPL license inside the package-local App; source staging never
 fabricates a runnable binary. Compatibility launchers use the common Host.
 Canonical native builds select the shared App build helper for the exact
 current Cargo-reported desktop entry; custom target directories and Cargo
 output-layout changes do not select a guessed or stale `xdgen` file.
-The binary no longer needs `claw-os-applet-provider`; shared release metadata
-requires the Agent-provided `claw-os-calendar-read-v1 (= 1)` and
-`claw-os-observation-v1 (= 1)` interfaces. `cosmic-applets` reads
+The binary no longer needs `yuos-applet-provider`; shared release metadata
+requires the Agent-provided `yuos-calendar-read-v1 (= 1)` and
+`yuos-observation-v1 (= 1)` interfaces. `cosmic-applets` reads
 none of its source/assets. The recipe requires an explicit non-root staging
 `rootdir`; it installs files, never permissions or installed-system hooks.
 Original UI tests remain and the integration test

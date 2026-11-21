@@ -1,6 +1,6 @@
 """Private adapters over Store's compiled-in catalog and OS policy/snapshots."""
 
-from cos_runtime import policy, snapshot
+from yuos_runtime import policy, snapshot
 import shutil
 import stat
 
@@ -14,7 +14,7 @@ def dispatch(request):
     if operation == "show":
         return backend.cmd_show([args["name"]])
     if operation == "remove_data":
-        if os.environ.get("COS_MCP_SERVER") == "1":
+        if os.environ.get("YUOS_MCP_SERVER") == "1":
             raise ValueError("human UI data deletion is unavailable in MCP")
         path = args["path"]
         if not isinstance(path, str) or not path or "\0" in path:
@@ -22,7 +22,7 @@ def dispatch(request):
         path = os.path.abspath(path)
         policy.require("fs.delete", path=path)
         metadata = os.lstat(path)
-        snapshot.snapshot(path, "rm", session_id=os.environ.get("COS_SESSION") or None)
+        snapshot.snapshot(path, "rm", session_id=os.environ.get("YUOS_SESSION") or None)
         if stat.S_ISDIR(metadata.st_mode):
             shutil.rmtree(path)
         else:

@@ -17,12 +17,12 @@ NATIVE = PRODUCT / "native/cosmic-files"
 
 @pytest.fixture
 def bridge(monkeypatch, tmp_path):
-    monkeypatch.setenv("COS_OWNER_HOME", str(tmp_path))
+    monkeypatch.setenv("YUOS_OWNER_HOME", str(tmp_path))
     module = load_local_module(NATIVE / "product_bridge.py", "files_native_bridge")
     module.fs = load_local_module(PRODUCT / "apps/fs/main.py", "files_native_fs")
     module.recoll = load_local_module(PRODUCT / "apps/docs/main.py", "files_native_recoll")
     module.document = load_local_module(
-        PRODUCT / "python/claw_files/document.py", "files_native_document",
+        PRODUCT / "python/yuos_files/document.py", "files_native_document",
     )
     with mock.patch.object(module.policy, "require") as require:
         module.require_fixture = require
@@ -113,9 +113,9 @@ def test_stages_complete_source_both_binaries_and_package_separation(tmp_path):
     assert (staged / "fs_backend.py").read_bytes() == (PRODUCT / "apps/fs/main.py").read_bytes()
     assert (staged / "recoll_backend.py").read_bytes() == (PRODUCT / "apps/docs/main.py").read_bytes()
     assert stage.stage("files", tmp_path / "desktop", ["cosmic-files"]) == ["cosmic-files"]
-    assert not (tmp_path / "desktop/usr/lib/cos/python").exists()
+    assert not (tmp_path / "desktop/usr/lib/yuos/python").exists()
     assert stage.stage("files", tmp_path / "agent", ["fs", "docs"]) == ["fs", "docs"]
-    assert (tmp_path / "agent/usr/lib/cos/python/claw_files/document.py").is_file()
+    assert (tmp_path / "agent/usr/lib/yuos/python/yuos_files/document.py").is_file()
 
 
 def test_document_reader_keeps_authorized_descriptor(bridge, tmp_path):
@@ -150,15 +150,15 @@ def test_gui_mutation_snapshots_original_bytes_and_mcp_environment_is_rejected(
 ):
     file = tmp_path / "file"
     file.write_bytes(b"before")
-    monkeypatch.setenv("COS_SESSION", "gui-session")
-    monkeypatch.delenv("COS_MCP_SERVER", raising=False)
+    monkeypatch.setenv("YUOS_SESSION", "gui-session")
+    monkeypatch.delenv("YUOS_MCP_SERVER", raising=False)
     seen = []
     with mock.patch.object(bridge.fs.snapshot, "snapshot", side_effect=lambda path, op, **kw:
                            seen.append((Path(path).read_bytes(), op, kw))):
         invoke(bridge, "write_bytes", path=str(file), content=[0, 255, 65])
     assert file.read_bytes() == b"\x00\xffA"
     assert seen == [(b"before", "write_bytes", {"session_id": "gui-session"})]
-    monkeypatch.setenv("COS_MCP_SERVER", "1")
+    monkeypatch.setenv("YUOS_MCP_SERVER", "1")
     with pytest.raises(ValueError, match="MCP process"):
         invoke(bridge, "rm", path=str(file))
     assert file.exists()

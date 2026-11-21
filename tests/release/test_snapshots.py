@@ -263,7 +263,7 @@ def test_apt_signature_cannot_authorize_changed_app_bytes(tmp_path, runtime, sig
     candidate = tmp_path / "tampered.tar.gz"
     snapshots.write_archive(root, snapshots.tree_inventory(root, "all"), candidate)
     checksum = digest(candidate)
-    filename = f"claw-app-snapshot-{checksum}.tar.gz"
+    filename = f"yuos-app-snapshot-{checksum}.tar.gz"
     candidate.rename(output / filename)
     old_archive.unlink()
     record["artifact"].update(file=filename, sha256=checksum, size=(output / filename).stat().st_size)
@@ -638,11 +638,11 @@ def test_complete_browser_and_mail_resources_remain_inside_signed_snapshots(tmp_
         staged = tmp_path / f"{product}-stage"
         stage.stage(product, staged, [app_id])
         root = tmp_path / f"{product}-snapshot"
-        shutil.copytree(staged / "usr/lib/cos/apps" / app_id, root, symlinks=True)
+        shutil.copytree(staged / "usr/lib/yuos/apps" / app_id, root, symlinks=True)
         resources = root / "assets"
         resources.mkdir()
         if product == "browser":
-            shutil.copytree(staged / "usr/share/claw/extensions/claw-agent-browser", resources / "extension")
+            shutil.copytree(staged / "usr/share/yuos/extensions/yuos-agent-browser", resources / "extension")
         else:
             shutil.copy2(staged / "usr/lib/thunderbird/distribution/extensions/yu-mail-ai@yuos.io.xpi",
                          resources / "yu-mail-ai@yuos.io.xpi")
@@ -774,22 +774,22 @@ def test_real_native_package_local_signed_acceptance(
 def test_real_panel_elf_and_original_resources_are_preserved(tmp_path, runtime, signing, app):
     _, sign = runtime
     installed = ROOT / "build/native-boundary-install/calendar"
-    binary = installed / "usr/bin/claw-applet-calendar"
+    binary = installed / "usr/bin/yuos-applet-calendar"
     if not binary.is_file():
         pytest.skip("Explicit candidate panel installer output is unavailable; this is not a native build substitute")
     root = app()
     (root / "bin").mkdir()
-    shutil.copy2(binary, root / "bin/claw-applet-calendar")
+    shutil.copy2(binary, root / "bin/yuos-applet-calendar")
     shutil.copytree(installed / "usr/share", root / "assets")
-    sign(root, entries=("server.py", "bin/claw-applet-calendar"))
+    sign(root, entries=("server.py", "bin/yuos-applet-calendar"))
     original = snapshots.tree_inventory(root, "amd64")
     catalog = build(root, tmp_path / "output", runtime, signing, architecture="amd64")
     archive = tmp_path / "output" / catalog["apps"][0]["artifact"]["file"]
     extracted = tmp_path / "extracted"
     snapshots.extract_archive(archive, extracted)
     assert snapshots.tree_inventory(extracted, "amd64") == original
-    assert (extracted / "bin/claw-applet-calendar").stat().st_mode & 0o777 == 0o755
-    assert digest(extracted / "bin/claw-applet-calendar") == digest(binary)
+    assert (extracted / "bin/yuos-applet-calendar").stat().st_mode & 0o777 == 0o755
+    assert digest(extracted / "bin/yuos-applet-calendar") == digest(binary)
     assert (extracted / "assets/applications/com.yuos.PanelCalendarButton.desktop").is_file()
     assert (extracted / "assets/icons/hicolor/scalable/actions/com.yuos.PanelCalendarButton-symbolic.svg").is_file()
 

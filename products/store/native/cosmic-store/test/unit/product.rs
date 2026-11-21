@@ -22,9 +22,9 @@ fn package_names_cannot_be_options_paths_or_launch_uris() {
 
 #[test]
 fn mcp_process_cannot_use_human_filesystem_adapters() {
-    let previous = std::env::var_os("COS_MCP_SERVER");
+    let previous = std::env::var_os("YUOS_MCP_SERVER");
     unsafe {
-        std::env::set_var("COS_MCP_SERVER", "1");
+        std::env::set_var("YUOS_MCP_SERVER", "1");
     }
     assert!(crate::yuos_glue::read_bytes(std::path::Path::new("/not-accessed")).is_err());
     assert!(crate::yuos_glue::fs_rm(std::path::Path::new("/not-accessed")).is_err());
@@ -42,8 +42,8 @@ fn mcp_process_cannot_use_human_filesystem_adapters() {
     );
     unsafe {
         match previous {
-            Some(value) => std::env::set_var("COS_MCP_SERVER", value),
-            None => std::env::remove_var("COS_MCP_SERVER"),
+            Some(value) => std::env::set_var("YUOS_MCP_SERVER", value),
+            None => std::env::remove_var("YUOS_MCP_SERVER"),
         }
     }
 }

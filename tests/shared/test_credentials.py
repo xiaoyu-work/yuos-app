@@ -9,12 +9,12 @@ from _shared import credentials
 
 class CredentialLoaderTests(unittest.TestCase):
     def setUp(self):
-        self.binary = mock.patch.dict(credentials.os.environ, {"COS_BIN": "/fixture/cos"})
+        self.binary = mock.patch.dict(credentials.os.environ, {"YUOS_BIN": "/fixture/yu"})
         self.binary.start()
         self.addCleanup(self.binary.stop)
 
     @mock.patch.object(credentials.subprocess, "run")
-    def test_loads_value_from_cos_json(self, run):
+    def test_loads_value_from_yu_json(self, run):
         run.return_value = mock.MagicMock(
             returncode=0,
             stdout=json.dumps({"value": "secret-value"}),
@@ -49,7 +49,7 @@ class CredentialLoaderTests(unittest.TestCase):
         )
         for app_id in ("pkg", "mail-ai", "user-owned-example"):
             with self.subTest(app_id=app_id), mock.patch.dict(
-                credentials.os.environ, {"COS_APP_ID": app_id},
+                credentials.os.environ, {"YUOS_APP_ID": app_id},
             ):
                 value, error = credentials.load_credential("TOKEN", namespace="owner")
                 self.assertIsNone(value)
@@ -58,7 +58,7 @@ class CredentialLoaderTests(unittest.TestCase):
                 self.assertNotIn("must-not-be-accepted", error)
                 self.assertEqual(
                     run.call_args.args[0],
-                    ["/fixture/cos", "credential", "load", "TOKEN", "--namespace", "owner"],
+                    ["/fixture/yu", "credential", "load", "TOKEN", "--namespace", "owner"],
                 )
 
 

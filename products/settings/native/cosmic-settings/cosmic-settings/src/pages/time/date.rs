@@ -304,7 +304,7 @@ impl Page {
     }
 
     fn timezone_context_view(&self) -> Element<'_, crate::pages::Message> {
-        let mut list = crate::widget::claw_list_column();
+        let mut list = crate::widget::yuos_list_column();
 
         let search_input = &self.timezone_search.trim().to_lowercase();
 
@@ -361,7 +361,7 @@ fn date() -> Section<crate::pages::Message> {
         .title(fl!("time-date"))
         .descriptions(descriptions)
         .view::<Page>(move |_binder, page, section| {
-            let mut section = crate::widget::claw_section()
+            let mut section = crate::widget::yuos_section()
                 .title(&section.title)
                 .add(
                     settings::item::builder(&*section.descriptions[title])
@@ -388,7 +388,7 @@ fn format() -> Section<crate::pages::Message> {
         .title(fl!("time-format"))
         .descriptions(descriptions)
         .view::<Page>(move |_binder, page, section| {
-            crate::widget::claw_section()
+            crate::widget::yuos_section()
                 .title(&section.title)
                 // 24-hour toggle
                 .add(
@@ -448,7 +448,7 @@ fn timezone() -> Section<crate::pages::Message> {
         .title(fl!("time-zone"))
         .descriptions(descriptions)
         .view::<Page>(move |_binder, page, section| {
-            crate::widget::claw_section()
+            crate::widget::yuos_section()
                 .title(&section.title)
                 // Time zone select
                 .add(crate::widget::go_next_with_item(

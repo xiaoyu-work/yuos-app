@@ -10,9 +10,9 @@
   },
   "icon": "com.yuos.PanelCalendarButton-symbolic",
   "runtime": "binary",
-  "entry": "bin/claw-applet-calendar",
+  "entry": "bin/yuos-applet-calendar",
   "mcp": {
-    "entry": "bin/claw-applet-calendar",
+    "entry": "bin/yuos-applet-calendar",
     "transport": "stdio",
     "lifecycle": "lazy",
     "tools": [

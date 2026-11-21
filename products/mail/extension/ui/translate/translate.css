@@ -1,9 +1,9 @@
 .translate-popup { width: 440px; }
 
 .translation {
-  background: var(--claw-panel);
-  border: 1px solid var(--claw-border);
-  border-radius: var(--claw-radius);
+  background: var(--yuos-panel);
+  border: 1px solid var(--yuos-border);
+  border-radius: var(--yuos-radius);
   padding: 10px 12px;
   margin: 10px 0 0 0;
   white-space: pre-wrap;

@@ -2,14 +2,14 @@ use super::*;
 
 #[test]
 fn mcp_cannot_use_human_ui_mutation_adapter() {
-    let previous = std::env::var_os("COS_MCP_SERVER");
-    unsafe { std::env::set_var("COS_MCP_SERVER", "1") };
+    let previous = std::env::var_os("YUOS_MCP_SERVER");
+    unsafe { std::env::set_var("YUOS_MCP_SERVER", "1") };
     let mkdir = files::mkdir("/not-accessed/terminal-fixture");
     let write = files::write("/not-accessed/terminal-fixture", "not written");
     unsafe {
         match previous {
-            Some(value) => std::env::set_var("COS_MCP_SERVER", value),
-            None => std::env::remove_var("COS_MCP_SERVER"),
+            Some(value) => std::env::set_var("YUOS_MCP_SERVER", value),
+            None => std::env::remove_var("YUOS_MCP_SERVER"),
         }
     }
     assert!(mkdir.unwrap_err().to_string().contains("unavailable in MCP"));

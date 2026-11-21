@@ -1,4 +1,4 @@
-"""systemd — native service control through the privileged clawd broker."""
+"""systemd — native service control through the privileged yuosd broker."""
 
 import json
 import os
@@ -9,14 +9,14 @@ import sys
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
 UNIT_RE = re.compile(
     r"^[A-Za-z0-9_][A-Za-z0-9_.@:-]*\.(service|socket|timer|mount|target|path)$"
 )
 QUERY_TIMEOUT_SECS = 30
-CONTROL_TIMEOUT_SECS = int(os.environ.get("CLAW_SYSTEMD_TIMEOUT", "180"))
+CONTROL_TIMEOUT_SECS = int(os.environ.get("YUOS_SYSTEMD_TIMEOUT", "180"))
 MUTATING = frozenset({"start", "stop", "restart", "reload", "enable", "disable"})
 
 
@@ -32,19 +32,19 @@ def _validate_unit(unit: str) -> None:
         )
 
 
-def _cos_binary() -> str | None:
-    return os.environ.get("COS_BIN") or shutil.which("yu")
+def _yu_binary() -> str | None:
+    return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _broker(action: str, unit: str) -> dict:
-    cos_bin = _cos_binary()
-    if not cos_bin:
+    yu_bin = _yu_binary()
+    if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; privileged systemd broker unavailable"
         )
     try:
         result = subprocess.run(
-            [cos_bin, "__systemd", action, unit],
+            [yu_bin, "__systemd", action, unit],
             capture_output=True,
             text=True,
             timeout=QUERY_TIMEOUT_SECS if action == "status" else CONTROL_TIMEOUT_SECS,

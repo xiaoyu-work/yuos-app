@@ -41,8 +41,8 @@ user-data import or new namespace is introduced.
 
 ## Ownership and dependency contracts
 
-The only nonstandard imports are `claw_os_sdk.ai.chat`, `claw_os_sdk.mcp.App`
-and the existing `cos_runtime.policy.require` / `cos_runtime.memory.remember`
+The only nonstandard imports are `yuos_sdk.ai.chat`, `yuos_sdk.mcp.App`
+and the existing `yuos_runtime.policy.require` / `yuos_runtime.memory.remember`
 client adapters. These carry versioned App requests; OS implementation ownership
 does not make their interface an entitlement reserved for bundled clients.
 Every App requires the same authenticated Host, capability and sandbox contract,
@@ -66,7 +66,7 @@ OS admission exceptions require coordinated follow-up. These client tests do
 not establish that the entire unified integration is already implemented.
 
 All four original files came from
-[`xiaoyu-work/claw-os` at `de07416d4b8146d05354b8e80ed3e9f47794240e`](https://github.com/xiaoyu-work/claw-os/tree/de07416d4b8146d05354b8e80ed3e9f47794240e/apps/summarize).
+[`xiaoyu-work/Yu-OS` at `de07416d4b8146d05354b8e80ed3e9f47794240e`](https://github.com/xiaoyu-work/Yu-OS/tree/de07416d4b8146d05354b8e80ed3e9f47794240e/apps/summarize).
 Implementation, server, original tests and file modes are preserved; only the
 AI scope binding is corrected as described above. First-party Apache-2.0
 attribution remains covered by the root [LICENSE](../../LICENSE).

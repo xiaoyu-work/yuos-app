@@ -29,7 +29,7 @@ def test_shared_stages_exact_app_libraries_once_without_platform_or_apps(source,
     _, shared = source
     root = tmp_path / "installed"
     python = stage.stage_shared(root)
-    assert python == root / "usr/lib/cos/python"
+    assert python == root / "usr/lib/yuos/python"
     assert {path.name for path in python.iterdir()} == set(stage.SHARED_LIBRARIES)
     before = {}
     for name in stage.SHARED_LIBRARIES:
@@ -37,9 +37,9 @@ def test_shared_stages_exact_app_libraries_once_without_platform_or_apps(source,
         before[name] = (python / name).stat().st_ino
     assert stage.stage_shared(root) == python
     assert {name: (python / name).stat().st_ino for name in before} == before
-    assert not (root / "usr/lib/cos/apps").exists()
-    assert not (python / "claw_os_sdk").exists()
-    assert not (python / "cos_runtime").exists()
+    assert not (root / "usr/lib/yuos/apps").exists()
+    assert not (python / "yuos_sdk").exists()
+    assert not (python / "yuos_runtime").exists()
     assert not (root / "var").exists()
 
 
@@ -101,7 +101,7 @@ def test_shared_conflicts_are_not_merged_or_overwritten(source, tmp_path, change
 
 
 def test_shared_module_conflict_is_preflighted_before_any_package_copy(source, tmp_path):
-    python = tmp_path / "installed/usr/lib/cos/python"
+    python = tmp_path / "installed/usr/lib/yuos/python"
     python.mkdir(parents=True)
     (python / "canonical_argv.py").write_text("conflicting module")
     with pytest.raises(ValueError, match="canonical_argv"):
@@ -134,7 +134,7 @@ def test_shared_cli_and_isolated_imports_need_no_sibling_os_checkout(source, tmp
     shutil.copy2(ROOT / "tools/stage.py", tools / "stage.py")
     shutil.copy2(ROOT / "tools/web_ui.py", tools / "web_ui.py")
     root = tmp_path / "installed"
-    assert not (repository.parent / "claw-os").exists()
+    assert not (repository.parent / "yuos").exists()
     assert not (repository / "apps").exists()
     result = subprocess.run(
         [sys.executable, "-I", "-B", str(tools / "stage.py"), "--shared", "--root", str(root)],
@@ -158,5 +158,5 @@ def test_shared_cli_and_isolated_imports_need_no_sibling_os_checkout(source, tmp
     payload = json.loads(result.stdout)
     assert all(Path(path).is_relative_to(python) for path in payload["modules"])
     assert payload["args"] == [["--literal"], {"label": "--urgent"}]
-    assert not (root / "usr/lib/cos/apps").exists()
+    assert not (root / "usr/lib/yuos/apps").exists()
     assert not list(root.rglob("*.pyc"))

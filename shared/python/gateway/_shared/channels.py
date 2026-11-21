@@ -1,7 +1,7 @@
 """Presentation-only client; Root owns channel admission and replay evidence."""
 
-from claw_os_sdk import channels
-from claw_os_sdk.mcp import current_context
+from yuos_sdk import channels
+from yuos_sdk.mcp import current_context
 from canonical_argv import parse_canonical_argv
 
 

@@ -8,14 +8,14 @@ import sys
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
-TIMEOUT_SECS = int(os.environ.get("CLAW_CAMERA_MANAGER_TIMEOUT", "180"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_CAMERA_MANAGER_TIMEOUT", "180"))
 
 
-def _cos_binary() -> str | None:
-    return os.environ.get("COS_BIN") or shutil.which("yu")
+def _yu_binary() -> str | None:
+    return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _broker(
@@ -27,12 +27,12 @@ def _broker(
     width: int | None = None,
     height: int | None = None,
 ) -> dict:
-    cos_bin = _cos_binary()
-    if not cos_bin:
+    yu_bin = _yu_binary()
+    if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Camera Manager broker unavailable"
         )
-    argv = [cos_bin, "__camera", action]
+    argv = [yu_bin, "__camera", action]
     for flag, value in [
         ("--node-id", node_id),
         ("--expected-serial", expected_serial),
@@ -55,11 +55,11 @@ def _broker(
         )
     except FileNotFoundError as exc:
         raise FileNotFoundError(
-            f"Camera Manager broker executable not found: {cos_bin}"
+            f"Camera Manager broker executable not found: {yu_bin}"
         ) from exc
     except PermissionError as exc:
         raise PermissionError(
-            f"permission denied launching Camera Manager broker: {cos_bin}"
+            f"permission denied launching Camera Manager broker: {yu_bin}"
         ) from exc
     except subprocess.TimeoutExpired as exc:
         raise TimeoutError(

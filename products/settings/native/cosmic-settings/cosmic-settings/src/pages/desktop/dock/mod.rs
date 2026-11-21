@@ -125,7 +125,7 @@ impl Default for Page {
             let panel_config = match CosmicPanelConfig::get_entry(config_helper) {
                 Ok(c) => c,
                 Err((errs, c)) => {
-                    // ClawOS: do not collapse the entire page to "Reset to Default"
+                    // YuOS: do not collapse the entire page to "Reset to Default"
                     // when a single field is missing from the system default schema —
                     // fall back to the partial result (which has every field that
                     // *was* readable, plus Default::default() for the missing ones).
@@ -180,7 +180,7 @@ pub(crate) fn enable() -> Section<crate::pages::Message> {
             let Some(container_config) = page.inner.container_config.as_ref() else {
                 return Element::from(text::body(fl!("unknown")));
             };
-            crate::widget::claw_section()
+            crate::widget::yuos_section()
                 .title(&section.title)
                 .add(
                     settings::item::builder(&descriptions[dock]).toggler(

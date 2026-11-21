@@ -6,7 +6,7 @@
 // Hot-path read-only enumerations (listing `~/.local/share/applications/`,
 // scanning font dirs, polling `/proc` via `sysinfo`, …) intentionally
 // stay on `std::fs` / `tokio::process` and are flagged at the call site
-// with `FIXME(claw)` — funnelling those through a subprocess would be
+// with `FIXME(yuos)` — funnelling those through a subprocess would be
 // far too expensive. See the per-app migration notes for the convention.
 //
 // `BridgeError::is_denied()` is surfaced as
@@ -18,7 +18,7 @@ use std::os::unix::process::ExitStatusExt;
 use std::path::Path;
 use std::process::{ExitStatus, Output};
 
-use cos_runtime::{BridgeError, ask_claw};
+use yuos_runtime::{BridgeError, ask_yu};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
@@ -40,7 +40,7 @@ fn path_str(p: &Path) -> io::Result<&str> {
 }
 
 fn human_ui() -> io::Result<()> {
-    if std::env::var("COS_MCP_SERVER").as_deref() == Ok("1") {
+    if std::env::var("YUOS_MCP_SERVER").as_deref() == Ok("1") {
         return Err(io::Error::new(
             io::ErrorKind::PermissionDenied, "human Settings access is unavailable in MCP",
         ));
@@ -52,7 +52,7 @@ fn human_ui() -> io::Result<()> {
 pub fn write_text(path: &Path, contents: &str) -> io::Result<()> {
     human_ui()?;
     let s = path_str(path)?;
-    cos_runtime::filesystem::write(s, contents).map(|_| ()).map_err(map_err)
+    yuos_runtime::filesystem::write(s, contents).map(|_| ()).map_err(map_err)
 }
 
 /// Create `path` and any missing parents. Mirrors `std::fs::create_dir_all`.
@@ -89,7 +89,7 @@ pub fn start(argv: &[&str]) -> io::Result<()> {
     }
     let mut args = vec!["proc", "spawn", "--"];
     args.extend_from_slice(argv);
-    let result = claw_os_sdk::cos_call_json("proc", "spawn", args).map_err(map_err)?;
+    let result = yuos_sdk::yu_call_json("proc", "spawn", args).map_err(map_err)?;
     if result["pid"].as_u64().is_none() || result["session_id"].as_str().is_none() {
         return Err(io::Error::other("process service did not confirm registration"));
     }
@@ -102,7 +102,7 @@ struct SettingsPageContext<'a> {
     title: &'a str,
 }
 
-impl ask_claw::Context for SettingsPageContext<'_> {
+impl ask_yu::Context for SettingsPageContext<'_> {
     const APP_ID: &'static str = "cosmic-settings";
 }
 
@@ -112,16 +112,16 @@ struct SettingsSearchContext<'a> {
     query: &'a str,
 }
 
-impl ask_claw::Context for SettingsSearchContext<'_> {
+impl ask_yu::Context for SettingsSearchContext<'_> {
     const APP_ID: &'static str = "cosmic-settings";
 }
 
-pub fn ask_claw_page(page: &str, title: &str) -> Result<(), ask_claw::LaunchError> {
-    ask_claw::launch(&SettingsPageContext { page, title })
+pub fn ask_yu_page(page: &str, title: &str) -> Result<(), ask_yu::LaunchError> {
+    ask_yu::launch(&SettingsPageContext { page, title })
 }
 
-pub fn ask_claw_search(query: &str) -> Result<(), ask_claw::LaunchError> {
-    ask_claw::launch(&SettingsSearchContext {
+pub fn ask_yu_search(query: &str) -> Result<(), ask_yu::LaunchError> {
+    ask_yu::launch(&SettingsSearchContext {
         mode: "search",
         query,
     })

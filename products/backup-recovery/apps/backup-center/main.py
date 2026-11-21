@@ -9,17 +9,17 @@ import sys
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
 CREDENTIAL_RE = re.compile(r"^[A-Za-z0-9_.:-]+/[A-Za-z0-9_.:-]+$")
 SNAPSHOT_ID_RE = re.compile(r"^[0-9A-Fa-f]{8,64}$")
 TAG_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
-TIMEOUT_SECS = int(os.environ.get("CLAW_BACKUP_CENTER_TIMEOUT", "10800"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_BACKUP_CENTER_TIMEOUT", "10800"))
 
 
-def _cos_binary() -> str | None:
-    return os.environ.get("COS_BIN") or shutil.which("yu")
+def _yu_binary() -> str | None:
+    return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _canonical_path(
@@ -122,12 +122,12 @@ def _broker(
     keep_monthly: int | None = None,
     confirm: bool = False,
 ) -> dict:
-    cos_bin = _cos_binary()
-    if not cos_bin:
+    yu_bin = _yu_binary()
+    if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Backup Center broker unavailable"
         )
-    argv = [cos_bin, "__backup", action, "--repo", repo, "--credential", credential]
+    argv = [yu_bin, "__backup", action, "--repo", repo, "--credential", credential]
     if source is not None:
         argv.extend(["--source", source])
     if destination is not None:
@@ -156,11 +156,11 @@ def _broker(
         )
     except FileNotFoundError as exc:
         raise FileNotFoundError(
-            f"Backup Center broker executable not found: {cos_bin}"
+            f"Backup Center broker executable not found: {yu_bin}"
         ) from exc
     except PermissionError as exc:
         raise PermissionError(
-            f"permission denied launching Backup Center broker: {cos_bin}"
+            f"permission denied launching Backup Center broker: {yu_bin}"
         ) from exc
     except subprocess.TimeoutExpired as exc:
         raise TimeoutError(

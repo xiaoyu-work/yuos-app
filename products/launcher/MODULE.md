@@ -1,7 +1,7 @@
 # Launcher Product
 
 Own the Python `launcher` App's five MCP tools and the complete native
-`claw-launcher` executable, UI, four-tool MCP surface and build/resources.
+`yuos-launcher` executable, UI, four-tool MCP surface and build/resources.
 
 | Path | Responsibility |
 | --- | --- |
@@ -9,7 +9,7 @@ Own the Python `launcher` App's five MCP tools and the complete native
 | `apps/launcher/main.py` | XDG desktop catalog, localized search, typed launch requests and recent-file handling |
 | `apps/launcher/server.py` | Direct SDK list/find/open/recent/is-running handlers |
 | `apps/launcher/test_main.py` | Desktop parsing, scopes, URI/path safety, broker errors, recent state and SDK dispatch |
-| `apps/claw-launcher/` | Signed native identity, permissions and authenticated adapter contracts |
+| `apps/yuos-launcher/` | Signed native identity, permissions and authenticated adapter contracts |
 | `native/cosmic-launcher/` | Complete GPL UI, compiled-in MCP adapter, upstream packaging/resources and Rust tests |
 | `native/cosmic-launcher/src/argparse.rs`, `native/cosmic-launcher/test/unit/argparse.rs` | Native subcommands, bounded Host GUI selector adaptation and parser regressions |
 | `native/PROVENANCE.md` | Source origin, license and shared OS backend ownership |
@@ -24,7 +24,7 @@ calling another App's business/MCP interface.
 
 Catalog reads retain declared filesystem scopes; is-running retains
 `proc.observe` Wild authority. Recent history retains its existing locked,
-atomic `COS_DATA_DIR/launcher/recent.jsonl` layout. No runtime state is copied.
+atomic `YUOS_DATA_DIR/launcher/recent.jsonl` layout. No runtime state is copied.
 The isolated App Host data directory is not automatically shared shell history;
 native catalog/history integration must be explicit. No writable OS state
 mounts or additional grants are introduced.
@@ -33,7 +33,7 @@ The native MCP process embeds the canonical product implementation
 (`apps/launcher/main.py`) at compile time and serves it through the Python SDK,
 not an App intercall or mutable helper script. Its fixed isolated interpreter
 imports packaged OS SDK/runtime and App-owned common libraries from
-`/usr/lib/cos/python`; the host's identity,
+`/usr/lib/yuos/python`; the host's identity,
 authenticated transport and per-App data directory are preserved. Both MCP
 surfaces reuse catalog, launch validation and recent-file logic, without
 merging grants or data partitions. Native extras preserve order, accepting
@@ -52,7 +52,7 @@ approval and is never inherited by MCP tools. It grants no catalog/history,
 application-launch, clipboard or global-input authority. Backend/resource
 admission remains an independent installed-runtime prerequisite.
 The native package explicitly depends on the Agent-provided
-`claw-os-launcher-backend-v1 (= 1)`. The unprivileged backend, original plugin
+`yuos-launcher-backend-v1 (= 1)`. The unprivileged backend, original plugin
 manifests, scripts and licenses remain OS-owned and no longer require Desktop
 ownership. Availability is not authority: catalog/history, launch and overlay
 resources still require their own normal App grants and controlled admission.
@@ -61,7 +61,7 @@ For a managed GUI launch, the existing SDK mode hint selects direct toolkit
 startup and opens the original palette without session-bus activation or the
 legacy hidden dummy surface. Input/AltTab activation shares the same command
 handling as the legacy single-instance path. Closing the managed palette exits
-its process for normal `clawd` retirement; ordinary desktop CLI startup keeps
+its process for normal `yuosd` retirement; ordinary desktop CLI startup keeps
 its original background/single-instance behavior. The hint supplies no
 authority, and source/build checks do not establish installed GUI acceptance.
 
@@ -79,19 +79,19 @@ The last command needs Linux bubblewrap and exercises the actual executable
 with installed-layout SDK imports, an authenticated fixture transport and fake
 policy/launch services. It never uses live desktop entries or user history.
 
-`native_payload` prepares the real `bin/claw-launcher` as the shared signed
+`native_payload` prepares the real `bin/yuos-launcher` as the shared signed
 GUI/MCP entry, without moving the OS launcher backend or common Python support.
-The installed `claw-launcher` command enters `yu app claw-launcher --gui`; this does not
+The installed `yuos-launcher` command enters `yu app yuos-launcher --gui`; this does not
 grant desktop transport, catalog/history access or activate resources. See
 [native payloads](../../docs/native-payloads.md).
 
-The same `claw-app-launcher-desktop` package replaces the former native
+The same `yuos-app-launcher-desktop` package replaces the former native
 identity and command. `com.yuos.Launcher` and the separate `launcher` App
 stay unchanged. The new signed identity does not inherit grants or private
 App data from `cosmic-launcher`.
 
 After the existing MCP dispatch, the native parser uses the App-owned
-`claw-app-gui-argv` library to remove one exact `--gui` at argv[1] only when the
+`yuos-app-gui-argv` library to remove one exact `--gui` at argv[1] only when the
 versioned SDK reports GUI mode. All remaining arguments go through the original
 Clap grammar, including `input -- --gui`. Direct CLI errors, help/version,
 single-instance command serialization and authenticated session state are unchanged.

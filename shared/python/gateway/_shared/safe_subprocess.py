@@ -16,8 +16,8 @@ wrappers enforce:
 
 * **Scrubbed environment.** Only an explicit allowlist of variables
   is passed through to the child. ``yu credential load`` does need
-  ``HOME`` and ``COS_*`` to function, but it does not need (and
-  should not see) ad-hoc tokens like ``COS_SLACK_TOKEN`` that the
+  ``HOME`` and ``YUOS_*`` to function, but it does not need (and
+  should not see) ad-hoc tokens like ``YUOS_SLACK_TOKEN`` that the
   caller set just to authenticate this particular send.
 
 * **Token redaction.** :func:`safe_credential_load` returns the
@@ -35,10 +35,10 @@ from typing import Iterable, Mapping, Optional, Sequence, Tuple
 
 
 # Default allowlist — every gateway needs at least these. Callers
-# extend per-invocation when they need more (e.g. ``COS_BIN``).
+# extend per-invocation when they need more (e.g. ``YUOS_BIN``).
 DEFAULT_ENV_ALLOWLIST: Tuple[str, ...] = (
     "HOME",
-    "COS_HOME",
+    "YUOS_HOME",
     "USER",
     "LOGNAME",
     "PATH",
@@ -47,13 +47,13 @@ DEFAULT_ENV_ALLOWLIST: Tuple[str, ...] = (
     "LC_CTYPE",
     "TMPDIR",
     "TZ",
-    "COS_SESSION",
-    "COS_DATA_DIR",
-    "COS_PROC_DATA_DIR",
-    "COS_APP_ID",
-    "COS_PERMS_MODE",
-    "COS_BIN",
-    "COS_VERSION",
+    "YUOS_SESSION",
+    "YUOS_DATA_DIR",
+    "YUOS_PROC_DATA_DIR",
+    "YUOS_APP_ID",
+    "YUOS_PERMS_MODE",
+    "YUOS_BIN",
+    "YUOS_VERSION",
     # Windows-specific minimal set so subprocess works there too.
     "SYSTEMROOT",
     "WINDIR",
@@ -152,14 +152,14 @@ def safe_credential_load(
     name: str,
     *,
     timeout: float = 10.0,
-    cos_bin: str = "yu",
+    yu_bin: str = "yu",
 ) -> Tuple[Optional[str], Optional[str]]:
     """Look up a credential and return ``(value, error)``.
 
     The credential value is parsed out of the JSON envelope that
     ``yu credential load`` returns. Importantly, on every error path
     the *literal credential value* is **never** echoed back into the
-    returned error string — even if ``cos`` accidentally writes it to
+    returned error string — even if ``yu`` accidentally writes it to
     stderr. We squelch stderr through a generic placeholder so a
     crashed credential helper cannot leak the secret into agent logs.
     """
@@ -168,7 +168,7 @@ def safe_credential_load(
 
     try:
         proc = safe_subprocess(
-            [cos_bin, "credential", "load", name],
+            [yu_bin, "credential", "load", name],
             timeout=timeout,
         )
     except FileNotFoundError:

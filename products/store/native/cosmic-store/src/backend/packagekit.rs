@@ -116,11 +116,11 @@ impl Backend for Packagekit {
             !info
                 .pkgnames
                 .iter()
-                .any(|name| product::claw_app_package(name))
+                .any(|name| product::yuos_app_package(name))
         });
         cache
             .pkgnames
-            .retain(|name, _| !product::claw_app_package(name));
+            .retain(|name, _| !product::yuos_app_package(name));
         self.appstream_caches[0] = cache;
         Ok(())
     }
@@ -151,7 +151,7 @@ impl Backend for Packagekit {
         let mut installed = HashMap::new();
         let mut rows = Vec::new();
         for update in updates.upgradable {
-            if product::claw_app_package(&update.package) {
+            if product::yuos_app_package(&update.package) {
                 continue;
             }
             installed.insert(update.package.clone(), update.old_version);

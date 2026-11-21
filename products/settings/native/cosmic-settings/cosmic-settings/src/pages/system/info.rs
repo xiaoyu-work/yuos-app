@@ -189,10 +189,10 @@ impl Info {
             }
             // The session ID still uses the upstream "COSMIC" XDG name for
             // protocol reasons (DesktopNames=, Categories=), but display
-            // ClawOS for the About page so the user-facing branding is
+            // Yu OS for the About page so the user-facing branding is
             // consistent with the rest of the OS.
             if session.eq_ignore_ascii_case("cosmic") {
-                session = String::from("ClawOS");
+                session = String::from("Yu OS");
             }
             info.desktop_environment = session;
         }

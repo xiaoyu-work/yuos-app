@@ -12,7 +12,7 @@ from test_support import load_local_module, unit_policy_bridge
 
 calendar_main = load_local_module(
     pathlib.Path(__file__).with_name("main.py"),
-    "claw_test_calendar_main",
+    "yuos_test_calendar_main",
     clear_modules=("_shared",),
 )
 run = calendar_main.run
@@ -21,7 +21,7 @@ run = calendar_main.run
 def _setup_local():
     """Point to a fresh temp database for testing."""
     tmp = tempfile.mkdtemp()
-    os.environ["COS_DATA_DIR"] = tmp
+    os.environ["YUOS_DATA_DIR"] = tmp
     # Clear any provider tokens so we default to local
     for var in (
         "GOOGLE_ACCESS_TOKEN", "GOOGLE_CALENDAR_TOKEN", "GOOGLE_OAUTH_TOKEN",
@@ -177,7 +177,7 @@ class TestMeetingCollaboration(unittest.TestCase):
 class TestEventObjects(unittest.TestCase):
     def test_local_event_resolves_the_created_object(self):
         with tempfile.TemporaryDirectory() as directory, mock.patch.dict(
-            os.environ, {"COS_DATA_DIR": directory}
+            os.environ, {"YUOS_DATA_DIR": directory}
         ):
             created = run(
                 "create", ["--provider", "local", "--title", "Review",
@@ -189,7 +189,7 @@ class TestEventObjects(unittest.TestCase):
 
     def test_missing_local_object_does_not_create_a_database(self):
         with tempfile.TemporaryDirectory() as directory, mock.patch.dict(
-            os.environ, {"COS_DATA_DIR": directory}
+            os.environ, {"YUOS_DATA_DIR": directory}
         ):
             result = run("local_event", ["--id", "missing"])
             self.assertFalse(os.path.exists(os.path.join(directory, "calendar", "events.db")))
@@ -349,7 +349,7 @@ class TestProviderErrors(unittest.TestCase):
         self.assertEqual(
             result["setup"]["agent_action"],
             {
-                "tool": "cos_oauth_login",
+                "tool": "yu_oauth_login",
                 "input": {"provider": "google"},
             },
         )
@@ -392,7 +392,7 @@ class TestProviderErrors(unittest.TestCase):
         self.assertEqual(
             result["setup"]["agent_action"],
             {
-                "tool": "cos_oauth_login",
+                "tool": "yu_oauth_login",
                 "input": {"provider": "microsoft"},
             },
         )

@@ -1,2 +1,0 @@
-#!/bin/sh
-exec /usr/bin/python3 -I /usr/lib/cos/browser-native-host.py "$@"

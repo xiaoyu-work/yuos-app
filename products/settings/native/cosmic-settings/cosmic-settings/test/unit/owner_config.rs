@@ -2,7 +2,7 @@ use super::*;
 
 #[test]
 fn retained_shared_config_ids_construct_without_turning_missing_grants_into_writes() {
-    const CHILD: &str = "CLAW_SETTINGS_DENIED_CONFIG_TEST";
+    const CHILD: &str = "YUOS_SETTINGS_DENIED_CONFIG_TEST";
     if std::env::var_os(CHILD).is_none() {
         let output=std::process::Command::new(std::env::current_exe().unwrap())
             .args(["--exact","owner_config::tests::retained_shared_config_ids_construct_without_turning_missing_grants_into_writes","--test-threads=1","--nocapture"])

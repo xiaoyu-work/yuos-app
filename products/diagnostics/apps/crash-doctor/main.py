@@ -9,19 +9,19 @@ import sys
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
 MAX_SINCE_MINUTES = 7 * 24 * 60
 MAX_LIMIT = 100
-TIMEOUT_SECS = int(os.environ.get("CLAW_CRASH_DOCTOR_TIMEOUT", "300"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_CRASH_DOCTOR_TIMEOUT", "300"))
 COREDUMP_ID_RE = re.compile(
     r"^[0-9A-Fa-f]{32}:[1-9][0-9]{0,9}:[1-9][0-9]{0,19}$"
 )
 
 
-def _cos_binary() -> str | None:
-    return os.environ.get("COS_BIN") or shutil.which("yu")
+def _yu_binary() -> str | None:
+    return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _broker(
@@ -30,12 +30,12 @@ def _broker(
     limit: int | None = None,
     coredump_id: str | None = None,
 ) -> dict:
-    cos_bin = _cos_binary()
-    if not cos_bin:
+    yu_bin = _yu_binary()
+    if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Crash Doctor broker unavailable"
         )
-    argv = [cos_bin, "__crash", action]
+    argv = [yu_bin, "__crash", action]
     if since_minutes is not None:
         argv.extend(["--since-minutes", str(since_minutes)])
     if limit is not None:
@@ -54,11 +54,11 @@ def _broker(
         )
     except FileNotFoundError as exc:
         raise FileNotFoundError(
-            f"Crash Doctor broker executable not found: {cos_bin}"
+            f"Crash Doctor broker executable not found: {yu_bin}"
         ) from exc
     except PermissionError as exc:
         raise PermissionError(
-            f"permission denied launching Crash Doctor broker: {cos_bin}"
+            f"permission denied launching Crash Doctor broker: {yu_bin}"
         ) from exc
     except subprocess.TimeoutExpired as exc:
         raise TimeoutError(

@@ -12,7 +12,7 @@ from test_support import load_local_module
 
 
 APP_DIR = pathlib.Path(__file__).parent
-COS = "/usr/local/bin/yu"
+YU = "/usr/local/bin/yu"
 RUNTIME_CHOICES = ["docker", "podman", "podman-root", "containerd"]
 SIGNAL_CHOICES = ["TERM", "KILL", "HUP", "INT", "USR1", "USR2"]
 OBSERVE = {"status", "list", "inspect", "logs", "processes", "stats", "namespaces"}
@@ -51,7 +51,7 @@ IMPLEMENTATIONS = {
 
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_container_manager_main",
+    "yuos_test_container_manager_main",
     clear_modules=("_shared",),
 )
 
@@ -209,13 +209,13 @@ def test_manifest_and_handlers_are_direct_mcp_only_and_aligned():
 @pytest.mark.parametrize(
     ("function_name", "args", "kwargs", "scope", "argv"),
     [
-        ("status", (), {}, "observe", [COS, "__container", "status"]),
+        ("status", (), {}, "observe", [YU, "__container", "status"]),
         (
             "list_containers",
             ("docker",),
             {},
             "observe",
-            [COS, "__container", "list", "--runtime", "docker"],
+            [YU, "__container", "list", "--runtime", "docker"],
         ),
         (
             "inspect",
@@ -223,7 +223,7 @@ def test_manifest_and_handlers_are_direct_mcp_only_and_aligned():
             {},
             "observe",
             [
-                COS,
+                YU,
                 "__container",
                 "inspect",
                 "--runtime",
@@ -238,7 +238,7 @@ def test_manifest_and_handlers_are_direct_mcp_only_and_aligned():
             {},
             "observe",
             [
-                COS,
+                YU,
                 "__container",
                 "logs",
                 "--runtime",
@@ -255,7 +255,7 @@ def test_manifest_and_handlers_are_direct_mcp_only_and_aligned():
             {},
             "observe",
             [
-                COS,
+                YU,
                 "__container",
                 "processes",
                 "--runtime",
@@ -270,7 +270,7 @@ def test_manifest_and_handlers_are_direct_mcp_only_and_aligned():
             {},
             "observe",
             [
-                COS,
+                YU,
                 "__container",
                 "stats",
                 "--runtime",
@@ -285,7 +285,7 @@ def test_manifest_and_handlers_are_direct_mcp_only_and_aligned():
             {},
             "observe",
             [
-                COS,
+                YU,
                 "__container",
                 "namespaces",
                 "--runtime",
@@ -300,7 +300,7 @@ def test_manifest_and_handlers_are_direct_mcp_only_and_aligned():
             {},
             "control",
             [
-                COS,
+                YU,
                 "__container",
                 "start",
                 "--runtime",
@@ -315,7 +315,7 @@ def test_manifest_and_handlers_are_direct_mcp_only_and_aligned():
             {},
             "control",
             [
-                COS,
+                YU,
                 "__container",
                 "stop",
                 "--runtime",
@@ -330,7 +330,7 @@ def test_manifest_and_handlers_are_direct_mcp_only_and_aligned():
             {},
             "control",
             [
-                COS,
+                YU,
                 "__container",
                 "restart",
                 "--runtime",
@@ -345,7 +345,7 @@ def test_manifest_and_handlers_are_direct_mcp_only_and_aligned():
             {},
             "control",
             [
-                COS,
+                YU,
                 "__container",
                 "pause",
                 "--runtime",
@@ -360,7 +360,7 @@ def test_manifest_and_handlers_are_direct_mcp_only_and_aligned():
             {},
             "control",
             [
-                COS,
+                YU,
                 "__container",
                 "unpause",
                 "--runtime",
@@ -375,7 +375,7 @@ def test_manifest_and_handlers_are_direct_mcp_only_and_aligned():
             {},
             "control",
             [
-                COS,
+                YU,
                 "__container",
                 "kill",
                 "--runtime",
@@ -392,7 +392,7 @@ def test_manifest_and_handlers_are_direct_mcp_only_and_aligned():
             {"confirm": True},
             "control",
             [
-                COS,
+                YU,
                 "__container",
                 "remove",
                 "--runtime",
@@ -412,7 +412,7 @@ def test_all_routes_use_exact_broker_argv_and_capability(
         stdout=json.dumps({"ok": True}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": COS}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YU}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(
         main.subprocess, "run", return_value=completed
@@ -503,7 +503,7 @@ def test_containerd_namespace_is_forwarded():
         stdout=json.dumps({"ok": True}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": COS}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YU}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         main.logs("containerd", "web", 25, "default")
@@ -531,7 +531,7 @@ def test_containerd_namespace_is_forwarded():
 )
 def test_broker_parses_stdout_before_stderr(stdout, stderr, expected):
     completed = mock.Mock(returncode=0, stdout=stdout, stderr=stderr)
-    with mock.patch.dict(os.environ, {"COS_BIN": COS}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YU}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed):
         assert main.status() == expected
@@ -571,7 +571,7 @@ def test_broker_payload_failures_raise(returncode, stdout, stderr, message):
         stdout=stdout,
         stderr=stderr,
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": COS}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YU}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match=re.escape(message)):
@@ -606,7 +606,7 @@ def test_missing_broker_executable_raises():
     ],
 )
 def test_broker_launch_failures_raise(failure, exception_type, message):
-    with mock.patch.dict(os.environ, {"COS_BIN": COS}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YU}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", side_effect=failure):
         with pytest.raises(exception_type, match=message):
@@ -614,7 +614,7 @@ def test_broker_launch_failures_raise(failure, exception_type, message):
 
 
 def test_broker_timeout_raises():
-    with mock.patch.dict(os.environ, {"COS_BIN": COS}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": YU}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(
         main.subprocess,

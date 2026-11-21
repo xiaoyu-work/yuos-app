@@ -13,10 +13,10 @@ static const CornerRounding cornerRound100(1.0f);
 RoundedPolygonShape MaterialShapes::rotated(
     const RoundedPolygonShape& shape, float degrees) {
     float radians = degrees * FloatPi / 180.0f;
-    float cosA = std::cos(radians);
+    float yuA = std::cos(radians);
     float sinA = std::sin(radians);
-    return shape.transformed([cosA, sinA](float x, float y) {
-        return TransformResult(x * cosA - y * sinA, x * sinA + y * cosA);
+    return shape.transformed([yuA, sinA](float x, float y) {
+        return TransformResult(x * yuA - y * sinA, x * sinA + y * yuA);
     });
 }
 

@@ -54,7 +54,7 @@ function context() {
     bodyToPlain: text => text,
   };
   return vm.createContext({
-    window: {ClawUI: ui, ClawMessages: messages}, ClawUI: ui, console,
+    window: {YuOsUI: ui, YuOsMessages: messages}, YuOsUI: ui, console,
     document: {
       addEventListener: noop,
       getElementById: id => elements[id] ||= element(),
@@ -98,7 +98,7 @@ function load(ctx, path) {
   if (requests.length !== previous) throw Error("Failed mailbox read silently reached AI");
 
   ctx = context();
-  ctx.ClawNative = {call: async (verb, args) => {
+  ctx.YuOsNative = {call: async (verb, args) => {
     requests.push({verb, args}); return {ok: false};
   }};
   ctx.browser.messages = {getFull: async () => ({})};
@@ -155,9 +155,9 @@ const ctx = vm.createContext({
   browser: {runtime: {connectNative: () => port}},
 });
 vm.runInContext(fs.readFileSync(process.argv[1], "utf8"), ctx);
-ctx.self.ClawNative.connect("os.yuos.mail_ai");
+ctx.self.YuOsNative.connect("os.yuos.mail_ai");
 for (const args of [false, null, [], "", {body: true}]) {
-  ctx.self.ClawNative.call("summarize", args);
+  ctx.self.YuOsNative.call("summarize", args);
 }
 process.stdout.write(JSON.stringify(sent.map(request => request.args)));
 """
@@ -276,7 +276,7 @@ const ctx = vm.createContext({
 });
 vm.runInContext(fs.readFileSync(process.argv[1] + "/lib/mailbox.js", "utf8"), ctx);
 (async () => {
-  const mailbox = ctx.self.ClawMailbox;
+  const mailbox = ctx.self.YuOsMailbox;
   await mailbox.ready;
   const accounts = await mailbox.handle("accounts", {});
   const a = accounts.accounts[0].id, b = accounts.accounts[1].id;

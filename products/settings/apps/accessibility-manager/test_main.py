@@ -12,7 +12,7 @@ from test_support import authenticated_mcp_params, load_local_module
 APP_DIR = pathlib.Path(__file__).parent
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_accessibility_manager_main",
+    "yuos_test_accessibility_manager_main",
     clear_modules=("_shared",),
 )
 
@@ -23,7 +23,7 @@ def test_magnifier_uses_accessibility_control_scope():
         stdout=json.dumps({"changed": True}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         result = main.set_toggle("magnifier", "on")
@@ -89,11 +89,11 @@ def test_relocated_sdk_preserves_choices_and_accessibility_scope(action, argumen
     completed = mock.Mock(returncode=0, stdout=json.dumps({"action": action}), stderr="")
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
         os.environ, {
-            "COS_APP_MANIFEST": str(APP_DIR / "app.json"),
-            "COS_BIN": "/usr/local/bin/yu",
+            "YUOS_APP_MANIFEST": str(APP_DIR / "app.json"),
+            "YUOS_BIN": "/usr/local/bin/yu",
         }
     ):
-        server = load_local_module(APP_DIR / "server.py", "claw_test_accessibility_manager_server")
+        server = load_local_module(APP_DIR / "server.py", "yuos_test_accessibility_manager_server")
         listed = server.app._handle_request("tools/list", {}, True)
         assert {tool["name"] for tool in listed["tools"]} == set(tools)
         with mock.patch.object(main.policy, "require") as require, mock.patch.object(

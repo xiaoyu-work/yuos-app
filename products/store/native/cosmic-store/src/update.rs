@@ -64,20 +64,20 @@ impl App {
                 return self.update_config();
             }
 
-            Message::AskClaw => {
+            Message::AskYu => {
                 let outcome = if let Some(selected) = &self.selected_opt {
-                    crate::yuos_glue::ask_claw_app(selected.id.raw(), &selected.info.name)
+                    crate::yuos_glue::ask_yu_app(selected.id.raw(), &selected.info.name)
                 } else if let Some(page) = self.explore_page_opt {
-                    crate::yuos_glue::ask_claw_explore(&format!("{page:?}"))
+                    crate::yuos_glue::ask_yu_explore(&format!("{page:?}"))
                 } else {
-                    crate::yuos_glue::ask_claw_home()
+                    crate::yuos_glue::ask_yu_home()
                 };
                 if let Err(err) = outcome {
-                    log::error!("failed to open Ask Claw overlay: {err}");
+                    log::error!("failed to open Ask Yu OS overlay: {err}");
                 }
             }
 
-            Message::AskClawSearch => {
+            Message::AskYuSearch => {
                 // The Store's literal search misses fuzzy / NL queries
                 // like "screen recording app" — keyword-match has no way
                 // to bridge concept→appstream-id. Hand the raw query to
@@ -86,8 +86,8 @@ impl App {
                 // result.
                 let query = self.search_input.trim().to_string();
                 if !query.is_empty() {
-                    if let Err(err) = crate::yuos_glue::ask_claw_search(&query) {
-                        log::error!("failed to open Ask Claw overlay: {err}");
+                    if let Err(err) = crate::yuos_glue::ask_yu_search(&query) {
+                        log::error!("failed to open Ask Yu OS overlay: {err}");
                     }
                 }
             }
@@ -177,8 +177,8 @@ impl App {
                 self.refresh_error = result.err();
                 return self.update_backends(true);
             }
-            Message::ClawCatalog(result) => {
-                self.claw_catalog = Some(result);
+            Message::YuOsCatalog(result) => {
+                self.yuos_catalog = Some(result);
             }
             Message::UpdateQueryFailed(backend, error) => {
                 self.pending_backend_updates.remove(&backend);

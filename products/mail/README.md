@@ -5,7 +5,7 @@ the existing shared Mail AI business implementation at `apps/mail-ai/`,
 its Thunderbird UI at `extension/`, and the Thunderbird-backed Agent
 client at `apps/email/`. The separate legacy SMTP delivery gateway is retired.
 
-The source moved from Claw OS commit
+The source moved from Yu OS commit
 `0492ea6c13cca3213b1b1bafabeed5e6074ebb44`. See
 [PROVENANCE.md](PROVENANCE.md) for the original upstream revisions and licenses.
 The native source is not a submodule or a second IMAP/SMTP client.

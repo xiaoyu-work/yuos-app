@@ -6,7 +6,7 @@ import re
 import stat
 
 
-SCHEMA = "claw.web-app/v1"
+SCHEMA = "yuos.web-app/v1"
 DESCRIPTOR = "web-ui.json"
 MAX_BYTES = 8 * 1024 * 1024
 EXTENSIONS = {".html", ".js", ".css", ".json", ".svg", ".png", ".webp", ".woff2", ".txt"}

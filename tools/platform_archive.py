@@ -1,4 +1,4 @@
-"""Validate and extract the public claw.app-platform/v1 library artifact."""
+"""Validate and extract the public yuos.app-platform/v1 library artifact."""
 
 from contextlib import contextmanager
 import gzip
@@ -13,16 +13,16 @@ import stat
 import tarfile
 
 
-SCHEMA = "claw.app-platform/v1"
+SCHEMA = "yuos.app-platform/v1"
 EXPORTS = {
-    "python-sdk": "claw-os-sdk/python/src",
-    "python-runtime": "cos-runtime/python/src",
-    "rust-sdk": "claw-os-sdk/rust",
-    "rust-runtime": "cos-runtime/rust",
+    "python-sdk": "yuos-sdk/python/src",
+    "python-runtime": "yuos-runtime/python/src",
+    "rust-sdk": "yuos-sdk/rust",
+    "rust-runtime": "yuos-runtime/rust",
     "ui-toolkit": "desktop/toolkit",
     "launcher-client": "desktop/launcher-backend",
 }
-SOURCE_ROOTS = ("claw-os-sdk", "cos-runtime", "desktop/toolkit", "desktop/launcher-backend")
+SOURCE_ROOTS = ("yuos-sdk", "yuos-runtime", "desktop/toolkit", "desktop/launcher-backend")
 MAX_ARCHIVE_BYTES = 128 * 1024 * 1024
 MAX_EXPANDED_BYTES = 512 * 1024 * 1024
 MAX_FILE_BYTES = 64 * 1024 * 1024

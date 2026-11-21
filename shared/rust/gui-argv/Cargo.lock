@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "claw-app-gui-argv"
+name = "yuos-app-gui-argv"
 version = "0.1.0"

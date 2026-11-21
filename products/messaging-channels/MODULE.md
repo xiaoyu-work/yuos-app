@@ -21,7 +21,7 @@ The OS owns authenticated owner/provider/sender configuration, credential
 custody, receiver lifetime, cursors, rate limits, durable replay and reply
 receipts. Apps call the versioned SDK `channels.control`; they never call
 `yu agent ask`, manage receiver processes, choose an owner/source or submit
-Agent tasks. There is no local-process fallback if `clawd` is unavailable.
+Agent tasks. There is no local-process fallback if `yuosd` is unavailable.
 Import App client support through `gateway._shared`, not a sibling OS checkout.
 
 A human first creates a bounded Activity and an ordinary generation-bound

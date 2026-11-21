@@ -24,8 +24,8 @@ _HERE = Path(__file__).resolve().parent
 def _bootstrap_sdk_path() -> None:
     # -I ignores PYTHONPATH and the script directory. Installed execution uses
     # only the canonical vendor package and explicit shared SDK/runtime tree.
-    if _HERE == Path("/usr/lib/cos/apps/mail-ai"):
-        paths = [Path("/usr/lib/cos/python")]
+    if _HERE == Path("/usr/lib/yuos/apps/mail-ai"):
+        paths = [Path("/usr/lib/yuos/python")]
     else:
         sys.dont_write_bytecode = True
         root = _HERE.parents[3]

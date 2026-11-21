@@ -10,15 +10,15 @@ import unicodedata
 import urllib.request
 
 from _shared import safe_http  # noqa: E402
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
-USER_AGENT = "cos/" + os.environ.get("COS_VERSION", "0.1.0")
+USER_AGENT = "yuos/" + os.environ.get("YUOS_VERSION", "0.1.0")
 DEFAULT_TIMEOUT = 30
 MAX_REQUEST_DATA_BYTES = 1_000_000
 MAX_RESPONSE_BYTES = 5_000_000
 MAX_DOWNLOAD_BYTES = int(
-    os.environ.get("COS_NET_DOWNLOAD_MAX", str(512 * 1024 * 1024))
+    os.environ.get("YUOS_NET_DOWNLOAD_MAX", str(512 * 1024 * 1024))
 )
 MAX_HEADER_COUNT = 100
 MAX_HEADER_LINE_BYTES = 8 * 1024

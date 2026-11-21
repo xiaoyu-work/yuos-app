@@ -7,7 +7,7 @@
 //
 // This module is loaded into the background event page via the
 // `background.scripts` manifest list (it runs *before* background.js)
-// and intentionally exposes a single namespace `ClawNative`.
+// and intentionally exposes a single namespace `YuOsNative`.
 
 (function () {
   "use strict";
@@ -36,7 +36,7 @@
     const current = port;
     mailboxReady.then(() => {
       if (port === current) current.postMessage({ type: "mailbox.ready", version: 1 });
-    }).catch(() => console.error("[claw-mail] mailbox initialization failed"));
+    }).catch(() => console.error("[yuos-mail] mailbox initialization failed"));
   }
 
   function setMailboxHandler(handler, ready) {
@@ -63,7 +63,7 @@
     try {
       port = browser.runtime.connectNative(name);
     } catch (e) {
-      console.warn("[claw-mail-ai] connectNative threw:", e);
+      console.warn("[yuos-mail-ai] connectNative threw:", e);
       fireStatus({ status: "error", error: String(e) });
       scheduleReconnect();
       return;
@@ -85,7 +85,7 @@
     port.onDisconnect.addListener(() => {
       const err = browser.runtime.lastError;
       const msg = err?.message || "host disconnected";
-      console.warn("[claw-mail-ai] NM port disconnected:", msg);
+      console.warn("[yuos-mail-ai] NM port disconnected:", msg);
       port = null;
       if (stableTimer) { clearTimeout(stableTimer); stableTimer = null; }
       // Fail every in-flight request.
@@ -180,5 +180,5 @@
 
   function getStatus() { return lastStatus; }
 
-  self.ClawNative = { connect, call, onStatus, getStatus, setMailboxHandler };
+  self.YuOsNative = { connect, call, onStatus, getStatus, setMailboxHandler };
 })();

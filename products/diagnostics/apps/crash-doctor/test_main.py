@@ -12,7 +12,7 @@ from test_support import authenticated_mcp_params, load_local_module
 APP_DIR = pathlib.Path(__file__).parent
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_crash_doctor_main",
+    "yuos_test_crash_doctor_main",
     clear_modules=("_shared",),
 )
 
@@ -23,7 +23,7 @@ def test_diagnose_uses_sensitive_crash_scope_and_explicit_bounds():
         stdout=json.dumps({"status": "warning"}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         result = main.diagnose(120, 10)
@@ -72,7 +72,7 @@ def test_backtrace_normalizes_id_and_uses_sensitive_crash_scope():
         stdout=json.dumps({"frames": []}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         result = main.backtrace(coredump_id)
@@ -103,7 +103,7 @@ def test_backtrace_normalizes_id_and_uses_sensitive_crash_scope():
 )
 def test_broker_failures_raise(returncode, stdout, message):
     completed = mock.Mock(returncode=returncode, stdout=stdout, stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match=message):
@@ -138,7 +138,7 @@ def test_missing_broker_executable_raises():
 def test_broker_launch_failures_raise_precise_exceptions(
     exception, error_type, message
 ):
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", side_effect=exception):
         with pytest.raises(error_type, match=message):
@@ -147,7 +147,7 @@ def test_broker_launch_failures_raise_precise_exceptions(
 
 
 def test_broker_timeout_raises():
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(
         main.subprocess,
@@ -187,11 +187,11 @@ def test_relocated_sdk_preserves_crash_authority_bounds_and_selectors(
     completed = mock.Mock(returncode=0, stdout=json.dumps({"action": action}), stderr="")
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
         os.environ, {
-            "COS_APP_MANIFEST": str(APP_DIR / "app.json"),
-            "COS_BIN": "/usr/local/bin/yu",
+            "YUOS_APP_MANIFEST": str(APP_DIR / "app.json"),
+            "YUOS_BIN": "/usr/local/bin/yu",
         }
     ):
-        server = load_local_module(APP_DIR / "server.py", "claw_test_crash_doctor_server")
+        server = load_local_module(APP_DIR / "server.py", "yuos_test_crash_doctor_server")
         listed = server.app._handle_request("tools/list", {}, True)
         assert {tool["name"] for tool in listed["tools"]} == set(tools)
         with mock.patch.object(main.policy, "require") as require, mock.patch.object(

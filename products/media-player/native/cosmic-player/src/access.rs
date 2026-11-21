@@ -17,7 +17,7 @@ pub(crate) async fn choose(title: String) -> Result<Option<url::Url>, String> {
             serde_json::json!({"request_id":id,"title":title,"modal":true})
         } else { serde_json::json!({"request_id":id}) };
         let response = tokio::task::spawn_blocking(move || {
-            claw_os_sdk::cos_call_json_with_stdin("file-picker", action,
+            yuos_sdk::yu_call_json_with_stdin("file-picker", action,
                 ["__gui-file-picker", action, "--request-stdin"], params.to_string().as_bytes())
         }).await.map_err(|error|error.to_string())?.map_err(|error|error.to_string())?;
         if response["version"]!=1 || response["request_id"]!=id {
@@ -44,10 +44,10 @@ pub(crate) async fn choose(title: String) -> Result<Option<url::Url>, String> {
 }
 
 fn node(path: &Path) -> Result<Option<u64>, String> {
-    if !claw_os_sdk::gui::is_gui_launch() {
+    if !yuos_sdk::gui::is_gui_launch() {
         return Ok(None);
     }
-    let home = std::env::var_os("COS_OWNER_HOME")
+    let home = std::env::var_os("YUOS_OWNER_HOME")
         .ok_or("managed media requires its owner path context")?;
     let home = std::fs::symlink_metadata(home).map_err(|error| error.to_string())?;
     let file = std::fs::symlink_metadata(path).map_err(|error| error.to_string())?;
@@ -63,7 +63,7 @@ pub(crate) fn read(url: &url::Url) -> Result<(), String> {
     let Some(node) = node(&path)? else {
         return Ok(());
     };
-    let mut reply = claw_os_sdk::gui::request_file_read(node).map_err(|error| error.to_string())?;
+    let mut reply = yuos_sdk::gui::request_file_read(node).map_err(|error| error.to_string())?;
     loop {
         if reply.node != node {
             return Err("media read selection changed its target".into());
@@ -73,7 +73,7 @@ pub(crate) fn read(url: &url::Url) -> Result<(), String> {
             "pending" => std::thread::sleep(Duration::from_millis(250)),
             _ => return Err(reply.reason.unwrap_or(reply.state)),
         }
-        reply = claw_os_sdk::gui::file_read_status(&reply.selection_id, node)
+        reply = yuos_sdk::gui::file_read_status(&reply.selection_id, node)
             .map_err(|error| error.to_string())?;
     }
 }
@@ -94,7 +94,7 @@ pub(crate) fn save_png(
     let scratch = match std::fs::symlink_metadata(output) {
         Ok(metadata) => {
             let node = metadata.ino();
-            let mut reply = claw_os_sdk::gui::request_file_write(node)?;
+            let mut reply = yuos_sdk::gui::request_file_write(node)?;
             loop {
                 if reply.node != node {
                     return Err("thumbnail write selection changed its target".into());
@@ -104,16 +104,16 @@ pub(crate) fn save_png(
                     "pending" => std::thread::sleep(Duration::from_millis(250)),
                     _ => return Err(reply.reason.unwrap_or(reply.state).into()),
                 }
-                reply = claw_os_sdk::gui::file_write_status(&reply.selection_id, node)?;
+                reply = yuos_sdk::gui::file_write_status(&reply.selection_id, node)?;
             }
-            let slot = claw_os_sdk::gui::reserve_file_save(&reply.selection_id, node)?;
+            let slot = yuos_sdk::gui::reserve_file_save(&reply.selection_id, node)?;
             if slot.parent_node != parent_node {
                 return Err("thumbnail write reservation changed its parent".into());
             }
             parent.join(slot.name)
         }
         Err(error) if error.kind() == io::ErrorKind::NotFound => {
-            let mut reply = claw_os_sdk::gui::request_file_create(parent_node, target_name)?;
+            let mut reply = yuos_sdk::gui::request_file_create(parent_node, target_name)?;
             loop {
                 if reply.parent_node != parent_node || reply.name != target_name {
                     return Err("thumbnail creation selection changed its target".into());
@@ -123,9 +123,9 @@ pub(crate) fn save_png(
                     "pending" => std::thread::sleep(Duration::from_millis(250)),
                     _ => return Err(reply.reason.unwrap_or(reply.state).into()),
                 }
-                reply = claw_os_sdk::gui::file_create_status(&reply.selection_id, parent_node)?;
+                reply = yuos_sdk::gui::file_create_status(&reply.selection_id, parent_node)?;
             }
-            let slot = claw_os_sdk::gui::reserve_file_create(&reply.selection_id, parent_node)?;
+            let slot = yuos_sdk::gui::reserve_file_create(&reply.selection_id, parent_node)?;
             if slot.parent_node != parent_node || slot.target_name != target_name {
                 return Err("thumbnail creation reservation changed its target".into());
             }

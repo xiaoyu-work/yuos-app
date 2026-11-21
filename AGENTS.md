@@ -1,4 +1,4 @@
-# Claw OS Applications
+# Yu OS Applications
 
 This repository owns application products and explicitly declared shared
 capability clients, not the operating system. Read `ARCHITECTURE.md` and the
@@ -17,9 +17,9 @@ source group's `MODULE.md` before changing its boundary.
   entitlements. Preserve existing protections until generic replacements and
   regressions are verified; unresolved special integration blocks publication.
 - Keep authority, credentials, consent, audit, App Host and system services in
-  `xiaoyu-work/claw-os`. Do not copy their implementations here.
+  `xiaoyu-work/Yu-OS`. Do not copy their implementations here.
 - Apps must run independently of an active AI Agent, Agent UI or model request.
-  Their lifecycle belongs to the OS service `clawd`, not the AI runtime.
+  Their lifecycle belongs to the OS service `yuosd`, not the AI runtime.
   Root is not a standalone lifecycle bypass. Keep the OS cutover status
   explicit; this contract does not itself complete runtime integration.
 - `platform.lock.json` pins a published SDK/runtime/toolkit artifact by version,
@@ -71,7 +71,7 @@ source group's `MODULE.md` before changing its boundary.
 The replacement desktop UI source baseline starts at
 [`products/desktop-shell/MODULE.md`](products/desktop-shell/MODULE.md).
 It is a registered GUI-only App, not yet the activated desktop session. Keep compositor, login/session
-and permission authority in `claw-os`; source import does not authorize an
+and permission authority in `yuos`; source import does not authorize an
 upstream installer or unmanaged desktop launch.
 
 ```bash

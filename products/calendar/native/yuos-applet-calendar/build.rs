@@ -1,0 +1,20 @@
+// SPDX-License-Identifier: GPL-3.0-only
+
+use std::{env, fs, path::PathBuf};
+use xdgen::{App, Context, FluentString};
+
+fn main() {
+    const ID: &str = "com.yuos.PanelCalendarButton";
+    println!("cargo:rerun-if-changed=i18n");
+    println!("cargo:rerun-if-changed=data/{ID}.desktop");
+    let context = Context::new("i18n/", "desktop_entries").unwrap();
+    let app = App::new(FluentString("yuos-applet-calendar"))
+        .comment(FluentString("yuos-applet-calendar-comment"))
+        .keywords(FluentString("yuos-applet-calendar-keywords"));
+    let desktop = app
+        .expand_desktop(&format!("data/{ID}.desktop"), &context)
+        .unwrap();
+    let destination = PathBuf::from(env::var_os("OUT_DIR").unwrap());
+    fs::create_dir_all(&destination).unwrap();
+    fs::write(destination.join(format!("{ID}.desktop")), desktop).unwrap();
+}

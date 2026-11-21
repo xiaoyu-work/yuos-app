@@ -489,7 +489,7 @@ impl Content {
 
         cosmic::iced::widget::column![
             // Export theme choice
-            crate::widget::claw_section().add(
+            crate::widget::yuos_section().add(
                 settings::item::builder(fl!("enable-export"))
                     .description(fl!("enable-export", "desc"))
                     .toggler(self.icon_global, |b| {
@@ -531,7 +531,7 @@ impl Content {
         let Spacing { space_m, .. } = cosmic::theme::spacing();
 
         cosmic::iced::widget::column![
-            crate::widget::claw_section()
+            crate::widget::yuos_section()
                 .title(fl!("shadows-floating"))
                 .add(
                     settings::item::builder(fl!("shadows-floating", "clip"))
@@ -539,7 +539,7 @@ impl Content {
                             Message::DrawerCorners(CornerMessage::ClipFloating(b))
                         })
                 ),
-            crate::widget::claw_section()
+            crate::widget::yuos_section()
                 .title(fl!("shadows-tiling"))
                 .add(
                     settings::item::builder(fl!("shadows-tiling", "clip"))

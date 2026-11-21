@@ -1,6 +1,6 @@
 // Options page. Read settings, render controls, write on Save.
 
-const { localiseDom } = window.ClawUI;
+const { localiseDom } = window.YuOsUI;
 
 document.addEventListener("DOMContentLoaded", async () => {
   localiseDom();
@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function loadSettings() {
-  const s = await ClawUI.getSettings();
+  const s = await YuOsUI.getSettings();
 
   for (const cb of document.querySelectorAll("[data-feature]")) {
     cb.checked = !!s.features[cb.dataset.feature];
@@ -19,7 +19,7 @@ async function loadSettings() {
   document.getElementById("triage-autoTag").checked            = !!s.triage.autoTag;
   document.getElementById("triage-autoMoveImportant").checked  = !!s.triage.autoMoveImportant;
   document.getElementById("triage-autoMoveNewsletter").checked = !!s.triage.autoMoveNewsletter;
-  document.getElementById("triage-tagPrefix").value            = s.triage.tagPrefix || "claw/";
+  document.getElementById("triage-tagPrefix").value            = s.triage.tagPrefix || "yuos/";
 
   document.getElementById("compose-defaultStyle").value       = s.compose.defaultStyle  || "formal";
   document.getElementById("translate-defaultTarget").value    = s.translate.defaultTarget || "English";
@@ -35,13 +35,13 @@ async function save() {
     autoTag:            document.getElementById("triage-autoTag").checked,
     autoMoveImportant:  document.getElementById("triage-autoMoveImportant").checked,
     autoMoveNewsletter: document.getElementById("triage-autoMoveNewsletter").checked,
-    tagPrefix:          (document.getElementById("triage-tagPrefix").value || "claw/").trim(),
+    tagPrefix:          (document.getElementById("triage-tagPrefix").value || "yuos/").trim(),
   };
 
   const compose   = { defaultStyle:    document.getElementById("compose-defaultStyle").value || "formal" };
   const translate = { defaultTarget:   (document.getElementById("translate-defaultTarget").value || "English").trim() };
 
-  await ClawUI.setSettings({ features, triage, compose, translate });
+  await YuOsUI.setSettings({ features, triage, compose, translate });
 
   const status = document.getElementById("save-status");
   status.textContent = browser.i18n.getMessage("saved") || "Saved";

@@ -24,7 +24,7 @@ into this repository.
 Firewall status retains `sys.observe:firewall`; add/delete/clear/restore retain
 `net.firewall:manage`. CIDR, port, interface and token validation precede policy.
 Clear and restore require exact boolean confirmation. The OS owns the dedicated
-`inet claw_agent` nftables table, durable rule revisions, mutation serialization,
+`inet yuos_agent` nftables table, durable rule revisions, mutation serialization,
 startup reconciliation and owner-bound backups that reject newer revisions.
 Source relocation does not move or reset firewall state.
 

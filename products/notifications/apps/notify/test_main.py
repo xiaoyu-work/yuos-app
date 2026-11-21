@@ -11,7 +11,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from claw_os_sdk import kernel
+from yuos_sdk import kernel
 from test_support import authenticated_mcp_params, load_local_module
 
 
@@ -24,7 +24,7 @@ SENT = {"id": "notif-" + "a" * 32, "message": "New", "urgent": False, "timestamp
 @pytest.fixture
 def modules(monkeypatch):
     monkeypatch.syspath_prepend(str(APP))
-    monkeypatch.setenv("COS_APP_MANIFEST", str(APP / "app.json"))
+    monkeypatch.setenv("YUOS_APP_MANIFEST", str(APP / "app.json"))
     client = load_local_module(APP / "client.py", "client", clear_modules=("client", "main"))
     main = load_local_module(APP / "main.py", "main")
     server = load_local_module(APP / "server.py", "notify_test_server")
@@ -38,7 +38,7 @@ def modules(monkeypatch):
         if authenticated:
             params = authenticated_mcp_params(params)
             if context:
-                params["_meta"]["claw-os.dev/call-context"].update(context)
+                params["_meta"]["yuos.dev/call-context"].update(context)
         server.app._handle_line(json.dumps({"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": params}))
         return responses.pop()
 
@@ -166,7 +166,7 @@ def test_historical_json_is_never_opened_mutated_moved_or_replayed(
     history = tmp_path / "notifications.json"
     history.write_bytes(old)
     history.chmod(0o400)
-    monkeypatch.setenv("COS_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("YUOS_DATA_DIR", str(tmp_path))
     before = history.stat()
     originals = [(builtins, builtins.open), (io, io.open)]
     for module, original in originals:
@@ -194,17 +194,17 @@ def test_historical_json_is_never_opened_mutated_moved_or_replayed(
 def test_staged_facade_is_complete_and_does_not_package_an_os_provider(tmp_path):
     stage = load_local_module(ROOT / "tools/stage.py", "notify_stage")
     assert stage.stage("notifications", tmp_path, ["notify"]) == ["notify"]
-    installed = tmp_path / "usr/lib/cos/apps/notify"
+    installed = tmp_path / "usr/lib/yuos/apps/notify"
     assert {path.name for path in installed.iterdir()} == {
         "app.json", "server.py", "main.py", "client.py", "web", "web-ui.json",
     }
     for name in ("app.json", "server.py", "main.py", "client.py"):
         assert (installed / name).read_bytes() == (APP / name).read_bytes()
         assert (installed / name).stat().st_mode & 0o777 == 0o644
-    assert not (tmp_path / "usr/lib/cos/python").exists()
+    assert not (tmp_path / "usr/lib/yuos/python").exists()
     assert not (tmp_path / "usr/bin").exists()
     assert not (tmp_path / "var").exists()
     for filename in ("main.py", "server.py", "client.py"):
         source = (APP / filename).read_text()
-        for forbidden in ("notifications.json", "COS_DATA_DIR", "sqlite", "subprocess", "Connection::session", "yu app"):
+        for forbidden in ("notifications.json", "YUOS_DATA_DIR", "sqlite", "subprocess", "Connection::session", "yu app"):
             assert forbidden not in source

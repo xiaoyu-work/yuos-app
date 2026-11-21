@@ -109,7 +109,7 @@ pub const MAX_RESULTS: usize = 100;
 
 /// Runs application with these settings
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    if std::env::var("COS_MCP_SERVER").as_deref() == Ok("1") {
+    if std::env::var("YUOS_MCP_SERVER").as_deref() == Ok("1") {
         return mcp::run().map_err(|e| -> Box<dyn std::error::Error> { e.into() });
     }
 
@@ -280,8 +280,8 @@ impl CosmicFlags for Flags {
 #[derive(Clone, Debug)]
 pub enum Message {
     AppTheme(AppTheme),
-    AskClaw,
-    AskClawSearch,
+    AskYu,
+    AskYuSearch,
     BackendUpdate(BackendName, Arc<dyn Backend>),
     BackendUpdateFinished,
     BackendUpdateStart,
@@ -289,7 +289,7 @@ pub enum Message {
     CategoryIconsLoaded(&'static [Category], Vec<(usize, widget::icon::Handle)>),
     CheckUpdates,
     SourcesRefreshed(Result<(), String>),
-    ClawCatalog(Result<yuos_apps::Catalog, String>),
+    YuOsCatalog(Result<yuos_apps::Catalog, String>),
     UpdateQueryFailed(BackendName, String),
     Config(Config),
     DialogCancel,
@@ -474,7 +474,7 @@ pub struct App {
     pub refreshing_sources: bool,
     pub refresh_error: Option<String>,
     pub update_errors: BTreeMap<BackendName, String>,
-    pub claw_catalog: Option<Result<yuos_apps::Catalog, String>>,
+    pub yuos_catalog: Option<Result<yuos_apps::Catalog, String>>,
     pub update_apps_in_progress: bool,
     /// Prevents multiple instances of `App::update_apps()` tasks
     pub update_apps_scheduled: bool,
@@ -1029,7 +1029,7 @@ impl App {
     }
 
     fn search(&self) -> Task<Message> {
-        if matches!(self.nav_model.active_data::<NavPage>(), Some(NavPage::ClawApps)) {
+        if matches!(self.nav_model.active_data::<NavPage>(), Some(NavPage::YuOsApps)) {
             return Task::none();
         }
         let input = self.search_input.clone();
@@ -1212,7 +1212,7 @@ impl App {
         if matches!(self.mode, Mode::Normal) {
             Task::batch([backends, Task::perform(
                 async { tokio::task::spawn_blocking(yuos_apps::load).await.unwrap_or_else(|error| Err(error.to_string())) },
-                |value| action::app(Message::ClawCatalog(value)),
+                |value| action::app(Message::YuOsCatalog(value)),
             )])
         } else {
             backends
@@ -1840,7 +1840,7 @@ impl App {
         let version_pair = self.updates.as_deref().and_then(|updates| updates.get(index))
             .and_then(|(_, package)| {
                 package.extra.get("previous_version").map(|current| {
-                    fl!("claw-version-pair", current = current.as_str(), available = package.version.as_str())
+                    fl!("yuos-version-pair", current = current.as_str(), available = package.version.as_str())
                 })
             });
 
@@ -2161,7 +2161,7 @@ impl Application for App {
             refreshing_sources: false,
             refresh_error: None,
             update_errors: BTreeMap::new(),
-            claw_catalog: None,
+            yuos_catalog: None,
             update_apps_scheduled: false,
             update_apps_in_progress: false,
             uninstall_purge_data: false,
@@ -2537,10 +2537,10 @@ impl Application for App {
     fn header_end(&self) -> Vec<Element<'_, Message>> {
         match self.mode {
             Mode::Normal => {
-                let ask_claw = widget::tooltip(
+                let ask_yu = widget::tooltip(
                     widget::button::icon(widget::icon::from_name("face-smile-symbolic"))
-                        .on_press(Message::AskClaw),
-                    widget::text(fl!("ask-claw")),
+                        .on_press(Message::AskYu),
+                    widget::text(fl!("ask-yu")),
                     widget::tooltip::Position::Bottom,
                 );
 
@@ -2565,7 +2565,7 @@ impl Application for App {
                     widgets.push(cosmic::widget::indeterminate_circular().size(20.0).into());
                 }
 
-                widgets.push(ask_claw.into());
+                widgets.push(ask_yu.into());
                 widgets.push(manage_repositories.into());
                 widgets
             }

@@ -15,13 +15,13 @@ def load_credential(name, *, namespace="default", timeout=10):
     if not isinstance(namespace, str) or not namespace.strip():
         return None, "credential namespace required"
 
-    cos_bin = os.environ.get("COS_BIN") or shutil.which("yu")
-    if not cos_bin:
+    yu_bin = os.environ.get("YUOS_BIN") or shutil.which("yu")
+    if not yu_bin:
         return None, "yu binary not found"
     try:
         result = subprocess.run(
             [
-                cos_bin,
+                yu_bin,
                 "credential",
                 "load",
                 name,

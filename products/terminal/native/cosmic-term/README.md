@@ -10,9 +10,9 @@ back to using `softbuffer` and `tiny-skia`.
 Custom color schemes can be imported from the `View -> Color schemes...` menu item.
 You can find templates for color schemes in the [color-schemes](color-schemes) folder.
 
-## Claw OS MCP service
+## Yu OS MCP service
 
-The App Host starts `/usr/bin/cosmic-term` with `COS_MCP_SERVER=1`.
+The App Host starts `/usr/bin/cosmic-term` with `YUOS_MCP_SERVER=1`.
 The product's `apps/cosmic-term/app.json` owns the audited command, PATH lookup, and
 terminal-launch tool definitions and capability needs.
 The private compiled-in command library shares Terminal's bounded execution

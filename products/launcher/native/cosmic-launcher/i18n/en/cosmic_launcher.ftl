@@ -18,8 +18,8 @@ state-no-recent = No recent items
 state-no-results = No results in this category
 desktop-action-unsupported = This shortcut is not available here. Open the application from its main result.
 
-ask-claw-ai = Ask Yu AI: { $query }
-ask-claw-ai-hint = Forward to the AI agent
+ask-yu-ai = Ask Yu AI: { $query }
+ask-yu-ai-hint = Forward to the AI agent
 
 ai-card-title = Yu AI
 ai-card-error-title = Yu AI — error

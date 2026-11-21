@@ -11,7 +11,7 @@ import unicodedata
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
 NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:-]*$")
@@ -29,11 +29,11 @@ TRANSFORMS = frozenset(
     }
 )
 ADAPTIVE = frozenset({"true", "automatic", "false"})
-TIMEOUT_SECS = int(os.environ.get("CLAW_DISPLAY_MANAGER_TIMEOUT", "180"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_DISPLAY_MANAGER_TIMEOUT", "180"))
 
 
-def _cos_binary() -> str | None:
-    return os.environ.get("COS_BIN") or shutil.which("yu")
+def _yu_binary() -> str | None:
+    return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _name(raw: object, kind: str, maximum: int) -> str:
@@ -149,12 +149,12 @@ def _broker(
     token: str | None = None,
     confirm: bool = False,
 ) -> dict:
-    cos_bin = _cos_binary()
-    if not cos_bin:
+    yu_bin = _yu_binary()
+    if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Display Manager broker unavailable"
         )
-    argv = [cos_bin, "__display", action]
+    argv = [yu_bin, "__display", action]
     options = (
         ("--output", output),
         ("--from", source_output),
@@ -188,11 +188,11 @@ def _broker(
         )
     except FileNotFoundError as exc:
         raise FileNotFoundError(
-            f"Display Manager broker executable not found: {cos_bin}"
+            f"Display Manager broker executable not found: {yu_bin}"
         ) from exc
     except PermissionError as exc:
         raise PermissionError(
-            f"permission denied launching Display Manager broker: {cos_bin}"
+            f"permission denied launching Display Manager broker: {yu_bin}"
         ) from exc
     except subprocess.TimeoutExpired as exc:
         raise TimeoutError(

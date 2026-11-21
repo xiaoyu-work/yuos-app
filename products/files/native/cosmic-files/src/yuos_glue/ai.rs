@@ -2,7 +2,7 @@
 
 use std::path::{Path, PathBuf};
 
-use claw_os_sdk::{ai, mcp::CallContext};
+use yuos_sdk::{ai, mcp::CallContext};
 use serde::Deserialize;
 use serde_json::{Value, json};
 

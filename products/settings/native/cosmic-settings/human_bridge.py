@@ -9,7 +9,7 @@ import stat
 import subprocess
 import sys
 import time
-from cos_runtime import policy, snapshot
+from yuos_runtime import policy, snapshot
 from _shared.env_scrub import scrub_env
 
 
@@ -58,7 +58,7 @@ def run(argv, timeout):
 
 
 def dispatch(request):
-    if os.environ.get("COS_MCP_SERVER") == "1":
+    if os.environ.get("YUOS_MCP_SERVER") == "1":
         raise PermissionError("human Settings access is unavailable in MCP")
     operation, args = request["operation"], request["arguments"]
     if operation == "run":
@@ -70,7 +70,7 @@ def dispatch(request):
     policy.require("fs.delete" if operation in {"remove", "rename"} else "fs.write", path=path)
     if destination is not None:
         policy.require("fs.write", path=destination)
-    sid = os.environ.get("COS_SESSION") or None
+    sid = os.environ.get("YUOS_SESSION") or None
     if destination is not None:
         snapshot.snapshot_pair(path, destination, "rename", session_id=sid)
     else:

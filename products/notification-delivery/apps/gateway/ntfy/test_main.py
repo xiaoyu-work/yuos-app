@@ -22,7 +22,7 @@ SUCCESS = (200, {}, b'{"id":"fixture-id"}')
 
 @pytest.fixture(autouse=True)
 def isolated_credentials(monkeypatch):
-    for name in ("COS_NTFY_SERVER", "COS_NTFY_DEFAULT_TOPIC", "COS_NTFY_TOKEN"):
+    for name in ("YUOS_NTFY_SERVER", "YUOS_NTFY_DEFAULT_TOPIC", "YUOS_NTFY_TOKEN"):
         monkeypatch.delenv(name, raising=False)
     with mock.patch.object(
         main, "_load_credential", side_effect=lambda name: (CREDENTIALS[name], None),
@@ -32,11 +32,11 @@ def isolated_credentials(monkeypatch):
 
 @pytest.fixture(params=["direct", "mcp"])
 def invoke(request):
-    from claw_os_sdk.mcp import App
+    from yuos_sdk.mcp import App
 
     servers = []
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-        os.environ, {"COS_APP_MANIFEST": str(Path(__file__).with_name("app.json"))},
+        os.environ, {"YUOS_APP_MANIFEST": str(Path(__file__).with_name("app.json"))},
     ), mock.patch.object(App, "serve", lambda app: servers.append(app)):
         load_local_module(Path(__file__).with_name("server.py"), "gateway_ntfy_server")
     assert len(servers) == 1
@@ -135,7 +135,7 @@ def test_authentication_precedence(invoke, monkeypatch, mode):
         kwargs["bearer"] = " explicit-token "
     if mode in ("basic", "both"):
         kwargs["basic"] = "user:fixture"
-    monkeypatch.setenv("COS_NTFY_TOKEN", " env-token " if mode == "environment" else "")
+    monkeypatch.setenv("YUOS_NTFY_TOKEN", " env-token " if mode == "environment" else "")
     with mock.patch.object(main, "_load_credential", return_value=(None, None)), mock.patch.object(
         main.safe_egress, "safe_urlopen", return_value=SUCCESS,
     ) as transport:
@@ -158,7 +158,7 @@ def test_public_server_allows_explicit_auth_only(invoke):
 @pytest.mark.parametrize("environment", [False, True])
 def test_default_topic_selection(invoke, monkeypatch, environment):
     if environment:
-        monkeypatch.setenv("COS_NTFY_DEFAULT_TOPIC", " env-topic ")
+        monkeypatch.setenv("YUOS_NTFY_DEFAULT_TOPIC", " env-topic ")
     with mock.patch.object(main.safe_egress, "safe_urlopen", return_value=SUCCESS):
         result = invoke("send", server=main.DEFAULT_SERVER, text="hello")
     assert result["topic"] == ("env-topic" if environment else "default-topic")

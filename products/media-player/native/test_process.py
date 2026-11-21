@@ -44,7 +44,7 @@ def main():
     parser.add_argument("--binary", type=Path, default=ROOT / "build/native-target/debug/cosmic-player")
     parser.add_argument("--source", type=Path, default=ROOT / "build/media-player-native")
     parser.add_argument("--fixture-binary", type=Path, default=ROOT / "build/native-target/debug/examples/media-player-mpris-fixture")
-    parser.add_argument("--cos-binary", type=Path)
+    parser.add_argument("--yuos-binary", type=Path)
     options = parser.parse_args()
     fixture = ROOT / "build/player-process-fixture"
     fixture.mkdir()
@@ -168,21 +168,21 @@ def main():
         cli.write_text(
             "#!/usr/bin/python3\n"
             "import json,os,socket,struct,sys,pathlib\n"
-            "assert 'CLAW_COS_BIN' not in os.environ\n"
+            "assert 'YUOS_KERNEL_BIN' not in os.environ\n"
             "assert 'DBUS_SESSION_BUS_ADDRESS' not in os.environ\n"
-            "assert not pathlib.Path('/run/cos/session-bus').exists()\n"
+            "assert not pathlib.Path('/run/yuos/session-bus').exists()\n"
             "assert not pathlib.Path('/run/user').exists()\n"
             "args=sys.argv[1:];assert args[:2]==['--wire=1','__media-player']\n"
             "assert len(args)==5 and args[3]=='--deadline'\n"
             "request={'v':2,'id':'fixture-call','command':'system.media-player.control',"
-            "'params':{'session':os.environ['COS_SESSION'],'action':args[2],'deadline_unix_ms':int(args[4])}}\n"
+            "'params':{'session':os.environ['YUOS_SESSION'],'action':args[2],'deadline_unix_ms':int(args[4])}}\n"
             "def read(s,n):\n"
             " data=b''\n"
             " while len(data)<n:\n"
             "  chunk=s.recv(n-len(data));assert chunk;data+=chunk\n"
             " return data\n"
             "with socket.socket(socket.AF_UNIX) as s:\n"
-            " s.connect('/run/cos/clawd.sock');data=json.dumps(request).encode()\n"
+            " s.connect('/run/yuos/yuosd.sock');data=json.dumps(request).encode()\n"
             " s.sendall(b'CBK1\\x01\\x00'+struct.pack('>I',len(data))+data)\n"
             " header=read(s,10);assert header[:6]==b'CBK1\\x02\\x00'\n"
             " result=json.loads(read(s,struct.unpack('>I',header[6:])[0]))\n"
@@ -198,18 +198,18 @@ def main():
             "--ro-bind", "/usr/share", "/usr/share", "--dir", "/usr/local/bin",
             "--ro-bind", "/lib", "/lib",
             "--ro-bind", "/lib64", "/lib64", "--proc", "/proc", "--dev", "/dev",
-            "--tmpfs", "/run", "--tmpfs", "/work", "--dir", "/run/cos",
-            "--ro-bind", str(options.cos_binary.resolve() if options.cos_binary else cli), "/usr/local/bin/yu",
+            "--tmpfs", "/run", "--tmpfs", "/work", "--dir", "/run/yuos",
+            "--ro-bind", str(options.yu_binary.resolve() if options.yu_binary else cli), "/usr/local/bin/yu",
             "--ro-bind", str(binary), "/work/cosmic-player",
-            "--ro-bind", str(installed / "usr/lib/cos/apps/cosmic-player/app.json"), "/work/app.json",
-            "--ro-bind", str(fixture / "broker.sock"), "/run/cos/clawd.sock",
+            "--ro-bind", str(installed / "usr/lib/yuos/apps/cosmic-player/app.json"), "/work/app.json",
+            "--ro-bind", str(fixture / "broker.sock"), "/run/yuos/yuosd.sock",
             "--chdir", "/work",
         ]
         for name, value in {
-            "COS_MCP_SERVER": "1", "COS_APP_ID": "cosmic-player",
-            "COS_APP_MANIFEST": "/work/app.json", "COS_SESSION": "worker-session",
-            "COS_WORKER_SANDBOX": "1", "COS_RUNTIME_DIR": "/run/cos",
-            "COS_DATA_DIR": "/work/data", "HOME": "/work",
+            "YUOS_MCP_SERVER": "1", "YUOS_APP_ID": "cosmic-player",
+            "YUOS_APP_MANIFEST": "/work/app.json", "YUOS_SESSION": "worker-session",
+            "YUOS_WORKER_SANDBOX": "1", "YUOS_RUNTIME_DIR": "/run/yuos",
+            "YUOS_DATA_DIR": "/work/data", "HOME": "/work",
             "XDG_CONFIG_HOME": "/work/config", "XDG_CACHE_HOME": "/work/cache",
             "TMPDIR": "/work", "PATH": "/usr/sbin:/usr/bin:/sbin:/bin",
         }.items():
@@ -239,7 +239,7 @@ def main():
         def params(action, arguments=None, **context):
             return {
                 "name": f"player.{action}", "arguments": arguments or {},
-                "_meta": {"claw-os.dev/call-context": {
+                "_meta": {"yuos.dev/call-context": {
                     "wire_version": 1, "call_id": f"fixture-{counter}", "trace_id": "fixture",
                     "session_id": "metadata-does-not-select-broker-session", "task_id": "fixture-task",
                     "caller": {"kind": "system-agent", "id": "fixture", "owner_uid": 1000}, **context,
@@ -262,12 +262,12 @@ def main():
         process.stdin.flush()
         tools = request("tools/list", {})["result"]["tools"]
         assert {tool["name"] for tool in tools} == {f"player.{name}" for name in ACTIONS}
-        wrong = json.loads((installed / "usr/lib/cos/apps/cosmic-player/app.json").read_text())
+        wrong = json.loads((installed / "usr/lib/yuos/apps/cosmic-player/app.json").read_text())
         wrong["id"] = "wrong-identity"
         (fixture / "wrong.json").write_text(json.dumps(wrong))
         wrong_identity = subprocess.run([
             *command, "--ro-bind", str(fixture / "wrong.json"), "/work/wrong.json",
-            "--setenv", "COS_APP_MANIFEST", "/work/wrong.json", "--", "/work/cosmic-player",
+            "--setenv", "YUOS_APP_MANIFEST", "/work/wrong.json", "--", "/work/cosmic-player",
         ], input="", capture_output=True, text=True, timeout=10)
         assert wrong_identity.returncode != 0 and "cosmic-player" in wrong_identity.stderr
         denied(request("tools/call", {"name": "player.status", "arguments": {}}))

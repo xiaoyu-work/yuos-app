@@ -1,6 +1,6 @@
 # Text Editor
 
-The complete native Claw OS Text Editor now lives in this product:
+The complete native Yu OS Text Editor now lives in this product:
 `cosmic-edit`, its UI, seven MCP tools, localization, resources and packaging.
 Installed identity `/usr/bin/cosmic-edit` / `com.yuos.Edit` is unchanged.
 

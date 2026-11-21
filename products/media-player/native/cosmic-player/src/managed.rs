@@ -66,7 +66,7 @@ impl Request {
 
 async fn exchange(reply: Option<Value>) -> Result<Option<Command>, String> {
     let value = tokio::task::spawn_blocking(move || {
-        claw_os_sdk::cos_call_json_with_stdin(
+        yuos_sdk::yu_call_json_with_stdin(
             "media-player",
             "exchange",
             ["__gui-media", "--request-stdin"],

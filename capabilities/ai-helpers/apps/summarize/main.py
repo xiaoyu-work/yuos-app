@@ -1,9 +1,9 @@
-"""Summarize explicitly provided text through the Claw OS AI gate."""
+"""Summarize explicitly provided text through the Yu OS AI gate."""
 
 from __future__ import annotations
 
-from claw_os_sdk import ai
-from cos_runtime import memory, policy
+from yuos_sdk import ai
+from yuos_runtime import memory, policy
 
 
 INPUT_SOURCE = "<input>"

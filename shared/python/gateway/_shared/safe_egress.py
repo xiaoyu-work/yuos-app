@@ -15,7 +15,7 @@ raw :mod:`urllib.request` API does not:
    AWS / GCP / Azure metadata services on ``169.254.169.254``,
    ``fd00:ec2::254``, etc. Operators who actually need to hit
    ``localhost`` (e.g. a sidecar ``signal-cli-rest-api`` container)
-   opt in by exporting ``COS_GATEWAY_ALLOW_PRIVATE=1``. DNS failures
+   opt in by exporting ``YUOS_GATEWAY_ALLOW_PRIVATE=1``. DNS failures
    fail closed, and the HTTP connection is made to the exact validated
    socket address so a second lookup cannot rebind to an internal IP.
 
@@ -29,7 +29,7 @@ raw :mod:`urllib.request` API does not:
    redirect-SSRF jumping-off point.
 
 4. **Policy gating.** Every call routes through
-   ``cos_runtime.policy.require("net.dial", host=hostname)``. The kernel
+   ``yuos_runtime.policy.require("net.dial", host=hostname)``. The kernel
    is the source of truth on whether *this* session can talk to
    *that* host; the helper raises :class:`PermissionDenied` otherwise.
 
@@ -54,16 +54,16 @@ import urllib.request
 from typing import Mapping, Optional, Tuple
 
 try:
-    from cos_runtime import policy  # type: ignore[import-not-found]
+    from yuos_runtime import policy  # type: ignore[import-not-found]
 except Exception:  # pragma: no cover - exercised only when runtime is absent
     policy = None  # type: ignore[assignment]
 
 try:
-    from cos_runtime import egress  # type: ignore[import-not-found]
+    from yuos_runtime import egress  # type: ignore[import-not-found]
 except Exception:  # pragma: no cover - exercised only when runtime is absent
 
     class _NoEgress:
-        """Stand-in used outside a Claw OS runtime: never brokered."""
+        """Stand-in used outside a Yu OS runtime: never brokered."""
 
         @staticmethod
         def available() -> bool:
@@ -71,7 +71,7 @@ except Exception:  # pragma: no cover - exercised only when runtime is absent
 
         @staticmethod
         def create_connection(host, port, timeout=None):
-            raise RuntimeError("cos_runtime.egress is unavailable")
+            raise RuntimeError("yuos_runtime.egress is unavailable")
 
     egress = _NoEgress()  # type: ignore[assignment]
 
@@ -94,7 +94,7 @@ class EgressBlocked(EgressError):
 # Internals -----------------------------------------------------------------
 
 
-_PRIVATE_OK_ENV = "COS_GATEWAY_ALLOW_PRIVATE"
+_PRIVATE_OK_ENV = "YUOS_GATEWAY_ALLOW_PRIVATE"
 _MAX_CONNECT_TARGETS = 8
 _HTTP_TOKEN = re.compile(r"^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$")
 
@@ -453,7 +453,7 @@ def safe_tls_connect(
         )
     if policy is None:
         raise EgressBlocked(
-            "cos_runtime.policy unavailable; refusing outbound connection"
+            "yuos_runtime.policy unavailable; refusing outbound connection"
         )
     _ = verb_id
     scope_host = f"[{host}]:{port}" if ":" in host else f"{host}:{port}"
@@ -507,7 +507,7 @@ def safe_urlopen(
         urllib.error.HTTPError: Server returned a non-2xx status,
                        *including* 30x redirects (which are blocked).
         urllib.error.URLError: Network-level failure.
-        cos_runtime.policy.PermissionDenied: Kernel denied the verb.
+        yuos_runtime.policy.PermissionDenied: Kernel denied the verb.
     """
     scheme, host, port, path = _parse_target(url)
     if not _allow_private() and _is_private_address(host):
@@ -520,7 +520,7 @@ def safe_urlopen(
         # Fail closed: no kernel runtime means no gateway can call
         # out. Tests stub `policy` in by monkey-patching the module.
         raise EgressBlocked(
-            "cos_runtime.policy unavailable; refusing outbound request"
+            "yuos_runtime.policy unavailable; refusing outbound request"
         )
     _ = verb_id
     scope_host = f"[{host}]:{port}" if ":" in host else f"{host}:{port}"

@@ -312,7 +312,7 @@ fn apps() -> Section<crate::pages::Message> {
             return widget::space().into();
         };
 
-        crate::widget::claw_section_with_capacity(9)
+        crate::widget::yuos_section_with_capacity(9)
             .title(&section.title)
             .add(app_item(
                 &mime_apps.apps[DROPDOWN_WEB_BROWSER],

@@ -70,7 +70,7 @@ def release_tag(selection, release_version):
     prefix = "cap-" + selection.removeprefix("capability:") if selection.startswith("capability:") else (
         selection if selection in ("support", "sets") else "app-" + selection
     )
-    return f"{prefix}-v{release_version.replace('~', '-')}"
+    return f"yuos-{prefix}-v{release_version.replace('~', '-')}"
 
 
 def require_publication_contract(settings):
@@ -93,9 +93,9 @@ def verify_artifacts(plan, directory):
     for name, record in records.items():
         entry = expected[name]
         control = record["control"]
-        if control.get("X-Claw-Source-Revision") != plan["source_revision"] or (
-            control.get("X-Claw-Variant") != entry["variant"]
-        ) or control.get("X-Claw-App-Ids", "") != ", ".join(entry["apps"]):
+        if control.get("X-YuOS-Source-Revision") != plan["source_revision"] or (
+            control.get("X-YuOS-Variant") != entry["variant"]
+        ) or control.get("X-YuOS-App-Ids", "") != ", ".join(entry["apps"]):
             raise ValueError("Release artifact metadata does not match the tested plan")
     jobs = {job["architecture"] for job in plan["matrix"]["include"]}
     development = {}
@@ -106,7 +106,7 @@ def verify_artifacts(plan, directory):
     for architecture in jobs:
         report = json.loads((directory / f"build-record-{architecture}.json").read_text())
         wanted = [record for record in records.values() if record["architecture"] == architecture]
-        if report.get("format") != "claw.app-build/v1" or report.get("plan") != plan or (
+        if report.get("format") != "yuos.app-build/v1" or report.get("plan") != plan or (
             sorted(report["packages"], key=identity) != sorted(wanted, key=identity)
         ):
             raise ValueError("Matrix build records differ from the Debian artifacts")
@@ -133,7 +133,8 @@ def assert_initial_publication(github):
     page = 1
     while True:
         _, releases = github.api(f"releases?per_page=100&page={page}")
-        if any(re.match(r"(?:app-|cap-|support-v|sets-v)", release["tag_name"]) for release in releases):
+        if any(release["tag_name"].startswith(("yuos-app-", "yuos-cap-", "yuos-support-v", "yuos-sets-v"))
+               for release in releases):
             raise ValueError("Prior App releases exist: restore the authenticated APT state, do not initialize")
         if len(releases) < 100:
             return
@@ -214,7 +215,7 @@ def release_assets(plan, selection, packages, directory, signing, *, development
         from release_store import release_files
         snapshot_records = release_files(snapshots, target)
     metadata = {
-        "format": "claw.app-release-assets/v1", "selection": selection,
+        "format": "yuos.app-release-assets/v1", "selection": selection,
         "version": plan["version"], "source_revision": plan["source_revision"],
         "packages": sorted(selected, key=identity),
         "development": fixture,
@@ -323,7 +324,7 @@ def push_snapshot(github, output, previous_commit):
         if (output / "store").exists():
             paths.append("store")
         run(["git", "add", "--", *paths], cwd=output)
-        run(["git", "-c", "user.name=Claw OS Applications Release",
+        run(["git", "-c", "user.name=Yu OS Applications Release",
              "-c", "user.email=41898282+github-actions[bot]@users.noreply.github.com",
              "commit", "--quiet", "--message", "Publish authenticated App APT metadata"], cwd=output)
         # An ordinary fast-forward push is also the publication compare-and-swap.

@@ -2,7 +2,7 @@
 
 `hardware-center` exposes nine MCP tools for the system summary, CPU, GPU,
 PCI, USB, memory, storage, drivers and thermals. All use the existing named
-hardware observation capability through the Claw OS broker.
+hardware observation capability through the Yu OS broker.
 
 `crash-doctor` exposes recent crashes, diagnosis and backtrace tools through
 the separate sensitive crash capability. Query bounds, defaults and canonical

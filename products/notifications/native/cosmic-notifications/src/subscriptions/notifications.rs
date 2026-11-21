@@ -270,7 +270,7 @@ impl Machine<Waiting> {
                             let server = connection.object_server();
                             if let Ok(presentation) = server
                                 .interface::<_, Presentation>(
-                                    claw_notification_presentation::OBJECT_PATH,
+                                    yuos_notification_presentation::OBJECT_PATH,
                                 )
                                 .await
                                 .inspect_err(|error| {
@@ -335,7 +335,7 @@ pub enum Input {
     Closed(u32, CloseReason),
     AppletDismissed(u32),
     AppletConn(Connection),
-    PresentationPreferencesChanged(claw_notification_presentation::Preferences),
+    PresentationPreferencesChanged(yuos_notification_presentation::Preferences),
 }
 
 #[derive(Debug, Clone)]
@@ -353,7 +353,7 @@ pub enum Event {
         id: u32,
         action: ActionId,
     },
-    Preferences(claw_notification_presentation::Preferences),
+    Preferences(yuos_notification_presentation::Preferences),
     Unavailable(String),
 }
 
@@ -502,7 +502,7 @@ impl Notifications {
     async fn get_server_information(
         &self,
     ) -> (&'static str, &'static str, &'static str, &'static str) {
-        ("cosmic-notifications", "ClawOS", VERSION, "1.2")
+        ("cosmic-notifications", "YuOS", VERSION, "1.2")
     }
 
     ///
@@ -541,7 +541,7 @@ impl Notifications {
             .ok_or_else(|| zbus::fdo::Error::AccessDenied("missing sender".into()))?;
         let (id, replacing) = self.allocate(sender.as_str(), replaces_id)?;
         let connection_bound = matches!(
-            hints.remove("x-claw-connection-bound"),
+            hints.remove("x-yuos-connection-bound"),
             Some(zbus::zvariant::Value::Bool(true)),
         );
         let hints_clone = hints
@@ -603,7 +603,7 @@ impl Notifications {
                     Ok(_) => {}
                 }
                 if let Ok(interface) = object_server
-                    .interface::<_, Presentation>(claw_notification_presentation::OBJECT_PATH)
+                    .interface::<_, Presentation>(yuos_notification_presentation::OBJECT_PATH)
                     .await
                     .inspect_err(|error| {
                         error!("Notification presentation interface is unavailable: {error}");

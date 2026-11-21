@@ -4,7 +4,7 @@ This is the manifest half of [Capture](../../README.md). The complete native
 implementation is in `../../native/cosmic-screenshot/` and installs to the
 unchanged `/usr/bin/cosmic-screenshot`.
 
-The App Host selects that fixed root-owned vendor binary with `COS_MCP_SERVER=1`.
+The App Host selects that fixed root-owned vendor binary with `YUOS_MCP_SERVER=1`.
 The SDK validates the manifest/tool/call-context contract. The only MCP tool,
 `screenshot.capture`, uses `desktop.capture:screen` and an exact
 `fs.write:save_dir` grant. `save_dir` retains its owner-resolved `~/Pictures`

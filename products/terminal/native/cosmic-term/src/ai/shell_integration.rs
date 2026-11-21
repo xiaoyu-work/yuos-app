@@ -1,7 +1,7 @@
 //! Shell integration scripts.
 //!
 //! Port of `aterm-local/src/shellIntegration.ts`. Generates per-shell snippets
-//! emitting OSC 133 markers and defining the `__cos_ai` function which:
+//! emitting OSC 133 markers and defining the `__yuos_ai` function which:
 //!   1. Overwrites the echo line in the alacritty grid with `@ <prompt>`.
 //!   2. `exec`s `copilot -p "<prompt with context>" --allow-all-tools`.
 //!
@@ -31,7 +31,7 @@ use super::{bridge_to_io, path_str};
 /// Paths to integration scripts on disk.
 #[derive(Clone, Debug)]
 pub struct IntegrationDirs {
-    /// Root directory under `XDG_CACHE_HOME/cosmic-term/cos-ai`.
+    /// Root directory under `XDG_CACHE_HOME/cosmic-term/yuos-ai`.
     pub root: PathBuf,
     pub bash_init: PathBuf,
     pub bash_integration: PathBuf,
@@ -51,7 +51,7 @@ impl IntegrationDirs {
             zsh_integration: root.join("integration.zsh"),
             fish_integration: root.join("integration.fish"),
             pwsh_integration: root.join("integration.ps1"),
-            cmd_stub: root.join("__cos_ai.cmd"),
+            cmd_stub: root.join("__yuos_ai.cmd"),
             root,
         }
     }
@@ -69,7 +69,7 @@ pub fn ensure_integration_dirs(
     allow_all_tools: bool,
     model: &str,
 ) -> io::Result<IntegrationDirs> {
-    let root = cache_dir.join("cos-ai");
+    let root = cache_dir.join("yuos-ai");
     // Product writes create authorized parents, but we mkdir the root
     // up-front so a permission failure surfaces here (rather than partway
     // through the per-shell writes below) with a clear path in the error.
@@ -136,31 +136,31 @@ const BASH_RCFILE_WRAPPER: &str = r#"# cosmic-term AI integration wrapper.
 if [ -r "$HOME/.bashrc" ]; then
     . "$HOME/.bashrc"
 fi
-if [ -n "$COS_AI_INTEGRATION_DIR" ] && [ -r "$COS_AI_INTEGRATION_DIR/integration.bash" ]; then
-    . "$COS_AI_INTEGRATION_DIR/integration.bash"
+if [ -n "$YUOS_AI_INTEGRATION_DIR" ] && [ -r "$YUOS_AI_INTEGRATION_DIR/integration.bash" ]; then
+    . "$YUOS_AI_INTEGRATION_DIR/integration.bash"
 fi
 "#;
 
 fn bash_integration(copilot_flags: &str, copilot_bin: &str) -> String {
     format!(
         r#"# cosmic-term AI integration — auto-generated, do not edit.
-if [ -n "$__COS_TERM_SHELL_INTEGRATION_ACTIVE" ]; then return; fi
-__COS_TERM_SHELL_INTEGRATION_ACTIVE=1
+if [ -n "$__YUOS_TERM_SHELL_INTEGRATION_ACTIVE" ]; then return; fi
+__YUOS_TERM_SHELL_INTEGRATION_ACTIVE=1
 
 # OSC 133 command boundary markers (Marked command lines / output / exit code).
-__cos_term_precmd() {{
+__yuos_term_precmd() {{
     local ec=$?
     printf '\e]133;D;%d\a' "$ec"
     printf '\e]133;A\a'
 }}
-__cos_term_preexec() {{
+__yuos_term_preexec() {{
     printf '\e]133;C\a'
 }}
 case "$PROMPT_COMMAND" in
-    *__cos_term_precmd*) ;;
-    *) PROMPT_COMMAND="__cos_term_precmd${{PROMPT_COMMAND:+;$PROMPT_COMMAND}}" ;;
+    *__yuos_term_precmd*) ;;
+    *) PROMPT_COMMAND="__yuos_term_precmd${{PROMPT_COMMAND:+;$PROMPT_COMMAND}}" ;;
 esac
-trap '__cos_term_preexec' DEBUG
+trap '__yuos_term_preexec' DEBUG
 
 # Ensure PS1 has a 133;B marker (end of prompt / start of command input).
 case "$PS1" in
@@ -168,26 +168,26 @@ case "$PS1" in
     *) PS1="${{PS1}}\[\e]133;B\a\]" ;;
 esac
 
-# Hide `__cos_ai` invocations from history (leading space).
+# Hide `__yuos_ai` invocations from history (leading space).
 case "$HISTCONTROL" in
     *ignorespace*|*ignoreboth*) ;;
     *) HISTCONTROL="${{HISTCONTROL:+$HISTCONTROL:}}ignorespace" ;;
 esac
 
-# AI assistant function — invoked as ` __cos_ai <queryId>` by cosmic-term.
-# Reads prompt from $COS_AI_TMP/aq-$1.txt and context from $COS_AI_TMP/ac-$1.json.
-__cos_ai() {{
-    if [ -z "$COS_AI_TMP" ]; then
+# AI assistant function — invoked as ` __yuos_ai <queryId>` by cosmic-term.
+# Reads prompt from $YUOS_AI_TMP/aq-$1.txt and context from $YUOS_AI_TMP/ac-$1.json.
+__yuos_ai() {{
+    if [ -z "$YUOS_AI_TMP" ]; then
         echo "cosmic-term AI not active in this shell." >&2
         return 1
     fi
-    local qfile="$COS_AI_TMP/aq-$1.txt"
-    local cfile="$COS_AI_TMP/ac-$1.json"
+    local qfile="$YUOS_AI_TMP/aq-$1.txt"
+    local cfile="$YUOS_AI_TMP/ac-$1.json"
     if [ ! -f "$qfile" ]; then
-        echo "cos-ai: query file $qfile missing." >&2
+        echo "yuos-ai: query file $qfile missing." >&2
         return 1
     fi
-    # Overwrite shell echo of "__cos_ai <id>" with a clean "@ <prompt>" line.
+    # Overwrite shell echo of "__yuos_ai <id>" with a clean "@ <prompt>" line.
     local fl
     if IFS= read -r fl < "$qfile" && [ -n "$fl" ]; then
         local trunc="$fl"
@@ -217,49 +217,49 @@ $(cat "$qfile")
 
 const ZSH_DOTDIR_WRAPPER: &str = r#"# cosmic-term AI integration ZDOTDIR wrapper.
 # Source the user's real zshrc first (preferring an earlier $ZDOTDIR override).
-if [ -n "$COS_TERM_PREV_ZDOTDIR" ] && [ -r "$COS_TERM_PREV_ZDOTDIR/.zshrc" ]; then
-    ZDOTDIR="$COS_TERM_PREV_ZDOTDIR"
-    source "$COS_TERM_PREV_ZDOTDIR/.zshrc"
+if [ -n "$YUOS_TERM_PREV_ZDOTDIR" ] && [ -r "$YUOS_TERM_PREV_ZDOTDIR/.zshrc" ]; then
+    ZDOTDIR="$YUOS_TERM_PREV_ZDOTDIR"
+    source "$YUOS_TERM_PREV_ZDOTDIR/.zshrc"
 elif [ -r "$HOME/.zshrc" ]; then
     source "$HOME/.zshrc"
 fi
-unset COS_TERM_PREV_ZDOTDIR
-if [ -n "$COS_AI_INTEGRATION_DIR" ] && [ -r "$COS_AI_INTEGRATION_DIR/integration.zsh" ]; then
-    source "$COS_AI_INTEGRATION_DIR/integration.zsh"
+unset YUOS_TERM_PREV_ZDOTDIR
+if [ -n "$YUOS_AI_INTEGRATION_DIR" ] && [ -r "$YUOS_AI_INTEGRATION_DIR/integration.zsh" ]; then
+    source "$YUOS_AI_INTEGRATION_DIR/integration.zsh"
 fi
 "#;
 
 fn zsh_integration(copilot_flags: &str, copilot_bin: &str) -> String {
     format!(
         r#"# cosmic-term AI integration — auto-generated, do not edit.
-if [[ -n "$__COS_TERM_SHELL_INTEGRATION_ACTIVE" ]]; then return; fi
-__COS_TERM_SHELL_INTEGRATION_ACTIVE=1
+if [[ -n "$__YUOS_TERM_SHELL_INTEGRATION_ACTIVE" ]]; then return; fi
+__YUOS_TERM_SHELL_INTEGRATION_ACTIVE=1
 
-__cos_term_precmd() {{
+__yuos_term_precmd() {{
     local ec=$?
     printf '\e]133;D;%d\a' "$ec"
     printf '\e]133;A\a'
 }}
-__cos_term_preexec() {{
+__yuos_term_preexec() {{
     printf '\e]133;C\a'
 }}
 autoload -Uz add-zsh-hook
-add-zsh-hook precmd __cos_term_precmd
-add-zsh-hook preexec __cos_term_preexec
+add-zsh-hook precmd __yuos_term_precmd
+add-zsh-hook preexec __yuos_term_preexec
 
 PS1="${{PS1}}%{{$(printf '\e]133;B\a')%}}"
 
 setopt HIST_IGNORE_SPACE
 
-__cos_ai() {{
-    if [[ -z "$COS_AI_TMP" ]]; then
+__yuos_ai() {{
+    if [[ -z "$YUOS_AI_TMP" ]]; then
         echo "cosmic-term AI not active in this shell." >&2
         return 1
     fi
-    local qfile="$COS_AI_TMP/aq-$1.txt"
-    local cfile="$COS_AI_TMP/ac-$1.json"
+    local qfile="$YUOS_AI_TMP/aq-$1.txt"
+    local cfile="$YUOS_AI_TMP/ac-$1.json"
     if [[ ! -f "$qfile" ]]; then
-        echo "cos-ai: query file $qfile missing." >&2
+        echo "yuos-ai: query file $qfile missing." >&2
         return 1
     fi
     local fl
@@ -292,29 +292,29 @@ $(cat "$qfile")
 fn fish_integration(copilot_flags: &str, copilot_bin: &str) -> String {
     format!(
         r#"# cosmic-term AI integration — auto-generated, do not edit.
-if test -n "$__COS_TERM_SHELL_INTEGRATION_ACTIVE"
+if test -n "$__YUOS_TERM_SHELL_INTEGRATION_ACTIVE"
     exit 0
 end
-set -gx __COS_TERM_SHELL_INTEGRATION_ACTIVE 1
+set -gx __YUOS_TERM_SHELL_INTEGRATION_ACTIVE 1
 
-function __cos_term_preexec --on-event fish_preexec
+function __yuos_term_preexec --on-event fish_preexec
     printf '\e]133;C\a'
 end
 
-function __cos_term_postexec --on-event fish_postexec
+function __yuos_term_postexec --on-event fish_postexec
     printf '\e]133;D;%d\a' $status
     printf '\e]133;A\a'
 end
 
-function __cos_ai
-    if test -z "$COS_AI_TMP"
+function __yuos_ai
+    if test -z "$YUOS_AI_TMP"
         echo "cosmic-term AI not active in this shell." >&2
         return 1
     end
-    set -l qfile "$COS_AI_TMP/aq-$argv[1].txt"
-    set -l cfile "$COS_AI_TMP/ac-$argv[1].json"
+    set -l qfile "$YUOS_AI_TMP/aq-$argv[1].txt"
+    set -l cfile "$YUOS_AI_TMP/ac-$argv[1].json"
     if not test -f "$qfile"
-        echo "cos-ai: query file $qfile missing." >&2
+        echo "yuos-ai: query file $qfile missing." >&2
         return 1
     end
     set -l fl (head -n1 "$qfile")
@@ -347,35 +347,35 @@ end
 fn pwsh_integration(copilot_flags: &str, copilot_bin: &str) -> String {
     format!(
         r##"# cosmic-term AI integration — auto-generated, do not edit.
-if ($env:__COS_TERM_SHELL_INTEGRATION_ACTIVE -eq '1') {{ return }}
-$env:__COS_TERM_SHELL_INTEGRATION_ACTIVE = '1'
+if ($env:__YUOS_TERM_SHELL_INTEGRATION_ACTIVE -eq '1') {{ return }}
+$env:__YUOS_TERM_SHELL_INTEGRATION_ACTIVE = '1'
 
 # Inject OSC 133 markers via prompt function override.
-$global:__cos_term_inner_prompt = $function:prompt
+$global:__yuos_term_inner_prompt = $function:prompt
 function global:prompt {{
     $ec = if ($LASTEXITCODE -ne $null) {{ $LASTEXITCODE }} else {{ 0 }}
-    "$([char]27)]133;D;$ec$([char]7)$([char]27)]133;A$([char]7)" + (& $global:__cos_term_inner_prompt) + "$([char]27)]133;B$([char]7)"
+    "$([char]27)]133;D;$ec$([char]7)$([char]27)]133;A$([char]7)" + (& $global:__yuos_term_inner_prompt) + "$([char]27)]133;B$([char]7)"
 }}
 
-# Filter `__cos_ai` lines from PSReadLine history.
+# Filter `__yuos_ai` lines from PSReadLine history.
 if (Get-Module -ListAvailable PSReadLine) {{
     Set-PSReadLineOption -AddToHistoryHandler {{
         param([string]$line)
-        if ($line.TrimStart() -match '^__cos_ai') {{ return $false }}
+        if ($line.TrimStart() -match '^__yuos_ai') {{ return $false }}
         return $true
     }}
 }}
 
-function global:__cos_ai {{
+function global:__yuos_ai {{
     param([string]$id)
-    if (-not $env:COS_AI_TMP) {{
+    if (-not $env:YUOS_AI_TMP) {{
         Write-Error "cosmic-term AI not active in this shell."
         return
     }}
-    $qfile = Join-Path $env:COS_AI_TMP "aq-$id.txt"
-    $cfile = Join-Path $env:COS_AI_TMP "ac-$id.json"
+    $qfile = Join-Path $env:YUOS_AI_TMP "aq-$id.txt"
+    $cfile = Join-Path $env:YUOS_AI_TMP "ac-$id.json"
     if (-not (Test-Path $qfile)) {{
-        Write-Error "cos-ai: query file $qfile missing."
+        Write-Error "yuos-ai: query file $qfile missing."
         return
     }}
     $query = Get-Content -Raw $qfile

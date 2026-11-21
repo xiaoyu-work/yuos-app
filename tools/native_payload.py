@@ -160,7 +160,7 @@ def plan(product):
     )
     return NativePlan(
         product, app_id, app, source / "native/LICENSE",
-        Path("usr/lib/cos/apps") / app.relative_to(source / "apps"),
+        Path("usr/lib/yuos/apps") / app.relative_to(source / "apps"),
         program, tuple(auxiliary), entries, selector, gui_entries, manifest_bytes,
         tuple(private_resources), tuple(private_executables),
     )
@@ -234,7 +234,7 @@ def _payload_path(name):
 def _gui_argv_license(native):
     for manifest in native.rglob("Cargo.toml"):
         dependencies = tomllib.loads(manifest.read_text()).get("dependencies", {})
-        if "claw-app-gui-argv" in dependencies:
+        if "yuos-app-gui-argv" in dependencies:
             license_path = ROOT / "LICENSE"
             if not license_path.is_file() or license_path.is_symlink():
                 raise ValueError("Native GUI argv support requires its original App-owned license")
@@ -282,7 +282,7 @@ def prepare(selected, installed, destination, architecture):
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(license_path, target)
         if gui_argv_license:
-            target = destination / "licenses/claw-app-gui-argv/LICENSE"
+            target = destination / "licenses/yuos-app-gui-argv/LICENSE"
             if target.exists():
                 raise ValueError("Native product licenses conflict with GUI argv support")
             target.parent.mkdir(parents=True, exist_ok=True)

@@ -37,7 +37,7 @@ impl Fixture {
             "XDG_CONFIG_HOME",
             "XDG_DATA_HOME",
             "XDG_DATA_DIRS",
-            claw_notification_presentation::PRESENTER_FD_ENV,
+            yuos_notification_presentation::PRESENTER_FD_ENV,
         ]
         .into_iter()
         .map(|key| (key, std::env::var_os(key)))

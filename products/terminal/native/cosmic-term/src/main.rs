@@ -94,12 +94,12 @@ pub fn icon_cache_get(name: &'static str, size: u16) -> widget::icon::Icon {
 /// Runs application with these settings
 #[rustfmt::skip]
 fn main() -> Result<(), Box<dyn Error>> {
-    if std::env::var("COS_MCP_SERVER").as_deref() == Ok("1") {
+    if std::env::var("YUOS_MCP_SERVER").as_deref() == Ok("1") {
         return mcp::run().map_err(|e| -> Box<dyn Error> { e.into() });
     }
 
     let cli::Args { shell_program_opt, shell_args, daemonize, working_directory } =
-        match cli::parse(env::args_os(), claw_os_sdk::gui::is_gui_launch()) {
+        match cli::parse(env::args_os(), yuos_sdk::gui::is_gui_launch()) {
             Ok(cli::Outcome::Run(args)) => args,
             Ok(cli::Outcome::Help) => {
                 print_help();
@@ -118,7 +118,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Platform-specific daemonization logic
 
     #[cfg(all(unix, not(target_os = "redox")))]
-    if daemonize && !claw_os_sdk::gui::is_gui_launch() {
+    if daemonize && !yuos_sdk::gui::is_gui_launch() {
         match fork::daemon(true, true) {
             Ok(fork::Fork::Child) => (),
             Ok(fork::Fork::Parent(_child_pid)) => process::exit(0),
@@ -189,7 +189,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 fn print_help() {
     println!(
         r#"Terminal
-Designed for ClawOS, cosmic-term is a libcosmic-based terminal emulator.
+Designed for YuOS, cosmic-term is a libcosmic-based terminal emulator.
 
 Project home page: https://github.com/pop-os/cosmic-term
 Options:
@@ -211,8 +211,8 @@ pub struct Flags {
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Action {
     About,
-    AskClaw,
-    AskClawExplain,
+    AskYu,
+    AskYuExplain,
     ClearScrollback,
     ColorSchemes(ColorSchemeKind),
     Copy,
@@ -264,8 +264,8 @@ impl Action {
     fn message(&self, entity_opt: Option<segmented_button::Entity>) -> Message {
         match self {
             Self::About => Message::ToggleContextPage(ContextPage::About),
-            Self::AskClaw => Message::AskClaw,
-            Self::AskClawExplain => Message::AskClawExplain,
+            Self::AskYu => Message::AskYu,
+            Self::AskYuExplain => Message::AskYuExplain,
             Self::ClearScrollback => Message::ClearScrollback(entity_opt),
             Self::ColorSchemes(color_scheme_kind) => {
                 Message::ToggleContextPage(ContextPage::ColorSchemes(*color_scheme_kind))
@@ -329,8 +329,8 @@ impl MenuAction for Action {
 #[derive(Clone, Debug)]
 pub enum Message {
     AppTheme(AppTheme),
-    AskClaw,
-    AskClawExplain,
+    AskYu,
+    AskYuExplain,
     ClearScrollback(Option<segmented_button::Entity>),
     ColorSchemeCollapse,
     ColorSchemeDelete(ColorSchemeKind, ColorSchemeId),
@@ -1516,7 +1516,7 @@ impl App {
     }
 
     /// Snapshot the active terminal's visible grid + scrollback as plain text
-    /// for the "Ask Claw → Explain output" action. Returns the captured
+    /// for the "Ask Yu OS → Explain output" action. Returns the captured
     /// scrollback and the shell cwd (if known).
     fn snapshot_active_terminal(&self, max_lines: usize) -> Option<(String, Option<String>)> {
         let tab_model = self.pane_model.active()?;
@@ -3262,29 +3262,29 @@ impl Application for App {
                     return window::close(window_id);
                 }
             }
-            Message::AskClaw => {
+            Message::AskYu => {
                 let cwd = self
                     .active_terminal_working_directory()
                     .map(|p| p.to_string_lossy().into_owned());
-                if let Err(err) = crate::yuos_glue::ask_claw(cwd.as_deref()) {
-                    log::error!("failed to open Ask Claw overlay: {err}");
+                if let Err(err) = crate::yuos_glue::ask_yu(cwd.as_deref()) {
+                    log::error!("failed to open Ask Yu OS overlay: {err}");
                 }
             }
-            Message::AskClawExplain => {
+            Message::AskYuExplain => {
                 // Snapshot the active terminal's visible scrollback (last 80
                 // lines) and hand it to the kernel agent. This is the
                 // terminal-native "what just happened?" affordance: the user
-                // ran a command, got an error or a long log, and wants Claw
+                // ran a command, got an error or a long log, and wants Yu OS
                 // to explain or suggest a fix without needing to copy/paste.
                 let snapshot = self.snapshot_active_terminal(80);
                 if let Some((scrollback, cwd)) = snapshot {
                     if let Err(err) =
                         crate::yuos_glue::explain_output(&scrollback, cwd.as_deref())
                     {
-                        log::error!("failed to open Ask Claw explain overlay: {err}");
+                        log::error!("failed to open Ask Yu OS explain overlay: {err}");
                     }
                 } else {
-                    log::warn!("AskClawExplain: no active terminal to snapshot");
+                    log::warn!("AskYuExplain: no active terminal to snapshot");
                 }
             }
             Message::WindowNew => {
@@ -3425,7 +3425,7 @@ impl Application for App {
 
     fn header_end(&self) -> Vec<Element<'_, Self::Message>> {
         vec![
-            // Claw Glass: ghost-glass icon button with a tooltip, matching the
+            // Yu OS Glass: ghost-glass icon button with a tooltip, matching the
             // floating new-tab affordance from the reference terminal chrome.
             widget::tooltip(
                 widget::button::custom(icon_cache_get("list-add-symbolic", 16))

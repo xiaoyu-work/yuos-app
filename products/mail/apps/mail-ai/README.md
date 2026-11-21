@@ -93,24 +93,24 @@ unsupported outside this stdio contract. In particular, use the command above,
 not `yu app mail-ai native-host`; no fallback rewrite or `run` wrapper is
 installed.
 
-The OS `claw-mail-ai-host` compatibility launcher selects this same verified
+The OS `yuos-mail-ai-host` compatibility launcher selects this same verified
 App/operation and accepts Thunderbird's existing extension argument. That
 argument and the launcher name confer no privilege. The ordinary host owns
 provenance, Root-peer registration, owner review, App deny policy and sandbox
 enforcement; developer-only trust cannot admit the long-lived channel.
-The canonical installed App directory is `/usr/lib/cos/apps/mail-ai`; there is
-no separate executable App copy at `/usr/lib/cos/mail-ai`.
+The canonical installed App directory is `/usr/lib/yuos/apps/mail-ai`; there is
+no separate executable App copy at `/usr/lib/yuos/mail-ai`.
 
-The launcher starts `/usr/lib/cos/apps/mail-ai/native_host.py` with isolated
+The launcher starts `/usr/lib/yuos/apps/mail-ai/native_host.py` with isolated
 Python. The host explicitly adds its own canonical directory and
-`/usr/lib/cos/python` for the packaged SDK and runtime; it does not depend on
+`/usr/lib/yuos/python` for the packaged SDK and runtime; it does not depend on
 `PYTHONPATH` or search legacy install roots. Source-checkout execution uses only
 the immutable SDK/runtime dependency prepared by `tools/platform_dependency.py`
 from this repository's `platform.lock.json`. It never searches a sibling OS
 checkout.
 
 All model calls require exact `ai.chat.untrusted` authority and use
-`claw_os_sdk.ai.chat(origin="external-content")`. Core retains provider
+`yuos_sdk.ai.chat(origin="external-content")`. Core retains provider
 credentials, owner identity, consent, budgets, safety, and audit. The manifest
 retains strict safety and a 500,000-unit monthly budget. Only summaries and the
 existing notable-triage cases write memory under the `mail-ai` self scope;
@@ -132,7 +132,7 @@ retaining their identities, so Thunderbird recognizes the packaged XPI update.
 Build and install matching signed OS and App packages through their coordinated
 release workflows. The stdio cutover does not authorize publication or complete
 the broader Host/resource contract.
-Neither the OS `claw-mail-ai` rootfs feature
+Neither the OS `yuos-mail-ai` rootfs feature
 nor its `tools/install-mail-ai.sh` copies or
 overwrites those package-owned files; preserving their package provenance is
 required.

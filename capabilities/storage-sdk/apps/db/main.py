@@ -6,9 +6,9 @@ from pathlib import Path
 import re
 import sqlite3
 
-from cos_runtime import policy
+from yuos_runtime import policy
 
-DATA_DIR = os.environ.get("COS_DATA_DIR", "/var/lib/cos")
+DATA_DIR = os.environ.get("YUOS_DATA_DIR", "/var/lib/yuos")
 DB_DIR = os.path.join(DATA_DIR, "db")
 MAX_ROWS = 1000  # Maximum rows returned from a single query
 

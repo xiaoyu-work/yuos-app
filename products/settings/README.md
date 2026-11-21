@@ -52,7 +52,7 @@ plaintext arguments. Account state, home directories and rollback remain
 OS-owned.
 
 Wayland, AT-SPI and PipeWire/WirePlumber execution and user-session validation remain behind
-the Claw OS broker. All eleven assigned management App sources have moved,
+the Yu OS broker. All eleven assigned management App sources have moved,
 and the complete native `cosmic-settings` UI/workspace now lives in
 `native/cosmic-settings`, including every page/subscription crate, original
 default features, toolkit patches, translations, resources and packaging.

@@ -12,7 +12,7 @@ from test_support import load_local_module
 APP_DIR = pathlib.Path(__file__).resolve().parent
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_browser_attached_main",
+    "yuos_test_browser_attached_main",
     clear_modules=("_shared",),
 )
 

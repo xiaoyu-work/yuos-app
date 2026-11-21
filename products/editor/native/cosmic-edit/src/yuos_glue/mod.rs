@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 //
-// Thin sync adapter over `claw-os-sdk` for cosmic-edit.
+// Thin sync adapter over `yuos-sdk` for cosmic-edit.
 //
 // Each function turns a `BridgeError` into a plain `io::Error` so call
 // sites can keep their `match … { Ok / Err(io::Error) }` shape. A
@@ -17,7 +17,7 @@ pub mod ai;
 use std::io;
 use std::path::Path;
 
-use cos_runtime::{BridgeError, ask_claw, desktop, filesystem};
+use yuos_runtime::{BridgeError, ask_yu, desktop, filesystem};
 use serde::Serialize;
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq)]
@@ -39,7 +39,7 @@ fn path_str(path: &Path) -> io::Result<&str> {
     path.to_str().ok_or_else(|| {
         io::Error::new(
             io::ErrorKind::InvalidInput,
-            "path is not valid UTF-8 (claw-os-sdk requires UTF-8 paths)",
+            "path is not valid UTF-8 (yuos-sdk requires UTF-8 paths)",
         )
     })
 }
@@ -51,8 +51,8 @@ fn path_str(path: &Path) -> io::Result<&str> {
 /// MUST keep using `std::fs` directly — those happen on every keystroke
 /// and routing each one through a subprocess would tank the editor.
 pub fn read_to_string(path: &Path) -> io::Result<String> {
-    if claw_os_sdk::gui::is_gui_launch()
-        && std::env::var("COS_MCP_SERVER").as_deref() != Ok("1")
+    if yuos_sdk::gui::is_gui_launch()
+        && std::env::var("YUOS_MCP_SERVER").as_deref() != Ok("1")
     {
         return std::fs::read_to_string(path);
     }
@@ -64,8 +64,8 @@ pub fn read_to_string(path: &Path) -> io::Result<String> {
 ///
 /// A denied save leaves the buffer unsaved; no privileged fallback is used.
 pub fn write_text(path: &Path, contents: &str, selection: Option<&FileSelection>) -> io::Result<()> {
-    if claw_os_sdk::gui::is_gui_launch()
-        && std::env::var("COS_MCP_SERVER").as_deref() != Ok("1")
+    if yuos_sdk::gui::is_gui_launch()
+        && std::env::var("YUOS_MCP_SERVER").as_deref() != Ok("1")
     {
         use std::io::Write;
         use std::os::unix::fs::MetadataExt;
@@ -75,11 +75,11 @@ pub fn write_text(path: &Path, contents: &str, selection: Option<&FileSelection>
         ))?;
         let (parent_node, name) = match selection {
             FileSelection::Existing(id, node) => {
-                let reserved = claw_os_sdk::gui::reserve_file_save(id, *node).map_err(map_err)?;
+                let reserved = yuos_sdk::gui::reserve_file_save(id, *node).map_err(map_err)?;
                 (reserved.parent_node, reserved.name)
             }
             FileSelection::Create(id, node) => {
-                let reserved = claw_os_sdk::gui::reserve_file_create(id, *node).map_err(map_err)?;
+                let reserved = yuos_sdk::gui::reserve_file_create(id, *node).map_err(map_err)?;
                 if path.file_name().and_then(|name| name.to_str()) != Some(reserved.target_name.as_str()) {
                     return Err(io::Error::new(io::ErrorKind::InvalidData, "creation reservation has another target"));
                 }
@@ -116,12 +116,12 @@ struct EditContext<'a> {
     file: Option<&'a str>,
 }
 
-impl ask_claw::Context for EditContext<'_> {
+impl ask_yu::Context for EditContext<'_> {
     const APP_ID: &'static str = "cosmic-edit";
 }
 
-/// Open Ask Claw with the optional active document path.
-pub fn ask_claw_overlay(file: Option<&Path>) -> Result<(), ask_claw::LaunchError> {
+/// Open Ask Yu OS with the optional active document path.
+pub fn ask_yu_overlay(file: Option<&Path>) -> Result<(), ask_yu::LaunchError> {
     let file = file.and_then(Path::to_str);
-    ask_claw::launch(&EditContext { file })
+    ask_yu::launch(&EditContext { file })
 }

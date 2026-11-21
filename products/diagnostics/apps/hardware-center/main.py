@@ -8,28 +8,28 @@ import sys
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
 COMMANDS = frozenset(
     {"summary", "cpu", "gpu", "pci", "usb", "memory", "storage", "drivers", "thermal"}
 )
-TIMEOUT_SECS = int(os.environ.get("CLAW_HARDWARE_CENTER_TIMEOUT", "180"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_HARDWARE_CENTER_TIMEOUT", "180"))
 
 
-def _cos_binary():
-    return os.environ.get("COS_BIN") or shutil.which("yu")
+def _yu_binary():
+    return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _broker(action):
-    cos_bin = _cos_binary()
-    if not cos_bin:
+    yu_bin = _yu_binary()
+    if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Hardware Center broker unavailable"
         )
     try:
         result = subprocess.run(
-            [cos_bin, "__hardware", action],
+            [yu_bin, "__hardware", action],
             capture_output=True,
             text=True,
             timeout=TIMEOUT_SECS,

@@ -8,7 +8,7 @@ def test_identity_and_independent_original_grants():
     manifest = json.loads((APP / "app.json").read_text())
     assert manifest["id"] == "widget-rail"
     assert manifest["runtime"] == "binary"
-    assert manifest["entry"] == manifest["mcp"]["entry"] == "bin/claw-applet-widget-rail"
+    assert manifest["entry"] == manifest["mcp"]["entry"] == "bin/yuos-applet-widget-rail"
     assert manifest["mcp"]["transport"] == "stdio"
     assert manifest["mcp"]["lifecycle"] == "lazy"
     assert list(manifest["operations"]) == ["open"]

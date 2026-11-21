@@ -6,8 +6,8 @@
 
 (() => {
   if (window !== window.top) return;
-  if (window.__clawAgentInstalled) return;
-  window.__clawAgentInstalled = true;
+  if (window.__yuosAgentInstalled) return;
+  window.__yuosAgentInstalled = true;
 
   const refNonce = new Uint8Array(16);
   crypto.getRandomValues(refNonce);
@@ -513,7 +513,7 @@
   };
 
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
-    if (!msg || !msg.claw_agent || !msg.kind) return false;
+    if (!msg || !msg.yuos_agent || !msg.kind) return false;
     const handler = VERBS[msg.kind];
     if (!handler) {
       sendResponse({ error: `unknown content verb: ${msg.kind}` });

@@ -4,7 +4,7 @@
 Activity admission, lifecycle and safe replies use the Root channel service.
 
 Credentials: ``yu credential store slack_bot_token`` (or env
-``COS_SLACK_TOKEN``).
+``YUOS_SLACK_TOKEN``).
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from gateway._shared import channels, gateway_memory, safe_egress, safe_subproce
 
 PLATFORM = "slack"
 SLACK_API = "https://slack.com/api"
-USER_AGENT = "cos-gateway-slack/0.2.0"
+USER_AGENT = "yuos-gateway-slack/0.2.0"
 # Slack hard limit per chat.postMessage text field ~40k chars; keep a
 # conservative cap that still covers normal agent replies cleanly.
 MAX_LEN = 4000
@@ -28,7 +28,7 @@ MAX_LEN = 4000
 
 def _load_token() -> tuple[str | None, str | None]:
     """Returns (token, error)."""
-    env_tok = os.environ.get("COS_SLACK_TOKEN")
+    env_tok = os.environ.get("YUOS_SLACK_TOKEN")
     if env_tok:
         return env_tok.strip(), None
     return safe_subprocess.safe_credential_load("slack_bot_token")
@@ -131,8 +131,8 @@ def run(command: str, args):
 
 
 if __name__ == "__main__":
-    cmd = os.environ.get("COS_COMMAND") or (sys.argv[1] if len(sys.argv) > 1 else "")
-    raw_args = os.environ.get("COS_ARGS_JSON")
+    cmd = os.environ.get("YUOS_COMMAND") or (sys.argv[1] if len(sys.argv) > 1 else "")
+    raw_args = os.environ.get("YUOS_ARGS_JSON")
     if raw_args:
         parsed_args = json.loads(raw_args)
     else:

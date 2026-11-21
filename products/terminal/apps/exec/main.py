@@ -14,16 +14,16 @@ from datetime import datetime, timezone
 from _shared.atomic import atomic_write_json  # noqa: E402
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
-DEFAULT_TIMEOUT = int(os.environ.get("COS_EXEC_TIMEOUT", "300"))
+DEFAULT_TIMEOUT = int(os.environ.get("YUOS_EXEC_TIMEOUT", "300"))
 MAX_OUTPUT_BYTES = 1_000_000  # 1 MB output limit for stdout/stderr
 # Hard upper bound on captured output, used by the streaming Popen
 # path below. Larger than the 1 MB MAX_OUTPUT_BYTES so the truncation
 # marker can be inserted without further loss.
 HARD_OUTPUT_CAP = 8 * 1024 * 1024  # 8 MiB per stream
 WHICH_TIMEOUT = 10
-DATA_DIR = os.environ.get("COS_DATA_DIR", "/var/lib/cos")
+DATA_DIR = os.environ.get("YUOS_DATA_DIR", "/var/lib/yuos")
 PROC_DIR = os.path.join(DATA_DIR, "proc")
 REGISTRY_FILE = os.path.join(PROC_DIR, "registry.json")
 
@@ -505,7 +505,7 @@ def cmd_ps(args):
 
 
 def run(command, args):
-    """Entry point called by cos."""
+    """Entry point called by yu."""
     handlers = {
         "run": cmd_run,
         "script": cmd_script,

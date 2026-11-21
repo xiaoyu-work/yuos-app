@@ -93,7 +93,7 @@ snapshot path. Attachment bytes do not cross the Python SDK response limit.
 
 Email uses the published SDK's explicit-binary/cancellable kernel transport
 for `yu __mail request --request-stdin`. The ordinary Host supplies the real
-session. `clawd` validates closed requests, account grants and owner identity;
+session. `yuosd` validates closed requests, account grants and owner identity;
 no caller can choose a provider socket, UID, profile path or executable.
 When needed it starts fixed Thunderbird through the owner's service manager,
 without the Agent UI or model loop. Installed session/display prerequisites
@@ -108,7 +108,7 @@ verified platform artifact cache, never a Git directory or sibling OS checkout.
 Prepare the pinned artifact explicitly with `tools/platform_dependency.py`;
 the isolated native host never downloads build dependencies at runtime and
 disables bytecode when importing from that cache. Installed execution retains
-the fixed `/usr/lib/cos/python` root and existing OS authority launcher.
+the fixed `/usr/lib/yuos/python` root and existing OS authority launcher.
 Protocol tests stage their own source/bootstrap fixture and a fully verified
 platform archive selected by the developer test command. The fixture's synthetic
 pin is private test data, never a production pin or runtime override; the actual

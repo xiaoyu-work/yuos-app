@@ -37,7 +37,7 @@ async fn call(action: &'static str, request: Value) -> Result<Value, CaptureErro
 }
 
 fn call_blocking(action: &str, request: Value) -> Result<Value, CaptureError> {
-    claw_os_sdk::cos_call_json_with_stdin(
+    yuos_sdk::yu_call_json_with_stdin(
         "capture", action, ["__gui-capture", action, "--request-stdin"], request.to_string().as_bytes(),
     ).map_err(|error| CaptureError::Portal(format!("OS Capture service: {error}")))
 }
@@ -47,12 +47,12 @@ pub(super) async fn save_capture(directory: Option<PathBuf>, modal: bool) -> Res
         .map_err(|error| CaptureError::Other(format!("Capture output worker: {error}")))?
 }
 
-fn sdk<T>(result: Result<T, claw_os_sdk::BridgeError>) -> Result<T, CaptureError> {
+fn sdk<T>(result: Result<T, yuos_sdk::BridgeError>) -> Result<T, CaptureError> {
     result.map_err(|error| CaptureError::Other(format!("OS selected output: {error}")))
 }
 
 fn save(directory: Option<PathBuf>, modal: bool) -> Result<CaptureOutcome, CaptureError> {
-    let home = std::env::var_os("COS_OWNER_HOME").map(PathBuf::from)
+    let home = std::env::var_os("YUOS_OWNER_HOME").map(PathBuf::from)
         .ok_or_else(|| CaptureError::Io("GUI capture requires its authenticated owner Home context".into()))?;
     let directory = directory.unwrap_or_else(|| home.join("Pictures"));
     let directory = if directory.is_absolute() { directory } else { home.join(directory) };
@@ -60,15 +60,15 @@ fn save(directory: Option<PathBuf>, modal: bool) -> Result<CaptureOutcome, Captu
     if !metadata.is_dir() { return Err(CaptureError::Io("capture destination must be an existing directory".into())); }
     let node = metadata.ino();
     let name = jiff::Zoned::now().strftime("Screenshot_%Y-%m-%d_%H-%M-%S.png").to_string();
-    let mut creation = sdk(claw_os_sdk::gui::request_file_create(node, &name))?;
+    let mut creation = sdk(yuos_sdk::gui::request_file_create(node, &name))?;
     while creation.state == "pending" {
         std::thread::sleep(Duration::from_millis(250));
-        creation = sdk(claw_os_sdk::gui::file_create_status(&creation.selection_id, node))?;
+        creation = sdk(yuos_sdk::gui::file_create_status(&creation.selection_id, node))?;
     }
     if creation.state != "selected" {
         return Err(CaptureError::Io(format!("screenshot output selection is {}", creation.state)));
     }
-    let slot = sdk(claw_os_sdk::gui::reserve_file_create(&creation.selection_id, node))?;
+    let slot = sdk(yuos_sdk::gui::reserve_file_create(&creation.selection_id, node))?;
     let id = correlation()?;
     let mut response = call_blocking("image", json!({"request_id":id,"modal":modal}))?;
     let length = loop {
@@ -101,7 +101,7 @@ fn save(directory: Option<PathBuf>, modal: bool) -> Result<CaptureOutcome, Captu
     output.sync_all().map_err(|error| CaptureError::Io(format!("sync selected screenshot: {error}")))?;
     drop(output);
     std::fs::rename(&temporary, &target).map_err(|error| CaptureError::Io(format!("finalize selected screenshot: {error}")))?;
-    let status = sdk(claw_os_sdk::gui::file_create_status(&creation.selection_id, node))?;
+    let status = sdk(yuos_sdk::gui::file_create_status(&creation.selection_id, node))?;
     if status.state != "created" {
         return Err(CaptureError::Io(format!("screenshot creation is unconfirmed: {}", status.state)));
     }
@@ -191,7 +191,7 @@ pub(super) async fn notify(
         "icon": "com.yuos.Screenshot", "expire_ms": 5000, "transient": true,
     });
     tokio::task::spawn_blocking(move || {
-        claw_os_sdk::cos_call_json_with_stdin(
+        yuos_sdk::yu_call_json_with_stdin(
             "notification",
             "post",
             [

@@ -8,7 +8,7 @@ from test_support import load_local_module
 
 main = load_local_module(
     Path(__file__).with_name("main.py"),
-    "claw_test_summarize_main",
+    "yuos_test_summarize_main",
 )
 
 

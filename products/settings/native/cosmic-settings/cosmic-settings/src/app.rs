@@ -161,7 +161,7 @@ impl SettingsApp {
 
 #[derive(Clone, Debug)]
 pub enum Message {
-    AskClaw,
+    AskYu,
     #[cfg(feature = "wayland")]
     DesktopInfo,
     Error(String),
@@ -182,7 +182,7 @@ pub enum Message {
     SearchChanged(String),
     SearchClear,
     SearchSubmit,
-    AskClawSearch,
+    AskYuSearch,
     SetTheme(cosmic::theme::Theme),
     SetWindowTitle,
     Surface(surface::Action),
@@ -271,7 +271,7 @@ impl cosmic::Application for SettingsApp {
             icon::from_name("face-smile-symbolic")
                 .apply(button::icon)
                 .padding(8)
-                .on_press(Message::AskClaw)
+                .on_press(Message::AskYu)
                 .into(),
         );
 
@@ -391,10 +391,10 @@ impl cosmic::Application for SettingsApp {
     #[allow(clippy::too_many_lines)]
     fn update(&mut self, message: Message) -> Task<Self::Message> {
         match message {
-            Message::AskClaw => {
+            Message::AskYu => {
                 let page_info = &self.pages.info[self.active_page];
-                if let Err(err) = crate::yuos_glue::ask_claw_page(&page_info.id, &page_info.title) {
-                    tracing::error!(?err, "failed to open Ask Claw overlay");
+                if let Err(err) = crate::yuos_glue::ask_yu_page(&page_info.id, &page_info.title) {
+                    tracing::error!(?err, "failed to open Ask Yu OS overlay");
                 }
             }
 
@@ -423,7 +423,7 @@ impl cosmic::Application for SettingsApp {
                 self.search_active = true;
             }
 
-            Message::AskClawSearch => {
+            Message::AskYuSearch => {
                 // Bridge cosmic-settings' literal search to the kernel
                 // agent so a natural-language query like "make pointer
                 // bigger" can be resolved to the relevant settings page
@@ -433,8 +433,8 @@ impl cosmic::Application for SettingsApp {
                 // which page to open.
                 let query = self.search_input.trim().to_string();
                 if !query.is_empty() {
-                    if let Err(err) = crate::yuos_glue::ask_claw_search(&query) {
-                        tracing::error!(?err, "failed to open Ask Claw overlay");
+                    if let Err(err) = crate::yuos_glue::ask_yu_search(&query) {
+                        tracing::error!(?err, "failed to open Ask Yu OS overlay");
                     }
                 }
             }
@@ -1300,7 +1300,7 @@ impl SettingsApp {
         }
 
         // Empty-state banner — shown only when keyword search returns
-        // nothing. Pairs with the always-shown "Ask Claw" callout so
+        // nothing. Pairs with the always-shown "Ask Yu OS" callout so
         // the user has a clear escape hatch.
         if self.search_selections.is_empty() {
             let banner = container(
@@ -1323,14 +1323,14 @@ impl SettingsApp {
         // keyword scan above couldn't.
         if !self.search_input.trim().is_empty() {
             let spacing = cosmic::theme::active().cosmic().spacing;
-            let title = cosmic::widget::text::heading(crate::fl!("ai-search-ask-claw"));
+            let title = cosmic::widget::text::heading(crate::fl!("ai-search-ask-yu"));
             let query_line =
                 cosmic::widget::text::body(format!("\u{201C}{}\u{201D}", self.search_input)).class(
                     cosmic::theme::Text::Custom(|t| cosmic::iced::widget::text::Style {
                         color: Some(t.cosmic().on_bg_color().into()),
                     }),
                 );
-            let hint = cosmic::widget::text::caption(crate::fl!("ai-search-ask-claw-hint"));
+            let hint = cosmic::widget::text::caption(crate::fl!("ai-search-ask-yu-hint"));
             let card_col = cosmic::widget::column::with_children(vec![
                 title.into(),
                 query_line.into(),
@@ -1348,7 +1348,7 @@ impl SettingsApp {
                 .width(Length::Fill)
                 .padding([spacing.space_xs as u16, spacing.space_m as u16])
                 .class(cosmic::style::Button::Suggested)
-                .on_press(Message::AskClawSearch);
+                .on_press(Message::AskYuSearch);
             let card = container(card)
                 .padding([spacing.space_s, cosmic::theme::active().cosmic().space_l()]);
             sections.push(card.into());

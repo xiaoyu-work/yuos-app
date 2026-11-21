@@ -12,7 +12,7 @@ from test_support import authenticated_mcp_params, load_local_module
 
 main = load_local_module(
     pathlib.Path(__file__).with_name("main.py"),
-    "claw_test_desktop_manager_main",
+    "yuos_test_desktop_manager_main",
     clear_modules=("_shared",),
 )
 
@@ -53,7 +53,7 @@ def test_routes_use_exact_scopes_and_broker_argv(
     completed = mock.Mock(
         returncode=0, stdout=json.dumps(expected), stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         function = getattr(main, function_name)
@@ -62,11 +62,11 @@ def test_routes_use_exact_scopes_and_broker_argv(
         else:
             manifest_path = pathlib.Path(__file__).with_name("app.json")
             with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-                os.environ, {"COS_APP_MANIFEST": str(manifest_path)}
+                os.environ, {"YUOS_APP_MANIFEST": str(manifest_path)}
             ):
                 server = load_local_module(
                     pathlib.Path(__file__).with_name("server.py"),
-                    "claw_test_desktop_manager_server",
+                    "yuos_test_desktop_manager_server",
                 )
                 listed = server.app._handle_request("tools/list", {}, True)
                 assert {tool["name"] for tool in listed["tools"]} == {
@@ -148,7 +148,7 @@ def test_restart_validates_before_policy(identifier, app_id, message):
 )
 def test_broker_failures_raise(returncode, stdout, message):
     completed = mock.Mock(returncode=returncode, stdout=stdout, stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match=message):
@@ -166,7 +166,7 @@ def test_missing_broker_executable_raises():
 
 
 def test_broker_execution_failure_raises():
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(
         main.subprocess, "run", side_effect=PermissionError("access denied")
@@ -179,7 +179,7 @@ def test_broker_execution_failure_raises():
 
 
 def test_broker_timeout_raises():
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(
         main.subprocess,

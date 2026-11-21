@@ -12,7 +12,7 @@ use zbus::{
 use super::notifications::Input;
 
 use anyhow::{Result, bail};
-use claw_notification_presentation::{PRESENTER_FD_ENV as DAEMON_NOTIFICATIONS_FD, Preferences};
+use yuos_notification_presentation::{PRESENTER_FD_ENV as DAEMON_NOTIFICATIONS_FD, Preferences};
 use cosmic::cosmic_config::Config;
 use std::os::unix::io::FromRawFd;
 
@@ -101,7 +101,7 @@ impl NotificationsSocket {
                 )
                 .and_then(|builder| {
                     builder.serve_at(
-                        claw_notification_presentation::OBJECT_PATH,
+                        yuos_notification_presentation::OBJECT_PATH,
                         Presentation {
                             tx: tx_clone.clone(),
                             config,
@@ -190,7 +190,7 @@ pub(super) struct Presentation {
 #[interface(name = "com.yuos.NotificationPresentation1")]
 impl Presentation {
     fn version(&self) -> u32 {
-        claw_notification_presentation::VERSION
+        yuos_notification_presentation::VERSION
     }
 
     fn preferences(&self) -> zbus::fdo::Result<String> {
@@ -212,13 +212,13 @@ impl Presentation {
     }
 
     async fn dismiss(&self, id: u32) -> zbus::fdo::Result<()> {
-        claw_notification_presentation::validate_handle(id)
+        yuos_notification_presentation::validate_handle(id)
             .map_err(|error| zbus::fdo::Error::InvalidArgs(error.to_string()))?;
         self.send(Input::AppletDismissed(id)).await
     }
 
     async fn invoke_action(&self, id: u32, action: &str) -> zbus::fdo::Result<()> {
-        claw_notification_presentation::validate_action(id, action)
+        yuos_notification_presentation::validate_action(id, action)
             .map_err(|error| zbus::fdo::Error::InvalidArgs(error.to_string()))?;
         self.send(Input::AppletActivated {
             id,

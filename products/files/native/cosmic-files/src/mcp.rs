@@ -1,6 +1,6 @@
 //! MCP tool surface for `cosmic-files`.
 //!
-//! When launched with `COS_MCP_SERVER=1`, the binary flips into a tiny
+//! When launched with `YUOS_MCP_SERVER=1`, the binary flips into a tiny
 //! stdio MCP server instead of opening a window. The agent calls these
 //! tools so it can navigate, inspect and act on the user's filesystem
 //! without having to spawn an interactive Files window first.
@@ -14,7 +14,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use claw_os_sdk::mcp::{App, CallContext, Tool, ToolResult};
+use yuos_sdk::mcp::{App, CallContext, Tool, ToolResult};
 use serde_json::{json, Value};
 use walkdir::WalkDir;
 
@@ -124,8 +124,8 @@ impl Tool for SearchTool {
         let search_context = context.clone();
         let results = tokio::task::spawn_blocking(move || -> Result<Vec<Value>, String> {
             let root = std::fs::canonicalize(&root).map_err(|error| error.to_string())?;
-            cos_runtime::policy::require(
-                "fs.read", cos_runtime::policy::Scope::path(
+            yuos_runtime::policy::require(
+                "fs.read", yuos_runtime::policy::Scope::path(
                     root.to_str().ok_or("search root must be UTF-8")?,
                 ),
             ).map_err(|error| error.to_string())?;
@@ -293,7 +293,7 @@ fn string_arg(input: &Value, key: &str) -> Result<String, ToolResult> {
 }
 
 // ---------------------------------------------------------------------------
-// Entry point — called from `main` when COS_MCP_SERVER=1.
+// Entry point — called from `main` when YUOS_MCP_SERVER=1.
 // ---------------------------------------------------------------------------
 
 pub(crate) fn run() -> anyhow::Result<()> {

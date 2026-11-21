@@ -11,7 +11,7 @@ from test_support import authenticated_mcp_params, load_local_module
 
 main = load_local_module(
     pathlib.Path(__file__).with_name("main.py"),
-    "claw_test_systemd_main",
+    "yuos_test_systemd_main",
     clear_modules=("_shared",),
 )
 
@@ -23,11 +23,11 @@ ACTIONS = ["start", "stop", "restart", "reload", "enable", "disable"]
 def invoke(request):
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
         os.environ, {
-            "COS_APP_MANIFEST": str(pathlib.Path(__file__).with_name("app.json")),
+            "YUOS_APP_MANIFEST": str(pathlib.Path(__file__).with_name("app.json")),
         },
     ):
         server = load_local_module(
-            pathlib.Path(__file__).with_name("server.py"), "claw_test_systemd_server",
+            pathlib.Path(__file__).with_name("server.py"), "yuos_test_systemd_server",
         )
         listed = server.app._handle_request("tools/list", {}, True)
         assert {tool["name"] for tool in listed["tools"]} == {
@@ -72,7 +72,7 @@ def test_rejects_option_and_path_units():
 
 def test_accepts_instantiated_service_unit(invoke):
     completed = mock.Mock(returncode=0, stdout="{}", stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as runner:
         invoke("status", "user@1000.service")
@@ -89,7 +89,7 @@ def test_status_uses_observe_capability(invoke, unit):
         stdout=json.dumps({"state": {"active": True}}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as runner:
         result = invoke("status", unit)
@@ -107,7 +107,7 @@ def test_status_uses_observe_capability(invoke, unit):
 @pytest.mark.parametrize("action", ACTIONS)
 def test_controls_use_exact_service_capability(invoke, action):
     completed = mock.Mock(returncode=0, stdout=json.dumps({"changed": True}), stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(
         main.subprocess, "run", return_value=completed
@@ -150,7 +150,7 @@ def test_broker_error_raises():
         stdout=json.dumps({"error": "restart failed"}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match="restart failed"):
@@ -160,7 +160,7 @@ def test_broker_error_raises():
 
 def test_invalid_json_raises():
     completed = mock.Mock(returncode=0, stdout="not-json", stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match="systemd broker returned invalid JSON"):

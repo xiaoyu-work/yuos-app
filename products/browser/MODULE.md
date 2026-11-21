@@ -16,7 +16,7 @@ upstream `helium-bin` runtime.
 | `apps/web/test_main.py` | URL canonicalization, MCP dispatch and existing engine/AI behavior |
 | `apps/browser-attached/` | Attached-browser MCP tools and a compatibility launcher for the OS transport |
 | `extension/` | MV3 service worker, top-frame DOM helpers and native browser chat side panel |
-| `packaging/claw-browser-host` | Unprivileged executable selecting the versioned OS browser transport |
+| `packaging/yuos-browser-host` | Unprivileged executable selecting the versioned OS browser transport |
 | `package.json` | Product-owned staging and test inputs |
 
 Use the immutable platform dependency for SDK/runtime and
@@ -35,20 +35,20 @@ OS integration tests exercise the published source through the real worker
 sandbox and broker.
 
 The `web` App uses the existing runtime bridge to send a typed render request
-to `clawd`. No browser socket, display, profile or direct network access
+to `yuosd`. No browser socket, display, profile or direct network access
 enters the App worker. A missing renderer fails explicitly. Screenshots
 create a new PNG at an approved output path; form submissions keep the
 separately approved HTTP path.
 
 `package.json` binds both `installed_assets` to `browser-attached`. The same
-staging contract used by the independent `claw-app-browser` Debian package
-installs the complete extension at `/usr/share/claw/extensions/claw-agent-browser`
-and the executable `/usr/lib/cos/claw-browser-host`. That launcher selects the
-OS-owned `/usr/lib/cos/browser-native-host.py` with isolated system Python.
+staging contract used by the independent `yuos-app-browser` Debian package
+installs the complete extension at `/usr/share/yuos/extensions/yuos-agent-browser`
+and the executable `/usr/lib/yuos/yuos-browser-host`. That launcher selects the
+OS-owned `/usr/lib/yuos/browser-native-host.py` with isolated system Python.
 The old package-local `native_host.py` is only a compatibility launcher, not a
-socket server or authority implementation. `claw-os-browser-bridge-v1 (= 1)`
+socket server or authority implementation. `yuos-browser-bridge-v1 (= 1)`
 is an Agent service dependency, not an installed App identity or grant.
-No duplicate transport is installed under `/usr/lib/cos/browser-agent`.
+No duplicate transport is installed under `/usr/lib/yuos/browser-agent`.
 Canonical `stage.py` invokes the asset helper once;
 release assembly does not repeat it. Selecting only Search or Web does not add these
 attached-browser assets.
@@ -61,7 +61,7 @@ clone App sources, copy package assets or alter browser profiles. Ordinary
 extension/browser reload remains explicit; package upgrades do not kill user
 processes or force-install an extension. See
 [release ownership and validation](../../docs/releases.md).
-`clawd` owns capabilities, origin injection and privileged socket access.
+`yuosd` owns capabilities, origin injection and privileged socket access.
 Its OS transport retains owner-only runtime/socket validation, kernel Root-peer
 admission, bounded Native Messaging frames and response correlation. It is
 system transport, not another App entrypoint or an exemption from App hosting.
@@ -70,7 +70,7 @@ own exact grants. Live installed browser/extension acceptance remains separate
 from source, unit and package checks.
 
 The side panel uses a separate OS-owned Native Messaging host in the Desktop
-package for the existing Claw Agent. Its opt-in tab context contains only the
+package for the existing Yu OS Agent. Its opt-in tab context contains only the
 tab ID and origin; the panel does not read page bodies, cookies, or model
 credentials. Browser package upgrades do not require Desktop for MCP or CLI.
 

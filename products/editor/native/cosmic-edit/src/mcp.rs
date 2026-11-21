@@ -1,6 +1,6 @@
 //! MCP tool surface for `cosmic-edit`.
 //!
-//! Launched with `COS_MCP_SERVER=1`, the binary becomes a stdio MCP
+//! Launched with `YUOS_MCP_SERVER=1`, the binary becomes a stdio MCP
 //! server instead of opening an editor window. The agent gets the
 //! same file-editing primitives the user has, going through the same
 //! controlled filesystem/desktop services and SDK AI gate — no App calls.
@@ -11,7 +11,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use claw_os_sdk::mcp::{App, CallContext, Tool, ToolResult};
+use yuos_sdk::mcp::{App, CallContext, Tool, ToolResult};
 use serde_json::{json, Value};
 
 use crate::yuos_glue;
@@ -48,7 +48,7 @@ impl Tool for ReadTool {
             worker_context
                 .check_cancelled()
                 .map_err(|e| e.to_string())?;
-            cos_runtime::filesystem::read(&path).map_err(|e| e.to_string())
+            yuos_runtime::filesystem::read(&path).map_err(|e| e.to_string())
         })
         .await;
         if let Err(error) = context.check_cancelled() {
@@ -89,7 +89,7 @@ impl Tool for WriteTool {
         };
         let res = tokio::task::spawn_blocking(move || {
             context.check_cancelled().map_err(|e| e.to_string())?;
-            cos_runtime::filesystem::write(&path, &content).map_err(|e| e.to_string())
+            yuos_runtime::filesystem::write(&path, &content).map_err(|e| e.to_string())
         })
         .await;
         match res {
@@ -132,7 +132,7 @@ impl Tool for ReplaceRangeTool {
         }
         let res = tokio::task::spawn_blocking(move || {
             context.check_cancelled().map_err(|e| e.to_string())?;
-            cos_runtime::filesystem::replace(&path, &find, &replace).map_err(|e| e.to_string())
+            yuos_runtime::filesystem::replace(&path, &find, &replace).map_err(|e| e.to_string())
         })
         .await;
         match res {
@@ -165,7 +165,7 @@ impl Tool for OpenTool {
         };
         let res = tokio::task::spawn_blocking(move || {
             context.check_cancelled().map_err(|e| e.to_string())?;
-            cos_runtime::desktop::open_editor(path.as_deref()).map_err(|e| e.to_string())
+            yuos_runtime::desktop::open_editor(path.as_deref()).map_err(|e| e.to_string())
         })
         .await;
         match res {

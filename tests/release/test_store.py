@@ -25,7 +25,7 @@ def web_app(root):
     (root / "web/app.js").write_text("window.fixture = true;")
     manifest = snapshots.read_metadata(root / "app.json")
     write_json(root / "web-ui.json", {
-        "schema": "claw.web-app/v1", "app_id": manifest["id"], "source_kind": "product",
+        "schema": "yuos.web-app/v1", "app_id": manifest["id"], "source_kind": "product",
         "source_name": "fixture", "title": manifest["name"], "description": "",
         "entry": "web/index.html",
     })
@@ -35,7 +35,7 @@ def web_app(root):
 @pytest.fixture
 def public_signer(tmp_path, monkeypatch):
     """Fake the public CLI wire only; real signature integration remains in runtime."""
-    binary = tmp_path / "fake-public-cos"
+    binary = tmp_path / "fake-public-yu"
     binary.write_text("test-only public signer fixture; not a production executable\n")
     binary.chmod(0o755)
     key = tmp_path / "package-key.json"
@@ -59,10 +59,10 @@ def public_signer(tmp_path, monkeypatch):
                       "digest": "sha256:" + record["sha256"]}
                      for name, record in inventory(root).items() if record["type"] == "file"]
             envelope = {
-                "schema": "claw.provenance/v1",
+                "schema": "yuos.provenance/v1",
                 "package": {
                     "kind": "app", "id": manifest["id"], "version": manifest["version"],
-                    "manifest_schema": "cos.app-manifest/v1", "manifest_path": "app.json",
+                    "manifest_schema": "yuos.app-manifest/v1", "manifest_path": "app.json",
                     "entrypoints": entries, "files": files, "content_digest": "sha256:" + "b" * 64,
                 },
                 "signature": {"algorithm": "ed25519", "key_id": publisher,
@@ -104,18 +104,18 @@ def app_deb(deb, roots, *, version="1.0.0", architecture="all", extra=None, cont
     for root in roots:
         value = snapshots.read_metadata(root / "app.json")["id"]
         apps.append(value)
-        base = f"usr/lib/cos/apps/{value}"
+        base = f"usr/lib/yuos/apps/{value}"
         modes[base] = root.stat().st_mode & 0o777
         for path in root.rglob("*"):
             name = base + "/" + path.relative_to(root).as_posix()
             modes[name] = path.stat().st_mode & 0o777
             if path.is_file():
                 files[name] = path.read_bytes()
-    return deb("claw-app-fixture", version, architecture=architecture, files=files, modes=modes,
+    return deb("yuos-app-fixture", version, architecture=architecture, files=files, modes=modes,
                control_files=control_files, symlinks=symlinks,
-               extra={"X-Claw-App-Ids": ", ".join(apps), "X-Claw-Product": "fixture",
-                      "X-Claw-Source-Kind": "product", "X-Claw-Variant": "agent",
-                      "X-Claw-Source-Revision": "a" * 40, **(extra or {})})
+               extra={"X-YuOS-App-Ids": ", ".join(apps), "X-YuOS-Product": "fixture",
+                      "X-YuOS-Source-Kind": "product", "X-YuOS-Variant": "agent",
+                      "X-YuOS-Source-Revision": "a" * 40, **(extra or {})})
 
 
 def test_store_index_binds_signed_product_ui_and_immutable_release(tmp_path, public_signer, signing, app, deb):
@@ -127,7 +127,7 @@ def test_store_index_binds_signed_product_ui_and_immutable_release(tmp_path, pub
     index = store.compose([tmp_path / "snapshots"], tmp_path / "store", verifier, signing, packages=[package])
     record = index["apps"][0]
     assert record["web_ui"]["sha256"] == digest(root / "web-ui.json")
-    assert record["release_tag"] == "app-fixture-v1.0.0"
+    assert record["release_tag"] == "yuos-app-fixture-v1.0.0"
     assert record["artifact"]["sha256"] in record["artifact"]["file"]
     assert record["delivery"] == {"kind": "apt", "package_sha256": digest(package)}
     assert store.verified_index(tmp_path / "store", signing) == index
@@ -137,7 +137,7 @@ def test_store_index_binds_signed_product_ui_and_immutable_release(tmp_path, pub
     with pytest.raises(ValueError, match="freshness|expired"):
         store.validate_index(changed)
     changed = json.loads(json.dumps(index))
-    changed["apps"][0]["release_tag"] = "app-different-v1.0.0"
+    changed["apps"][0]["release_tag"] = "yuos-app-different-v1.0.0"
     with pytest.raises(ValueError, match="official release"):
         store.validate_index(changed)
     (tmp_path / "store/index.json").write_text("{}")
@@ -179,7 +179,7 @@ def test_publication_signs_exact_debian_app_payload_and_retains_web_assets(
     desktop.write_text(f"[Desktop Entry]\nType=Application\nName=Fixture\nExec=yu app {app_id} --gui\n")
     artifact = app_deb(deb, [root])
     plan = {"version": "1.0.0", "source_date_epoch": 1700000000, "packages": [{
-        "package": "claw-app-fixture", "architecture": "all",
+        "package": "yuos-app-fixture", "architecture": "all",
         "selection": "fixture", "apps": [app_id],
     }]}
     packages, groups = store.prepare_release_snapshots(
@@ -199,7 +199,7 @@ def test_publication_signs_exact_debian_app_payload_and_retains_web_assets(
     assert record["provenance"]["publisher_key_id"] == verifier.publisher_key_id
     final = tmp_path / "final"
     run(["dpkg-deb", "--extract", packages[0], final])
-    assert (final / f"usr/lib/cos/apps/{app_id}/.provenance.json").read_bytes() == (
+    assert (final / f"usr/lib/yuos/apps/{app_id}/.provenance.json").read_bytes() == (
         extracted / ".provenance.json"
     ).read_bytes()
 
@@ -212,23 +212,23 @@ def bundle(tmp_path, public_signer, signing, app, deb):
     (roots[0] / "LICENSE").chmod(0o444)
     (roots[0] / "web").chmod(0o750)
     package = app_deb(deb, roots, version="1.0.0-2", control_files={"md5sums": b""},
-                      symlinks={"usr/share/claw-fixture/license-link": "./../../lib/cos/apps/bundle-first/LICENSE"})
-    support = deb("claw-app-support", "1.0.0-2",
-                  extra={"X-Claw-Variant": "support", "X-Claw-Source-Revision": "a" * 40},
-                  files={"usr/lib/cos/python/fixture.py": b"shared library fixture\n"},
-                  symlinks={"usr/lib/cos/python/fixture-link.py": "fixture.py"})
-    metapackage = deb("claw-apps-agent", "1.0.0-2",
-                      extra={"X-Claw-Variant": "agent", "X-Claw-Source-Revision": "a" * 40})
+                      symlinks={"usr/share/yuos-fixture/license-link": "./../../lib/yuos/apps/bundle-first/LICENSE"})
+    support = deb("yuos-app-support", "1.0.0-2",
+                  extra={"X-YuOS-Variant": "support", "X-YuOS-Source-Revision": "a" * 40},
+                  files={"usr/lib/yuos/python/fixture.py": b"shared library fixture\n"},
+                  symlinks={"usr/lib/yuos/python/fixture-link.py": "fixture.py"})
+    metapackage = deb("yuos-apps-agent", "1.0.0-2",
+                      extra={"X-YuOS-Variant": "agent", "X-YuOS-Source-Revision": "a" * 40})
     plan = {
         "version": "1.0.0-2", "source_date_epoch": 1700000000, "source_revision": "a" * 40,
         "include_fixtures": False, "selections": ["fixture", "support", "sets"],
         "matrix": {"include": [{"architecture": "all"}]},
         "packages": [
-            {"package": "claw-app-fixture", "architecture": "all", "variant": "agent",
+            {"package": "yuos-app-fixture", "architecture": "all", "variant": "agent",
              "selection": "fixture", "apps": ["bundle-first", "bundle-second"]},
-            {"package": "claw-app-support", "architecture": "all", "variant": "support",
+            {"package": "yuos-app-support", "architecture": "all", "variant": "support",
              "selection": "support", "apps": []},
-            {"package": "claw-apps-agent", "architecture": "all", "variant": "agent",
+            {"package": "yuos-apps-agent", "architecture": "all", "variant": "agent",
              "selection": "sets", "apps": []},
         ],
     }
@@ -238,7 +238,7 @@ def bundle(tmp_path, public_signer, signing, app, deb):
         shutil.copy2(path, ci / path.name)
     originals = [package_record(path) for path in sorted(ci.glob("*.deb"))]
     write_json(ci / "build-record-all.json", {
-        "format": "claw.app-build/v1", "plan": plan, "packages": originals,
+        "format": "yuos.app-build/v1", "plan": plan, "packages": originals,
         "development": {}, "interfaces": {},
     })
     packages, _, _ = release_publish.verify_artifacts(plan, ci)
@@ -253,34 +253,34 @@ def test_final_signed_debs_drive_store_snapshots_apt_and_immutable_assets(tmp_pa
     plan, originals, packages, groups, index, verifier = bundle
     before = {item["package"]: item for item in originals}
     final = {item["package"]: item for item in map(package_record, packages)}
-    assert final["claw-app-fixture"]["sha256"] != before["claw-app-fixture"]["sha256"]
-    assert final["claw-app-support"] == before["claw-app-support"]
-    assert final["claw-apps-agent"] == before["claw-apps-agent"]
+    assert final["yuos-app-fixture"]["sha256"] != before["yuos-app-fixture"]["sha256"]
+    assert final["yuos-app-support"] == before["yuos-app-support"]
+    assert final["yuos-apps-agent"] == before["yuos-apps-agent"]
     report = snapshots.read_metadata(tmp_path / "prepared/release-record.json")
     assert report["build_packages"] == sorted(originals, key=store.identity)
     assert report["packages"] == sorted(final.values(), key=store.identity)
     release_publish.verify_artifacts(plan, tmp_path / "ci")
     assert {item["package"]: item["apps"] for item in index["packages"]} == {
-        "claw-app-fixture": ["bundle-first", "bundle-second"],
-        "claw-app-support": [], "claw-apps-agent": [],
+        "yuos-app-fixture": ["bundle-first", "bundle-second"],
+        "yuos-app-support": [], "yuos-apps-agent": [],
     }
     extracted = tmp_path / "final"
-    package = next(path for path in packages if path.name.startswith("claw-app-fixture_"))
+    package = next(path for path in packages if path.name.startswith("yuos-app-fixture_"))
     run(["dpkg-deb", "--raw-extract", package, extracted])
     assert (extracted / "DEBIAN/control").read_bytes() == (
         tmp_path / "deb-1/stage/DEBIAN/control"
     ).read_bytes()
-    assert os.readlink(extracted / "usr/share/claw-fixture/license-link") == "./../../lib/cos/apps/bundle-first/LICENSE"
+    assert os.readlink(extracted / "usr/share/yuos-fixture/license-link") == "./../../lib/yuos/apps/bundle-first/LICENSE"
     sums = (extracted / "DEBIAN/md5sums").read_text()
     for record in store.snapshot_records(groups["fixture"][0], verifier, signing):
         snapshot = tmp_path / record["app_id"]
         snapshots.extract_archive(groups["fixture"][0] / record["artifact"]["file"], snapshot)
-        installed = extracted / "usr/lib/cos/apps" / record["app_id"]
+        installed = extracted / "usr/lib/yuos/apps" / record["app_id"]
         assert snapshots.tree_inventory(installed, "all") == snapshots.tree_inventory(snapshot, "all")
         assert f"{digest(installed / '.provenance.json', 'md5')}  " in sums
-        assert f"usr/lib/cos/apps/{record['app_id']}/.provenance.json\n" in sums
+        assert f"usr/lib/yuos/apps/{record['app_id']}/.provenance.json\n" in sums
     assert not (tmp_path / "entrypoint-executed").exists()
-    assert all(record["delivery"] == {"kind": "apt", "package_sha256": final["claw-app-fixture"]["sha256"]}
+    assert all(record["delivery"] == {"kind": "apt", "package_sha256": final["yuos-app-fixture"]["sha256"]}
                for record in index["apps"])
     assert all(record["version"] == "1.0.0-2" for record in index["packages"])
     repository = release_apt.compose(packages, tmp_path / "apt", signing, initialize=True,
@@ -291,12 +291,12 @@ def test_final_signed_debs_drive_store_snapshots_apt_and_immutable_assets(tmp_pa
         artifact_directory=tmp_path / "ci", snapshots=groups["fixture"], build_packages=originals,
     )
     published = snapshots.read_metadata(assets / "release.json")
-    assert published["packages"] == [final["claw-app-fixture"]]
-    assert published["build_packages"] == [before["claw-app-fixture"]]
+    assert published["packages"] == [final["yuos-app-fixture"]]
+    assert published["build_packages"] == [before["yuos-app-fixture"]]
     assert (assets / package.name).read_bytes() == package.read_bytes()
-    for field, value in (("size", final["claw-app-fixture"]["size"] + 1), ("sha256", "c" * 64)):
+    for field, value in (("size", final["yuos-app-fixture"]["size"] + 1), ("sha256", "c" * 64)):
         changed = json.loads(json.dumps(index))
-        next(item for item in changed["packages"] if item["package"] == "claw-app-fixture")[field] = value
+        next(item for item in changed["packages"] if item["package"] == "yuos-app-fixture")[field] = value
         if field == "sha256":
             for record in changed["apps"]:
                 record["delivery"]["package_sha256"] = value
@@ -309,7 +309,7 @@ def test_final_signed_debs_drive_store_snapshots_apt_and_immutable_assets(tmp_pa
 def test_store_v2_rejects_missing_ambiguous_and_conflicting_apt_bindings(bundle):
     _, _, _, _, index, _ = bundle
     mutations = [
-        lambda value: value.update(schema="claw.app-store/v1"),
+        lambda value: value.update(schema="yuos.app-store/v1"),
         lambda value: value["packages"].append(dict(value["packages"][0])),
         lambda value: value["packages"][0].update(apps=["bundle-first", "bundle-first"]),
         lambda value: value["apps"][0]["delivery"].update(package_sha256="0" * 64),
@@ -329,11 +329,11 @@ def test_store_v2_rejects_missing_ambiguous_and_conflicting_apt_bindings(bundle)
 
 @pytest.mark.parametrize("change", [
     {"size": 1024**3 + 1},
-    {"package": "claw-app-" + "a" * 248},
+    {"package": "yuos-app-" + "a" * 248},
     {"apps": [f"app{number:04}" for number in range(1001)]},
 ])
 def test_store_package_limits_fit_the_os_delivery_parser(change):
-    record = {"package": "claw-app-fixture", "version": "1.0.0", "architecture": "all",
+    record = {"package": "yuos-app-fixture", "version": "1.0.0", "architecture": "all",
               "size": 1, "sha256": "a" * 64, "apps": []}
     with pytest.raises(ValueError):
         store.validate_packages([{**record, **change}])
@@ -343,7 +343,7 @@ def test_store_retains_package_tuples_on_support_only_release_and_checks_apt_inv
     tmp_path, bundle, signing, deb,
 ):
     _, _, packages, _, initial, _ = bundle
-    support = deb("claw-app-support", "2.0.0")
+    support = deb("yuos-app-support", "2.0.0")
     retained = store.compose([], tmp_path / "retained", None, signing, packages=[support],
                              previous=tmp_path / "store")
     assert retained["apps"] == initial["apps"]
@@ -352,7 +352,7 @@ def test_store_retains_package_tuples_on_support_only_release_and_checks_apt_inv
     assert len(retained["packages"]) == len(initial["packages"]) + 1
     with pytest.raises(ValueError, match="tuple collision"):
         store.compose([], tmp_path / "collision", None, signing,
-                      packages=[deb("claw-app-support", "1.0.0-2", payload=b"different bytes")],
+                      packages=[deb("yuos-app-support", "1.0.0-2", payload=b"different bytes")],
                       previous=tmp_path / "store")
     with pytest.raises(ValueError, match="inventory differs"):
         release_apt.compose(packages, tmp_path / "incomplete", signing, initialize=True,
@@ -364,7 +364,7 @@ def test_store_retains_package_tuples_on_support_only_release_and_checks_apt_inv
     assert store.verified_index(updated / "store", signing) == retained
     with pytest.raises(ValueError, match="downgrade"):
         store.compose([], tmp_path / "downgrade", None, signing,
-                      packages=[deb("claw-app-support", "1.9.9")], previous=tmp_path / "retained")
+                      packages=[deb("yuos-app-support", "1.9.9")], previous=tmp_path / "retained")
 
 
 @pytest.mark.parametrize("mismatch", ["control", "ownership", "signature", "snapshot"])
@@ -377,10 +377,10 @@ def test_store_rejects_control_provenance_and_snapshot_mismatches(
                             architecture="all", provenance=verifier, signing=signing)
     extra = {}
     if mismatch == "control":
-        extra["X-Claw-App-Ids"] = "different-app"
+        extra["X-YuOS-App-Ids"] = "different-app"
         message = "control App IDs"
     elif mismatch == "ownership":
-        extra["X-Claw-Source-Kind"] = "capability"
+        extra["X-YuOS-Source-Kind"] = "capability"
         message = "source ownership"
     elif mismatch == "signature":
         (root / ".provenance.json").write_text("{}")
@@ -411,7 +411,7 @@ def test_delivery_validation_runs_on_final_repacked_deb(
 
     monkeypatch.setattr(store, "run", inject_hook)
     plan = {"version": "1.0.0", "source_date_epoch": 1700000000, "packages": [{
-        "package": "claw-app-fixture", "architecture": "all",
+        "package": "yuos-app-fixture", "architecture": "all",
         "selection": "fixture", "apps": ["snapshot-fixture"],
     }]}
     with pytest.raises(ValueError, match="maintainer/root hooks"):
@@ -426,7 +426,7 @@ def test_debian_architecture_binding_is_exact(tmp_path, public_signer, signing, 
     verifier, _ = public_signer
     package = app_deb(deb, [web_app(app())], architecture=architecture)
     plan = {"version": "1.0.0", "source_date_epoch": 1700000000, "packages": [{
-        "package": "claw-app-fixture", "architecture": architecture,
+        "package": "yuos-app-fixture", "architecture": architecture,
         "selection": "fixture", "apps": ["snapshot-fixture"],
     }]}
     packages, groups = store.prepare_release_snapshots(

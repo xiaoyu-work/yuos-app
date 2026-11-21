@@ -19,7 +19,7 @@ from release_development import tar_entry
 from release_payload import MAX_BYTES, MAX_ENTRIES
 from release_signing import Signing
 
-SCHEMA = "claw.app-snapshot-catalog/v1"
+SCHEMA = "yuos.app-snapshot-catalog/v1"
 MAX_METADATA = 8 * 1024 * 1024
 CATALOG_FILES = {"catalog.json", "catalog.json.asc", "SHA256SUMS", "SHA256SUMS.asc"}
 ROOT_HOOKS = {"preinst", "postinst", "prerm", "postrm"}
@@ -112,7 +112,7 @@ def tree_inventory(root, architecture):
         if stat.S_ISDIR(info.st_mode):
             record = {"type": "directory", "mode": mode}
         elif stat.S_ISLNK(info.st_mode):
-            raise ValueError(f"claw.provenance/v1 cannot sign symlinks; prepare explicit owned files: {name}")
+            raise ValueError(f"yuos.provenance/v1 cannot sign symlinks; prepare explicit owned files: {name}")
         elif stat.S_ISREG(info.st_mode):
             if info.st_nlink != 1:
                 raise ValueError(f"App snapshots cannot use hardlinked files: {name}")
@@ -262,9 +262,9 @@ def verified_binding(root, provenance):
     manifest = read_metadata(root / "app.json")
     package, signature = envelope.get("package", {}), envelope.get("signature", {})
     verified = result["package"]
-    if envelope.get("schema") != "claw.provenance/v1" or not isinstance(package, dict) or (
+    if envelope.get("schema") != "yuos.provenance/v1" or not isinstance(package, dict) or (
         not isinstance(signature, dict) or package.get("kind") != "app"
-        or package.get("manifest_schema") != "cos.app-manifest/v1"
+        or package.get("manifest_schema") != "yuos.app-manifest/v1"
         or package.get("manifest_path") != "app.json" or result.get("manifest_path") != "app.json"
         or signature.get("algorithm") != "ed25519" or signature.get("key_id") != provenance.publisher_key_id
         or package.get("content_digest") != verified.get("content_digest")
@@ -378,7 +378,7 @@ def extract_archive(source, destination):
             elif member.isfile():
                 kind = "file"
             else:
-                raise ValueError("claw.provenance/v1 App archives cannot contain links or special nodes")
+                raise ValueError("yuos.provenance/v1 App archives cannot contain links or special nodes")
             archive.extract(member, destination, filter="data")
             (destination / member.name).chmod(member.mode)
             nodes[member.name] = kind
@@ -420,7 +420,7 @@ def verify_frozen_catalog(directory, provenance, signing):
             ):
                 raise ValueError("Invalid App snapshot artifact")
             checksum = sha256_value(artifact.get("sha256"))
-            filename = f"claw-app-snapshot-{checksum}.tar.gz"
+            filename = f"yuos-app-snapshot-{checksum}.tar.gz"
             if artifact.get("file") != filename:
                 raise ValueError("App snapshot filename must bind its exact SHA256")
             path = directory / filename
@@ -456,7 +456,7 @@ def verify_catalog(directory, provenance, signing):
         for index, source in enumerate(directory.iterdir()):
             if index >= 1000 + len(CATALOG_FILES) or source.is_symlink() or not source.is_file() or (
                 source.name not in CATALOG_FILES
-                and not re.fullmatch(r"claw-app-snapshot-[0-9a-f]{64}\.tar\.gz", source.name)
+                and not re.fullmatch(r"yuos-app-snapshot-[0-9a-f]{64}\.tar\.gz", source.name)
             ):
                 raise ValueError("App catalog contains an unexpected file, directory or symlink")
             size = source.stat().st_size
@@ -499,7 +499,7 @@ def build_catalog(app_directories, output, *, release_version, architecture, pro
             archive = scratch / f"app-{index}.tar.gz"
             write_archive(root, inventory, archive)
             checksum = digest(archive)
-            name = f"claw-app-snapshot-{checksum}.tar.gz"
+            name = f"yuos-app-snapshot-{checksum}.tar.gz"
             archive.rename(bundle / name)
             records.append({
                 **binding, "architecture": architecture,

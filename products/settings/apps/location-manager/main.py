@@ -8,24 +8,24 @@ import sys
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
 ACCURACIES = frozenset({"country", "city", "neighborhood", "street", "exact"})
-TIMEOUT_SECS = int(os.environ.get("CLAW_LOCATION_MANAGER_TIMEOUT", "45"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_LOCATION_MANAGER_TIMEOUT", "45"))
 
 
-def _cos_binary():
-    return os.environ.get("COS_BIN") or shutil.which("yu")
+def _yu_binary():
+    return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _broker(action, accuracy):
-    cos_bin = _cos_binary()
-    if not cos_bin:
+    yu_bin = _yu_binary()
+    if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Location Manager broker unavailable"
         )
-    argv = [cos_bin, "__location", action, "--accuracy", accuracy]
+    argv = [yu_bin, "__location", action, "--accuracy", accuracy]
     try:
         result = subprocess.run(
             argv,

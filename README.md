@@ -1,6 +1,6 @@
 # Yu OS Apps
 
-Official application products for [Yu OS](https://github.com/xiaoyu-work/claw-os),
+Official application products for [Yu OS](https://github.com/xiaoyu-work/Yu-OS),
 developed separately from the operating system.
 
 Each product owns its UI, business implementation, Agent MCP surface,
@@ -78,6 +78,6 @@ Run Summarize contracts without live models with
 Native Mail uses `python3 products/mail/build.py build -j 8` after the
 preparation described in its README.
 
-The root license covers first-party code imported from Claw OS; vendored
+The root license covers first-party code imported from Yu OS; vendored
 products retain their own licenses and notices. Thunderbird is principally
 MPL-2.0. Its name/logo are not licensed for unrestricted reuse.

@@ -51,7 +51,7 @@ def test_complete_native_graph_and_resources_are_staged_without_os_implementatio
     stage = load_local_module(ROOT / "tools/stage.py", "capture_stage")
     native = load_local_module(ROOT / "tools/stage_native.py", "capture_native_stage")
     assert stage.stage("capture", tmp_path / "installed") == ["cosmic-screenshot"]
-    installed = tmp_path / "installed/usr/lib/cos/apps/cosmic-screenshot"
+    installed = tmp_path / "installed/usr/lib/yuos/apps/cosmic-screenshot"
     assert (installed / "app.json").read_bytes() == MANIFEST.read_bytes()
     assert not (installed / "test_main.py").exists()
     assert native.stage("capture", tmp_path / "native") == ["cosmic-screenshot"]
@@ -74,7 +74,7 @@ def test_native_build_keeps_the_original_portal_graph_and_only_rewrites_runtime(
     native = load_local_module(ROOT / "tools/native_build.py", "capture_native_build")
     native.prepare("capture", tmp_path / "platform/desktop/toolkit", tmp_path / "native")
     manifest = tomllib.loads((tmp_path / "native/Cargo.toml").read_text())
-    for library in ("claw-os-sdk", "cos-runtime"):
+    for library in ("yuos-sdk", "yuos-runtime"):
         assert manifest["dependencies"][library]["path"] == str(tmp_path / "platform" / library / "rust")
     assert "libcosmic" not in manifest["dependencies"]
     assert "patch" not in manifest
@@ -85,9 +85,9 @@ def test_native_build_keeps_the_original_portal_graph_and_only_rewrites_runtime(
     assert manifest["profile"]["release"]["lto"] == "fat"
     assert (tmp_path / "native/Cargo.lock").read_bytes() == (NATIVE / "Cargo.lock").read_bytes()
     production = "\n".join(path.read_text() for path in (NATIVE / "src").glob("*.rs"))
-    assert "cos_runtime::fs::" not in production
-    assert "cos_runtime::exec::" not in production
-    assert 'cos_runtime::capture::screenshot' in production
+    assert "yuos_runtime::fs::" not in production
+    assert "yuos_runtime::exec::" not in production
+    assert 'yuos_runtime::capture::screenshot' in production
     package = json.loads((PRODUCT / "package.json").read_text())
     assert package["native_process_test"] == "native/test_process.py"
     assert package["native_examples"] == ["capture-portal-fixture"]

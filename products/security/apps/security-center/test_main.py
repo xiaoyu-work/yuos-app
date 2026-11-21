@@ -11,7 +11,7 @@ from test_support import authenticated_mcp_params, load_local_module
 
 main = load_local_module(
     pathlib.Path(__file__).with_name("main.py"),
-    "claw_test_security_center_main",
+    "yuos_test_security_center_main",
     clear_modules=("_shared",),
 )
 
@@ -23,12 +23,12 @@ ACTIONS = ["summary", "auth", "ssh", "sudo", "mac", "ports", "events"]
 def mcp_app():
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
         os.environ, {
-            "COS_APP_MANIFEST": str(pathlib.Path(__file__).with_name("app.json")),
+            "YUOS_APP_MANIFEST": str(pathlib.Path(__file__).with_name("app.json")),
         },
     ):
         server = load_local_module(
             pathlib.Path(__file__).with_name("server.py"),
-            "claw_test_security_center_server",
+            "yuos_test_security_center_server",
         )
         yield server.app
 
@@ -58,7 +58,7 @@ def test_routes_use_sensitive_security_scope(mcp_app, transport, action):
         stdout=json.dumps({"status": "warning"}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         if transport == "direct":
@@ -94,7 +94,7 @@ def test_broker_error_raises():
         stdout=json.dumps({"error": "security inspection failed"}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match="security inspection failed"):

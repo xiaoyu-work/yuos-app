@@ -31,7 +31,7 @@ def test_standalone_keeps_original_renderer_filechooser_and_lock(tmp_path):
     destination = tmp_path / "terminal"
     native.prepare("terminal", tmp_path / "platform/desktop/toolkit", destination)
     cargo = tomllib.loads((destination / "Cargo.toml").read_text())
-    for library in ("claw-os-sdk", "cos-runtime"):
+    for library in ("yuos-sdk", "yuos-runtime"):
         assert cargo["dependencies"][library]["path"] == str(tmp_path / "platform" / library / "rust")
     assert cargo["features"]["default"] == ["dbus-config", "wgpu", "wayland", "password_manager"]
     assert cargo["dependencies"]["cosmic-files"]["git"] == "https://github.com/pop-os/cosmic-files.git"
@@ -49,15 +49,15 @@ def test_standalone_keeps_original_renderer_filechooser_and_lock(tmp_path):
 
 def test_ui_and_mcp_do_not_invoke_apps_or_merge_process_state():
     code = "\n".join(path.read_text() for path in (NATIVE / "src").rglob("*.rs"))
-    assert "cos_runtime::exec::" not in code
-    assert "cos_runtime::fs::" not in code
+    assert "yuos_runtime::exec::" not in code
+    assert "yuos_runtime::fs::" not in code
     bridge = (NATIVE / "product_bridge.py").read_text()
     assert "backend.cmd_run" in bridge and "backend.cmd_which" in bridge
     assert "cmd_start" not in bridge and "session_id" not in bridge
     source = (NATIVE / "src/product.rs").read_text()
     assert '["-I", "-c"' in source
-    assert "COS_SESSION" not in source
-    assert "cos_runtime::filesystem::write" in source
+    assert "YUOS_SESSION" not in source
+    assert "yuos_runtime::filesystem::write" in source
 
 
 @pytest.mark.parametrize(("operation", "result", "expected"), [

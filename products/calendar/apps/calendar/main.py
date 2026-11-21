@@ -19,16 +19,16 @@ from datetime import datetime, timedelta, timezone
 
 from _shared.credentials import load_credential  # noqa: E402
 from _shared.safe_http import open_url  # noqa: E402
-from claw_os_sdk.objects import format_reference  # noqa: E402
-from claw_os_sdk import events  # noqa: E402
-from cos_runtime import memory, policy  # noqa: E402
+from yuos_sdk.objects import format_reference  # noqa: E402
+from yuos_sdk import events  # noqa: E402
+from yuos_runtime import memory, policy  # noqa: E402
 
 # Ceiling on one provider request. Bounded here rather than left to the
 # platform default so a hung endpoint cannot hold an operation open past
 # its sandbox runtime limit.
 HTTP_TIMEOUT = 30
 
-DATA_DIR = os.environ.get("COS_DATA_DIR", "/var/lib/cos")
+DATA_DIR = os.environ.get("YUOS_DATA_DIR", "/var/lib/yuos")
 
 GOOGLE_CALENDAR_HOST = "www.googleapis.com"
 OUTLOOK_API_HOST = "graph.microsoft.com"
@@ -275,7 +275,7 @@ def _provider_auth_error(provider, detail):
         "setup": {
             "interactive_oauth_available": True,
             "agent_action": {
-                "tool": "cos_oauth_login",
+                "tool": "yu_oauth_login",
                 "input": {"provider": oauth_provider},
             },
             "login_command": login_command,
@@ -915,15 +915,15 @@ COMMANDS = {
 
 
 def run(command, args):
-    """Entry point called by cos."""
+    """Entry point called by yu."""
     from canonical_argv import normalize_argparse_booleans, normalize_canonical_argv
     args = (
         normalize_argparse_booleans(args, bool_flags={"confirm"})
         if command in {"invite", "respond"} else normalize_canonical_argv(args)
     )
-    # Re-read DATA_DIR in case COS_DATA_DIR changed (e.g. in tests).
+    # Re-read DATA_DIR in case YUOS_DATA_DIR changed (e.g. in tests).
     global DATA_DIR
-    DATA_DIR = os.environ.get("COS_DATA_DIR", "/var/lib/cos")
+    DATA_DIR = os.environ.get("YUOS_DATA_DIR", "/var/lib/yuos")
 
     handler = COMMANDS.get(command)
     if handler is None:

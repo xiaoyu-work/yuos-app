@@ -31,7 +31,7 @@ StyledWindow {
         interval: 450
     }
 
-    name: "claw-top-bar"
+    name: "yuos-top-bar"
     anchors {
         top: true
         left: true

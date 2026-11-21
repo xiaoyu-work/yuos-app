@@ -58,9 +58,9 @@ def main():
     env = os.environ.copy()
     env.update({
         "MOZCONFIG": str(PRODUCT / "mozconfig"),
-        "CLAW_MAIL_OBJDIR": str(WORK / "obj"),
+        "YUOS_MAIL_OBJDIR": str(WORK / "obj"),
         "MOZBUILD_STATE_PATH": str(WORK / "state"),
-        "COMM_HEAD_REPOSITORY": "https://github.com/xiaoyu-work/clawos-app",
+        "COMM_HEAD_REPOSITORY": "https://github.com/xiaoyu-work/yuos-app",
         "COMM_HEAD_REV": output("git", "rev-parse", "HEAD"),
         "GECKO_HEAD_REPOSITORY": pin["repository"],
         "GECKO_HEAD_REV": pin["revision"],

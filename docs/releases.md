@@ -14,76 +14,30 @@ trust-root override.
 [Yu Office](../products/office/MODULE.md) is an independent product selection
 (`office`), not a stock LibreOffice dependency or an OS preinstall. Its desktop
 package builds the ordered patches against the checked upstream source and
-enters **Claw Apps** through this same signed APT channel. Distribution
+enters **Yu OS Apps** through this same signed APT channel. Distribution
 LibreOffice remains available separately under **Linux Apps**.
 
 ## Platform publication status
 
-App development platform `1.0.0` and `1.1.0` releases, tags and uploaded Actions
-artifacts have been withdrawn at the owner's request. The production OS platform
-development pin is the separately approved, published **`0.2.1`** platform,
-runtime ABI 1. App and Agent package publication remains separate as noted below.
-Historical `1.0.0`/`1.1.0` archives were not restored.
-
-[`app-platform-v0.1.0`](https://github.com/xiaoyu-work/claw-os/releases/tag/app-platform-v0.1.0)
-was published by the approved platform workflow from OS source
-`e561926c43018a1c583bdf68ae563f0fb0c8d719`.
-Its historical release asset has SHA-256:
-`0cc2efe5d05ddc555da1526a9fd8e56d65eb79ab913c12f3f2ebe1f9ae66cca1`.
-The archive includes the event/channel SDK clients and existing public
-object/effect/runtime exports; full payload verification and 411 focused App
-compatibility tests passed without sibling-source imports or live accounts/models.
-
-[`app-platform-v0.2.0`](https://github.com/xiaoyu-work/claw-os/releases/tag/app-platform-v0.2.0)
-was published with explicit owner approval from OS source
-`ae4ede35da721d5743c5d71693f6ffdb9abb21e3`.
-Its historical HTTPS archive has SHA-256
-`7db6ab8c069ca245b98cd1395d1aa70c28524eb2fc0a1d593b1a36b4d9586c6d`,
-runtime ABI 1. It adds the account-scoped `mail.accounts`, `mail.read`,
-`mail.draft` and `mail.send` manifest vocabulary consumed by Thunderbird-backed
-Agent Email. Both the GitHub asset digest and published checksum agree;
-the normal dependency consumer re-verifies the complete payload on use.
-
-[`app-platform-v0.2.1`](https://github.com/xiaoyu-work/claw-os/releases/tag/app-platform-v0.2.1)
-was published through the approved platform workflow from OS source
-`83cd069ba9ead851c0bcc2654b2bb84adf4b3d8c`, after its complete nine-job validation
-passed. `platform.lock.json` selects its real HTTPS archive with SHA-256
-`0412f750add06a32c81312c9405338687471249a01dcbf0c9688e66885dde8d8`,
-runtime ABI 1. The published checksum, GitHub asset digest and complete bounded
-archive/inventory verification agree.
-It supplies independent GUI entries and mandatory/optional needs, owner-path
-bindings and bounded selected read/write/save/create clients. Root's actual
-metadata, content, no-replace creation, canonical evidence and checked-retirement
-acceptance passed; this does not establish every product's installed native UI.
-The matching [`sdk-v0.2.1`](https://github.com/xiaoyu-work/claw-os/releases/tag/sdk-v0.2.1)
-publishes all four language bindings and the portable amd64/arm64 provenance
-CLIs with upstream notices. All eleven assets match their GitHub digests and
-published checksums; the verified amd64 CLI reports version `0.2.1`.
-
-This release supplies development libraries, not installed Apps or a running
-OS update. Production channel ingress also requires its matching OS service,
-explicit human owner/provider/sender configuration and public HTTPS forwarding
-for Slack/WhatsApp. App products, OS images and APT packages were not released
-by this platform approval. Their distinct publication gate below remains intact.
+The initial Yu OS App Platform and SDK version is **`0.1.0`**, with runtime
+ABI 1. The OS publishes development exports under `yuos-app-platform-v0.1.0`
+and language bindings and provenance tools under `yuos-sdk-v0.1.0`.
+Adopt the verified published archive in `platform.lock.json` and use the
+verified CLI digests in `packaging/provenance-tools.lock.json` before
+attempting App publication. Until those assets are published and verified,
+the production pins are intentionally absent. These releases alone do not install Apps or
+update an OS image.
 
 Source development can instead explicitly supply a local archive with its
 expected version and SHA-256; see
 [local platform development](../tools/MODULE.md#local-platform-development).
-This verifies the same public artifact format in a separate cache. It does not
-authorize release/install payload staging or select another source at runtime.
-Default development now resolves the published pin above through the same
-strict artifact verifier.
+This verifies the same public artifact format in a separate cache. A local
+archive can build a private acceptance fixture, but cannot stage a release
+or install payload or select another source at runtime.
 
 Any future release, release tag, version bump or dependency-pin adoption needs
 explicit owner approval. Source development, successful validation and requests
 to commit or push do not authorize publication.
-
-The coordinated **0.2.1 App/Agent package cutover** is approved, not published.
-OS source provides runtime ABI 1 with implementation version 0.2.1; independent
-App packages require that implementation floor. The separately approved
-development-library publication above does not publish those packages or
-complete their installed native UI acceptance. No unpublished artifact, URL or
-digest is substituted for the real platform pin.
 
 ## One App integration contract
 
@@ -91,15 +45,15 @@ The coordinated 0.2.1 generic runtime contract is verified. This records
 implementation and private software acceptance, not publication or physical
 hardware acceptance.
 
-- [OS acceptance](https://github.com/xiaoyu-work/claw-os/actions/runs/43995119842):
+- [OS acceptance](https://github.com/xiaoyu-work/Yu-OS/actions/runs/43995119842):
   all 21 jobs passed at `a2f1763f10319e8519399e3fbfe177b6027389d0`,
   including the actual signed native programs, protected reviews, real
   file read/write/create and thumbnail output, private output-only audio,
   notification actions, revocation and checked process/resource/PAM retirement.
-- [App acceptance](https://github.com/xiaoyu-work/clawos-app/actions/runs/43845474779):
+- [App acceptance](https://github.com/xiaoyu-work/yuos-app/actions/runs/43845474779):
   all 41 jobs passed at `d2a6e5250971b38c11d6593301104af671063123`,
   including the retained native builds, original backend fixtures and product contracts.
-- [Release contracts](https://github.com/xiaoyu-work/clawos-app/actions/runs/43845887479)
+- [Release contracts](https://github.com/xiaoyu-work/yuos-app/actions/runs/43845887479)
   passed with the real digest-pinned published 0.2.1 provenance CLI.
 
 The tests use isolated synthetic data and private software services. They do
@@ -145,11 +99,11 @@ physical-device and public deployment qualifications are not App privileges.
 
 | Existing surface | Verified contract and deployment boundary |
 | --- | --- |
-| App lifecycle and AI independence | Ordinary App launchers, including UID 0, now register through authenticated `clawd`; the local backend is an explicit unit fixture only. Apps remain independent of an active AI Agent, not of the OS service. Root install/update/rollback coordination and installed acceptance remain in progress; this does not establish publication approval. |
+| App lifecycle and AI independence | Ordinary App launchers, including UID 0, now register through authenticated `yuosd`; the local backend is an explicit unit fixture only. Apps remain independent of an active AI Agent, not of the OS service. Root install/update/rollback coordination and installed acceptance remain in progress; this does not establish publication approval. |
 | OS `core/src/worker/trusted_desktop.rs::verified_entrypoint` | Generic signed package-relative entry admission has replaced the fixed launch table. The nine native producer manifests/payload plans now use it; this does not establish runtime resource or provider integration. |
 | Mail opaque stdio integration | The existing stdin operation now uses the generic authenticated App Host and sandbox, with operation-only AI/memory needs and no native exemption. Protected launcher/interpreter/Thunderbird-parent admission and the OS-owned root-peer mailbox multiplexer remain. Legacy native registration cannot mint sessions. This does not establish full installed Mail/desktop acceptance or publication approval. |
 | Browser Native Messaging transport | Socket ownership, kernel Root-peer admission, bounded frames and response correlation now live in the versioned OS browser transport. The App owns only its extension/MCP and unprivileged launchers; no App Host exemption or new identity is introduced. Every tool still uses normal authenticated App hosting and its own exact grants. Final installed browser/extension acceptance remains pending. |
-| OS `core/src/clawd/packages.rs` | Fixed `pkg` client gating is replaced by the existing Critical `sys.package` authority, exact requested scope and authenticated owner/session. Each client retains its identity; global actions still require explicit wildcard authority and rollback must match recorded inverse state. Effects remain system-wide. No default App grants, installation-review bypass or publication readiness follows. |
+| OS `core/src/yuosd/packages.rs` | Fixed `pkg` client gating is replaced by the existing Critical `sys.package` authority, exact requested scope and authenticated owner/session. Each client retains its identity; global actions still require explicit wildcard authority and rollback must match recorded inverse state. Effects remain system-wide. No default App grants, installation-review bypass or publication readiness follows. |
 | OS App permission-management service | `system.app-permissions` now accepts independently authorized Apps through the existing High-risk `sys.permissions:manage` capability and authenticated owner, not a fixed Settings identity. It can inspect, request restoration and revoke supported permissions; trusted OS approval, target validation and checked retirement remain mandatory. This does not complete GUI permission acquisition or permit App-owned approval. |
 | OS media-player route | Any independently authorized client uses exact observation/control scopes. Root selects the actual signed running GUI instance; its original UI supplies live status and commands. Caller revocation, ambiguous-window refusal, protected media/thumbnail access, real output-only PCM and checked retirement are verified without an owner bus or compatibility-executable identity. |
 | App persistent storage | The OS binds the existing owner/App data partition through exact-App private idmapped views for service Hosts and, after Root registration authorization, task-host ordinary operations. Host/UID replacement does not copy, chown or delete backing files. Calendar reads now use the owner-scoped OS broker service and a bounded read-only helper, not the consumer's private directory; this does not complete installed-App or GUI resource acceptance. |
@@ -178,7 +132,7 @@ replace Host authentication and runtime capability/sandbox enforcement.
 
 [`tools/release_snapshots.py`](../tools/release_snapshots.py) packages explicitly
 selected, already prepared and signed App directories. Every directory has its
-own original `app.json` and existing `claw.provenance/v1` `.provenance.json`,
+own original `app.json` and existing `yuos.provenance/v1` `.provenance.json`,
 with package kind `app`. It does not merge identities, rewrite manifest/App
 versions, author permission summaries, grant permissions or run App entrypoints.
 Product preparation must include the complete App-owned binaries, resources and
@@ -186,7 +140,7 @@ licenses before signing; this producer copies the entire tree, without payload
 filters, build hooks or installed-system path mappings.
 
 Sign prepared trees with the existing public
-[`yu provenance sign` contract](https://github.com/xiaoyu-work/claw-os/blob/main/docs/extension-provenance.md#publisher).
+[`yu provenance sign` contract](https://github.com/xiaoyu-work/Yu-OS/blob/main/docs/extension-provenance.md#publisher).
 The release producer deliberately does not implement Ed25519 canonicalization,
 import OS implementation code, create trust roots, or silently sign unsigned
 inputs. The publisher key must be authorized for `package-signing` and kind
@@ -241,8 +195,8 @@ Each successful output contains:
 
 | File | Contract |
 | --- | --- |
-| `claw-app-snapshot-<sha256>.tar.gz` | Deterministic archive rooted directly at `app.json` and `.provenance.json`, preserving complete regular-file bytes, modes and empty directories |
-| `catalog.json` | `claw.app-snapshot-catalog/v1`, distribution `release_version`, `runtime_abi: 1`, and one record per selected App identity/architecture |
+| `yuos-app-snapshot-<sha256>.tar.gz` | Deterministic archive rooted directly at `app.json` and `.provenance.json`, preserving complete regular-file bytes, modes and empty directories |
+| `catalog.json` | `yuos.app-snapshot-catalog/v1`, distribution `release_version`, `runtime_abi: 1`, and one record per selected App identity/architecture |
 | `catalog.json.asc` | Detached signature under the checked-in App archive OpenPGP key |
 | `SHA256SUMS`, `SHA256SUMS.asc` | Exact catalog/archive checksum set and its detached signature |
 
@@ -278,7 +232,7 @@ parsing: 8 MiB per metadata/header body, 100,000 payload nodes and a 2 GiB
 payload/catalog budget. Nested metadata, sparse/link headers, truncation and
 unindexed trailing data fail before extraction; ordinary long UTF-8 paths use
 the standard PAX/data-filter implementation.
-The current public `claw.provenance/v1` signer does not admit symlinks.
+The current public `yuos.provenance/v1` signer does not admit symlinks.
 Preparation must resolve any required delivery-layout change explicitly; the
 producer never silently dereferences, drops or invents a signed link.
 There is no `.deb` maintainer-hook execution or post-extraction installer.
@@ -332,7 +286,7 @@ Host-only compatibility launchers and the separate resource/runtime blockers.
 
 ## Official Store APT producer
 
-The separately OpenPGP-signed `store/index.json` uses **`claw.app-store/v2`**.
+The separately OpenPGP-signed `store/index.json` uses **`yuos.app-store/v2`**.
 Its existing repository, runtime ABI, monotonic generation, bounded
 `issued_at`/`expires_at`, App snapshot, raw manifest/provenance, display and
 product-owned Web bindings remain. A required `packages` array inventories
@@ -341,7 +295,7 @@ metapackages. Each entry has exactly:
 
 ```json
 {
-  "package": "claw-cap-storage-sdk",
+  "package": "yuos-cap-storage-sdk",
   "version": "1.2.3-2",
   "architecture": "all",
   "size": 12345,
@@ -353,7 +307,7 @@ metapackages. Each entry has exactly:
 `size` and `sha256` describe the actual final Debian bytes; `version` is the
 complete Debian release version, not the independent manifest App version.
 Architecture is `all`, `amd64` or `arm64`. `apps` is sorted and unique and
-matches both the real contained manifests and Debian `X-Claw-App-Ids`;
+matches both the real contained manifests and Debian `X-YuOS-App-Ids`;
 support/library/metapackages without Apps use `[]`.
 The inventory is bounded to 10,000 packages, 255 ASCII package-name characters,
 1 GiB per `.deb`, and 1,000 sorted unique App IDs per package. The existing
@@ -373,7 +327,7 @@ generation without allowing version regression.
 Compose and the scheduled signed metadata refresh remove those exact discovery
 entries and refuse new releases that contain them. The original `.deb` files,
 APT inventory tuples, tags and release assets remain available as historical
-records. `cosmic-launcher` is retired; `claw-launcher` appears once a signed
+records. `cosmic-launcher` is retired; `yuos-launcher` appears once a signed
 release containing the replacement is published.
 
 The release order deliberately separates tested inputs from final publication:
@@ -402,7 +356,7 @@ are not overwritten or claimed to equal the signed published bytes.
 Standalone `release_store.py build` requires repeated `--package <final.deb>`
 alongside its explicit `--snapshot-directory` inputs.
 
-Only the OS `clawd` transaction/review service may install these pinned APT
+Only the OS `yuosd` transaction/review service may install these pinned APT
 packages and manage installed state, rollback, capabilities and runtime
 authority. App data, independent identities/grants, product/capability ownership,
 native UIs, architectures and the separate App archive/package publishers do
@@ -427,26 +381,26 @@ package catalog from each explicitly kinded `package.json`:
 
 | Package | Contents |
 | --- | --- |
-| `claw-app-<product>` | The product's headless identities, if any |
-| `claw-app-<product>-desktop` | Native graphical identities, binaries and original installed resources |
-| `claw-cap-<group>` | Explicit shared-capability client identities |
-| `claw-app-support` | App-owned `_shared`, `gateway._shared` and `canonical_argv` under `/usr/lib/cos/python` |
-| `claw-apps-agent` | Recommended headless set: 51 identities, their libraries and capability clients |
+| `yuos-app-<product>` | The product's headless identities, if any |
+| `yuos-app-<product>-desktop` | Native graphical identities, binaries and original installed resources |
+| `yuos-cap-<group>` | Explicit shared-capability client identities |
+| `yuos-app-support` | App-owned `_shared`, `gateway._shared` and `canonical_argv` under `/usr/lib/yuos/python` |
+| `yuos-apps-agent` | Recommended headless set: 51 identities, their libraries and capability clients |
 
 Native-only products such as Editor and Capture have only a `-desktop` package;
 installers should use the package catalog rather than assume a headless alias.
 Mail additionally has an architecture-independent `-desktop` asset package.
 Its existing XPI installs in Thunderbird's distribution extension
 directory and depends on system `thunderbird`. Its native Mozilla fork is **not**
-built or claimed as a completed replacement. The existing `claw-mail-ai-host`
+built or claimed as a completed replacement. The existing `yuos-mail-ai-host`
 authority launcher remains OS-owned, but its special integration is an unresolved
 contract above, not an approved privileged App category.
 
-`claw-app-browser` owns all three Browser Apps, the complete declared MV3
-extension at `/usr/share/claw/extensions/claw-agent-browser`, and executable
-`/usr/lib/cos/claw-browser-host`. The launcher executes `/usr/bin/python3`
-with the canonical `/usr/lib/cos/apps/browser-attached/native_host.py`; it never
-duplicates that implementation under `/usr/lib/cos/browser-agent`.
+`yuos-app-browser` owns all three Browser Apps, the complete declared MV3
+extension at `/usr/share/yuos/extensions/yuos-agent-browser`, and executable
+`/usr/lib/yuos/yuos-browser-host`. The launcher executes `/usr/bin/python3`
+with the canonical `/usr/lib/yuos/apps/browser-attached/native_host.py`; it never
+duplicates that implementation under `/usr/lib/yuos/browser-agent`.
 Browser's `package.json` declares these `installed_assets`, scoped to
 `browser-attached`. Canonical `stage.py` invokes the `package_assets.py` helper
 once alongside App/library staging; release assembly does not stage them twice.
@@ -460,7 +414,7 @@ profiles, registration, grants and owner data are not package payloads.
 An already running browser/extension still needs its ordinary reload/restart;
 packages do not terminate user processes or enable a force-install policy.
 
-`claw-apps-agent` has no dependency on the desktop set, native graphical App
+`yuos-apps-agent` has no dependency on the desktop set, native graphical App
 packages, Thunderbird or Chromium. On minimal hosts, `--no-install-recommends`
 also avoids optional recommendations from the OS runtime package. Mixed products'
 desktop subpackages depend on the same product's matching headless version;
@@ -471,25 +425,24 @@ owner-scoped data. A product group is a distribution unit, not a merged identity
 Packages contain no user-data payload or data-migration/deletion maintainer
 scripts.
 
-Files alone owns `/usr/lib/cos/python/claw_files`; Document Engine depends on
-`claw-app-files` and its exact `claw-app-python-claw-files-v1` library ABI.
+Files alone owns `/usr/lib/yuos/python/yuos_files`; Document Engine depends on
+`yuos-app-files` and its exact `yuos-app-python-yuos-files-v1` library ABI.
 Consumers do not duplicate the export, even though standalone development
 staging can materialize the dependency. Common support similarly provides
-`claw-app-support-v1`. Keep these ABI names while compatible; introducing a
+`yuos-app-support-v1`. Keep these ABI names while compatible; introducing a
 breaking library ABI requires an explicit consumer change, not a silent merge.
 Neither ABI is an exact product or OS release-version lock.
 Common safe HTTP/IDNA helpers require Debian `python3-idna (>= 3.3)` and
-`python3-idna (<< 4)` through `claw-app-support`; consumers do not vendor a
+`python3-idna (<< 4)` through `yuos-app-support`; consumers do not vendor a
 separate IDNA implementation or install it dynamically.
 
-Apps depend on `yuos-app-runtime-v1 (>= 0.2.1)`, with additional permission, capture,
+Apps depend on `yuos-app-runtime-v1 (>= 0.1.0)`, with additional permission, capture,
 media-player and notification service interfaces where required. Native runtime
 library dependencies are computed from the actual installed ELF binaries with
 `dpkg-shlibdeps`. Python/system package mappings remain explicit in the release
 configuration.
 These dependencies express public interface availability, never a grant, a
-special caller class or a sandbox exemption. Existing names remain for
-compatibility while the general service/Host contracts above are resolved.
+special caller class or a sandbox exemption.
 Calendar, Clipboard and Desktop Widgets' standalone packages consume the
 Agent's declared Calendar/history/observation services, not a hard dependency
 on the full OS Desktop package. The OS retains policy and service
@@ -499,38 +452,23 @@ packages explicitly, subject to the same GUI resources and permissions.
 
 Debian trixie does not provide `python3-pptx`. Files therefore owns the explicitly
 SHA256/size-pinned pure `python-pptx` wheel, including its upstream MIT license
-and distribution metadata, under `/usr/lib/cos/python`. Its available Debian
+and distribution metadata, under `/usr/lib/yuos/python`. Its available Debian
 dependencies (Pillow, lxml, XlsxWriter and typing extensions) and the other
 document parser dependencies are Files dependencies. Document Engine reuses
 that owner, rather than depending on a nonexistent Debian package or installing
 packages with pip on the user's machine. The build cache is rehashed on use;
 different bytes and unsafe/architecture-specific wheel paths are refused.
 
-### First ownership transfer
+### Package ownership
 
-The initial split requires OS packages **at least `1:0.2.1`**, which no longer
-own the transferred files and still enforce the OS security floor. App packages
-declare bounded `Breaks` and `Replaces` against the former owner
-`(<< 1:0.2.1)`. Headless/support payloads and Mail's XPI replace old
-`claw-os-agent` ownership; other native payloads replace old
-`claw-os-desktop` ownership. These declarations never authorize replacement
-of a newer OS package. Calendar, Clipboard and Widget Rail replace the former
-Desktop `/usr/bin/claw-applet-*` aliases with their own real executables at the
-same paths, together with the original desktop entries/icons. This does not
-change their human-only identities or move user data.
-Upgrade the OS platform boundary in the same ordinary
-APT transaction before installing the split Apps. Do not weaken an OS gate,
-force an overwrite or delete owner data to make the transition install.
-The OS security epoch and protocol ABI remain **1**; only its package-version
-compatibility boundary advances from `1:0.2.0` to `1:0.2.1`. The OS's signed-channel
-bootstrap/cutover guard must prove the App channel and required packages are
-available before removing old bundled payloads.
+Yu OS starts with independent App packages and one owner for each installed
+file. App packages do not take ownership from earlier distributions. The
+signed OS and App channels enforce the Yu OS runtime dependency and
+anti-downgrade checks on their own packages.
 
-OS Agent recommends `claw-apps-agent`; Desktop depends on the headless set,
+OS Agent recommends `yuos-apps-agent`; Desktop depends on the headless set,
 the independent graphical packages and Mail's Thunderbird integration.
-`sets` builds only `claw-apps-agent`. Historical `claw-apps-desktop` tuples
-remain in immutable Releases and the retained App APT/Store inventory, but
-new Desktop packages do not use them. Bootstrap publishes the approved SDK
+`sets` builds only `yuos-apps-agent`. Bootstrap publishes the approved SDK
 artifact and independent App APT packages first, then the OS packages. OS release
 preparation authenticates the App APT indexes and complete selected package
 closure, preserving exact matching native/headless versions. Missing, stale,
@@ -540,7 +478,7 @@ separate dpkg owners in the ordinary transaction.
 
 ### Desktop Shell build input
 
-The GUI-only `desktop-shell` is included in `claw-os-desktop`, not published
+The GUI-only `desktop-shell` is included in `yuos-desktop`, not published
 as an App `.deb` or offered by the Store. After native and authenticated
 desktop acceptance, dispatch **Release Desktop Shell build inputs** with an
 approved version and the same public provenance CLI/publisher pins used for
@@ -631,7 +569,7 @@ establish availability of later schema/Rust API changes or unified Host behavior
 or reusable via `workflow_call`; it publishes reviewed `main` only:
 
 ```bash
-gh workflow run release-apps.yml --repo xiaoyu-work/clawos-app \
+gh workflow run release-apps.yml --repo xiaoyu-work/yuos-app \
   -f select=files -f version=1.2.3 -F initialize=false
 ```
 
@@ -662,9 +600,9 @@ become empty-repository success.
 
 Each selection gets an immutable tag:
 
-- `app-files-v1.2.3`
-- `cap-http-v1.2.3`
-- `support-v1.2.3`
+- `yuos-app-files-v1.2.3`
+- `yuos-cap-http-v1.2.3`
+- `yuos-support-v1.2.3`
 - `sets-v1.2.3`
 
 Debian's prerelease `~` becomes `-` in the Git tag (Git forbids `~` in refs).
@@ -673,10 +611,10 @@ the same APT channel; choose a preview version only deliberately.
 
 Its assets are the actual `.deb` files, any selected development/interface archives,
 `release.json`, `SHA256SUMS` and `SHA256SUMS.asc`. Packages carry
-`X-Claw-Product`, `X-Claw-Source-Kind`,
-`X-Claw-Variant`, `X-Claw-App-Ids`, `X-Claw-Runtime-ABI` and
-`X-Claw-Source-Revision` control fields. Per-package installed metadata lives
-at `/usr/share/clawos-app/packages/<package>.json`. The package version is the
+`X-YuOS-Product`, `X-YuOS-Source-Kind`,
+`X-YuOS-Variant`, `X-YuOS-App-Ids`, `X-YuOS-Runtime-ABI` and
+`X-YuOS-Source-Revision` control fields. Per-package installed metadata lives
+at `/usr/share/yuos-app/packages/<package>.json`. The package version is the
 distribution version; App manifest/XPI schema versions are not rewritten.
 
 Releases are created as drafts, populated, then published and checked for
@@ -701,7 +639,7 @@ publication, even when supplied explicitly. Restoring config/util
 development-fixture preparation.
 
 The replacement is OS-defined
-`claw-os-sdk/rust/notification-presentation`, included by the existing recursive
+`yuos-sdk/rust/notification-presentation`, included by the existing recursive
 `rust-sdk` platform export. Its optional `dbus` feature carries normalized
 presentation data through additive `com.yuos.NotificationPresentation1` on
 the existing private P2P channel. Native-owner checks report the OS panel and
@@ -728,7 +666,7 @@ rule. No runtime package depends on or fetches an interface archive.
 ## Optional development and integration fixture archives
 
 When `fixtures=true` is explicitly selected, each selected release also publishes
-`claw-app-development-<sha256>.tar.xz`. `release.json` references it through
+`yuos-app-development-<sha256>.tar.xz`. `release.json` references it through
 `development` with `format`, `selection`, `version`, `source_revision`,
 `filename`, `sha256` and `size`. The archive and descriptor are covered by the
 same signed `SHA256SUMS` as the Debian assets and protected by the immutable
@@ -745,12 +683,12 @@ tools/package_assets.py
 shared/python/
 products/<selected-or-Python-dependency>/
 capabilities/<selected-or-Python-dependency>/
-payload/usr/lib/cos/apps/<selected-identities>/
-payload/usr/lib/cos/python/
+payload/usr/lib/yuos/apps/<selected-identities>/
+payload/usr/lib/yuos/python/
 interfaces/<explicit-native-library>/
 ```
 
-The manifest format is `claw.app-development/v1`, with
+The manifest format is `yuos.app-development/v1`, with
 `purpose: development-and-integration-fixtures`. Its `groups` record source
 kind, name, path, App IDs and `role` (`selected` or `python-dependency`).
 `groups[].source_package` preserves the original complete package declaration.
@@ -813,7 +751,7 @@ the archive, and it never enters the APT pool or image payload.
 The App channel is separate from the OS channel:
 
 ```text
-https://xiaoyu-work.github.io/clawos-app/
+https://xiaoyu-work.github.io/yuos-app/
   archive-key.asc
   dists/trixie/InRelease
   dists/trixie/Release
@@ -826,7 +764,7 @@ https://xiaoyu-work.github.io/clawos-app/
   store/index.json.asc
 ```
 
-The signed `app-apt` branch retains repository content between deployments.
+The signed `yuos-apt` branch retains repository content between deployments.
 Publication verifies the exact previous commit's signatures, identity, bounded
 freshness, catalog, package bytes and all indexes before merging a selection.
 Previous products, versions and by-hash indexes are retained. Same
@@ -866,13 +804,13 @@ Before dispatching the first release:
 3. Enable **immutable releases** in the App repository. The workflow verifies
    GitHub's setting before writing release content and verifies each published
    release is immutable. In the `app-release` environment, set
-   `CLAW_APPS_REPO_SETTINGS_TOKEN` to a fine-grained token for `clawos-app`
+   `CLAW_APPS_REPO_SETTINGS_TOKEN` to a fine-grained token for `yuos-app`
    with **Administration: read**. GitHub Actions' `GITHUB_TOKEN` cannot read
    the repository-level setting. The separate token is used only for that
    read by both release and refresh; release assets and state pushes still use
    `GITHUB_TOKEN`. Do not grant the settings token write access.
 4. Configure GitHub Pages with **GitHub Actions** as its source. Protect `main`
-   and the `app-apt` state branch against force pushes/deletion while allowing
+   and the `yuos-apt` state branch against force pushes/deletion while allowing
    this workflow's normal state commits.
 5. Configure dedicated secrets `CLAW_APPS_APT_SIGNING_PRIVATE_KEY` and
    `CLAW_APPS_APT_SIGNING_PASSPHRASE`. Use a signing-enabled key matching

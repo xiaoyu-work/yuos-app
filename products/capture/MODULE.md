@@ -72,7 +72,7 @@ preserving its original defaults, boolean/value syntax, save-path bytes,
 help/version, errors and MCP-first ordering. CLI early exits precede localization;
 MCP retains its existing localization initialization. The focused parser filter is
 `native_gui_argv_` in `test/unit/main.rs`.
-Both OS providers use their own gated `clawd` helper, never this App's
+Both OS providers use their own gated `yuosd` helper, never this App's
 compatibility launcher. The obsolete hidden `--portal-capture-stdout` mode now
 refuses explicitly, rather than contacting a user bus from ordinary App code.
 This does not establish physical portal/display, installed-package or whole

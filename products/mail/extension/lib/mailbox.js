@@ -313,7 +313,7 @@
       await journalTail;
     } catch (_) {
       await browser.storage.local.set({ mailboxJournalFailed: true });
-      console.error("[claw-mail] new-mail journal failed");
+      console.error("[yuos-mail] new-mail journal failed");
     }
   }
 
@@ -410,5 +410,5 @@
     throw Error("Unknown native Mail operation");
   }
 
-  self.ClawMailbox = { ready, handle, onNewMail };
+  self.YuOsMailbox = { ready, handle, onNewMail };
 })();

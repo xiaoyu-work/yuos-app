@@ -18,12 +18,12 @@ APP_DIR = Path(__file__).parent
 
 
 def _load_server(monkeypatch: pytest.MonkeyPatch, data_dir: Path):
-    monkeypatch.setenv("COS_APP_MANIFEST", str(APP_DIR / "app.json"))
-    monkeypatch.setenv("COS_APP_ID", "kv")
-    monkeypatch.setenv("COS_DATA_DIR", str(data_dir))
+    monkeypatch.setenv("YUOS_APP_MANIFEST", str(APP_DIR / "app.json"))
+    monkeypatch.setenv("YUOS_APP_ID", "kv")
+    monkeypatch.setenv("YUOS_DATA_DIR", str(data_dir))
     return load_local_module(
         APP_DIR / "server.py",
-        "claw_test_kv_server",
+        "yuos_test_kv_server",
         clear_modules=("_shared",),
     )
 
@@ -77,7 +77,7 @@ def _environment(data_dir):
     return {
         "PATH": os.defpath,
         "PYTHONPATH": os.environ["PYTHONPATH"],
-        "COS_DATA_DIR": str(data_dir),
+        "YUOS_DATA_DIR": str(data_dir),
     }
 
 
@@ -360,7 +360,7 @@ def test_object_declaration_reuses_the_existing_exact_key_mcp_command():
 
 @pytest.mark.parametrize("key", ["--schema", "001", "space /?id=key&revision=版本"])
 def test_object_identity_remains_literal_data_through_public_mcp(tmp_path, key):
-    from claw_os_sdk.objects import format_reference, parse_reference
+    from yuos_sdk.objects import format_reference, parse_reference
 
     reference = format_reference({
         "app_id": "kv", "object_type": "entry", "object_id": key,

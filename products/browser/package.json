@@ -4,12 +4,12 @@
   "installed_assets": [
     {
       "source": "extension",
-      "destination": "usr/share/claw/extensions/claw-agent-browser",
+      "destination": "usr/share/yuos/extensions/yuos-agent-browser",
       "apps": ["browser-attached"]
     },
     {
-      "source": "packaging/claw-browser-host",
-      "destination": "usr/lib/cos/claw-browser-host",
+      "source": "packaging/yuos-browser-host",
+      "destination": "usr/lib/yuos/yuos-browser-host",
       "apps": ["browser-attached"]
     }
   ],

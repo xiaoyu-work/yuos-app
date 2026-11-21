@@ -669,7 +669,7 @@ impl App {
                         grid_width,
                         Message::SelectSearchResult,
                     ));
-                    column = column.push(ask_claw_search_callout(input));
+                    column = column.push(ask_yu_search_callout(input));
                     column.into()
                 }
                 None => match self
@@ -677,20 +677,20 @@ impl App {
                     .active_data::<NavPage>()
                     .map_or(NavPage::default(), |nav_page| *nav_page)
                 {
-                    NavPage::ClawApps => {
+                    NavPage::YuOsApps => {
                         let mut column = widget::column::with_capacity(3)
                             .padding([0, space_s, space_m, space_s])
                             .spacing(space_s)
                             .width(Length::Fill)
                             .push(widget::flex_row(vec![
-                                widget::text::title2(NavPage::ClawApps.title()).into(),
+                                widget::text::title2(NavPage::YuOsApps.title()).into(),
                                 widget::space::horizontal().width(Length::Fill).into(),
                                 self.source_check_button(),
                             ]));
                         if let Some(error) = &self.refresh_error {
-                            column = column.push(widget::text::body(fl!("claw-refresh-failed", error = error.as_str())));
+                            column = column.push(widget::text::body(fl!("yuos-refresh-failed", error = error.as_str())));
                         }
-                        column.push(self.claw_apps_view(false)).into()
+                        column.push(self.yuos_apps_view(false)).into()
                     }
                     NavPage::Explore => {
                         match self.explore_page_opt {
@@ -886,20 +886,20 @@ impl App {
                         ]));
                         if let Some(error) = &self.refresh_error {
                             column = column.push(widget::text::body(
-                                fl!("claw-refresh-failed", error = error.as_str())));
+                                fl!("yuos-refresh-failed", error = error.as_str())));
                         }
-                        let checked = self.claw_catalog.as_ref()
+                        let checked = self.yuos_catalog.as_ref()
                             .and_then(|result| result.as_ref().ok())
                             .and_then(|catalog| catalog.checked_at.as_deref());
                         column = column.push(widget::text::caption(match checked {
-                            Some(time) => fl!("claw-last-checked", time = time),
-                            None => fl!("claw-not-checked"),
+                            Some(time) => fl!("yuos-last-checked", time = time),
+                            None => fl!("yuos-not-checked"),
                         }));
-                        column = column.push(widget::text::title3(NavPage::ClawApps.title()))
-                            .push(self.claw_apps_view(true))
+                        column = column.push(widget::text::title3(NavPage::YuOsApps.title()))
+                            .push(self.yuos_apps_view(true))
                             .push(widget::text::title3(fl!("linux-system-updates")));
                         for (source, error) in &self.update_errors {
-                            column = column.push(widget::text::body(fl!("claw-update-query-failed",
+                            column = column.push(widget::text::body(fl!("yuos-update-query-failed",
                                 source = source.as_str(), error = error.as_str())));
                         }
                         match &self.updates {
@@ -1106,7 +1106,7 @@ impl App {
 }
 
 /// Accent-tinted featured spotlight for the Explore home. Showcases a single
-/// app (the first Editor's Choice pick) inside a Claw Glass hero card: large
+/// app (the first Editor's Choice pick) inside a Yu OS Glass hero card: large
 /// icon, brand-blue eyebrow label, name, summary and a filled action that opens
 /// the full Editor's Choice shelf. Clicking the card opens the app's detail.
 fn featured_hero<'a>(
@@ -1155,17 +1155,17 @@ fn featured_hero<'a>(
     .into()
 }
 
-fn ask_claw_search_callout<'a>(query: &str) -> Element<'a, Message> {
+fn ask_yu_search_callout<'a>(query: &str) -> Element<'a, Message> {
     let cosmic_theme::Spacing {
         space_xxs, space_s, ..
     } = theme::active().cosmic().spacing;
     let q = query.trim();
     let label = if q.is_empty() {
-        fl!("ai-search-ask-claw")
+        fl!("ai-search-ask-yu")
     } else {
-        fl!("ai-search-ask-claw-q", query = q)
+        fl!("ai-search-ask-yu-q", query = q)
     };
-    let hint = widget::text::caption(fl!("ai-search-ask-claw-hint"))
+    let hint = widget::text::caption(fl!("ai-search-ask-yu-hint"))
         .class(theme::Text::Custom(|t| cosmic::iced::widget::text::Style {
             color: Some(t.cosmic().accent_color().into()),
         }));
@@ -1181,7 +1181,7 @@ fn ask_claw_search_callout<'a>(query: &str) -> Element<'a, Message> {
         .align_y(Alignment::Center);
     widget::button::custom(row)
         .padding([space_xxs, space_s])
-        .on_press(Message::AskClawSearch)
+        .on_press(Message::AskYuSearch)
         .width(Length::Fill)
         .class(theme::Button::Suggested)
         .into()

@@ -12,7 +12,7 @@ existence, permission or rollback guarantees. See
 
 The `docs` App adds four MCP tools for Recoll document search, indexing, status
 and configuration. It uses the owner's existing `~/.recoll` state, with
-`COS_OWNER_HOME` supplied by the OS host rather than the service's private home.
+`YUOS_OWNER_HOME` supplied by the OS host rather than the service's private home.
 Recoll remains an external system dependency; its background index service is
 OS-owned. The product does not duplicate that service or add semantic search.
 
@@ -25,7 +25,7 @@ another App. Native reveal uses the OS's fixed `com.yuos.Files` target.
 Metadata explicitly requires the sibling tag directory read scope; summary
 memory uses only `self:cosmic-files`, not another App's namespace.
 
-The shared parser is staged into the Agent package as `claw_files.document`
+The shared parser is staged into the Agent package as `yuos_files.document`
 for the remaining Document App too. Native binaries embed it at build time.
 SDK/runtime libraries are system-owned and no mutable product script is
 loaded at runtime. Existing native hot-path file operations, thumbnail caches,

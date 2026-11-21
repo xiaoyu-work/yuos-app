@@ -12,7 +12,7 @@ from test_support import authenticated_mcp_params, load_local_module
 APP_DIR = pathlib.Path(__file__).parent
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_hardware_center_main",
+    "yuos_test_hardware_center_main",
     clear_modules=("_shared",),
 )
 
@@ -23,7 +23,7 @@ def test_summary_uses_hardware_observe_scope():
         stdout=json.dumps({"schema": 1}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         result = main.inspect("summary")
@@ -56,11 +56,11 @@ def test_relocated_sdk_routes_preserve_hardware_scope(command):
     )
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
         os.environ, {
-            "COS_APP_MANIFEST": str(APP_DIR / "app.json"),
-            "COS_BIN": "/usr/local/bin/yu",
+            "YUOS_APP_MANIFEST": str(APP_DIR / "app.json"),
+            "YUOS_BIN": "/usr/local/bin/yu",
         }
     ):
-        server = load_local_module(APP_DIR / "server.py", "claw_test_hardware_center_server")
+        server = load_local_module(APP_DIR / "server.py", "yuos_test_hardware_center_server")
         listed = server.app._handle_request("tools/list", {}, True)
         assert {tool["name"] for tool in listed["tools"]} == set(tools)
         with mock.patch.object(main.policy, "require") as require, mock.patch.object(
@@ -87,7 +87,7 @@ def test_relocated_sdk_routes_preserve_hardware_scope(command):
 ])
 def test_broker_failures_remain_errors(returncode, stdout, message):
     completed = mock.Mock(returncode=returncode, stdout=stdout, stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match=message):

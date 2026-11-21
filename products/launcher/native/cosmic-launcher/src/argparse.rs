@@ -5,7 +5,7 @@ use std::fmt::Display;
 use std::str::FromStr;
 
 #[derive(Parser, Debug, Serialize, Deserialize, Clone)]
-#[command(name = "claw-launcher", author, version, about, long_about = None)]
+#[command(name = "yuos-launcher", author, version, about, long_about = None)]
 #[command(propagate_version = true)]
 pub struct Args {
     #[clap(subcommand)]
@@ -39,7 +39,7 @@ impl FromStr for LauncherTasks {
 }
 
 pub(crate) fn parse() -> Args {
-    parse_from(std::env::args_os(), claw_os_sdk::gui::is_gui_launch())
+    parse_from(std::env::args_os(), yuos_sdk::gui::is_gui_launch())
         .unwrap_or_else(|error| error.exit())
 }
 
@@ -47,7 +47,7 @@ fn parse_from<I>(argv: I, gui_launch: bool) -> Result<Args, clap::Error>
 where
     I: IntoIterator<Item = OsString>,
 {
-    Args::try_parse_from(claw_app_gui_argv::normalize(
+    Args::try_parse_from(yuos_app_gui_argv::normalize(
         argv,
         gui_launch,
         OsStr::new("--gui"),

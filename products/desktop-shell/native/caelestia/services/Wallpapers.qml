@@ -13,7 +13,7 @@ Searcher {
 
     readonly property string currentNamePath: `${Paths.state}/wallpaper/path.txt`
     readonly property list<string> smartArg: GlobalConfig.services.smartScheme ? [] : ["--no-smart"]
-    readonly property string systemWallpaper: "/usr/share/backgrounds/claw-os/yuos-default.jpg"
+    readonly property string systemWallpaper: "/usr/share/backgrounds/yuos/yuos-default.jpg"
 
     property bool showPreview: false
     readonly property string current: showPreview ? previewPath : actualCurrent

@@ -5,7 +5,7 @@ import json
 import os
 import sys
 
-from cos_runtime import memory, policy
+from yuos_runtime import memory, policy
 
 
 def dispatch(request):
@@ -46,11 +46,11 @@ def dispatch(request):
         raise ValueError("unknown private Files operation")
     # These are human UI mutations, never MCP handlers. A persistent MCP
     # process must not confuse its own environment with a caller's session.
-    if os.environ.get("COS_MCP_SERVER") == "1":
+    if os.environ.get("YUOS_MCP_SERVER") == "1":
         raise ValueError("UI mutations are unavailable in the MCP process")
     if operation == "write_bytes":
         args = {**args, "content": base64.b64encode(bytes(args["content"])).decode("ascii")}
-    return mutations[operation](**args, session_id=os.environ.get("COS_SESSION") or None)
+    return mutations[operation](**args, session_id=os.environ.get("YUOS_SESSION") or None)
 
 
 def main():

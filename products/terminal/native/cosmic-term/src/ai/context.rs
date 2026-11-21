@@ -17,7 +17,7 @@ use std::path::{Path, PathBuf};
 
 use super::{bridge_to_io, path_str};
 
-/// JSON payload written to `$COS_AI_TMP/ac-<id>.json` for the shell function to
+/// JSON payload written to `$YUOS_AI_TMP/ac-<id>.json` for the shell function to
 /// pass to copilot. Mirrors aterm's `contextData` shape (aiMiddleware.ts:288-302).
 #[derive(Serialize)]
 pub struct ContextSnapshot {

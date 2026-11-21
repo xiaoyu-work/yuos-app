@@ -6,14 +6,14 @@ fn manifest_defaults_preserve_presentation_but_never_supply_authority() {
     assert_eq!(
         value,
         json!({
-            "action":"post","summary":"Hello","body":"","app_name":"Claw OS Agent",
+            "action":"post","summary":"Hello","body":"","app_name":"Yu OS Agent",
             "icon":"com.yuos.Notifications","expire_ms":-1,"transient":false,
         })
     );
     let custom = request("notify.post", json!({
         "summary":"Hello","app_name":"","icon":"","expire_ms":0,"transient":true,"dedupe_key":"one",
     })).unwrap();
-    assert_eq!(custom["app_name"], "Claw OS Agent");
+    assert_eq!(custom["app_name"], "Yu OS Agent");
     assert_eq!(custom["icon"], "");
     assert_eq!(custom["expire_ms"], 0);
     assert_eq!(custom["transient"], true);

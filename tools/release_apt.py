@@ -17,7 +17,7 @@ from release_common import (
 )
 from release_signing import Signing
 
-INDEX = b"<!doctype html><title>Claw OS Applications</title><h1>Claw OS Applications APT</h1>\n"
+INDEX = b"<!doctype html><title>Yu OS Applications</title><h1>Yu OS Applications APT</h1>\n"
 
 
 def now_utc():
@@ -87,7 +87,7 @@ def verify_repository(root, signing, *, now=None):
     signing.verify(dist / "Release.gpg", dist / "Release")
     release = fields(signed.decode().strip())
     for key, expected in {
-        "Origin": "Claw OS Applications", "Label": "Claw OS Applications",
+        "Origin": "Yu OS Applications", "Label": "Yu OS Applications",
         "Suite": settings["suite"], "Codename": settings["suite"],
         "Architectures": " ".join(settings["architectures"]),
         "Components": settings["component"], "Acquire-By-Hash": "yes",
@@ -113,7 +113,7 @@ def verify_repository(root, signing, *, now=None):
             raise ValueError("Signed index sizes disagree")
         check_hash(dist, name, {"size": sha256[name][0], "sha256": sha256[name][1], "sha512": sha512[name][1]})
     catalog = json.loads((dist / "catalog.json").read_text())
-    if catalog.get("format") != "claw.app-apt/v1" or catalog.get("repository") != settings["repository"]:
+    if catalog.get("format") != "yuos.app-apt/v1" or catalog.get("repository") != settings["repository"]:
         raise ValueError("Unexpected signed package catalog")
     records = catalog["packages"]
     if not isinstance(records, list) or len({identity(record) for record in records}) != len(records):
@@ -240,17 +240,17 @@ def compose(packages, output, signing, *, previous=None, initialize=False, now=N
                 hashed.write_bytes(payload)
                 indexes[hashed.relative_to(dist).as_posix()] = expected
     write_json(dist / "catalog.json", {
-        "format": "claw.app-apt/v1", "repository": settings["repository"],
+        "format": "yuos.app-apt/v1", "repository": settings["repository"],
         "packages": records, "indexes": indexes,
     })
     release_paths.append(dist / "catalog.json")
     release = {
-        "Origin": "Claw OS Applications", "Label": "Claw OS Applications",
+        "Origin": "Yu OS Applications", "Label": "Yu OS Applications",
         "Suite": settings["suite"], "Codename": settings["suite"],
         "Date": format_datetime(current, usegmt=True),
         "Valid-Until": format_datetime(current + timedelta(days=settings["validity_days"]), usegmt=True),
         "Architectures": " ".join(settings["architectures"]), "Components": settings["component"],
-        "Acquire-By-Hash": "yes", "Description": "Independently released Claw OS applications",
+        "Acquire-By-Hash": "yes", "Description": "Independently released Yu OS applications",
     }
     for algorithm in ("SHA256", "SHA512"):
         release[algorithm] = "".join(

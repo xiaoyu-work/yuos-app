@@ -10,19 +10,19 @@ import sys
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
 ID_RE = re.compile(r"^[0-9A-Fa-f]{32}$")
 IFACE_RE = re.compile(r"^[A-Za-z0-9_.:-]{1,15}$")
-TIMEOUT_SECS = int(os.environ.get("CLAW_FIREWALL_MANAGER_TIMEOUT", "180"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_FIREWALL_MANAGER_TIMEOUT", "180"))
 ACTIONS = frozenset({"allow", "deny"})
 DIRECTIONS = frozenset({"input", "output"})
 PROTOCOLS = frozenset({"tcp", "udp"})
 
 
-def _cos_binary() -> str | None:
-    return os.environ.get("COS_BIN") or shutil.which("yu")
+def _yu_binary() -> str | None:
+    return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _choice(value: object, label: str, choices: frozenset[str]) -> str:
@@ -96,12 +96,12 @@ def _broker(
     token: str | None = None,
     confirm: bool = False,
 ) -> dict:
-    cos_bin = _cos_binary()
-    if not cos_bin:
+    yu_bin = _yu_binary()
+    if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Firewall Manager broker unavailable"
         )
-    argv = [cos_bin, "__firewall", action]
+    argv = [yu_bin, "__firewall", action]
     for flag, value in [
         ("--rule-action", rule_action),
         ("--direction", direction),
@@ -128,11 +128,11 @@ def _broker(
         )
     except FileNotFoundError as exc:
         raise FileNotFoundError(
-            f"Firewall Manager broker executable not found: {cos_bin}"
+            f"Firewall Manager broker executable not found: {yu_bin}"
         ) from exc
     except PermissionError as exc:
         raise PermissionError(
-            f"permission denied launching Firewall Manager broker: {cos_bin}"
+            f"permission denied launching Firewall Manager broker: {yu_bin}"
         ) from exc
     except subprocess.TimeoutExpired as exc:
         raise TimeoutError(

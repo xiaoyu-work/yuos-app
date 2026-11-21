@@ -2,7 +2,7 @@
 
 import time
 
-from claw_os_sdk.kernel import KernelDenied, KernelUnavailable, call_json_with_stdin_binary
+from yuos_sdk.kernel import KernelDenied, KernelUnavailable, call_json_with_stdin_binary
 
 
 def main() -> int:

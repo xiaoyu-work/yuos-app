@@ -248,16 +248,16 @@ fn dashboard_button_style(
     style
 }
 
-pub fn ask_claw_button() -> theme::Button {
+pub fn ask_yu_button() -> theme::Button {
     theme::Button::Custom {
-        active: Box::new(|focused, theme| ask_claw_style(theme, focused, 0.10, 0.22)),
-        hovered: Box::new(|focused, theme| ask_claw_style(theme, focused, 0.18, 0.34)),
-        pressed: Box::new(|focused, theme| ask_claw_style(theme, focused, 0.24, 0.44)),
-        disabled: Box::new(|theme| ask_claw_style(theme, false, 0.06, 0.10)),
+        active: Box::new(|focused, theme| ask_yu_style(theme, focused, 0.10, 0.22)),
+        hovered: Box::new(|focused, theme| ask_yu_style(theme, focused, 0.18, 0.34)),
+        pressed: Box::new(|focused, theme| ask_yu_style(theme, focused, 0.24, 0.44)),
+        disabled: Box::new(|theme| ask_yu_style(theme, false, 0.06, 0.10)),
     }
 }
 
-fn ask_claw_style(
+fn ask_yu_style(
     theme: &Theme,
     focused: bool,
     background_alpha: f32,

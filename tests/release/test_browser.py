@@ -16,11 +16,11 @@ from test_apt import IsolatedApt
 from test_packages import contents
 
 
-EXTENSION = Path("usr/share/claw/extensions/claw-agent-browser")
-LAUNCHER = Path("usr/lib/cos/claw-browser-host")
-HOST = Path("usr/lib/cos/apps/browser-attached/native_host.py")
+EXTENSION = Path("usr/share/yuos/extensions/yuos-agent-browser")
+LAUNCHER = Path("usr/lib/yuos/yuos-browser-host")
+HOST = Path("usr/lib/yuos/apps/browser-attached/native_host.py")
 RESOURCES = {"manifest.json", "background.js", "content.js", "popup.html", "popup.js", "README.md"}
-HOST_COMMAND = '#!/bin/sh\nexec /usr/bin/python3 -I /usr/lib/cos/browser-native-host.py "$@"\n'
+HOST_COMMAND = '#!/bin/sh\nexec /usr/bin/python3 -I /usr/lib/yuos/browser-native-host.py "$@"\n'
 
 
 @pytest.fixture
@@ -34,18 +34,18 @@ def browser_source(tmp_path, monkeypatch):
 
 def test_browser_package_owns_complete_extension_and_the_single_canonical_host(tmp_path):
     plan = release.make_plan("browser", "1.2.3")
-    assert [entry["package"] for entry in plan["packages"]] == ["claw-app-browser"]
+    assert [entry["package"] for entry in plan["packages"]] == ["yuos-app-browser"]
     assert [job["architecture"] for job in plan["matrix"]["include"]] == ["all"]
     for name in ("first", "second"):
         release.build(plan, "all", tmp_path / name)
-    package = tmp_path / "first/claw-app-browser_1.2.3_all.deb"
+    package = tmp_path / "first/yuos-app-browser_1.2.3_all.deb"
     assert digest(package) == digest(tmp_path / "second" / package.name)
     entries = contents(package)
     assert {Path(name).relative_to(EXTENSION).as_posix() for name, entry in entries.items()
             if entry.isfile() and Path(name).is_relative_to(EXTENSION)} == RESOURCES
     assert entries[LAUNCHER.as_posix()].mode == 0o755
     assert [name for name in entries if name.endswith("/native_host.py")] == [HOST.as_posix()]
-    assert not any(name.startswith(("usr/lib/cos/browser-agent", "usr/share/clawos-app/browser", "etc/", "home/", "var/"))
+    assert not any(name.startswith(("usr/lib/yuos/browser-agent", "usr/share/yuos-app/browser", "etc/", "home/", "var/"))
                    for name in entries)
     assert all(entry.uid == entry.gid == 0 for entry in entries.values())
     payload = tmp_path / "payload"
@@ -55,15 +55,15 @@ def test_browser_package_owns_complete_extension_and_the_single_canonical_host(t
     source, declaration = release.stage.load_package("browser")
     assert [(origin.relative_to(source).as_posix(), target.as_posix())
             for origin, target in asset_entries(source, declaration, ["browser-attached"])] == [
-        ("extension", EXTENSION.as_posix()), ("packaging/claw-browser-host", LAUNCHER.as_posix()),
+        ("extension", EXTENSION.as_posix()), ("packaging/yuos-browser-host", LAUNCHER.as_posix()),
     ]
     for resource in RESOURCES:
         assert (payload / EXTENSION / resource).read_bytes() == (source / "extension" / resource).read_bytes()
     assert (payload / HOST).read_bytes() == (source / "apps/browser-attached/native_host.py").read_bytes()
     control = fields(run(["dpkg-deb", "-f", package]).stdout.decode().strip())
-    assert control["X-Claw-App-Ids"] == "search, web, browser-attached"
-    assert "chromium" not in control["Depends"] and "claw-os-app-permissions-v1" not in control["Depends"]
-    assert control["Breaks"] == control["Replaces"] == "claw-os-agent (<< 1:0.2.1)"
+    assert control["X-YuOS-App-Ids"] == "search, web, browser-attached"
+    assert "chromium" not in control["Depends"] and "yuos-app-permissions-v1" not in control["Depends"]
+    assert "Breaks" not in control and "Replaces" not in control
 
 
 def test_browser_fixture_archive_restages_the_declared_extension_and_launcher(tmp_path):
@@ -86,7 +86,7 @@ def test_browser_fixture_archive_restages_the_declared_extension_and_launcher(tm
         assert (staged / relative).read_bytes() == (root / "payload" / relative).read_bytes()
     assert (staged / LAUNCHER).stat().st_mode & 0o777 == 0o755
     assert not (staged / EXTENSION / "test_contract.py").exists()
-    assert not (staged / "usr/lib/cos/apps/search").exists()
+    assert not (staged / "usr/lib/yuos/apps/search").exists()
 
 
 def test_browser_asset_cli_is_separate_from_app_and_common_library_staging(tmp_path):
@@ -98,8 +98,8 @@ def test_browser_asset_cli_is_separate_from_app_and_common_library_staging(tmp_p
     result = run([*command, "--apps", "browser-attached", "--root", attached])
     assert json.loads(result.stdout) == [EXTENSION.as_posix(), LAUNCHER.as_posix()]
     assert (attached / LAUNCHER).read_text() == HOST_COMMAND
-    assert not (attached / "usr/lib/cos/apps").exists()
-    assert not (attached / "usr/lib/cos/python").exists()
+    assert not (attached / "usr/lib/yuos/apps").exists()
+    assert not (attached / "usr/lib/yuos/python").exists()
 
 
 def test_real_browser_apt_upgrade_updates_extension_and_host_together_without_registration_or_data_changes(
@@ -107,21 +107,25 @@ def test_real_browser_apt_upgrade_updates_extension_and_host_together_without_re
 ):
     release.build(release.make_plan("browser", "1.0.0"), "all", tmp_path / "first")
     platform = [
-        deb("claw-app-fixture-platform", extra={
-            "Provides": "yuos-app-runtime-v1 (= 0.2.1), claw-os-browser-bridge-v1 (= 1), claw-app-support-v1, python3 (= 3.13)",
+        deb("yuos-app-fixture-platform", extra={
+            "Provides": (
+                "yuos-app-runtime-v1 (= 0.1.0), yuos-browser-bridge-v1 (= 1), "
+                "yuos-browser-render-v1 (= 1), helium-bin (= 0.22.1.1-1), "
+                "yuos-app-support-v1, python3 (= 3.13)"
+            ),
         }),
-        deb("claw-app-unrelated"),
+        deb("yuos-app-unrelated"),
     ]
     repository = compose([*platform, *sorted((tmp_path / "first").glob("*.deb"))],
                          tmp_path / "repository", signing, initialize=True)
     apt = IsolatedApt(tmp_path / "root", repository, signing)
     preserved = {}
     for relative, content in {
-        "var/lib/cos/owners/1000/grants.json": b'{"browser-attached":["exact existing grants"]}\n',
-        "home/owner/.local/share/claw/apps/browser-attached/state.json": b'{"owner":"unchanged"}\n',
+        "var/lib/yuos/owners/1000/grants.json": b'{"browser-attached":["exact existing grants"]}\n',
+        "home/owner/.local/share/yuos/apps/browser-attached/state.json": b'{"owner":"unchanged"}\n',
         "home/owner/.config/chromium/Default/Preferences": b'{"profile":"unchanged"}\n',
         "etc/chromium/native-messaging-hosts/com.yuos.browser.json": b'{"allowed_origins":["existing owner registration"]}\n',
-        "etc/chromium/policies/managed/claw-browser-agent.json": b'{"policy":"OS owned"}\n',
+        "etc/chromium/policies/managed/yuos-browser-agent.json": b'{"policy":"OS owned"}\n',
     }.items():
         path = apt.root / relative
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -129,8 +133,8 @@ def test_real_browser_apt_upgrade_updates_extension_and_host_together_without_re
         path.chmod(0o600)
         preserved[path] = (content, path.stat().st_mode, path.stat().st_ino)
     apt.update()
-    apt.call("install", "-y", "claw-app-browser", "claw-app-unrelated")
-    assert apt.installed("claw-app-browser") == "1.0.0"
+    apt.call("install", "-y", "yuos-app-browser", "yuos-app-unrelated")
+    assert apt.installed("yuos-app-browser") == "1.0.0"
     original_host = (apt.root / HOST).read_bytes()
     original_background = (apt.root / EXTENSION / "background.js").read_bytes()
     for relative, suffix in (
@@ -145,9 +149,9 @@ def test_real_browser_apt_upgrade_updates_extension_and_host_together_without_re
     shutil.rmtree(repository)
     updated.rename(repository)
     apt.update()
-    apt.call("install", "--only-upgrade", "-y", "claw-app-browser")
-    assert apt.installed("claw-app-browser") == "1.1.0"
-    assert apt.installed("claw-app-unrelated") == "1.0.0"
+    apt.call("install", "--only-upgrade", "-y", "yuos-app-browser")
+    assert apt.installed("yuos-app-browser") == "1.1.0"
+    assert apt.installed("yuos-app-unrelated") == "1.0.0"
     assert (apt.root / HOST).read_bytes() != original_host
     assert (apt.root / EXTENSION / "background.js").read_bytes() != original_background
     assert (apt.root / HOST).read_bytes() == (browser_source / "apps/browser-attached/native_host.py").read_bytes()
@@ -156,23 +160,23 @@ def test_real_browser_apt_upgrade_updates_extension_and_host_together_without_re
     for relative in (LAUNCHER, HOST, *(EXTENSION / resource for resource in RESOURCES)):
         owner = run(["dpkg-query", f"--admindir={apt.root}/var/lib/dpkg",
                      "--search", "/" + relative.as_posix()]).stdout.decode().strip()
-        assert owner == f"claw-app-browser: /{relative.as_posix()}"
+        assert owner == f"yuos-app-browser: /{relative.as_posix()}"
     for resource in RESOURCES:
         assert (apt.root / EXTENSION / resource).read_bytes() == (browser_source / "extension" / resource).read_bytes()
     for path, expected in preserved.items():
         assert (path.read_bytes(), path.stat().st_mode, path.stat().st_ino) == expected
-    assert not (apt.root / "usr/lib/cos/browser-agent").exists()
-    assert not (apt.root / "usr/share/clawos-app/browser").exists()
+    assert not (apt.root / "usr/lib/yuos/browser-agent").exists()
+    assert not (apt.root / "usr/share/yuos-app/browser").exists()
     for app in ("search", "web", "browser-attached"):
-        assert (apt.root / "usr/lib/cos/apps" / app / "app.json").read_bytes() == (
+        assert (apt.root / "usr/lib/yuos/apps" / app / "app.json").read_bytes() == (
             browser_source / "apps" / app / "app.json"
         ).read_bytes()
 
 
 @pytest.mark.parametrize(("field", "value"), [
     ("source", "../other-product"),
-    ("destination", "/usr/lib/cos/claw-browser-host"),
-    ("destination", "etc/chromium/policies/managed/claw-browser.json"),
+    ("destination", "/usr/lib/yuos/yuos-browser-host"),
+    ("destination", "etc/chromium/policies/managed/yuos-browser.json"),
     ("apps", ["other-app"]),
 ])
 def test_installed_asset_declarations_refuse_escapes_and_undeclared_owners(tmp_path, field, value):

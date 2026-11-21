@@ -79,7 +79,7 @@ impl std::fmt::Display for CaptureError {
 
 pub(crate) async fn capture(opts: CaptureOptions) -> Result<CaptureOutcome, CaptureError> {
     if !opts.interactive {
-        if claw_os_sdk::gui::is_gui_launch() {
+        if yuos_sdk::gui::is_gui_launch() {
             return gui::save_capture(opts.save_dir, opts.modal).await;
         }
         let dir = opts
@@ -109,9 +109,9 @@ pub(crate) async fn noninteractive(
         .to_owned();
     let result = tokio::task::spawn_blocking(move || {
         if human_cli {
-            cos_runtime::capture::screenshot_from_terminal(&dir, modal)
+            yuos_runtime::capture::screenshot_from_terminal(&dir, modal)
         } else {
-            cos_runtime::capture::screenshot(&dir, modal)
+            yuos_runtime::capture::screenshot(&dir, modal)
         }
     })
     .await
@@ -135,7 +135,7 @@ async fn send_notification(path: &str) -> Result<(), CaptureError> {
 //TODO: better error handling
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
-    if std::env::var("COS_MCP_SERVER").as_deref() == Ok("1") {
+    if std::env::var("YUOS_MCP_SERVER").as_deref() == Ok("1") {
         crate::localize::localize();
         if let Err(e) = mcp::run().await {
             eprintln!("cosmic-screenshot MCP server exited: {e}");
@@ -144,9 +144,9 @@ async fn main() {
         return;
     }
 
-    let args = Args::parse_from(claw_app_gui_argv::normalize(
+    let args = Args::parse_from(yuos_app_gui_argv::normalize(
         std::env::args_os(),
-        claw_os_sdk::gui::is_gui_launch(),
+        yuos_sdk::gui::is_gui_launch(),
         std::ffi::OsStr::new("--gui"),
     ));
 

@@ -112,7 +112,7 @@ class DocsAppTests(unittest.TestCase):
         self._saved_env: dict[str, str | None] = {}
         environment = {
             "HOME": str(self.private_home),
-            "COS_OWNER_HOME": str(self.owner_home),
+            "YUOS_OWNER_HOME": str(self.owner_home),
             "RECOLLQ_ARGS_LOG": str(self.q_args),
             "RECOLLQ_HOME_LOG": str(self.q_home),
             "RECOLLINDEX_ARGS_LOG": str(self.index_args),
@@ -122,8 +122,8 @@ class DocsAppTests(unittest.TestCase):
             self._saved_env[key] = os.environ.get(key)
             os.environ[key] = value
         for variable in (
-            "CLAW_RECOLLQ_BIN",
-            "CLAW_RECOLLINDEX_BIN",
+            "YUOS_RECOLLQ_BIN",
+            "YUOS_RECOLLINDEX_BIN",
             "RECOLLQ_FAIL",
             "RECOLLQ_EXIT",
             "RECOLLQ_MALFORMED",
@@ -133,7 +133,7 @@ class DocsAppTests(unittest.TestCase):
             os.environ.pop(variable, None)
 
         sys.path.insert(0, str(APP_DIR))
-        self.module_name = f"claw_test_docs_main_{id(self)}"
+        self.module_name = f"yuos_test_docs_main_{id(self)}"
         self.main = load_local_module(
             APP_DIR / "main.py",
             self.module_name,
@@ -187,7 +187,7 @@ class DocsAppTests(unittest.TestCase):
         )
 
         source = SERVER_PATH.read_text(encoding="utf-8")
-        self.assertIn("from claw_os_sdk.mcp import App", source)
+        self.assertIn("from yuos_sdk.mcp import App", source)
         self.assertNotIn("serve_manifest_operations", source)
         bindings = _server_bindings()
         self.assertEqual(list(bindings), TOOL_NAMES)
@@ -204,8 +204,8 @@ class DocsAppTests(unittest.TestCase):
         main_source = (APP_DIR / "main.py").read_text(encoding="utf-8")
         self.assertIn('RECOLLQ_BIN = "/usr/bin/recollq"', main_source)
         self.assertIn('RECOLLINDEX_BIN = "/usr/bin/recollindex"', main_source)
-        self.assertNotIn("CLAW_RECOLLQ_BIN", main_source)
-        self.assertNotIn("CLAW_RECOLLINDEX_BIN", main_source)
+        self.assertNotIn("YUOS_RECOLLQ_BIN", main_source)
+        self.assertNotIn("YUOS_RECOLLINDEX_BIN", main_source)
         self.assertFalse(
             any(
                 isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
@@ -221,12 +221,12 @@ class DocsAppTests(unittest.TestCase):
 
     def test_owner_home_has_no_missing_or_noncanonical_fallback(self):
         with mock.patch.dict(os.environ, {}, clear=False):
-            os.environ.pop("COS_OWNER_HOME", None)
-            with self.assertRaisesRegex(RuntimeError, "COS_OWNER_HOME is required"):
+            os.environ.pop("YUOS_OWNER_HOME", None)
+            with self.assertRaisesRegex(RuntimeError, "YUOS_OWNER_HOME is required"):
                 self.main._owner_home()
         with mock.patch.dict(
             os.environ,
-            {"COS_OWNER_HOME": str(self.owner_home / ".." / "owner")},
+            {"YUOS_OWNER_HOME": str(self.owner_home / ".." / "owner")},
         ):
             with self.assertRaisesRegex(RuntimeError, "absolute canonical path"):
                 self.main._owner_home()

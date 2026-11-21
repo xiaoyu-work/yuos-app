@@ -78,7 +78,7 @@ impl Default for Page {
             let panel_config = match CosmicPanelConfig::get_entry(config_helper) {
                 Ok(c) => c,
                 Err((errs, c)) => {
-                    // ClawOS: do not collapse the entire page to "Reset to Default"
+                    // YuOS: do not collapse the entire page to "Reset to Default"
                     // when a single field is missing from the system default schema —
                     // fall back to the partial result (which has every field that
                     // *was* readable, plus Default::default() for the missing ones).

@@ -1,4 +1,4 @@
-"""Explicit-provider web and image search for Claw OS."""
+"""Explicit-provider web and image search for Yu OS."""
 
 from __future__ import annotations
 
@@ -12,11 +12,11 @@ import urllib.request
 
 from _shared.credentials import load_credential  # noqa: E402
 from _shared.safe_http import open_url  # noqa: E402
-from cos_runtime import memory, policy  # noqa: E402
+from yuos_runtime import memory, policy  # noqa: E402
 
 
-VERSION = os.environ.get("COS_VERSION", "0.1.0")
-USER_AGENT = "cos/" + VERSION
+VERSION = os.environ.get("YUOS_VERSION", "0.1.0")
+USER_AGENT = "yuos/" + VERSION
 TIMEOUT = 15
 MAX_RESULTS_DEFAULT = 5
 MAX_RESULTS_LIMIT = 10

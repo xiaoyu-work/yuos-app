@@ -4,12 +4,12 @@ use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use async_trait::async_trait;
-use claw_os_sdk::mcp::{App, AppError, CallContext, Tool, ToolResult};
+use yuos_sdk::mcp::{App, AppError, CallContext, Tool, ToolResult};
 use serde::Deserialize;
 use serde_json::{Value, json};
 
 fn default_sender() -> String {
-    "Claw OS Agent".into()
+    "Yu OS Agent".into()
 }
 fn default_icon() -> String {
     "com.yuos.Notifications".into()
@@ -133,7 +133,7 @@ impl Tool for NotificationTool {
                 .to_string(),
             Err(_) => return ToolResult::error("invalid system clock"),
         };
-        let call = claw_os_sdk::cos_call_json_async_with_stdin_binary(
+        let call = yuos_sdk::yu_call_json_async_with_stdin_binary(
             "/usr/local/bin/yu",
             "notification",
             self.0,

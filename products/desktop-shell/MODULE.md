@@ -12,14 +12,14 @@ payload. The OS admits it as the shell of an authenticated login.
 `release: false` excludes it from independent App Debian and Store releases.
 Once its target ABI and authenticated launch are qualified, the separate
 Desktop Shell build workflow supplies the signed payload embedded in
-`claw-os-desktop`. `native/qt.lock.json` pins Qt 6.12.0 and
+`yuos-desktop`. `native/qt.lock.json` pins Qt 6.12.0 and
 its published corrections. The unified CMake build compiles those sources
 against the build host's ABI and uses them for every native child. Release
 payloads must be built on Debian 13, not the Ubuntu preview environment.
 The pinned Qt runtime is App-owned; Debian backports supply the Wayland
 scanner and protocol XML needed to build Quickshell's background effects.
 Do not treat an upstream installer or direct executable launch as completed
-Claw runtime integration.
+Yu OS runtime integration.
 
 ## Key files
 
@@ -45,9 +45,9 @@ Claw runtime integration.
 | `native/caelestia/utils/scripts/desktop_review.py` | One reviewed menu selection or power action through the private GUI broker |
 
 Managed GUI mode accepts only `--gui` and requires the Host's absolute
-`COS_APP_RESOURCE_DIR`. It selects the bundled shell and QML modules there,
+`YUOS_APP_RESOURCE_DIR`. It selects the bundled shell and QML modules there,
 not the working directory, an ambient Quickshell config or caller-supplied
-CLI paths. `COS_APP_GUI` chooses parsing behavior, never identity or authority;
+CLI paths. `YUOS_APP_GUI` chooses parsing behavior, never identity or authority;
 Root still owns the authenticated launch and its whole lifetime.
 Outside GUI mode, the original CLI remains available for source development.
 
@@ -60,7 +60,7 @@ Replacing the visual shell must not replace those services with upstream
 notification history, raw system commands or a second permission mechanism.
 Ordinary Apps do not need to be rewritten in QML.
 
-The desktop uses the OS-owned `/usr/share/backgrounds/claw-os/yuos-default.jpg`
+The desktop uses the OS-owned `/usr/share/backgrounds/yuos/yuos-default.jpg`
 as its default wallpaper, shared with the boot and login screens. The common
 Host exposes it read-only under `/usr`. The Shell migrates only the exact
 saved path to its retired bundled default; custom selections still take
@@ -77,9 +77,9 @@ second copy when they are already running. A visible unmanaged window can
 still be focused, but it does not establish a managed App lifetime.
 Right-clicking an App pins it in the Shell's private data.
 The permanent Launcher entry opens the independent
-`claw-launcher` GUI; the Shell contains no launcher search.
+`yuos-launcher` GUI; the Shell contains no launcher search.
 `services/DesktopMenu.qml` sends one desktop entry ID through the existing
-`desktop_review.py` and private GUI broker, never an Exec string. The Claw
+`desktop_review.py` and private GUI broker, never an Exec string. The Yu OS
 mark sends the reserved Agent UI entry to the same broker, which handles it
 only for the OS-started desktop Shell. This does not start recording or send a
 model request. A submission does not prove a window appeared. Denial or
@@ -144,7 +144,7 @@ licenses, notices, file modes and resources must remain available.
 The initial source import is checked against the Git tree IDs recorded in
 `upstream.lock.json`, including executable modes and every tracked file.
 Those are baseline identities, not hashes that should be rewritten when
-making intentional Claw modifications. Native compilation and actual
+making intentional Yu OS modifications. Native compilation and actual
 managed-GUI acceptance are separate required checks before activation.
 
 The native plugin requires Qt 6.9 or newer, libqalculate, PipeWire, Aubio,
@@ -166,7 +166,7 @@ Run from a Linux-filesystem checkout of this repository:
 ```sh
 cmake -S products/desktop-shell/native/caelestia -B build/caelestia -G Ninja \
   -DCMAKE_BUILD_TYPE=Release -DVERSION=1.0.0 \
-  -DGIT_REVISION="$(git rev-parse HEAD)" -DDISTRIBUTOR=Claw \
+  -DGIT_REVISION="$(git rev-parse HEAD)" -DDISTRIBUTOR=Yu OS \
   '-DENABLE_MODULES=plugin;shell'
 cmake --build build/caelestia --parallel 4
 cmake -S products/desktop-shell/native/m3shapes -B build/m3shapes -G Ninja \

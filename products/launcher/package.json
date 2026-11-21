@@ -1,11 +1,11 @@
 {
-  "web_ui": {"source": "web", "apps": ["launcher", "claw-launcher"]},
-  "apps": ["apps/launcher", "apps/claw-launcher"],
+  "web_ui": {"source": "web", "apps": ["launcher", "yuos-launcher"]},
+  "apps": ["apps/launcher", "apps/yuos-launcher"],
   "tests": [],
-  "native": {"claw-launcher": "native/cosmic-launcher"},
+  "native": {"yuos-launcher": "native/cosmic-launcher"},
   "native_kind": "binary",
-  "native_payload": {"app": "claw-launcher", "program": "claw-launcher"},
+  "native_payload": {"app": "yuos-launcher", "program": "yuos-launcher"},
   "native_assets": {
-    "claw-launcher": {"mcp_backend.py": "apps/launcher/main.py"}
+    "yuos-launcher": {"mcp_backend.py": "apps/launcher/main.py"}
   }
 }

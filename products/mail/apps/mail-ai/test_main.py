@@ -19,7 +19,7 @@ from test_support import load_local_module, stage_source_platform_fixture
 
 HERE = Path(__file__).parent
 PROCESS_APP = HERE
-main = load_local_module(HERE / "main.py", "claw_test_mail_ai_main")
+main = load_local_module(HERE / "main.py", "yuos_test_mail_ai_main")
 MANIFEST = json.loads((HERE / "app.json").read_text())
 CASES = [
     ("summarize", {"body": "Please review by Friday.", "subject": "Q3", "sender": "alex"},
@@ -317,7 +317,7 @@ elif mode == "probe":
     except SystemExit as exc:
         status = exc.code
 else:
-    os.environ["COS_APP_MANIFEST"] = str(pathlib.Path(root) / "app.json")
+    os.environ["YUOS_APP_MANIFEST"] = str(pathlib.Path(root) / "app.json")
     server = runpy.run_path(str(pathlib.Path(root) / "server.py"))
     server["create_app"]().serve()
     status = 0
@@ -342,7 +342,7 @@ def mcp_request(verb, args, rid="request"):
         "jsonrpc": "2.0", "id": rid, "method": "tools/call",
         "params": {
             "name": f"mail-ai.{verb}", "arguments": args,
-            "_meta": {"claw-os.dev/call-context": {
+            "_meta": {"yuos.dev/call-context": {
                 "wire_version": 1, "call_id": str(rid), "trace_id": "test-trace",
                 "session_id": "test-session", "task_id": "test-task",
                 "caller": {"kind": "system-agent", "id": "test-agent", "owner_uid": 1000},
@@ -360,7 +360,7 @@ def drive(mode, requests=(), *, text="Hello", failure="", raw=None):
     process = subprocess.run(
         [sys.executable, "-I", "-c", DRIVER, str(PROCESS_APP.resolve()), mode, text, failure],
         input=raw, capture_output=True, timeout=20, cwd=PROCESS_APP,
-        env={key: value for key, value in os.environ.items() if key not in ("COS_APP_MANIFEST", "COS_SESSION")},
+        env={key: value for key, value in os.environ.items() if key not in ("YUOS_APP_MANIFEST", "YUOS_SESSION")},
     )
     stderr = process.stderr.decode()
     effect_line = next((line for line in stderr.splitlines() if line.startswith("TEST_EFFECTS=")), None)
@@ -542,7 +542,7 @@ def test_declared_native_host_answers_fragmented_frames_before_input_eof():
         [sys.executable, "-I", "-c", DRIVER, str(PROCESS_APP.resolve()), "native", "Hello", ""],
         stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         bufsize=0, cwd=PROCESS_APP,
-        env={key: value for key, value in os.environ.items() if key not in ("COS_APP_MANIFEST", "COS_SESSION")},
+        env={key: value for key, value in os.environ.items() if key not in ("YUOS_APP_MANIFEST", "YUOS_SESSION")},
     )
 
     def read_output(length):

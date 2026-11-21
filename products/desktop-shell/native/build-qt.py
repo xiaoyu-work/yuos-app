@@ -15,7 +15,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parent
 LOCK = ROOT / "qt.lock.json"
-INSTALL_DIR = Path("usr/share/claw-desktop-shell")
+INSTALL_DIR = Path("usr/share/yuos-desktop-shell")
 QT = "https://download.qt.io/official_releases/qt"
 
 
@@ -99,7 +99,7 @@ def build(cache, jobs):
         run("cmake", "--build", output, "--parallel", str(jobs))
         run("cmake", "--install", output)
         complete.touch()
-    (prefix / "claw-qt-source").write_text(str(work / "src") + "\n")
+    (prefix / "yuos-qt-source").write_text(str(work / "src") + "\n")
     return prefix
 
 
@@ -142,7 +142,7 @@ def stage(prefix, destination):
     notices = base / "licenses/qt"
     notices.mkdir(parents=True)
     shutil.copyfile(LOCK, notices / LOCK.name)
-    source = Path((prefix / "claw-qt-source").read_text().strip())
+    source = Path((prefix / "yuos-qt-source").read_text().strip())
     for module in lock["modules"]:
         shutil.copytree(source / module / "LICENSES", notices / module)
 
@@ -164,9 +164,9 @@ def stage(prefix, destination):
             search.append(f"$ORIGIN/{os.path.relpath(caelestia / 'lib', resource.parent)}")
         run("patchelf", "--set-rpath", ":".join(search), resource)
         run("strip", "--strip-unneeded", resource)
-    binary = destination / "usr/bin/claw-desktop-shell"
+    binary = destination / "usr/bin/yuos-desktop-shell"
     run("patchelf", "--set-rpath",
-        "$ORIGIN/../resources/usr/share/claw-desktop-shell/qt/lib", binary)
+        "$ORIGIN/../resources/usr/share/yuos-desktop-shell/qt/lib", binary)
     run("strip", "--strip-unneeded", binary)
 
 

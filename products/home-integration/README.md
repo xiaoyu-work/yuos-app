@@ -1,6 +1,6 @@
 # Home Integration
 
-Own the existing `gateway-homeassistant` App source independently of Claw OS.
+Own the existing `gateway-homeassistant` App source independently of Yu OS.
 This is a device/service integration, not a chat connector, a new GUI or a
 copy of the Home Assistant upstream server.
 

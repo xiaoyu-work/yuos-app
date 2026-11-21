@@ -13,7 +13,7 @@ from test_support import load_local_module
 
 
 email = load_local_module(
-    Path(__file__).with_name("main.py"), "claw_test_email_main", clear_modules=("_shared",),
+    Path(__file__).with_name("main.py"), "yuos_test_email_main", clear_modules=("_shared",),
 )
 ACCOUNT = "00000000-0000-4000-8000-000000000001:account1"
 OTHER = "00000000-0000-4000-8000-000000000001:account2"
@@ -119,7 +119,7 @@ class TestThunderbirdEmail(unittest.TestCase):
             self.call.assert_not_called()
 
     def test_repeated_submission_returns_its_receipt_without_sending_again(self):
-        with tempfile.TemporaryDirectory() as root, patch.dict(os.environ, {"COS_DATA_DIR": root}):
+        with tempfile.TemporaryDirectory() as root, patch.dict(os.environ, {"YUOS_DATA_DIR": root}):
             request_id = str(uuid.uuid4())
             args = [
                 f"--account={ACCOUNT}", "--to=public@example.invalid",
@@ -135,7 +135,7 @@ class TestThunderbirdEmail(unittest.TestCase):
 
     def test_indeterminate_transport_failure_cannot_resubmit_and_has_no_provider_fallback(self):
         with tempfile.TemporaryDirectory() as root, patch.dict(os.environ, {
-            "COS_DATA_DIR": root, "GOOGLE_ACCESS_TOKEN": "synthetic-unused-token",
+            "YUOS_DATA_DIR": root, "GOOGLE_ACCESS_TOKEN": "synthetic-unused-token",
             "SMTP_HOST": "unused.example.invalid",
         }):
             args = [
@@ -148,7 +148,7 @@ class TestThunderbirdEmail(unittest.TestCase):
             self.call.assert_called_once()
 
     def test_mailbox_baseline_and_event_failure_do_not_replay_or_advance_the_cursor(self):
-        with tempfile.TemporaryDirectory() as root, patch.dict(os.environ, {"COS_DATA_DIR": root}):
+        with tempfile.TemporaryDirectory() as root, patch.dict(os.environ, {"YUOS_DATA_DIR": root}):
             self.call.return_value = {"account": ACCOUNT, "cursor": 10, "messages": [], "baseline": True}
             first = email.run("sync", [f"--account={ACCOUNT}"])
             self.assertEqual(first["events_emitted"], 0)

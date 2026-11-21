@@ -22,9 +22,9 @@ Optional fields surfaced:
 
 Credentials needed:
   * ``pushover_app_token`` -- application API token
-                               (env override: COS_PUSHOVER_APP_TOKEN)
+                               (env override: YUOS_PUSHOVER_APP_TOKEN)
   * ``pushover_user_key``  -- default user / group key
-                               (env override: COS_PUSHOVER_USER_KEY)
+                               (env override: YUOS_PUSHOVER_USER_KEY)
 
 Stdlib only.
 """
@@ -42,7 +42,7 @@ from gateway._shared import gateway_args, gateway_memory, safe_egress, safe_subp
 
 
 PLATFORM = "pushover"
-USER_AGENT = "ClawOSPushover/0.1.0"
+USER_AGENT = "YuOSPushover/0.1.0"
 SOFT_LEN = 1024  # Pushover hard cap is 1024 chars
 TITLE_LEN = 250
 URL_LEN = 512
@@ -94,13 +94,13 @@ def _send(
     if not text or not str(text).strip():
         return {"ok": False, "error": "text required"}
 
-    app_token, app_err = _env_or_credential("COS_PUSHOVER_APP_TOKEN", "pushover_app_token")
+    app_token, app_err = _env_or_credential("YUOS_PUSHOVER_APP_TOKEN", "pushover_app_token")
     if not app_token:
         return {"ok": False, "error": app_err or "pushover_app_token required"}
 
     user_key = recipient
     if not user_key:
-        user_key, user_err = _env_or_credential("COS_PUSHOVER_USER_KEY", "pushover_user_key")
+        user_key, user_err = _env_or_credential("YUOS_PUSHOVER_USER_KEY", "pushover_user_key")
         if not user_key:
             return {"ok": False, "error": user_err or "pushover_user_key required"}
 
@@ -197,8 +197,8 @@ def _send(
 
 
 def _status() -> dict:
-    app_token, app_err = _env_or_credential("COS_PUSHOVER_APP_TOKEN", "pushover_app_token")
-    user_key, user_err = _env_or_credential("COS_PUSHOVER_USER_KEY", "pushover_user_key")
+    app_token, app_err = _env_or_credential("YUOS_PUSHOVER_APP_TOKEN", "pushover_app_token")
+    user_key, user_err = _env_or_credential("YUOS_PUSHOVER_USER_KEY", "pushover_user_key")
     return {
         "ok": True,
         "platform": PLATFORM,
@@ -318,8 +318,8 @@ def run(command: str, args):
 
 
 if __name__ == "__main__":
-    cmd = os.environ.get("COS_COMMAND") or (sys.argv[1] if len(sys.argv) > 1 else "")
-    raw_args = os.environ.get("COS_ARGS_JSON")
+    cmd = os.environ.get("YUOS_COMMAND") or (sys.argv[1] if len(sys.argv) > 1 else "")
+    raw_args = os.environ.get("YUOS_ARGS_JSON")
     if raw_args:
         parsed_args = json.loads(raw_args)
     else:

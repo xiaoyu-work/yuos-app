@@ -1,7 +1,7 @@
 """App-owned helpers imported from the common Python library root.
 
 Development uses ``shared/python``; installed Apps use
-``/usr/lib/cos/python``. Both expose the same imports::
+``/usr/lib/yuos/python``. Both expose the same imports::
 
     from _shared.paths import safe_realpath
     from _shared.atomic import atomic_write_bytes, atomic_write_json

@@ -3,8 +3,8 @@
 // Lives inside the compose window (Thunderbird's "Write" window). The
 // tab id we operate on is whatever compose tab is currently active.
 
-const { aiCall, showBusy, clearBusy, showError, el, localiseDom } = window.ClawUI;
-const { getComposeTab, getComposeDetails, setComposeBody, plainToHtml, bodyToPlain } = window.ClawMessages;
+const { aiCall, showBusy, clearBusy, showError, el, localiseDom } = window.YuOsUI;
+const { getComposeTab, getComposeDetails, setComposeBody, plainToHtml, bodyToPlain } = window.YuOsMessages;
 
 let composeTab = null;
 let mode = "reply";          // "reply" | "compose"
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("btn-compose-generate").addEventListener("click", runSmartCompose);
 
   // Preload style preference.
-  const settings = await ClawUI.getSettings();
+  const settings = await YuOsUI.getSettings();
   document.getElementById("compose-style").value = settings.compose.defaultStyle || "formal";
 
   // If the compose window is a reply (has originalMessage), default to
@@ -144,7 +144,7 @@ async function applySuggestion(body) {
 }
 
 async function copySuggestion(body) {
-  try { await ClawUI.copyToClipboard(body); } catch (_) {}
+  try { await YuOsUI.copyToClipboard(body); } catch (_) {}
 }
 
 // ---------------------------------------------------------------------------
@@ -172,7 +172,7 @@ async function runSmartCompose() {
   const details = await getComposeDetails(composeTab.id);
   const lang = (browser.i18n.getUILanguage() || "en").replace("-", "_");
   const style = document.getElementById("compose-style").value || "formal";
-  await ClawUI.setSettings({ compose: { defaultStyle: style } });
+  await YuOsUI.setSettings({ compose: { defaultStyle: style } });
 
   // First recipient — the address is a string in MV3 compose details.
   const to = (details?.to || [])[0] || "";
@@ -225,7 +225,7 @@ async function insertCompose(replace) {
 
 async function copyComposeBody() {
   if (!lastCompose) return;
-  try { await ClawUI.copyToClipboard(lastCompose.body || ""); } catch (_) {}
+  try { await YuOsUI.copyToClipboard(lastCompose.body || ""); } catch (_) {}
 }
 
 // ---------------------------------------------------------------------------

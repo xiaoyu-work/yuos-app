@@ -1,4 +1,4 @@
-"""network-manager — NetworkManager control through the root clawd broker."""
+"""network-manager — NetworkManager control through the root yuosd broker."""
 
 import json
 import os
@@ -9,15 +9,15 @@ from typing import Literal
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from cos_runtime import policy  # noqa: E402
+from yuos_runtime import policy  # noqa: E402
 
 
-TIMEOUT_SECS = int(os.environ.get("CLAW_NETWORK_MANAGER_TIMEOUT", "180"))
+TIMEOUT_SECS = int(os.environ.get("YUOS_NETWORK_MANAGER_TIMEOUT", "180"))
 RadioState = Literal["on", "off"]
 
 
-def _cos_binary() -> str | None:
-    return os.environ.get("COS_BIN") or shutil.which("yu")
+def _yu_binary() -> str | None:
+    return os.environ.get("YUOS_BIN") or shutil.which("yu")
 
 
 def _require_name(value: object, label: str) -> str:
@@ -32,12 +32,12 @@ def _broker(
     state: RadioState | None = None,
     credential: str | None = None,
 ) -> dict:
-    cos_bin = _cos_binary()
-    if not cos_bin:
+    yu_bin = _yu_binary()
+    if not yu_bin:
         raise FileNotFoundError(
             "yu binary not found; Network Manager broker unavailable"
         )
-    argv = [cos_bin, "__network", action]
+    argv = [yu_bin, "__network", action]
     if target is not None:
         argv.extend(["--target", target])
     if state is not None:

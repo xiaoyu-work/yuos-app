@@ -1302,7 +1302,7 @@ def test_mcp_only_apps_bind_direct_sdk_handlers() -> None:
         tree = ast.parse(source)
         imports_sdk_app = any(
             isinstance(node, ast.ImportFrom)
-            and node.module == "claw_os_sdk.mcp"
+            and node.module == "yuos_sdk.mcp"
             and any(alias.name == "App" for alias in node.names)
             for node in tree.body
         )

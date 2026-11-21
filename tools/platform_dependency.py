@@ -129,8 +129,11 @@ def validate_lock(lock):
 
 
 def read_lock():
-    with (ROOT / "platform.lock.json").open("rb") as source:
-        data = source.read(16 * 1024 + 1)
+    try:
+        with (ROOT / "platform.lock.json").open("rb") as source:
+            data = source.read(16 * 1024 + 1)
+    except FileNotFoundError as error:
+        raise ValueError("No published Yu OS App Platform is pinned in platform.lock.json") from error
     if len(data) > 16 * 1024:
         raise ValueError("App platform lock is oversized")
     return validate_lock(artifact.read_json(data))
@@ -144,7 +147,7 @@ class _HTTPSRedirect(urllib.request.HTTPRedirectHandler):
 
 def _download(url, destination):
     request = urllib.request.Request(
-        _https(url), headers={"Accept-Encoding": "identity", "User-Agent": "clawos-app-platform/1"},
+        _https(url), headers={"Accept-Encoding": "identity", "User-Agent": "yuos-app-platform/1"},
     )
     opener = urllib.request.build_opener(_HTTPSRedirect())
     started = time.monotonic()

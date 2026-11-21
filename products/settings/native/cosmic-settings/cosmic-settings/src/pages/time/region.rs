@@ -658,7 +658,7 @@ mod preferred_languages {
 
                 let description = widget::text::body(&section.descriptions[pref_lang_desc]);
 
-                let mut content = crate::widget::claw_section();
+                let mut content = crate::widget::yuos_section();
 
                 if let Some(((_config, locales), registry)) =
                     page.config.as_ref().zip(page.registry.as_ref())
@@ -780,7 +780,7 @@ mod formatting {
                     Message::RegionContext,
                 );
 
-                crate::widget::claw_section()
+                crate::widget::yuos_section()
                     .title(&desc[formatting_txt])
                     .add(formatted_demo)
                     .add(select_region)

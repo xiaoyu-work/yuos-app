@@ -12,7 +12,7 @@ from test_support import authenticated_mcp_params, load_local_module
 APP_DIR = pathlib.Path(__file__).parent
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_system_snapshot_main",
+    "yuos_test_system_snapshot_main",
     clear_modules=("_shared",),
 )
 
@@ -37,7 +37,7 @@ def test_invalid_snapshot_id_is_rejected_before_policy():
 
 def test_create_uses_snapshot_capability():
     completed = mock.Mock(returncode=0, stdout=json.dumps({"created": {}}), stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         result = main.create_snapshot("before upgrade")
@@ -53,11 +53,11 @@ def test_create_uses_snapshot_capability():
 
 def test_create_preserves_default_description():
     completed = mock.Mock(returncode=0, stdout=json.dumps({"created": {}}), stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed) as run:
         main.create_snapshot()
-    assert run.call_args.args[0][-1] == "Claw OS recovery point"
+    assert run.call_args.args[0][-1] == "Yu OS recovery point"
 
 
 def test_broker_error_payload_raises():
@@ -66,7 +66,7 @@ def test_broker_error_payload_raises():
         stdout=json.dumps({"error": "snapshot creation failed"}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ), mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match="snapshot creation failed"):
@@ -102,7 +102,7 @@ def test_manifest_preserves_snapshot_scopes_and_rollback_confirmation():
 @pytest.mark.parametrize(("action", "arguments", "tail"), [
     ("status", {}, []),
     ("list", {}, []),
-    ("create", {}, ["Claw OS recovery point"]),
+    ("create", {}, ["Yu OS recovery point"]),
     ("create", {"description": "before upgrade"}, ["before upgrade"]),
     ("delete", {"id": SNAPSHOT_ID}, [SNAPSHOT_ID]),
     ("rollback", {"id": SNAPSHOT_ID, "confirm": True}, [SNAPSHOT_ID, "--confirm"]),
@@ -110,9 +110,9 @@ def test_manifest_preserves_snapshot_scopes_and_rollback_confirmation():
 def test_relocated_sdk_dispatch_preserves_broker_argv_and_scope(action, arguments, tail):
     completed = mock.Mock(returncode=0, stdout=json.dumps({"action": action}), stderr="")
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
-        os.environ, {"COS_APP_MANIFEST": str(APP_DIR / "app.json"), "COS_BIN": "/usr/local/bin/yu"}
+        os.environ, {"YUOS_APP_MANIFEST": str(APP_DIR / "app.json"), "YUOS_BIN": "/usr/local/bin/yu"}
     ):
-        server = load_local_module(APP_DIR / "server.py", "claw_test_system_snapshot_server")
+        server = load_local_module(APP_DIR / "server.py", "yuos_test_system_snapshot_server")
         listed = server.app._handle_request("tools/list", {}, True)
         assert len(listed["tools"]) == 5
         with mock.patch.object(main.policy, "require") as require, mock.patch.object(

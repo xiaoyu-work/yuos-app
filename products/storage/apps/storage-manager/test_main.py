@@ -12,7 +12,7 @@ from test_support import authenticated_mcp_params, load_local_module
 APP_DIR = pathlib.Path(__file__).parent
 main = load_local_module(
     APP_DIR / "main.py",
-    "claw_test_storage_manager_main",
+    "yuos_test_storage_manager_main",
     clear_modules=("_shared",),
 )
 
@@ -23,7 +23,7 @@ def test_mount_requires_exact_device_scope():
         stdout=json.dumps({"changed": True}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.os.path, "realpath", return_value="/dev/sdb1"
     ), mock.patch.object(main.policy, "require") as require, mock.patch.object(
         main.subprocess, "run", return_value=completed
@@ -46,7 +46,7 @@ def test_health_uses_diagnostic_scope():
         stdout=json.dumps({"status": "ok"}),
         stderr="",
     )
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.os.path, "realpath", return_value="/dev/nvme0n1"
     ), mock.patch.object(main.policy, "require") as require, mock.patch.object(
         main.subprocess, "run", return_value=completed
@@ -107,7 +107,7 @@ def test_unknown_action_is_rejected_before_policy():
 )
 def test_broker_failures_raise(returncode, stdout, message):
     completed = mock.Mock(returncode=returncode, stdout=stdout, stderr="")
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(main.subprocess, "run", return_value=completed):
         with pytest.raises(RuntimeError, match=message):
@@ -125,7 +125,7 @@ def test_missing_broker_executable_raises():
 
 
 def test_broker_execution_failure_raises():
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.policy, "require"
     ) as require, mock.patch.object(
         main.subprocess, "run", side_effect=PermissionError("access denied")
@@ -145,7 +145,7 @@ def test_broker_execution_failure_raises():
     ],
 )
 def test_broker_timeout_raises(call, timeout, action):
-    with mock.patch.dict(os.environ, {"COS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
+    with mock.patch.dict(os.environ, {"YUOS_BIN": "/usr/local/bin/yu"}), mock.patch.object(
         main.os.path, "realpath", side_effect=lambda value: value
     ), mock.patch.object(main.policy, "require"), mock.patch.object(
         main.subprocess,
@@ -162,7 +162,7 @@ def test_broker_timeout_raises(call, timeout, action):
 
 @pytest.mark.parametrize("action", ["status", "health", "check", "mount", "unmount", "eject"])
 def test_relocated_sdk_preserves_storage_authority_and_broker_contract(action):
-    device = "/dev/claw-test-device"
+    device = "/dev/yuos-test-device"
     arguments = {} if action == "status" else {"device": device}
     manifest = json.loads((APP_DIR / "app.json").read_text(encoding="utf-8"))
     assert "operations" not in manifest
@@ -187,11 +187,11 @@ def test_relocated_sdk_preserves_storage_authority_and_broker_contract(action):
     completed = mock.Mock(returncode=0, stdout=json.dumps({"action": action}), stderr="")
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.dict(
         os.environ, {
-            "COS_APP_MANIFEST": str(APP_DIR / "app.json"),
-            "COS_BIN": "/usr/local/bin/yu",
+            "YUOS_APP_MANIFEST": str(APP_DIR / "app.json"),
+            "YUOS_BIN": "/usr/local/bin/yu",
         }
     ):
-        server = load_local_module(APP_DIR / "server.py", "claw_test_storage_manager_server")
+        server = load_local_module(APP_DIR / "server.py", "yuos_test_storage_manager_server")
         listed = server.app._handle_request("tools/list", {}, True)
         assert {tool["name"] for tool in listed["tools"]} == set(tools)
         with mock.patch.object(main.os.path, "realpath", side_effect=lambda value: value), \

@@ -6,19 +6,19 @@
 #include <string>
 
 int main(int argc, char** argv) {
-	const auto* gui = std::getenv("COS_APP_GUI");
+	const auto* gui = std::getenv("YUOS_APP_GUI");
 	if (!gui || std::strcmp(gui, "1") != 0) return qs::launch::main(argc, argv);
 
 	if (argc != 2 || std::strcmp(argv[1], "--gui") != 0) {
 		std::fputs("Managed desktop launch accepts only its declared GUI selector.\n", stderr);
 		return 1;
 	}
-	const auto* resources = std::getenv("COS_APP_RESOURCE_DIR");
+	const auto* resources = std::getenv("YUOS_APP_RESOURCE_DIR");
 	if (!resources || resources[0] != '/') {
 		std::fputs("Managed desktop launch requires package-local resources.\n", stderr);
 		return 1;
 	}
-	const std::string shell = std::string(resources) + "/usr/share/claw-desktop-shell";
+	const std::string shell = std::string(resources) + "/usr/share/yuos-desktop-shell";
 	::unsetenv("QT_PLUGIN_PATH");
 	::unsetenv("QT_QPA_PLATFORM_PLUGIN_PATH");
 	::unsetenv("QML2_IMPORT_PATH");

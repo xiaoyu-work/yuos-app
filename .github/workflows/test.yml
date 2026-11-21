@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 env:
-  CLAW_CI_APT_SOURCES: /etc/apt/sources.list.d/ubuntu.sources
+  YUOS_CI_APT_SOURCES: /etc/apt/sources.list.d/ubuntu.sources
 
 jobs:
   platform-tools:
@@ -50,22 +50,22 @@ jobs:
       - name: Install Mail TLS fixture dependency
         if: matrix.product == 'mail'
         run: |
-          test -s "$CLAW_CI_APT_SOURCES"
-          sudo apt-get -o Dir::Etc::sourcelist="$CLAW_CI_APT_SOURCES" \
+          test -s "$YUOS_CI_APT_SOURCES"
+          sudo apt-get -o Dir::Etc::sourcelist="$YUOS_CI_APT_SOURCES" \
             -o Dir::Etc::sourceparts=- update -qq
           sudo apt-get install -y openssl
       - name: Install Files search dependency
         if: matrix.product == 'files'
         run: |
-          test -s "$CLAW_CI_APT_SOURCES"
-          sudo apt-get -o Dir::Etc::sourcelist="$CLAW_CI_APT_SOURCES" \
+          test -s "$YUOS_CI_APT_SOURCES"
+          sudo apt-get -o Dir::Etc::sourcelist="$YUOS_CI_APT_SOURCES" \
             -o Dir::Etc::sourceparts=- update -qq
           sudo apt-get install -y ripgrep
       - name: Enable isolated Notify process fixture
         if: matrix.product == 'notifications'
         run: |
-          test -s "$CLAW_CI_APT_SOURCES"
-          sudo apt-get -o Dir::Etc::sourcelist="$CLAW_CI_APT_SOURCES" \
+          test -s "$YUOS_CI_APT_SOURCES"
+          sudo apt-get -o Dir::Etc::sourcelist="$YUOS_CI_APT_SOURCES" \
             -o Dir::Etc::sourceparts=- update -qq
           sudo apt-get install -y bubblewrap
           if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
@@ -104,8 +104,8 @@ jobs:
           python-version: "3.12"
       - name: Install native toolkit build dependencies
         run: |
-          test -s "$CLAW_CI_APT_SOURCES"
-          sudo apt-get -o Dir::Etc::sourcelist="$CLAW_CI_APT_SOURCES" \
+          test -s "$YUOS_CI_APT_SOURCES"
+          sudo apt-get -o Dir::Etc::sourcelist="$YUOS_CI_APT_SOURCES" \
             -o Dir::Etc::sourceparts=- update -qq
           sudo apt-get install -y pkg-config cmake libfontconfig-dev libfreetype-dev \
             libwayland-dev libxkbcommon-dev libudev-dev libinput-dev libdbus-1-dev \

@@ -80,10 +80,10 @@ def test_retired_interface_inputs_are_rejected_by_complete_release_verification(
     release.build(plan, "all", output)
     if kind == "record":
         record = json.loads((output / "build-record-all.json").read_bytes())
-        record["interfaces"] = {"notifications": {"filename": "claw-app-interfaces-1.0.0.tar.gz"}}
+        record["interfaces"] = {"notifications": {"filename": "yuos-app-interfaces-1.0.0.tar.gz"}}
         write_json(output / "build-record-all.json", record)
     else:
-        (output / "claw-app-interfaces-1.0.0.tar.gz").write_bytes(b"historical fixture, not a release input")
+        (output / "yuos-app-interfaces-1.0.0.tar.gz").write_bytes(b"historical fixture, not a release input")
     with pytest.raises(ValueError, match="Retired App.*interface archives"):
         verify_artifacts(plan, output)
 
@@ -95,7 +95,7 @@ def test_legacy_interfaces_cannot_be_signed_even_when_explicitly_supplied(tmp_pa
         release_assets(
             plan, "notifications", [], tmp_path / "assets", signing, development={},
             artifact_directory=tmp_path,
-            interfaces={"notifications": {"filename": "claw-app-interfaces-1.2.3.tar.gz"}},
+            interfaces={"notifications": {"filename": "yuos-app-interfaces-1.2.3.tar.gz"}},
         )
     assert not (tmp_path / "assets").exists()
 

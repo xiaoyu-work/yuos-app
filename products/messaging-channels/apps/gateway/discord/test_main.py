@@ -15,14 +15,14 @@ main = load_local_module(Path(__file__).with_name("main.py"), "gateway_discord_m
 
 @pytest.fixture
 def sdk_app(tmp_path, monkeypatch):
-    from claw_os_sdk.mcp import App
+    from yuos_sdk.mcp import App
 
-    monkeypatch.setenv("COS_DATA_DIR", str(tmp_path))
+    monkeypatch.setenv("YUOS_DATA_DIR", str(tmp_path))
     for name in vars(main):
         if name.startswith("ENV_"):
             monkeypatch.delenv(getattr(main, name), raising=False)
     manifest_path = Path(__file__).with_name("app.json")
-    monkeypatch.setenv("COS_APP_MANIFEST", str(manifest_path))
+    monkeypatch.setenv("YUOS_APP_MANIFEST", str(manifest_path))
     servers = []
     with mock.patch.dict(sys.modules, {"main": main}), mock.patch.object(App, "serve", lambda app: servers.append(app)):
         load_local_module(Path(__file__).with_name("server.py"), "gateway_discord_server")

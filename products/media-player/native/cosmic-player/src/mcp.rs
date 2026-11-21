@@ -5,7 +5,7 @@ use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use async_trait::async_trait;
-use claw_os_sdk::mcp::{App, AppError, CallContext, Tool, ToolResult};
+use yuos_sdk::mcp::{App, AppError, CallContext, Tool, ToolResult};
 use serde_json::Value;
 
 struct PlayerTool(&'static str);
@@ -27,7 +27,7 @@ impl Tool for PlayerTool {
         };
         let action = self.0.strip_prefix("player.").expect("fixed tool name");
         let deadline = deadline.to_string();
-        let call = claw_os_sdk::cos_call_json_async_with_binary(
+        let call = yuos_sdk::yu_call_json_async_with_binary(
             "/usr/local/bin/yu", "media-player", action,
             ["__media-player", action, "--deadline", &deadline],
         );

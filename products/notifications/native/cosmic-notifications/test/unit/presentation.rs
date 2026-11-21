@@ -1,5 +1,5 @@
 use super::*;
-use claw_notification_presentation::{Icon, MAX_IMAGE_BYTES};
+use yuos_notification_presentation::{Icon, MAX_IMAGE_BYTES};
 use cosmic_notifications_util::{Hint, Image};
 
 pub(super) mod fixture {

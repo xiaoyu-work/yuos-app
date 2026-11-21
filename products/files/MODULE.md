@@ -19,7 +19,7 @@ product tests. The OS owns filesystem authority, sandbox mounts and snapshots.
 | `native/cosmic-files/src/cli.rs`, `native/cosmic-files/test/unit/cli.rs` | Primary Files argv parsing and path/URI regressions |
 | `native/cosmic-files/src/yuos_glue/` | Shared product bridge, SDK AI and fixed OS reveal |
 | `native/cosmic-files/product_bridge.py` | Private compiled-in adapter over canonical filesystem/Recoll/parser libraries |
-| `python/claw_files/document.py` | Named shared descriptor-safe parsing/conversion export, also consumed by the Document Engine capability client |
+| `python/yuos_files/document.py` | Named shared descriptor-safe parsing/conversion export, also consumed by the Document Engine capability client |
 | `native/test_process.py` | Authenticated real-binary fixture against synthetic OS/model/Recoll services |
 
 The source move preserves `fs` and `docs`, their manifests, runtime behavior
@@ -37,9 +37,9 @@ continue to use the authenticated per-call context, never process environment.
 Filesystem search and its tests require the system `ripgrep` package.
 Document search uses the fixed system `recollq` and `recollindex` executables;
 its unit tests substitute explicit local executable fixtures. The OS still
-owns the background index service and supplies canonical `COS_OWNER_HOME`.
+owns the background index service and supplies canonical `YUOS_OWNER_HOME`.
 [`Document Engine`](../../capabilities/document-engine/MODULE.md) declares
-`claw_files` as a library dependency, not an App call. Doc-only staging includes
+`yuos_files` as a library dependency, not an App call. Doc-only staging includes
 the export without installing Files Apps; combined staging checks identical
 library content instead of copying conflicting trees. Native Files continues
 embedding this same source through its existing native asset declaration.
@@ -60,7 +60,7 @@ mapping. Like current `fs.write`, preparation requires explicit text `content`
 `operations`, argv dispatcher or native GUI grant is added.
 
 Preparation reads at most 64 KiB of UTF-8 text and saves a private proposal
-under `$COS_DATA_DIR/file-change-plans/<path-sha256>/`. Files use `0600`,
+under `$YUOS_DATA_DIR/file-change-plans/<path-sha256>/`. Files use `0600`,
 directories `0700`; storage remains within the existing `fs` owner/App
 partition. Each target has at most 64 plans, bounded to a 60–86400-second
 lifetime. The real unified diff is UTF-8 bounded to 64 KiB. Preparing a
@@ -73,7 +73,7 @@ nanosecond modification/change times. After rechecking normal exact read/write
 authority and the baseline, it durably records `applying` before snapshot or
 replacement. App-owned shared atomic helpers strictly sync records and their
 directory entries. Replacement is exclusively the OS public
-`system.file.replace` broker via `cos_runtime.file_changes.replace_file`;
+`system.file.replace` broker via `yuos_runtime.file_changes.replace_file`;
 neither this App nor its manifest broadens parent mounts to rename a target.
 Both snapshot and replacement receive `current_context().session_id`, never
 the persistent service's ambient session. Conflicted, consumed and uncertain
@@ -88,7 +88,7 @@ existence, freshness, truth, authority or an available rollback. Effect and
 recovery metadata remain previews; a reported snapshot is not OS rollback
 evidence.
 
-This source requires the public SDK `claw_os_sdk.objects` reference helpers,
+This source requires the public SDK `yuos_sdk.objects` reference helpers,
 the file-plan wire shape and manifest `objects`/MCP `effects` metadata, plus
 the session-aware runtime signature
 `replace_file(path, expected, content, *, session_id=...)`. The withdrawn
@@ -106,7 +106,7 @@ python3 tools/native_build.py files build
 python3 products/files/native/test_process.py
 ```
 
-The primary native entry uses shared `claw-app-gui-argv` and the published
+The primary native entry uses shared `yuos-app-gui-argv` and the published
 SDK's GUI-launch signal to remove only the leading Host `--gui`, after the
 existing MCP dispatch. Direct `--gui` remains a path; `--` is not a delimiter.
 Managed GUI launches suppress upstream daemonization so the common Host retains

@@ -359,7 +359,7 @@ pub enum Message {
     AiAssistSubmit,
     AiAssistSearchResult(Result<Vec<crate::yuos_glue::ai::SearchHit>, String>),
     AiAssistFindSimilar,
-    AskClaw,
+    AskYu,
     AiRewrite(Option<Entity>),
     AiRewriteInput(String),
     AiRewriteSubmit,
@@ -2718,12 +2718,12 @@ impl App {
             .padding(space_xxs)
             .selected(matches!(view, tab::View::List))
             .on_press(Message::TabView(None, tab::View::List));
-        let ask_claw = widget::tooltip(
+        let ask_yu = widget::tooltip(
             widget::button::icon(icon::from_name("face-smile-symbolic").size(16))
                 .padding(space_xxs)
-                .class(crate::glass::ask_claw_button())
-                .on_press(Message::AskClaw),
-            widget::text::body(fl!("ask-claw")),
+                .class(crate::glass::ask_yu_button())
+                .on_press(Message::AskYu),
+            widget::text::body(fl!("ask-yu")),
             widget::tooltip::Position::Bottom,
         );
 
@@ -2736,7 +2736,7 @@ impl App {
             .push(grid)
             .push(list)
             .push(widget::space::horizontal().width(Length::Fill))
-            .push(ask_claw);
+            .push(ask_yu);
 
         let search_term = self.search_get();
         let search_input = widget::text_input::search_input(
@@ -2753,7 +2753,7 @@ impl App {
             .padding([space_xxs, space_xs])
             .width(Length::Fill)
             .class(theme::Container::custom(crate::glass::toolbar));
-        // Claw Glass: brand-blue translucent hairline separating chrome from content.
+        // Yu OS Glass: brand-blue translucent hairline separating chrome from content.
         let hairline = cosmic::iced::widget::rule::horizontal(1).class(theme::Rule::Custom(
             Box::new(|theme| cosmic::iced::widget::rule::Style {
                 color: {
@@ -3876,15 +3876,15 @@ impl Application for App {
                     self.home_dashboard_tabs.remove(&entity);
                 }
             }
-            Message::AskClaw => {
+            Message::AskYu => {
                 let tab_opt = self.tab_model.active_data::<Tab>();
                 let selected = self.selected_paths(None).next();
                 let cwd = tab_opt
                     .and_then(|t| t.location.path_opt().cloned())
                     .map(|p| p.to_string_lossy().into_owned());
                 let sel_str = selected.map(|p| p.to_string_lossy().into_owned());
-                if let Err(err) = crate::yuos_glue::ask_claw(cwd.as_deref(), sel_str.as_deref()) {
-                    log::error!("failed to open Ask Claw overlay: {err}");
+                if let Err(err) = crate::yuos_glue::ask_yu(cwd.as_deref(), sel_str.as_deref()) {
+                    log::error!("failed to open Ask Yu OS overlay: {err}");
                 }
             }
             Message::AiSummaryResult { path, outcome } => {
@@ -7799,7 +7799,7 @@ impl Application for App {
             .layer(cosmic_theme::Layer::Primary)
             .class(theme::Container::custom(crate::glass::toolbar));
 
-        // Claw Glass: brand-blue translucent hairline above the footer status/path bar.
+        // Yu OS Glass: brand-blue translucent hairline above the footer status/path bar.
         let hairline = cosmic::iced::widget::rule::horizontal(1).class(theme::Rule::Custom(
             Box::new(|theme| cosmic::iced::widget::rule::Style {
                 color: {
@@ -8439,8 +8439,8 @@ impl Application for App {
         }));
 
         if matches!(self.mode, Mode::App)
-            && claw_os_sdk::gui::is_gui_launch()
-            && std::env::var("COS_ARGS_JSON").as_deref() == Ok("[]")
+            && yuos_sdk::gui::is_gui_launch()
+            && std::env::var("YUOS_ARGS_JSON").as_deref() == Ok("[]")
         {
             let desktop = Subscription::run(crate::yuos_glue::desktop_events);
             if self.desktop_resident && self.core.main_window_id().is_none()

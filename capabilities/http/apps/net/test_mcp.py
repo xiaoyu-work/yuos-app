@@ -74,7 +74,7 @@ def _http_broker():
         def handle_error(self, request, client_address):
             raise
 
-    with tempfile.TemporaryDirectory(prefix="cos-net-") as temporary:
+    with tempfile.TemporaryDirectory(prefix="yuos-net-") as temporary:
         socket_path = str(Path(temporary) / "egress.sock")
         with Broker(socket_path, Handler) as server, ThreadPoolExecutor(max_workers=1) as pool:
             future = pool.submit(server.serve_forever, poll_interval=0.01)
@@ -87,9 +87,9 @@ def _http_broker():
 
 @pytest.fixture(params=["original", "private-module", "declared-entrypoint"])
 def client(tmp_path, request):
-    stage = load_local_module(ROOT / "tools/stage.py", "claw_http_test_stage")
+    stage = load_local_module(ROOT / "tools/stage.py", "yuos_http_test_stage")
     stage.stage("http", tmp_path / "stage", kind="capability")
-    apps = tmp_path / "stage/usr/lib/cos/apps"
+    apps = tmp_path / "stage/usr/lib/yuos/apps"
     python = stage.stage_shared(tmp_path / "stage")
     stage_platform_python(python)
     app = apps / "net"
@@ -125,8 +125,8 @@ def client(tmp_path, request):
     policy.chmod(0o755)
     with _http_broker() as (socket_path, transport), mcp_process(app, env={
         "PATH": os.defpath, "PYTHONPATH": str(python),
-        "COS_DATA_DIR": str(tmp_path / "data"), "COS_EGRESS_SOCKET": socket_path,
-        "COS_NET_DOWNLOAD_MAX": "32", "CLAW_COS_BIN": str(policy),
+        "YUOS_DATA_DIR": str(tmp_path / "data"), "YUOS_EGRESS_SOCKET": socket_path,
+        "YUOS_NET_DOWNLOAD_MAX": "32", "YUOS_KERNEL_BIN": str(policy),
         "TEST_POLICY_LOG": str(log), "TEST_WRITE_ROOT": str(downloads),
     }) as rpc:
         def call(command, arguments):

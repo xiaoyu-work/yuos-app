@@ -95,7 +95,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // MCP server mode — agent kernel spawns us with this env var
     // set to bring up the App session. Don't initialise gstreamer /
     // libcosmic in this mode.
-    if std::env::var("COS_MCP_SERVER").as_deref() == Ok("1") {
+    if std::env::var("YUOS_MCP_SERVER").as_deref() == Ok("1") {
         return mcp::run();
     }
 
@@ -119,7 +119,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     #[cfg(all(unix, not(target_os = "redox")))]
-    if !claw_os_sdk::gui::is_gui_launch() {
+    if !yuos_sdk::gui::is_gui_launch() {
         match fork::daemon(true, true) {
             Ok(fork::Fork::Child) => (),
             Ok(fork::Fork::Parent(_child_pid)) => process::exit(0),
@@ -372,7 +372,7 @@ impl App {
     }
 
     fn load(&mut self) -> Task<Message> {
-        if !claw_os_sdk::gui::is_gui_launch() {
+        if !yuos_sdk::gui::is_gui_launch() {
             return self.load_admitted();
         }
         if self.close() {
@@ -1085,7 +1085,7 @@ impl Application for App {
                 }
             }
             Message::FileOpen => {
-                if claw_os_sdk::gui::is_gui_launch() {
+                if yuos_sdk::gui::is_gui_launch() {
                     return Task::perform(async move {
                         match access::choose(fl!("open-media")).await {
                             Ok(Some(url)) => action::app(Message::FileLoad(url)),
@@ -2151,11 +2151,11 @@ impl Application for App {
             );
         }
 
-        if claw_os_sdk::gui::is_gui_launch() {
+        if yuos_sdk::gui::is_gui_launch() {
             subscriptions.push(managed::subscription());
         }
         #[cfg(feature = "mpris-server")]
-        if !claw_os_sdk::gui::is_gui_launch() {
+        if !yuos_sdk::gui::is_gui_launch() {
             subscriptions.push(mpris::subscription());
         }
 

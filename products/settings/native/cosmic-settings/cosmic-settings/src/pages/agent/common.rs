@@ -5,7 +5,7 @@
 // image gen / embeddings) gets its own thin `Page` wrapper around `State`;
 // all the actual logic lives here so the per-modality files stay tiny.
 //
-// The page never touches `~/.config/cos/config.json` directly. Reads and writes
+// The page never touches `~/.config/yuos/config.json` directly. Reads and writes
 // are funnelled through the kernel's non-interactive subcommands:
 //
 //   * `yu agent setup --providers <modality>` -> provider/model catalogue
@@ -1096,7 +1096,7 @@ pub async fn load(modality: Modality) -> Loaded {
 }
 
 async fn providers(modality: Modality) -> Result<ProvidersDoc, String> {
-    let stdout = cos_setup(&["--providers", modality.as_arg()], None).await?;
+    let stdout = yu_setup(&["--providers", modality.as_arg()], None).await?;
     serde_json::from_str(&stdout).map_err(|e| format!("invalid providers JSON: {e}"))
 }
 
@@ -1104,7 +1104,7 @@ async fn status(modality: Modality) -> Result<Status, String> {
     if modality == Modality::Decision {
         return decision_settings("decision-status", None).await;
     }
-    let stdout = cos_setup(&[modality.as_arg(), "--status"], None).await?;
+    let stdout = yu_setup(&[modality.as_arg(), "--status"], None).await?;
     serde_json::from_str(&stdout).map_err(|e| format!("invalid status JSON: {e}"))
 }
 
@@ -1147,7 +1147,7 @@ async fn apply(modality: Modality, args: ApplyArgs) -> Result<ApplyResult, Strin
         }
     };
     let refs: Vec<&str> = argv.iter().map(String::as_str).collect();
-    let stdout = cos_setup(&refs, stdin).await?;
+    let stdout = yu_setup(&refs, stdin).await?;
     serde_json::from_str(&stdout).map_err(|e| format!("invalid apply JSON: {e}"))
 }
 
@@ -1155,7 +1155,7 @@ async fn test(modality: Modality) -> Result<TestResult, String> {
     if modality == Modality::Decision {
         return decision_settings("decision-test", None).await;
     }
-    let stdout = cos_setup(&[modality.as_arg(), "test"], None).await?;
+    let stdout = yu_setup(&[modality.as_arg(), "test"], None).await?;
     serde_json::from_str(&stdout).map_err(|e| format!("invalid test JSON: {e}"))
 }
 
@@ -1165,7 +1165,7 @@ async fn reset(modality: Modality) -> Result<(), String> {
             .await
             .map(|_| ());
     }
-    cos_setup(&[modality.as_arg(), "--reset"], None)
+    yu_setup(&[modality.as_arg(), "--reset"], None)
         .await
         .map(|_| ())
 }
@@ -1179,7 +1179,7 @@ async fn decision_settings<T: serde::de::DeserializeOwned>(
         request["decision_model"] = serde_json::json!(model);
     }
     let bytes = serde_json::to_vec(&request).map_err(|error| error.to_string())?;
-    let value = claw_os_sdk::cos_call_json_async_with_stdin_binary(
+    let value = yuos_sdk::yu_call_json_async_with_stdin_binary(
         "/usr/local/bin/yu",
         "decision-settings",
         "control",
@@ -1204,7 +1204,7 @@ async fn decision_settings<T: serde::de::DeserializeOwned>(
 const MIN_OAUTH_POLL_SECS: u64 = 5;
 
 async fn oauth_start(provider: &str) -> Result<DeviceCodeView, String> {
-    let stdout = cos_setup(&["text", "oauth-start", "--provider", provider], None).await?;
+    let stdout = yu_setup(&["text", "oauth-start", "--provider", provider], None).await?;
     let v: serde_json::Value =
         serde_json::from_str(&stdout).map_err(|e| format!("invalid oauth-start JSON: {e}"))?;
     let user_code = v
@@ -1235,7 +1235,7 @@ async fn oauth_start(provider: &str) -> Result<DeviceCodeView, String> {
 }
 
 async fn oauth_poll(provider: &str, device_code: &str) -> Result<PollStatus, String> {
-    let stdout = cos_setup(
+    let stdout = yu_setup(
         &[
             "text",
             "oauth-poll",
@@ -1275,7 +1275,7 @@ async fn oauth_poll(provider: &str, device_code: &str) -> Result<PollStatus, Str
 }
 
 async fn fetch_oauth_models(provider: &str) -> Result<Vec<String>, String> {
-    let stdout = cos_setup(&["text", "models", "--provider", provider], None).await?;
+    let stdout = yu_setup(&["text", "models", "--provider", provider], None).await?;
     let v: serde_json::Value =
         serde_json::from_str(&stdout).map_err(|e| format!("invalid models JSON: {e}"))?;
     let arr = v
@@ -1302,8 +1302,8 @@ async fn sleep_secs(secs: u64) {
 
 /// Invoke `yu agent setup <argv...>`, optionally piping a secret via stdin.
 /// Returns stdout on success. On failure returns stderr (or stdout if stderr
-/// is empty — `cos` writes JSON error envelopes there too).
-async fn cos_setup(extra_argv: &[&str], stdin_input: Option<String>) -> Result<String, String> {
+/// is empty — `yu` writes JSON error envelopes there too).
+async fn yu_setup(extra_argv: &[&str], stdin_input: Option<String>) -> Result<String, String> {
     let mut cmd = Command::new("yu");
     cmd.arg("agent")
         .arg("setup")
@@ -1318,7 +1318,7 @@ async fn cos_setup(extra_argv: &[&str], stdin_input: Option<String>) -> Result<S
 
     let mut child = cmd
         .spawn()
-        .map_err(|e| format!("failed to spawn `cos`: {e}"))?;
+        .map_err(|e| format!("failed to spawn `yu`: {e}"))?;
 
     if let Some(input) = stdin_input {
         if let Some(mut stdin) = child.stdin.take() {
@@ -1333,7 +1333,7 @@ async fn cos_setup(extra_argv: &[&str], stdin_input: Option<String>) -> Result<S
     let output = child
         .wait_with_output()
         .await
-        .map_err(|e| format!("failed to wait on `cos`: {e}"))?;
+        .map_err(|e| format!("failed to wait on `yu`: {e}"))?;
     let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
     let stderr = String::from_utf8_lossy(&output.stderr).into_owned();
 
@@ -1398,7 +1398,7 @@ where
             let state = state_of(page);
             let view: Element<'_, Message> = status_view(state);
             let wrap = wrap.clone();
-            crate::widget::claw_section()
+            crate::widget::yuos_section()
                 .title(&section.title)
                 .add(view.map(move |m| wrap(m)))
                 .into()
@@ -1416,7 +1416,7 @@ where
             let state = state_of(page);
             let view: Element<'_, Message> = configuration_view(state);
             let wrap = wrap.clone();
-            crate::widget::claw_section()
+            crate::widget::yuos_section()
                 .title(&section.title)
                 .add(view.map(move |m| wrap(m)))
                 .into()

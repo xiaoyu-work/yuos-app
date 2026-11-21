@@ -64,10 +64,10 @@ def main():
             "#!/usr/bin/python3\n"
             "import json,pathlib,sys,os\n"
             f"root=pathlib.Path({namespace!r})\n"
-            "assert 'CLAW_COS_BIN' not in os.environ\n"
+            "assert 'YUOS_KERNEL_BIN' not in os.environ\n"
             "assert os.environ['PATH']=='/usr/sbin:/usr/bin:/sbin:/bin'\n"
             "args=sys.argv[1:]\n"
-            "with (root/'calls').open('a') as f:f.write(json.dumps([args,os.environ.get('COS_SESSION')])+'\\n')\n"
+            "with (root/'calls').open('a') as f:f.write(json.dumps([args,os.environ.get('YUOS_SESSION')])+'\\n')\n"
             "if args[1]=='__app-permissions':\n"
             " request=json.loads(args[2]);assert not {'owner_uid','session','confirm','approve'} & request.keys()\n"
             " action=request['action'];assert action in ['list','show','request','revoke']\n"
@@ -97,9 +97,9 @@ def main():
             "--chdir", namespace,
         ]
         for name, value in {
-            "COS_MCP_SERVER": "1",
-            "COS_APP_MANIFEST": namespace + "/installed/usr/lib/cos/apps/cosmic-settings/app.json",
-            "COS_SESSION": "worker-session", "COS_DATA_DIR": namespace + "/data",
+            "YUOS_MCP_SERVER": "1",
+            "YUOS_APP_MANIFEST": namespace + "/installed/usr/lib/yuos/apps/cosmic-settings/app.json",
+            "YUOS_SESSION": "worker-session", "YUOS_DATA_DIR": namespace + "/data",
             "HOME": namespace, "XDG_CONFIG_HOME": namespace + "/config",
             "XDG_DATA_HOME": namespace + "/data", "XDG_CACHE_HOME": namespace + "/cache",
             "XDG_RUNTIME_DIR": namespace, "TMPDIR": namespace,
@@ -133,7 +133,7 @@ def main():
         def call(name, args, **context):
             return request("tools/call", {
                 "name": "settings." + name, "arguments": args,
-                "_meta": {"claw-os.dev/call-context": {
+                "_meta": {"yuos.dev/call-context": {
                     "wire_version": 1, "call_id": f"fixture-{counter}", "trace_id": "fixture",
                     "session_id": "caller-session", "task_id": "fixture-task",
                     "caller": {"kind": "system-agent", "id": "fixture", "owner_uid": 1000},
@@ -262,7 +262,7 @@ def main():
         ]
         assert len(tests) == 1, tests
         human = subprocess.run([
-            *command, "--unsetenv", "COS_MCP_SERVER", "--unsetenv", "COS_SESSION",
+            *command, "--unsetenv", "YUOS_MCP_SERVER", "--unsetenv", "YUOS_SESSION",
             "--ro-bind", tests[0], "/usr/bin/settings-permission-client-fixture",
             "--", "/usr/bin/settings-permission-client-fixture", "--ignored", "--exact",
             "permissions::tests::installed_permission_client_uses_closed_environment",
@@ -277,7 +277,7 @@ def main():
               "pending/approved/denied restoration with OS query truth, cancelled-authentication pending "
               "and failed-transport behavior, revocation responses; 31 pages, search clamps, fixed launch, denial, "
               "expiry and wrong-target rejection; human and MCP permission clients use sanitized PATH "
-              "without CLAW_COS_BIN; no GUI/device/account access")
+              "without YUOS_KERNEL_BIN; no GUI/device/account access")
     finally:
         if process is not None:
             process.terminate()

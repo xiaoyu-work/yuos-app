@@ -91,6 +91,6 @@ pub fn view() -> Section<crate::pages::Message> {
                 widget::settings::item::builder(name).control(dropdown)
             });
 
-        crate::widget::claw_section().extend(devices).into()
+        crate::widget::yuos_section().extend(devices).into()
     })
 }

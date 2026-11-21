@@ -20,15 +20,15 @@ def module(path):
 
 def test_native_staging_preserves_complete_ui_backend_and_license(tmp_path):
     stage = module(ROOT / "tools/stage_native.py")
-    assert stage.stage("clipboard", tmp_path) == ["claw-applet-clipboard"]
-    output = tmp_path / "claw-applet-clipboard"
-    for source in (NATIVE / "claw-applet-clipboard").rglob("*"):
+    assert stage.stage("clipboard", tmp_path) == ["yuos-applet-clipboard"]
+    output = tmp_path / "yuos-applet-clipboard"
+    for source in (NATIVE / "yuos-applet-clipboard").rglob("*"):
         if source.is_file():
-            assert (output / source.relative_to(NATIVE / "claw-applet-clipboard")).read_bytes() == source.read_bytes()
+            assert (output / source.relative_to(NATIVE / "yuos-applet-clipboard")).read_bytes() == source.read_bytes()
     assert (output / "LICENSE").read_bytes() == (NATIVE / "LICENSE").read_bytes()
     assert (output / "Cargo.lock").read_bytes() == (NATIVE / "Cargo.lock").read_bytes()
     entry = (output / "data/com.yuos.AppletClipboard.desktop").read_text()
-    assert "Exec=claw-applet-clipboard" in entry
+    assert "Exec=yuos-applet-clipboard" in entry
     assert "Icon=edit-paste-symbolic" in entry
 
 
@@ -37,15 +37,15 @@ def test_native_build_has_no_app_or_authority_dependency(tmp_path):
     builder.prepare("clipboard", tmp_path / "platform/desktop/toolkit", tmp_path / "build")
     manifest = tomllib.loads((tmp_path / "build/Cargo.toml").read_text())
     assert {name for name, value in manifest["dependencies"].items()
-            if isinstance(value, dict) and "path" in value} == {"claw-os-sdk"}
-    assert manifest["dependencies"]["claw-os-sdk"]["path"] == str(
-        tmp_path / "platform/claw-os-sdk/rust"
+            if isinstance(value, dict) and "path" in value} == {"yuos-sdk"}
+    assert manifest["dependencies"]["yuos-sdk"]["path"] == str(
+        tmp_path / "platform/yuos-sdk/rust"
     )
     patch = manifest["patch"]["https://github.com/pop-os/libcosmic"]
     assert len(patch) == 17
     assert all(str(tmp_path / "platform/desktop/toolkit") in value["path"]
                for value in patch.values())
-    assert manifest["bin"] == [{"name": "claw-applet-clipboard", "path": "src/main.rs"}]
+    assert manifest["bin"] == [{"name": "yuos-applet-clipboard", "path": "src/main.rs"}]
     assert manifest["profile"]["release"]["opt-level"] == 1
     assert (tmp_path / "build/Cargo.lock").read_bytes() == (NATIVE / "Cargo.lock").read_bytes()
 
@@ -53,8 +53,8 @@ def test_native_build_has_no_app_or_authority_dependency(tmp_path):
 def test_history_panel_stages_independently_of_selection_app(tmp_path):
     stage = module(ROOT / "tools/stage.py")
     assert stage.stage("clipboard", tmp_path, ["panel-clipboard"]) == ["panel-clipboard"]
-    assert not (tmp_path / "usr/lib/cos/apps/clipboard-manager").exists()
-    assert not (tmp_path / "usr/lib/cos/apps/panel-clipboard/test_main.py").exists()
+    assert not (tmp_path / "usr/lib/yuos/apps/clipboard-manager").exists()
+    assert not (tmp_path / "usr/lib/yuos/apps/panel-clipboard/test_main.py").exists()
 
 
 def test_install_requires_explicit_build_staging_not_live_root(tmp_path):
@@ -72,9 +72,9 @@ def test_install_requires_explicit_build_staging_not_live_root(tmp_path):
     env = {
         "PATH": f"{tmp_path}{os.pathsep}{os.defpath}", "INSTALL_PROBE": str(probe),
         "GENERATION_PROBE": str(generation), "DESKTOP_PROBE": str(tmp_path / "generated.desktop"),
-        "CLAW_NATIVE_DESKTOP_METADATA": str(ROOT / "tools/native_desktop_metadata.py"),
+        "YUOS_NATIVE_DESKTOP_METADATA": str(ROOT / "tools/native_desktop_metadata.py"),
     }
-    command = [just, "--justfile", str(NATIVE / "claw-applet-clipboard/justfile")]
+    command = [just, "--justfile", str(NATIVE / "yuos-applet-clipboard/justfile")]
     for root in ["", "/", "//", "/usr/.."]:
         result = subprocess.run(command + [f"rootdir={root}", "install"],
                                 env=env, capture_output=True, text=True, timeout=10)

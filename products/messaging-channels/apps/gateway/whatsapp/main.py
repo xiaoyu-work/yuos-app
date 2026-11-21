@@ -13,7 +13,7 @@ Credentials needed:
                                        attached to the WhatsApp
                                        Business Account)
 
-Optional env override: ``COS_WHATSAPP_TOKEN``.
+Optional env override: ``YUOS_WHATSAPP_TOKEN``.
 
 Stdlib only.
 """
@@ -30,7 +30,7 @@ from gateway._shared import channels, gateway_memory, safe_egress, safe_subproce
 
 
 PLATFORM = "whatsapp"
-USER_AGENT = "ClawOSWhatsApp/0.1.0 (+https://github.com/clawos/cos)"
+USER_AGENT = "YuOSWhatsApp/0.1.0 (+https://github.com/xiaoyu-work/Yu-OS)"
 GRAPH_API = "https://graph.facebook.com"
 API_VERSION = "v21.0"
 SOFT_LEN = 4096  # WhatsApp text body limit (per Meta docs, 4096 chars)
@@ -41,14 +41,14 @@ def _load_credential(name: str) -> tuple[str | None, str | None]:
 
 
 def _load_token() -> tuple[str | None, str | None]:
-    env_tok = os.environ.get("COS_WHATSAPP_TOKEN")
+    env_tok = os.environ.get("YUOS_WHATSAPP_TOKEN")
     if env_tok:
         return env_tok.strip(), None
     return _load_credential("whatsapp_access_token")
 
 
 def _load_phone_number_id() -> tuple[str | None, str | None]:
-    env_id = os.environ.get("COS_WHATSAPP_PHONE_NUMBER_ID")
+    env_id = os.environ.get("YUOS_WHATSAPP_PHONE_NUMBER_ID")
     if env_id:
         return env_id.strip(), None
     return _load_credential("whatsapp_phone_number_id")
@@ -171,8 +171,8 @@ def run(command: str, args):
 
 
 if __name__ == "__main__":
-    cmd = os.environ.get("COS_COMMAND") or (sys.argv[1] if len(sys.argv) > 1 else "")
-    raw_args = os.environ.get("COS_ARGS_JSON")
+    cmd = os.environ.get("YUOS_COMMAND") or (sys.argv[1] if len(sys.argv) > 1 else "")
+    raw_args = os.environ.get("YUOS_ARGS_JSON")
     if raw_args:
         parsed_args = json.loads(raw_args)
     else:

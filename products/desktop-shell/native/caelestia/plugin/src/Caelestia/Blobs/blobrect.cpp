@@ -89,11 +89,11 @@ void BlobRect::updatePhysics() {
         const float targetStretch = 1.0f + std::min(speed * stretchFactor, k_maxStretch);
         const float targetCompress = 1.0f / targetStretch;
 
-        const float cosA = velX / speed;
+        const float yuA = velX / speed;
         const float sinA = velY / speed;
-        const float cos2 = cosA * cosA;
+        const float cos2 = yuA * yuA;
         const float sin2 = sinA * sinA;
-        const float cs = cosA * sinA;
+        const float cs = yuA * sinA;
 
         target00 = targetStretch * cos2 + targetCompress * sin2;
         target01 = (targetStretch - targetCompress) * cs;
