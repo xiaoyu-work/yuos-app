@@ -101,8 +101,9 @@ already been published or that every physical device has been exercised.
 
 App release CI builds selected independently versioned Debian packages. OS
 images and installed systems consume named packages from the separately signed
-App APT channel, not product source copied into an OS package. Desktop Shell
-is a signed build input to `yuos-desktop`, not a separate Debian package.
+App APT channel, not product source copied into an OS package. OS release CI
+builds Desktop Shell from a pinned App source commit and seals it before
+embedding it in `yuos-desktop`. There is no separate Shell Debian package.
 Existing installed App paths, exact identities, grants and publisher
 provenance checks remain intact.
 The OS still owns privileged package transactions and its security-floor gates;

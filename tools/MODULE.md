@@ -92,9 +92,11 @@ These products do not consume the Rust toolkit. Their runtime SDK dependency
 still follows the validated public platform lock. GUI-only native Apps have
 no mandatory Python test module, and a missing CMake test target is an explicit
 error rather than a successful empty test run.
-Debian native release jobs provision the Desktop Shell's pinned Qt build
-dependencies and qualify its real ELF and resource stage. They do not call a
-nonexistent native test target for CMake products.
+OS release CI provisions Debian build dependencies with
+`release_ci.py build --desktop-shell`, then runs `build_desktop_shell.py` to
+stage the real ELF and resources built with the pinned Qt source. This emits an
+unsigned [OS build input](../docs/releases.md#desktop-shell-build-input), not a
+standalone App release.
 The native dependency scan creates a temporary release-owned package root
 marker so Debian resolves each ELF's `$ORIGIN` against its staged private
 libraries. The marker is removed before final control metadata is emitted.

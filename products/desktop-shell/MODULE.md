@@ -10,9 +10,9 @@ together. The engine is not an OS shared runtime.
 The product declares the GUI-only `desktop-shell` App and its CMake native
 payload. The OS admits it as the shell of an authenticated login.
 `release: false` excludes it from independent App Debian and Store releases.
-Once its target ABI and authenticated launch are qualified, the separate
-Desktop Shell build workflow supplies the signed payload embedded in
-`yuos-desktop`. `native/qt.lock.json` pins Qt 6.12.0 and
+OS release CI builds the unsigned payload from the pinned App source commit,
+then validates and seals it for `yuos-desktop` without a separate Shell release.
+`native/qt.lock.json` pins Qt 6.12.0 and
 its published corrections. The unified CMake build compiles those sources
 against the build host's ABI and uses them for every native child. Release
 payloads must be built on Debian 13, not the Ubuntu preview environment.

@@ -370,8 +370,8 @@ pin, complete OS integration or declare release readiness.
 ## Packages and ownership
 
 The Yu OS App builds target `/usr/local/bin/yu` and require the new
-`yuos-app-runtime-v1` package provider. These packages and the matching
-Desktop Shell must be released together with the corresponding OS build.
+`yuos-app-runtime-v1` package provider. Use matching App packages for the
+corresponding OS build, which builds its Desktop Shell from pinned source.
 Previously published assets keep their original bytes and are not a Yu OS
 runtime fallback.
 
@@ -479,14 +479,22 @@ separate dpkg owners in the ordinary transaction.
 ### Desktop Shell build input
 
 The GUI-only `desktop-shell` is included in `yuos-desktop`, not published
-as an App `.deb` or offered by the Store. After native and authenticated
-desktop acceptance, dispatch **Release Desktop Shell build inputs** with an
-approved version and the same public provenance CLI/publisher pins used for
-App releases. The workflow builds on Debian 13 for both architectures,
-signs the App, private resources and Debian dependency metadata in the
-protected `app-release` job, and publishes two archives under an immutable
-`desktop-shell-v<version>` tag. It does not update the App APT/Store channel.
-The OS release freezes and verifies that exact build before embedding it.
+as an App `.deb` or offered by the Store. OS release CI checks out the exact
+pinned App source commit and runs these commands on native Debian 13 for each
+`ARCHITECTURE` (`amd64` or `arm64`):
+
+```bash
+python3 tools/release_ci.py build --desktop-shell --architecture "$ARCHITECTURE"
+python3 tools/build_desktop_shell.py --architecture "$ARCHITECTURE"
+```
+
+`build/desktop-shell/unsigned-<arch>.tar.gz` contains the unchanged App
+manifest, native payload and `build.json` (`yuos.desktop-shell-build/v1`).
+The metadata records `architecture`, the full checkout SHA as
+`source_revision`, Debian `depends`, and the App manifest's version as
+`release_version`. No separate Shell release or signing credentials are needed
+to build it. The OS sign/package job validates the input and seals the App
+before embedding it.
 
 The OS shell no longer links Calendar/Clipboard/Widget Rail UI or
 Notifications-private config/util. App packages retain the original panel
