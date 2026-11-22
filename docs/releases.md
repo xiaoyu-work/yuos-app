@@ -24,11 +24,10 @@ arm64, `yuos-app-office-desktop` owns the `yu-office` App and is not part of
 The initial Yu OS App Platform and SDK version is **`0.1.0`**, with runtime
 ABI 1. The OS publishes development exports under `yuos-app-platform-v0.1.0`
 and language bindings and provenance tools under `yuos-sdk-v0.1.0`.
-Adopt the verified published archive in `platform.lock.json` and use the
-verified CLI digests in `packaging/provenance-tools.lock.json` before
-attempting App publication. Until those assets are published and verified,
-the production pins are intentionally absent. These releases alone do not install Apps or
-update an OS image.
+`platform.lock.json` pins the verified public Platform archive. App
+publication also requires the verified public CLI digests in
+`packaging/provenance-tools.lock.json`. These releases alone neither install
+Apps nor update an OS image.
 
 Source development can instead explicitly supply a local archive with its
 expected version and SHA-256; see
