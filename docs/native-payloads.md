@@ -1,8 +1,8 @@
 # Package-local native App payloads
 
 This is the producer contract for Editor, Files, Terminal, Launcher, Store,
-Media Player, Capture, Settings, Notifications, Calendar, Clipboard History
-and Widget Rail. It is not permission to publish or an assertion of
+Media Player, Capture, Settings, Notifications, Calendar, Clipboard History,
+Widget Rail and Yu Office. It is not permission to publish or an assertion of
 GUI/resource integration acceptance.
 
 Clipboard History preserves `panel-clipboard` and its `open` desktop selector.

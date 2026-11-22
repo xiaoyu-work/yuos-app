@@ -12,7 +12,26 @@ the distribution's LibreOffice remains a separate Linux Apps entry.
 | `patches/series`, `patches/*.patch` | Complete ordered downstream changes; initially the Yu Office product name |
 | `source.py` | Verify the cached/downloaded archive, extract a fresh tree and apply every listed patch |
 | `native/` | Configure and compile the patched source, smoke-check its identity, and stage the private runtime and Host launcher |
-| `apps/yu-office/app.json` | GUI-only App contract; no Agent dependency or MCP authority |
+| `apps/yu-office/app.json`, `apps/yu-office/server.py` | Independent GUI and SDK MCP entries under the same signed App identity |
+
+## Agent tools
+
+The desktop package also serves `yu-office.read` and `yu-office.replace_text`
+through the public Python SDK. The same signed launcher selects MCP or the
+unchanged GUI; the GUI does not use or require an active Agent.
+
+The tools read the main body of `.docx` and `.odt` Writer documents. Edits
+replace one exact, case-sensitive match within a single formatted text run,
+leaving other package members unchanged. They do not execute macros or
+follow external links. Spreadsheets, presentations and other formats are
+not part of this tool set. Reads return up to 64,000 characters and the file's
+SHA-256 revision. Pass that revision as `expected_sha256` to edit; a stale
+revision, an ambiguous match or a match across formatting runs fails without
+saving. Edits reject signed documents.
+
+Each call requires OS authorization for the exact path; edits also require
+write permission and use the OS snapshot service before atomically saving.
+Neither installation nor the App's GUI grants Agent file access.
 
 ## Patch and build
 

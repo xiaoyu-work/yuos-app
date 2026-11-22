@@ -33,7 +33,7 @@
     "media-player": ["yuos-media-player-v1", "pipewire-bin", "libvulkan1", "mesa-vulkan-drivers", "gstreamer1.0-plugins-base", "gstreamer1.0-plugins-good", "gstreamer1.0-libav"],
     "notifications": ["yuos-notifications-v1"],
     "store": ["yuos-software-store-v1 (= 1)", "appstream", "flatpak", "gir1.2-flatpak-1.0", "packagekit"],
-    "office": ["fonts-liberation"],
+    "office": ["fonts-liberation", "python3-lxml"],
     "settings": ["yuos-app-permissions-v1", "xkb-data"]
   },
   "desktop_assets": {

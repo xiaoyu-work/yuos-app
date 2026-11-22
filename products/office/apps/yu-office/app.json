@@ -9,6 +9,63 @@
   },
   "runtime": "binary",
   "entry": "bin/yu-office",
+  "mcp": {
+    "entry": "bin/yu-office",
+    "transport": "stdio",
+    "lifecycle": "lazy",
+    "access": {"system_agent": true},
+    "tools": [
+      {
+        "name": "yu-office.read",
+        "summary": {
+          "en": "Read the body text and revision of a DOCX or ODT document.",
+          "zh-CN": "读取 DOCX 或 ODT 文档的正文和版本标识。"
+        },
+        "args": [
+          {"name": "path", "kind": "path", "required": true, "label": {"en": "DOCX or ODT file"}}
+        ],
+        "needs": [
+          {
+            "verb": "fs.read",
+            "scope": {"kind": "from-arg", "arg": "path"},
+            "why": {"en": "Read only the Office document you asked to inspect.", "zh-CN": "只读取你指定的办公文档。"}
+          }
+        ],
+        "effects": [
+          {"kind": "read", "label": {"en": "Read the requested document body."}, "target_arg": "path", "recovery": "not_applicable"}
+        ]
+      },
+      {
+        "name": "yu-office.replace_text",
+        "summary": {
+          "en": "Replace one unique, case-sensitive match within a formatted text run in a DOCX or ODT document.",
+          "zh-CN": "在 DOCX 或 ODT 文档的一个格式片段内替换唯一匹配的文本。"
+        },
+        "args": [
+          {"name": "path", "kind": "path", "required": true, "label": {"en": "DOCX or ODT file to edit"}},
+          {"name": "expected_sha256", "kind": "text", "required": true, "label": {"en": "SHA-256 revision returned by the latest read or edit"}},
+          {"name": "find", "kind": "text", "required": true, "label": {"en": "Nonempty literal text to find"}},
+          {"name": "replacement", "kind": "text", "required": true, "label": {"en": "Literal replacement text; may be empty"}}
+        ],
+        "needs": [
+          {
+            "verb": "fs.read",
+            "scope": {"kind": "from-arg", "arg": "path"},
+            "why": {"en": "Verify the document revision and locate the unique text match.", "zh-CN": "核对文档版本并定位唯一匹配。"}
+          },
+          {
+            "verb": "fs.write",
+            "scope": {"kind": "from-arg", "arg": "path"},
+            "why": {"en": "Save the replacement only to the same requested document.", "zh-CN": "只将替换结果保存到你指定的原文档。"}
+          }
+        ],
+        "effects": [
+          {"kind": "read", "label": {"en": "Verify the document version and find the requested text."}, "target_arg": "path", "recovery": "not_applicable"},
+          {"kind": "update", "label": {"en": "Save one text replacement to the requested document."}, "target_arg": "path", "recovery": "unknown"}
+        ]
+      }
+    ]
+  },
   "desktop": {
     "exec": "--gui",
     "needs": []

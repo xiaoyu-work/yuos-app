@@ -24,5 +24,7 @@ install(DIRECTORY "${runtime}/" DESTINATION share/yu-office
     PATTERN "soffice.bin" EXCLUDE PATTERN "xpdfimport" EXCLUDE)
 install(PROGRAMS "${runtime}/program/soffice.bin" "${runtime}/program/xpdfimport"
     DESTINATION share/yu-office/program)
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../apps/yu-office/server.py"
+    DESTINATION share/yu-office RENAME mcp_server.py)
 install(FILES com.yuos.Office.desktop DESTINATION share/applications)
 install(FILES com.yuos.Office.svg DESTINATION share/icons/hicolor/scalable/apps)
