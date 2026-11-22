@@ -8,6 +8,7 @@ import Quickshell.Bluetooth
 import Quickshell.Wayland
 import Quickshell.Services.UPower
 import Caelestia.I18n
+import qs.components
 import qs.components.containers
 import qs.services
 
@@ -18,6 +19,7 @@ StyledWindow {
     signal pinMenuRequested(string desktopId, real position)
     signal launched()
 
+    property string menuPage
     property Item hoveredApp
     readonly property string dockTooltip: hoveredApp && !hoverDelay.running && !dock.moving
         ? hoveredApp.Accessible.name : ""
@@ -42,9 +44,10 @@ StyledWindow {
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
 
-    Rectangle {
+    QuietSurface {
         anchors.fill: parent
-        color: Quiet.panel
+        radius: 0
+        border.width: 0
 
         Rectangle {
             anchors.bottom: parent.bottom
@@ -81,6 +84,7 @@ StyledWindow {
                     anchors.centerIn: parent
                     width: 26
                     height: 26
+                    preferredRendererType: Shape.CurveRenderer
 
                     ShapePath {
                         strokeColor: Quiet.ink
@@ -131,10 +135,18 @@ StyledWindow {
                 id: app
 
                 required property var modelData
+                readonly property string desktopId: modelData.id
+                readonly property real iconSize: 25
+                readonly property real hoverScale: 1.08
+                // Qt applies the output's DPR to image-provider requests. Budget only for peak hover.
+                readonly property int iconLoadSize: Math.ceil(iconSize * hoverScale)
+
                 width: 35
                 height: 36
                 padding: 3
-                Accessible.name: Quiet.title(modelData.id)
+                highlighted: modelData.window?.active === true
+                    && modelData.window.monitor?.name === root.screen?.name
+                Accessible.name: Quiet.title(desktopId)
                 onHoveredChanged: {
                     if (hovered)
                         root.hoveredApp = app;
@@ -158,22 +170,32 @@ StyledWindow {
                     Image {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: parent.top
-                        width: 26
-                        height: 26
-                        sourceSize.width: 64
-                        sourceSize.height: 64
-                        source: Quiet.icon(app.modelData.id)
+                        anchors.topMargin: 1
+                        width: app.iconSize
+                        height: app.iconSize
+                        sourceSize: Qt.size(app.iconLoadSize, app.iconLoadSize)
+                        source: Quiet.icon(app.desktopId)
                         fillMode: Image.PreserveAspectFit
+                        asynchronous: true
+                        scale: app.down ? 0.94 : app.hovered && !dock.moving ? app.hoverScale : 1
+
+                        Behavior on scale {
+                            Anim { type: Anim.FastEffects }
+                        }
                     }
 
                     Rectangle {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.bottom: parent.bottom
-                        width: 4
-                        height: 4
-                        radius: 2
-                        color: Quiet.accent
+                        width: app.highlighted ? 10 : 4
+                        height: 3
+                        radius: height / 2
+                        color: app.highlighted ? Quiet.accent : Quiet.dim
                         visible: app.modelData.running
+
+                        Behavior on width {
+                            Anim { type: Anim.FastEffects }
+                        }
                     }
                 }
 
@@ -181,8 +203,8 @@ StyledWindow {
                     acceptedButtons: Qt.RightButton
                     onTapped: {
                         app.clearHover();
-                        if (app.modelData.id !== DesktopMenu.launcher)
-                            root.pinMenuRequested(app.modelData.id, app.mapToItem(leading, 0, 0).x + leading.x);
+                        if (app.desktopId !== DesktopMenu.launcher)
+                            root.pinMenuRequested(app.desktopId, app.mapToItem(leading, 0, 0).x + leading.x);
                     }
                 }
             }
@@ -203,6 +225,8 @@ StyledWindow {
             width: 60
             height: 36
             text: Time.format("hh:mm")
+            font.weight: Font.DemiBold
+            highlighted: root.menuPage === "overview"
             Accessible.name: Tr.tr("Desktop overview")
             onClicked: root.menuRequested("overview")
         }
@@ -210,6 +234,7 @@ StyledWindow {
         QuietButton {
             width: UPower.displayDevice.isLaptopBattery ? 108 : 56
             height: 36
+            highlighted: root.menuPage === "control" || root.menuPage === "notifications"
             Accessible.name: Tr.tr("Control Center")
             ToolTip.text: Accessible.name
             ToolTip.visible: hovered
@@ -249,6 +274,7 @@ StyledWindow {
         QuietButton {
             width: 36
             height: 36
+            highlighted: root.menuPage === "power" || root.menuPage === "logout"
             Accessible.name: Tr.tr("Power menu")
             ToolTip.visible: hovered
             ToolTip.text: Accessible.name
@@ -270,6 +296,7 @@ StyledWindow {
 
         width: 16
         height: 16
+        preferredRendererType: Shape.CurveRenderer
         ShapePath {
             strokeColor: Quiet.accent
             strokeWidth: 1.4

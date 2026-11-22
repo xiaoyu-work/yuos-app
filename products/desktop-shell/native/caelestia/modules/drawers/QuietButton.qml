@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic
+import Caelestia.Config
 import qs.services
 
 Button {
@@ -20,9 +21,25 @@ Button {
     }
     background: Rectangle {
         implicitHeight: 32
-        radius: 5
-        color: root.down || root.checked ? Quiet.selected
-            : root.hovered || root.visualFocus ? Quiet.field : "transparent"
+        radius: Tokens.rounding.small
+        color: {
+            if (root.enabled) {
+                if (root.down)
+                    return Quiet.pressed;
+                if (root.checked || root.highlighted)
+                    return Quiet.selected;
+                if (root.hovered)
+                    return Quiet.field;
+            }
+            return Qt.alpha(Quiet.field, 0);
+        }
         border.color: root.visualFocus ? Quiet.accent : "transparent"
+
+        Behavior on color {
+            ColorAnimation {
+                duration: Tokens.anim.durations.expressiveFastEffects
+                easing: Tokens.anim.expressiveFastEffects
+            }
+        }
     }
 }

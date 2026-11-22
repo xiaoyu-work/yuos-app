@@ -68,7 +68,14 @@ precedence. The wallpaper fills each display with an aspect-preserving crop.
 
 The top Dock reads public desktop entries for labels and original SVG
 artwork. Hover labels are single-line, click-through and sit below the bar.
-It starts one `yu __desktop-events` connection per Shell, with an
+The icon source is sized for the output's pixel ratio and the largest hover
+scale, without cropping the artwork or changing the click or scroll geometry.
+A muted dot shows a running App; the focused window on that output gets a
+longer accent mark and a selected background. The bar and Quiet panels share
+light/dark surfaces and rounded controls. Closing a panel fades its last page
+out while immediately releasing keyboard focus and pointer input.
+
+The Shell starts one `yu __desktop-events` connection, with an
 initial snapshot and subsequent updates only on relevant changes. The Root
 GUI Host reports managed Apps independently of window count. The Dock focuses
 an existing epoch-bound window, otherwise it asks Root to reopen the

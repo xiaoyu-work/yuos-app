@@ -10,6 +10,7 @@ import Quickshell.Bluetooth
 import Caelestia
 import Caelestia.I18n
 import Caelestia.State
+import qs.components
 import qs.components.containers
 import qs.services
 
@@ -20,26 +21,53 @@ StyledWindow {
     property string page
     property string pinId
     property real pinX
+    readonly property bool opened: page !== ""
+    property string displayedPage
+    property real reveal: opened ? 1 : 0
+    readonly property int slideDistance: 4
     readonly property var backlight: screen ? Brightness.getMonitorForScreen(screen) : null
-    readonly property bool pinMenu: page === "pin"
+    readonly property bool pinMenu: displayedPage === "pin"
+
+    // Keep the last page and its anchor for the exit, but release input immediately.
+    onPageChanged: {
+        if (page !== "")
+            displayedPage = page;
+    }
+    onOpenedChanged: {
+        if (opened)
+            scroll.forceActiveFocus();
+    }
+
+    Behavior on reveal {
+        Anim { type: Anim.FastEffects }
+    }
 
     name: "yuos-top-menu"
-    visible: page !== ""
+    visible: opened || reveal > 0
     anchors {
         top: true
         left: root.pinMenu
         right: !root.pinMenu
     }
     margins {
-        top: 8
-        left: root.pinMenu ? Math.min(Math.max(8, root.pinX), root.screen.width - root.implicitWidth - 8) : 0
+        top: 8 - root.slideDistance
+        left: root.pinMenu ? Math.max(8, Math.min(root.pinX, root.screen.width - root.implicitWidth - 8)) : 0
         right: root.pinMenu ? 0 : 8
     }
     exclusiveZone: 0
     implicitWidth: Math.min(pinMenu ? 216 : 408, screen.width - 16)
-    implicitHeight: Math.max(1, Math.min(body.implicitHeight + 28, screen.height - bar.implicitHeight - 16))
+    implicitHeight: slideDistance
+        + Math.max(1, Math.min(body.implicitHeight + 28, screen.height - bar.implicitHeight - 16))
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+    WlrLayershell.keyboardFocus: opened ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+
+    mask: Region {
+        // Fixed bounds avoid updating the compositor's input region on every animation frame.
+        y: root.slideDistance
+        width: root.opened ? root.width : 0
+        height: root.opened ? Math.max(0, root.height - y) : 0
+        radius: surface.radius
+    }
 
     function toggle(name: string): void {
         page = page === name ? "" : name;
@@ -51,16 +79,18 @@ StyledWindow {
     }
 
     HyprlandFocusGrab {
-        active: root.visible
+        active: root.opened
         windows: [root, root.bar]
         onCleared: root.page = ""
     }
 
-    Rectangle {
-        anchors.fill: parent
-        color: Quiet.panel
-        border.color: Quiet.line
-        radius: 8
+    QuietSurface {
+        id: surface
+
+        width: parent.width
+        height: Math.max(0, parent.height - root.slideDistance)
+        y: root.slideDistance * root.reveal
+        opacity: root.reveal
 
         ScrollView {
             id: scroll
@@ -69,6 +99,7 @@ StyledWindow {
             anchors.margins: 14
             contentWidth: availableWidth
             clip: true
+            enabled: root.opened
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
             focus: true
             Keys.priority: Keys.BeforeItem
@@ -78,7 +109,7 @@ StyledWindow {
                 id: body
 
                 width: scroll.availableWidth
-                spacing: 5
+                spacing: 8
 
                 RowLayout {
                     visible: !root.pinMenu
@@ -88,25 +119,31 @@ StyledWindow {
                         Layout.fillWidth: true
                         color: Quiet.ink
                         font.pixelSize: 17
-                        font.bold: true
+                        font.weight: Font.DemiBold
+                        elide: Text.ElideRight
                         text: ({
                             control: Tr.tr("Control Center"),
                             notifications: Tr.tr("Notifications"),
                             overview: Tr.tr("Desktop overview"),
                             power: Tr.tr("Power"),
                             logout: Tr.tr("Log out to switch users?")
-                        })[root.page] ?? ""
+                        })[root.displayedPage] ?? ""
                     }
 
                     QuietButton {
                         text: "\u00d7"
+                        padding: 0
+                        font.pixelSize: 20
+                        Layout.preferredWidth: 32
                         Accessible.name: Tr.tr("Close panel")
                         onClicked: root.page = ""
                     }
                 }
 
+                Separator { visible: !root.pinMenu }
+
                 ColumnLayout {
-                    visible: root.page === "control"
+                    visible: root.displayedPage === "control"
                     Layout.fillWidth: true
                     spacing: 4
 
@@ -171,7 +208,7 @@ StyledWindow {
                 }
 
                 ColumnLayout {
-                    visible: root.page === "overview"
+                    visible: root.displayedPage === "overview"
                     Layout.fillWidth: true
 
                     Text {
@@ -191,7 +228,7 @@ StyledWindow {
                 }
 
                 ColumnLayout {
-                    visible: root.page === "notifications"
+                    visible: root.displayedPage === "notifications"
                     Layout.fillWidth: true
 
                     Text {
@@ -201,7 +238,7 @@ StyledWindow {
                     }
 
                     Repeater {
-                        model: root.page === "notifications" ? Notifs.notClosed : []
+                        model: root.visible && root.displayedPage === "notifications" ? Notifs.notClosed : []
 
                         delegate: ColumnLayout {
                             id: notification
@@ -222,7 +259,7 @@ StyledWindow {
                 }
 
                 ColumnLayout {
-                    visible: root.page === "power"
+                    visible: root.displayedPage === "power"
                     Layout.fillWidth: true
 
                     QuietButton {
@@ -256,7 +293,7 @@ StyledWindow {
                 }
 
                 ColumnLayout {
-                    visible: root.page === "logout"
+                    visible: root.displayedPage === "logout"
                     Layout.fillWidth: true
 
                     Text {

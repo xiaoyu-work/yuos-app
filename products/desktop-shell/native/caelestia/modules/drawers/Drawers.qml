@@ -16,6 +16,7 @@ Variants {
             id: top
 
             screen: scope.modelData
+            menuPage: menu.page
             onMenuRequested: name => menu.toggle(name)
             onPinMenuRequested: (id, x) => {
                 menu.pinId = id;

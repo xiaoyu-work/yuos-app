@@ -13,11 +13,13 @@ Singleton {
     readonly property bool light: preferences.appearance === "light"
         || (preferences.appearance !== "dark" && Colours.light)
     readonly property color panel: light ? "#f8f7f8f3" : "#f8192522"
+    readonly property color panelTop: light ? "#fcfcfdf9" : "#fc26352f"
     readonly property color ink: light ? "#25352e" : "#f6f7f5"
     readonly property color dim: light ? "#516159" : "#c7d0cd"
     readonly property color line: light ? "#d4dcd2" : "#33d7e3dd"
     readonly property color field: light ? "#e9eee6" : "#13d4dfdc"
     readonly property color selected: light ? "#dce8df" : "#23d4dfdc"
+    readonly property color pressed: light ? "#cbdcd0" : "#43d4dfdc"
     readonly property color accent: light ? "#2a614b" : "#b0e1ce"
 
     readonly property list<string> pins: {
@@ -25,6 +27,8 @@ Singleton {
         const ordered = [...new Set([...valid, DesktopMenu.launcher])];
         return ordered.length <= 24 ? ordered : [DesktopMenu.launcher, ...ordered.filter(id => id !== DesktopMenu.launcher).slice(0, 23)];
     }
+    readonly property var byDesktopId: new Map(DesktopEntries.applications.values
+        .map(entry => [entry.id, entry]))
     readonly property var byStartupClass: new Map(DesktopEntries.applications.values
         .filter(entry => entry.startupClass)
         .map(entry => [entry.startupClass, entry]))
@@ -48,8 +52,13 @@ Singleton {
             || row.id === DesktopMenu.launcher || DesktopEntries.byId(row.id));
     }
 
+    function desktopEntry(desktopId: string): DesktopEntry {
+        // The index notifies when the initial scan or a later App install adds an entry.
+        return byDesktopId.get(desktopId) ?? DesktopEntries.byId(desktopId);
+    }
+
     function title(desktopId: string): string {
-        const entry = DesktopEntries.byId(desktopId);
+        const entry = desktopEntry(desktopId);
         if (entry)
             return entry.name;
         if (desktopId === DesktopMenu.launcher)
@@ -60,7 +69,7 @@ Singleton {
     }
 
     function icon(desktopId: string): url {
-        const name = DesktopEntries.byId(desktopId)?.icon ?? desktopId;
+        const name = desktopEntry(desktopId)?.icon ?? desktopId;
         return Quickshell.iconPath(name, "application-x-executable");
     }
 

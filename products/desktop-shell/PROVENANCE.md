@@ -49,6 +49,13 @@ Yu OS modified the Shell presentation on 2026-11-19: the Quiet design replaces
 the upstream left bar and integrated launcher. The retained Caelestia code
 and its adaptations are distributed under the original GPL-3.0 terms.
 
+The Quiet dock and panel polish took presentation cues from
+[Dux Shell](https://github.com/duxlabs-dev/dux-shell/tree/745a805d3dc049cc2d036b791fbac27dd348ef42)
+([MIT, copyright 2025 Avenge Media LLC](https://github.com/duxlabs-dev/dux-shell/blob/745a805d3dc049cc2d036b791fbac27dd348ef42/LICENSE)):
+fixed hit boxes, icon source sizing independent of hover frames, and
+interruptible panel motion. The implementation uses existing Qt Quick and
+Caelestia components; no Dux code, artwork or services are bundled.
+
 The Yu OS CMake adapter builds only libcava's original `cavacore.c` into the
 native UI plugin, with FFTW. It does not build the terminal program or its raw
 audio-input backends, download a library during configure, or substitute a
