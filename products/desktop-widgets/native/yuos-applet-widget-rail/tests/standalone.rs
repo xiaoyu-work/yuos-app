@@ -39,5 +39,5 @@ fn actual_binary_dispatches_only_manifest_read_tools_before_gui_initialization()
     let listed = responses.iter().find(|value| value["id"] == 2).unwrap();
     let names: Vec<_> = listed["result"]["tools"].as_array().unwrap().iter()
         .map(|tool| tool["name"].as_str().unwrap()).collect();
-    assert_eq!(names, ["widget-rail.calendar", "widget-rail.tasks", "widget-rail.system"]);
+    assert_eq!(names, ["widget-rail.system"]);
 }

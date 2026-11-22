@@ -28,7 +28,7 @@
     "launcher": ["yuos-launcher-backend-v1 (= 1)"],
     "calendar": ["yuos-calendar-read-v1 (= 1)"],
     "clipboard": ["copyq", "yuos-clipboard-history-v1 (= 1)"],
-    "desktop-widgets": ["yuos-calendar-read-v1 (= 1)", "yuos-observation-v1 (= 1)"],
+    "desktop-widgets": ["yuos-observation-v1 (= 1)"],
     "capture": ["yuos-capture-v1", "xdg-desktop-portal"],
     "media-player": ["yuos-media-player-v1", "pipewire-bin", "libvulkan1", "mesa-vulkan-drivers", "gstreamer1.0-plugins-base", "gstreamer1.0-plugins-good", "gstreamer1.0-libav"],
     "notifications": ["yuos-notifications-v1"],

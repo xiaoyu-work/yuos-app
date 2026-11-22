@@ -712,7 +712,6 @@ dependencies = [
  "yuos-sdk",
  "i18n-embed",
  "i18n-embed-fl",
- "jiff",
  "libcosmic",
  "rust-embed",
  "serde_json",

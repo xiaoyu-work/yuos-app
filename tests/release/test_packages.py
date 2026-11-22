@@ -73,7 +73,7 @@ def test_standalone_applet_packages_require_the_versioned_os_service_only_for_de
             product == "clipboard" and entry["variant"] == "desktop"
         )
         assert ("yuos-calendar-read-v1 (= 1)" in dependencies) == (
-            product in {"calendar", "desktop-widgets"} and entry["variant"] == "desktop"
+            product == "calendar" and entry["variant"] == "desktop"
         )
         assert ("yuos-observation-v1 (= 1)" in dependencies) == (
             product == "desktop-widgets" and entry["variant"] == "desktop"

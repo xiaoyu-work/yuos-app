@@ -93,7 +93,7 @@ already been published or that every physical device has been exercised.
 | `tools/stage.py` | Kind-aware assembly of declared App assets and named shared Python library dependencies |
 | `tools/package_assets.py` | Owner-scoped extra product assets invoked once by canonical staging, without changing common-library ownership |
 | `tools/native_payload.py` | Original-installer output to package-local ELF/resource/license preparation, explicit signer entries and common-Host compatibility launchers; no resource activation or authority |
-| `products/desktop-widgets/` | Complete Widget Rail native presentation and assets; Calendar/task/telemetry access and authority remain OS-provided |
+| `products/desktop-widgets/` | Widget Rail native and Web presentation; resource telemetry and authority remain OS-owned |
 | `products/home-integration/` | Home Assistant REST adapter source; external server, accounts, devices and automation state are not imported; OS credentials and egress authority remain separate |
 | `products/messaging-channels/` | Selected Discord, Telegram, Slack and WhatsApp outbound/presentation clients; versioned SDK delegates authenticated owner/sender admission, lifecycle and replay to the OS and ordinary Activity triggers |
 | `platform.lock.json`, `tools/platform_dependency.py` | Published, digest-pinned SDK/runtime/toolkit artifact, not an OS source checkout |
@@ -413,14 +413,10 @@ script or App intercall is involved. The OS-supplied SDK authenticates native
 calls and the runtime checks exact scopes before the typed launch service.
 The native UI service's catalog/history and per-App MCP data remain separate.
 
-Desktop Widgets uses typed `Providers` callbacks for Calendar, read-only Agent
-tasks and telemetry. OS shared services retain exact policy checks, data paths,
-bounded commands and existing Linux telemetry fallback. Agent Activity shares
-only the OS read-only task adapter; no App calls another App. Sampling state
-stays process-local in the host, while the complete original rail UI, refresh
-guards, suggestions, resources and tests are product-owned. The descriptor and
-linked shell remain desktop-package assets. This move does not introduce a new
-Agent executor, data owner or visual redesign.
+Desktop Widgets reads only OS resource telemetry. Its native and Web surfaces
+do not read the Calendar product's data or the owner's Agent task records.
+The OS owns authorization and sampling. Widget Rail owns presentation, refresh
+guards and native suggestions based on reported memory and storage usage.
 
 Media Player preserves the full standalone native video/audio UI, renderer
 and optional dependency graph, thumbnailer and 72 locales. Its MPRIS backend

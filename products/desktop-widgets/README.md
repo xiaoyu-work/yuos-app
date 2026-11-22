@@ -1,9 +1,9 @@
 # Desktop Widgets
 
-The complete native Desktop Widgets rail: Today, AI Tasks, System Health and
-deterministic Suggestions, with the original layout, icon and refresh behavior.
+Desktop Widgets shows system health in its native and Web views. Its native
+rail suggests actions based on reported memory and storage usage.
 See [MODULE.md](MODULE.md) for ownership, provider contracts and validation,
 and [PROVENANCE.md](PROVENANCE.md) for the retained GPL source origin.
 
-All displayed data comes through independently authorized OS providers.
-The App does not execute tasks, call another App, or create a new data store.
+The App reads only the authorized OS resource observer, not Calendar events
+or Agent tasks.

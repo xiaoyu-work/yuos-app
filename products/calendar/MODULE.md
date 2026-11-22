@@ -29,16 +29,16 @@ surfaces use the published SDK 0.2.1 generic wire client with the fixed
 `/usr/local/bin/yu __calendar day <year> <month> <day>` OS command and SDK
 `CalendarEvent` records. No Desktop-only applet-provider, other App, raw
 database, user bus or process-global credential override is used.
-The existing read-only `data.db.read:Name(calendar)` provider stays OS-owned,
-also serving Widget Rail. Denial and missing/broken service errors remain
+The existing read-only `data.db.read:Name(calendar)` provider stays OS-owned.
+Denial and missing/broken service errors remain
 visible. No identity, grant or data partition is merged.
 
 The OS service and ordinary task-operation Hosts bind Calendar's existing
 owner/App data partition through private UID-mapped views, so a new Host can read the same
 on-disk state without copying it or changing its owner. This is not a new
-Calendar directory. Panel and Widget Rail reads now use the owner-scoped OS
-Calendar service through the public SDK wire interface. Their own data directories
-cannot select the Calendar database, and they receive no raw file access.
+Calendar directory. The panel reads through the owner-scoped OS Calendar
+service; it receives no raw database file access. Widget Rail no longer
+reads this service.
 Installed GUI/resource acceptance remains separate.
 
 ## Read-only panel service and Web UI
@@ -71,8 +71,8 @@ popup/Calendar-service read remain distinct acceptance gates.
 
 The Rust UI uses the same verified App manifest, identity/session, capability
 and sandbox contract as any other App. Neither its language nor its package
-origin grants privilege. The public data service is available to other Apps
-with the same resource scopes; no native App allowlist entry is added.
+origin grants privilege. Admission to the Calendar data service remains
+OS-owned.
 
 ## Activity event objects
 

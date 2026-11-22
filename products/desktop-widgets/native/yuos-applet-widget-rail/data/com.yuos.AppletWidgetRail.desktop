@@ -1,11 +1,11 @@
 [Desktop Entry]
 Name=Desktop Widgets
-Comment=Calendar, AI tasks, system health, and smart suggestions
+Comment=System health and resource suggestions
 Type=Application
 Exec=yuos-applet-widget-rail
 Terminal=false
 Categories=X-YuOS;
-Keywords=Yu OS;Applet;Widgets;Calendar;Tasks;System;Suggestions;
+Keywords=Yu OS;Applet;Widgets;System;Suggestions;
 Icon=view-grid-symbolic
 StartupNotify=true
 NoDisplay=true

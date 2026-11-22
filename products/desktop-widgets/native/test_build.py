@@ -65,6 +65,9 @@ def test_desktop_identity_stages_without_tests(tmp_path):
     assert manifest["entry"] == manifest["mcp"]["entry"] == "bin/yuos-applet-widget-rail"
     assert not (output / manifest["entry"]).exists(), "source staging must not fabricate an ELF"
     assert not (output / "test_main.py").exists()
+    page = (output / "web/index.html").read_text()
+    assert 'id="system-state"' in page
+    assert 'id="calendar-state"' not in page and 'id="tasks-state"' not in page
 
 
 def test_install_requires_explicit_build_staging_not_live_root(tmp_path):

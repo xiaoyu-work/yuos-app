@@ -8,29 +8,12 @@ use serde_json::{Value, json};
 
 use crate::service::Client;
 
-#[derive(Clone, Copy)]
-enum Source { Calendar, Tasks, System }
-
-struct Read(Source, Client);
-
-impl Read {
-    async fn read(&self) -> Result<Value, String> {
-        match self.0 {
-            Source::Calendar => Ok(json!({"events": self.1.calendar_today().await?})),
-            Source::Tasks => Ok(json!({"tasks": self.1.tasks().await?})),
-            Source::System => Ok(json!({"summary": self.1.system().await?})),
-        }
-    }
-}
+struct System(Client);
 
 #[async_trait]
-impl Tool for Read {
+impl Tool for System {
     fn name(&self) -> &str {
-        match self.0 {
-            Source::Calendar => "widget-rail.calendar",
-            Source::Tasks => "widget-rail.tasks",
-            Source::System => "widget-rail.system",
-        }
+        "widget-rail.system"
     }
 
     async fn handle(&self, input: Value, context: CallContext) -> ToolResult {
@@ -38,13 +21,13 @@ impl Tool for Read {
             return ToolResult::error(error.to_string());
         }
         if !input.as_object().is_some_and(|args| args.is_empty()) {
-            return ToolResult::error("Widget Rail read tools take no arguments.");
+            return ToolResult::error("Widget Rail system telemetry takes no arguments.");
         }
         tokio::select! {
             biased;
             _ = context.cancelled() => ToolResult::error("Widget Rail call cancelled or deadline exceeded."),
-            result = self.read() => match result {
-                Ok(value) => ToolResult::structured(value)
+            result = self.0.system() => match result {
+                Ok(summary) => ToolResult::structured(json!({"summary": summary}))
                     .unwrap_or_else(|error| ToolResult::error(error.to_string())),
                 Err(error) => ToolResult::error(error),
             },
@@ -56,9 +39,7 @@ fn bind(mut app: App, client: Client) -> Result<App, AppError> {
     if app.id() != "widget-rail" {
         return Err(AppError::Manifest("Widget Rail requires the widget-rail identity".into()));
     }
-    for source in [Source::Calendar, Source::Tasks, Source::System] {
-        app.bind(Arc::new(Read(source, client.clone())))?;
-    }
+    app.bind(Arc::new(System(client)))?;
     Ok(app)
 }
 

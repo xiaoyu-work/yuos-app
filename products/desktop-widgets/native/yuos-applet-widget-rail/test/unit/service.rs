@@ -1,34 +1,7 @@
 use super::*;
 
 #[test]
-fn translates_all_presented_fields_without_inventing_state() {
-    let event = calendar_event(applet::CalendarEvent {
-        id: "event-1".into(),
-        title: "Review".into(),
-        start: "2026-09-08".into(),
-        end: Some("2026-09-09".into()),
-        location: "Office".into(),
-    });
-    assert_eq!(event.id, "event-1");
-    assert_eq!(event.title, "Review");
-    assert_eq!(event.start, "2026-09-08");
-    assert_eq!(event.end.as_deref(), Some("2026-09-09"));
-    assert_eq!(event.location, "Office");
-    let task = task(applet::Task {
-        id: "task-1".into(),
-        purpose: "Review".into(),
-        status: "running".into(),
-        created_at: "2026-09-09".into(),
-    });
-    assert_eq!(
-        task,
-        Task {
-            id: "task-1".into(),
-            purpose: "Review".into(),
-            status: "running".into(),
-            created_at: "2026-09-09".into(),
-        }
-    );
+fn preserves_presented_telemetry_fields() {
     let summary = system_summary(applet::SystemSummary {
         cpu_percent: Some(42.0),
         memory: Some(applet::Usage {

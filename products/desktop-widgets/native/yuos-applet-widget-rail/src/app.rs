@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-use crate::{CalendarEvent, Providers, SystemSummary, Task, Usage, fl};
+use crate::{SystemProvider, SystemSummary, Usage, fl};
 use cosmic::{
     Element, Task as IcedTask, app,
     cosmic_theme::palette::WithAlpha,
@@ -16,7 +16,6 @@ use cosmic::{
     theme,
     widget::icon,
 };
-use jiff::{Timestamp, Zoned, fmt::strtime, tz::TimeZone};
 use std::time::Duration;
 
 const REFRESH_SECONDS: u64 = 5;
@@ -24,48 +23,34 @@ const RAIL_WIDTH: u32 = 360;
 const RAIL_HEIGHT: f32 = 620.0;
 
 #[derive(Clone)]
-enum SourceState<T> {
+enum SystemState {
     Loading,
-    Ready(T),
-    Empty,
+    Ready(SystemSummary),
     Unavailable(String),
-}
-
-impl<T> Default for SourceState<T> {
-    fn default() -> Self {
-        Self::Loading
-    }
 }
 
 #[derive(Clone)]
 pub struct WidgetRail {
     core: cosmic::app::Core,
-    calendar: SourceState<Vec<CalendarEvent>>,
-    tasks: SourceState<Vec<Task>>,
-    system: SourceState<SystemSummary>,
-    providers: Providers,
-    calendar_in_flight: bool,
-    tasks_in_flight: bool,
+    system: SystemState,
+    provider: SystemProvider,
     system_in_flight: bool,
 }
 
 #[derive(Debug, Clone)]
 pub enum Message {
-    RefreshFast,
-    RefreshCalendar,
-    CalendarLoaded(Result<Vec<CalendarEvent>, String>),
-    TasksLoaded(Result<Vec<Task>, String>),
+    Refresh,
     SystemLoaded(Result<SystemSummary, String>),
 }
 
 impl cosmic::Application for WidgetRail {
     type Message = Message;
     type Executor = cosmic::SingleThreadExecutor;
-    type Flags = Providers;
+    type Flags = SystemProvider;
 
     const APP_ID: &'static str = "com.yuos.AppletWidgetRail";
 
-    fn init(mut core: cosmic::app::Core, providers: Providers) -> (Self, app::Task<Message>) {
+    fn init(mut core: cosmic::app::Core, provider: SystemProvider) -> (Self, app::Task<Message>) {
         let panel = SctkLayerSurfaceSettings {
             id: window::Id::RESERVED,
             namespace: Self::APP_ID.into(),
@@ -81,25 +66,14 @@ impl cosmic::Application for WidgetRail {
         core.window.show_maximize = false;
         core.window.show_minimize = false;
         core.window.use_template = false;
-        let refreshes = IcedTask::batch([
-            refresh_calendar(&providers),
-            refresh_tasks(&providers),
-            refresh_system(&providers),
-        ]);
+        let refresh = refresh_system(&provider);
         let rail = Self {
             core,
-            providers,
-            calendar: SourceState::Loading,
-            tasks: SourceState::Loading,
-            system: SourceState::Loading,
-            calendar_in_flight: true,
-            tasks_in_flight: true,
+            provider,
+            system: SystemState::Loading,
             system_in_flight: true,
         };
-        (
-            rail,
-            IcedTask::batch([get_layer_surface(panel), refreshes]),
-        )
+        (rail, IcedTask::batch([get_layer_surface(panel), refresh]))
     }
 
     fn core(&self) -> &cosmic::app::Core {
@@ -115,63 +89,24 @@ impl cosmic::Application for WidgetRail {
     }
 
     fn subscription(&self) -> Subscription<Message> {
-        Subscription::batch([
-            time::every(Duration::from_secs(REFRESH_SECONDS)).map(|_| Message::RefreshFast),
-            time::every(Duration::from_secs(60)).map(|_| Message::RefreshCalendar),
-        ])
+        time::every(Duration::from_secs(REFRESH_SECONDS)).map(|_| Message::Refresh)
     }
 
     fn update(&mut self, message: Message) -> app::Task<Message> {
         match message {
-            Message::RefreshFast => {
-                let mut refreshes = Vec::new();
-                if !self.tasks_in_flight {
-                    self.tasks_in_flight = true;
-                    refreshes.push(refresh_tasks(&self.providers));
-                }
-                if !self.system_in_flight {
-                    self.system_in_flight = true;
-                    refreshes.push(refresh_system(&self.providers));
-                }
-                IcedTask::batch(refreshes)
-            }
-            Message::RefreshCalendar => {
-                if self.calendar_in_flight {
+            Message::Refresh => {
+                if self.system_in_flight {
                     IcedTask::none()
                 } else {
-                    self.calendar_in_flight = true;
-                    refresh_calendar(&self.providers)
+                    self.system_in_flight = true;
+                    refresh_system(&self.provider)
                 }
-            }
-            Message::CalendarLoaded(result) => {
-                self.calendar_in_flight = false;
-                self.calendar = match result {
-                    Ok(events) if events.is_empty() => SourceState::Empty,
-                    Ok(events) => SourceState::Ready(events),
-                    Err(error) => SourceState::Unavailable(short_error(error)),
-                };
-                IcedTask::none()
-            }
-            Message::TasksLoaded(result) => {
-                self.tasks_in_flight = false;
-                self.tasks = match result {
-                    Ok(tasks) => {
-                        let tasks = select_tasks(tasks);
-                        if tasks.is_empty() {
-                            SourceState::Empty
-                        } else {
-                            SourceState::Ready(tasks)
-                        }
-                    }
-                    Err(error) => SourceState::Unavailable(short_error(error)),
-                };
-                IcedTask::none()
             }
             Message::SystemLoaded(result) => {
                 self.system_in_flight = false;
                 self.system = match result {
-                    Ok(summary) => SourceState::Ready(summary),
-                    Err(error) => SourceState::Unavailable(short_error(error)),
+                    Ok(summary) => SystemState::Ready(summary),
+                    Err(error) => SystemState::Unavailable(short_error(error)),
                 };
                 IcedTask::none()
             }
@@ -181,8 +116,6 @@ impl cosmic::Application for WidgetRail {
     fn view(&self) -> Element<'_, Message> {
         let content = column![
             rail_header(),
-            self.today_card(),
-            self.tasks_card(),
             self.system_card(),
             self.suggestions_card(),
         ]
@@ -215,74 +148,13 @@ impl cosmic::Application for WidgetRail {
 }
 
 impl WidgetRail {
-    fn today_card(&self) -> Element<'_, Message> {
-        let date = strtime::format("%A, %B %-d", &Zoned::now())
-            .map(|formatted| formatted.to_string())
-            .unwrap_or_else(|_| Zoned::now().date().to_string());
-        let mut body = column![text(date).size(20)].spacing(8);
-
-        match &self.calendar {
-            SourceState::Loading => {
-                body = body.push(state_row(
-                    "process-working-symbolic",
-                    fl!("calendar-loading"),
-                ));
-            }
-            SourceState::Empty => {
-                body = body.push(state_row("emblem-ok-symbolic", fl!("calendar-empty")));
-            }
-            SourceState::Unavailable(error) => {
-                body = body.push(unavailable(fl!("calendar-unavailable"), error.to_string()));
-            }
-            SourceState::Ready(events) => {
-                for event in events.iter().take(3) {
-                    body = body.push(event_row(event));
-                }
-            }
-        }
-
-        card(
-            fl!("today-title"),
-            "x-office-calendar-symbolic",
-            body.into(),
-        )
-    }
-
-    fn tasks_card(&self) -> Element<'_, Message> {
-        let body: Element<'_, Message> = match &self.tasks {
-            SourceState::Loading => state_row("process-working-symbolic", fl!("tasks-loading")),
-            SourceState::Empty => state_row("emblem-ok-symbolic", fl!("tasks-empty")),
-            SourceState::Unavailable(error) => {
-                unavailable(fl!("tasks-unavailable"), error.to_string())
-            }
-            SourceState::Ready(tasks) => {
-                let active = tasks.iter().filter(|task| is_active(task)).count();
-                let mut content = column![
-                    text(if active == 0 {
-                        fl!("recent")
-                    } else {
-                        fl!("active-count", count = active)
-                    })
-                    .size(11)
-                ]
-                .spacing(7);
-                for task in tasks.iter().take(3) {
-                    content = content.push(task_row(task));
-                }
-                content.into()
-            }
-        };
-        card(fl!("tasks-title"), "system-run-symbolic", body)
-    }
-
     fn system_card(&self) -> Element<'_, Message> {
         let body: Element<'_, Message> = match &self.system {
-            SourceState::Loading => state_row("process-working-symbolic", fl!("system-loading")),
-            SourceState::Empty => state_row("dialog-information-symbolic", fl!("not-available")),
-            SourceState::Unavailable(error) => {
+            SystemState::Loading => state_row("process-working-symbolic", fl!("system-loading")),
+            SystemState::Unavailable(error) => {
                 unavailable(fl!("system-unavailable"), error.to_string())
             }
-            SourceState::Ready(summary) => {
+            SystemState::Ready(summary) => {
                 let cpu = summary
                     .cpu_percent
                     .map(|value| format!("{value:.0}%"))
@@ -324,15 +196,20 @@ impl WidgetRail {
     }
 
     fn suggestions_card(&self) -> Element<'_, Message> {
-        let suggestions = suggestions(&self.calendar, &self.tasks, &self.system);
-        let body: Element<'_, Message> = if suggestions.is_empty() {
+        let suggestions = match &self.system {
+            SystemState::Ready(summary) => suggestions(summary),
+            _ => Vec::new(),
+        };
+        let body: Element<'_, Message> = if matches!(self.system, SystemState::Loading) {
             state_row("process-working-symbolic", fl!("suggestions-loading"))
+        } else if suggestions.is_empty() {
+            state_row("dialog-information-symbolic", fl!("not-available"))
         } else {
             let mut content = column![].spacing(8);
             for suggestion in suggestions {
                 content = content.push(
                     row![
-                        status_dot(Tone::Accent),
+                        status_dot(),
                         text(suggestion).size(12).width(Length::Fill),
                     ]
                     .spacing(8)
@@ -435,62 +312,6 @@ fn metric(label: String, value: String) -> Element<'static, Message> {
         .into()
 }
 
-fn event_row(event: &CalendarEvent) -> Element<'_, Message> {
-    let title = if event.title.trim().is_empty() {
-        fl!("no-title")
-    } else {
-        truncate(&event.title, 42)
-    };
-    let time = event_time(&event.start);
-    let detail = if event.location.trim().is_empty() {
-        time
-    } else {
-        format!("{time} · {}", truncate(&event.location, 24))
-    };
-
-    row![
-        status_dot(Tone::Accent),
-        column![text(title).size(12), text(detail).size(10)].spacing(2),
-    ]
-    .spacing(8)
-    .align_y(Alignment::Start)
-    .into()
-}
-
-fn task_row(task: &Task) -> Element<'_, Message> {
-    let title = if task.purpose.trim().is_empty() {
-        format!(
-            "…{}",
-            task.id
-                .chars()
-                .rev()
-                .take(8)
-                .collect::<String>()
-                .chars()
-                .rev()
-                .collect::<String>()
-        )
-    } else {
-        truncate(&task.purpose, 46)
-    };
-    let tone = match task.status.as_str() {
-        "running" | "pending" => Tone::Accent,
-        "failed" => Tone::Danger,
-        _ => Tone::Muted,
-    };
-    row![
-        status_dot(tone),
-        column![
-            text(title).size(12),
-            text(task.status.to_ascii_uppercase()).size(9),
-        ]
-        .spacing(2),
-    ]
-    .spacing(8)
-    .align_y(Alignment::Start)
-    .into()
-}
-
 fn state_row(icon_name: &'static str, message: String) -> Element<'static, Message> {
     row![
         icon::from_name(icon_name).size(16).symbolic(true),
@@ -513,26 +334,13 @@ fn unavailable(title: String, detail: String) -> Element<'static, Message> {
     .into()
 }
 
-#[derive(Clone, Copy)]
-enum Tone {
-    Accent,
-    Muted,
-    Danger,
-}
-
-fn status_dot(tone: Tone) -> Element<'static, Message> {
+fn status_dot() -> Element<'static, Message> {
     const SIZE: f32 = 7.0;
     container(horizontal_space().width(Length::Fixed(SIZE)))
         .height(Length::Fixed(SIZE))
-        .class(theme::Container::custom(move |theme| {
-            let cosmic = theme.cosmic();
-            let color = match tone {
-                Tone::Accent => cosmic.accent_color(),
-                Tone::Muted => cosmic.palette.neutral_6,
-                Tone::Danger => cosmic.destructive_color(),
-            };
+        .class(theme::Container::custom(|theme| {
             container::Style {
-                background: Some(Background::Color(color.into())),
+                background: Some(Background::Color(theme.cosmic().accent_color().into())),
                 border: Border {
                     radius: (SIZE / 2.0).into(),
                     ..Default::default()
@@ -543,91 +351,20 @@ fn status_dot(tone: Tone) -> Element<'static, Message> {
         .into()
 }
 
-fn select_tasks(mut tasks: Vec<Task>) -> Vec<Task> {
-    tasks.sort_by(|a, b| {
-        let a_active = is_active(a);
-        let b_active = is_active(b);
-        b_active
-            .cmp(&a_active)
-            .then_with(|| b.created_at.cmp(&a.created_at))
-    });
-    tasks
-}
-
-fn is_active(task: &Task) -> bool {
-    matches!(task.status.as_str(), "running" | "pending")
-}
-
-fn suggestions(
-    calendar: &SourceState<Vec<CalendarEvent>>,
-    tasks: &SourceState<Vec<Task>>,
-    system: &SourceState<SystemSummary>,
-) -> Vec<String> {
-    if matches!(calendar, SourceState::Loading)
-        && matches!(tasks, SourceState::Loading)
-        && matches!(system, SourceState::Loading)
-    {
-        return Vec::new();
-    }
-
+fn suggestions(summary: &SystemSummary) -> Vec<String> {
+    let memory = summary.memory.filter(|usage| usage.total_mb > 0);
+    let storage = summary.storage.filter(|usage| usage.total_mb > 0);
     let mut suggestions = Vec::new();
-    if let SourceState::Ready(events) = calendar {
-        if let Some(event) = events.first() {
-            let event_title = if event.title.trim().is_empty() {
-                fl!("no-title")
-            } else {
-                event.title.clone()
-            };
-            suggestions.push(fl!(
-                "suggestion-prepare",
-                title = truncate(&event_title, 34)
-            ));
-        }
-    } else if matches!(calendar, SourceState::Empty) {
-        suggestions.push(fl!("suggestion-clear"));
+    if memory.is_some_and(|usage| usage.percent() >= 85) {
+        suggestions.push(fl!("suggestion-memory"));
     }
-
-    if let SourceState::Ready(tasks) = tasks {
-        let active = tasks.iter().filter(|task| is_active(task)).count();
-        if active > 0 {
-            suggestions.push(fl!("suggestion-tasks", count = active));
-        }
+    if storage.is_some_and(|usage| usage.percent() >= 90) {
+        suggestions.push(fl!("suggestion-storage"));
     }
-
-    if let SourceState::Ready(summary) = system {
-        if summary.memory.is_some_and(|usage| usage.percent() >= 85) {
-            suggestions.push(fl!("suggestion-memory"));
-        }
-        if summary.storage.is_some_and(|usage| usage.percent() >= 90) {
-            suggestions.push(fl!("suggestion-storage"));
-        }
-    }
-
-    if suggestions.is_empty() {
+    if suggestions.is_empty() && memory.is_some() && storage.is_some() {
         suggestions.push(fl!("suggestion-balanced"));
     }
-    suggestions.truncate(3);
     suggestions
-}
-
-fn event_time(start: &str) -> String {
-    event_time_in_zone(start, TimeZone::system())
-}
-
-fn event_time_in_zone(start: &str, time_zone: TimeZone) -> String {
-    if start.len() == 10 {
-        return fl!("all-day");
-    }
-    if let Ok(timestamp) = start.parse::<Timestamp>() {
-        if let Ok(formatted) = strtime::format("%H:%M", &timestamp.to_zoned(time_zone)) {
-            return formatted.to_string();
-        }
-    }
-    start
-        .get(11..16)
-        .filter(|time| time.as_bytes().get(2) == Some(&b':'))
-        .unwrap_or(start)
-        .to_string()
 }
 
 fn format_usage(usage: Usage) -> String {
@@ -662,21 +399,8 @@ fn short_error(error: String) -> String {
     truncate(error.lines().next().unwrap_or_default().trim(), 96)
 }
 
-fn refresh_calendar(providers: &Providers) -> app::Task<Message> {
-    IcedTask::perform((providers.calendar)(), |result| {
-        cosmic::Action::App(Message::CalendarLoaded(result))
-    })
-}
-
-fn refresh_tasks(providers: &Providers) -> app::Task<Message> {
-    IcedTask::perform(
-        (providers.tasks)(),
-        |result| cosmic::Action::App(Message::TasksLoaded(result)),
-    )
-}
-
-fn refresh_system(providers: &Providers) -> app::Task<Message> {
-    IcedTask::perform((providers.system)(), |result| {
+fn refresh_system(provider: &SystemProvider) -> app::Task<Message> {
+    IcedTask::perform(provider(), |result| {
         cosmic::Action::App(Message::SystemLoaded(result))
     })
 }

@@ -4,44 +4,7 @@ use std::{future::Future, pin::Pin, sync::Arc};
 
 pub type DataFuture<T> = Pin<Box<dyn Future<Output = Result<T, String>> + Send>>;
 
-/// Read-only, independently authorized OS data sources. No provider invokes an App.
-#[derive(Clone)]
-pub struct Providers {
-    pub calendar: Arc<dyn Fn() -> DataFuture<Vec<CalendarEvent>> + Send + Sync>,
-    pub tasks: Arc<dyn Fn() -> DataFuture<Vec<Task>> + Send + Sync>,
-    pub system: Arc<dyn Fn() -> DataFuture<SystemSummary> + Send + Sync>,
-}
-
-impl Providers {
-    pub fn new(
-        calendar: impl Fn() -> DataFuture<Vec<CalendarEvent>> + Send + Sync + 'static,
-        tasks: impl Fn() -> DataFuture<Vec<Task>> + Send + Sync + 'static,
-        system: impl Fn() -> DataFuture<SystemSummary> + Send + Sync + 'static,
-    ) -> Self {
-        Self {
-            calendar: Arc::new(calendar),
-            tasks: Arc::new(tasks),
-            system: Arc::new(system),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CalendarEvent {
-    pub id: String,
-    pub title: String,
-    pub start: String,
-    pub end: Option<String>,
-    pub location: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Task {
-    pub id: String,
-    pub purpose: String,
-    pub status: String,
-    pub created_at: String,
-}
+pub type SystemProvider = Arc<dyn Fn() -> DataFuture<SystemSummary> + Send + Sync>;
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct SystemSummary {

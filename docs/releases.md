@@ -448,9 +448,10 @@ library dependencies are computed from the actual installed ELF binaries with
 configuration.
 These dependencies express public interface availability, never a grant, a
 special caller class or a sandbox exemption.
-Calendar, Clipboard and Desktop Widgets' standalone packages consume the
-Agent's declared Calendar/history/observation services, not a hard dependency
-on the full OS Desktop package. The OS retains policy and service
+The standalone Calendar, Clipboard and Desktop Widgets packages use,
+respectively, the OS Calendar, clipboard history and observation interfaces.
+Widget Rail no longer depends on Calendar or reads Agent tasks. None has a hard dependency on the
+full OS Desktop package. The OS retains policy and service
 implementations; App packages install only their own presentation
 binaries/resources. Agent-only Ubuntu/WSL installations can select native App
 packages explicitly, subject to the same GUI resources and permissions.
