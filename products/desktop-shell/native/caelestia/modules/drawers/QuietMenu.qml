@@ -91,6 +91,7 @@ StyledWindow {
         height: Math.max(0, parent.height - root.slideDistance)
         y: root.slideDistance * root.reveal
         opacity: root.reveal
+        border.color: Quiet.floatingLine
 
         ScrollView {
             id: scroll

@@ -17,6 +17,7 @@ Singleton {
     readonly property color ink: light ? "#25352e" : "#f6f7f5"
     readonly property color dim: light ? "#516159" : "#c7d0cd"
     readonly property color line: light ? "#d4dcd2" : "#33d7e3dd"
+    readonly property color floatingLine: light ? "#a5b6ab" : "#60766a"
     readonly property color field: light ? "#e9eee6" : "#13d4dfdc"
     readonly property color selected: light ? "#dce8df" : "#23d4dfdc"
     readonly property color pressed: light ? "#cbdcd0" : "#43d4dfdc"
@@ -33,23 +34,73 @@ Singleton {
         .filter(entry => entry.startupClass)
         .map(entry => [entry.startupClass, entry]))
 
-    readonly property var dock: {
+    readonly property ListModel dock: ListModel {}
+
+    readonly property var dockWindows: {
         const windows = new Map();
         for (const window of Hypr.toplevels.values) {
-            const app = window.lastIpcObject.class;
-            if (!app || app === DesktopMenu.agent)
-                continue;
-            const id = DesktopEntries.byId(app)?.id ?? byStartupClass.get(app)?.id
-                ?? (pins.includes(app) ? app : null);
+            const id = dockId(window.lastIpcObject.class);
             if (id && (!windows.has(id) || window.active))
                 windows.set(id, window);
         }
+        return windows;
+    }
+
+    readonly property var dockRows: {
         const running = new Set(Hypr.desktop.runningApps);
-        return [...new Set([...pins, ...running, ...windows.keys()])].map(id => ({
-            id, window: windows.get(id) ?? null,
-            running: running.has(id) || windows.has(id)
-        })).filter(row => row.window || row.id === DesktopMenu.files
-            || row.id === DesktopMenu.launcher || DesktopEntries.byId(row.id));
+        const rows = new Map();
+        for (const id of new Set([...pins, ...running, ...dockWindows.keys()])) {
+            const window = dockWindows.get(id);
+            if (window || id === DesktopMenu.files || id === DesktopMenu.launcher || desktopEntry(id)) {
+                rows.set(id, {
+                    desktopId: id,
+                    appRunning: running.has(id) || !!window,
+                    focusedOutput: window?.active ? (window.monitor?.name ?? "") : ""
+                });
+            }
+        }
+        return rows;
+    }
+
+    readonly property string pendingDockId: {
+        const identifier = Hypr.pendingFocusId;
+        if (!identifier)
+            return "";
+        const window = Hypr.toplevels.values.find(window => window.identifier === identifier);
+        return window ? dockId(window.lastIpcObject.class) : "";
+    }
+
+    onDockRowsChanged: Qt.callLater(syncDock)
+    Component.onCompleted: Qt.callLater(syncDock)
+
+    function syncDock(): void {
+        for (let i = dock.count - 1; i >= 0; --i) {
+            if (!dockRows.has(dock.get(i).desktopId))
+                dock.remove(i);
+        }
+
+        let index = 0;
+        for (const row of dockRows.values()) {
+            let existing = index;
+            while (existing < dock.count && dock.get(existing).desktopId !== row.desktopId)
+                ++existing;
+            if (existing === dock.count) {
+                dock.insert(index, row);
+            } else {
+                if (existing !== index)
+                    dock.move(existing, index, 1);
+                const current = dock.get(index);
+                if (current.appRunning !== row.appRunning || current.focusedOutput !== row.focusedOutput)
+                    dock.set(index, { appRunning: row.appRunning, focusedOutput: row.focusedOutput });
+            }
+            ++index;
+        }
+    }
+
+    function dockId(app: string): string {
+        if (!app || app === DesktopMenu.agent)
+            return "";
+        return desktopEntry(app)?.id ?? byStartupClass.get(app)?.id ?? (pins.includes(app) ? app : "");
     }
 
     function desktopEntry(desktopId: string): DesktopEntry {
@@ -69,15 +120,21 @@ Singleton {
     }
 
     function icon(desktopId: string): url {
+        if (desktopId === DesktopMenu.files)
+            return Quickshell.shellPath("assets/dock/files.svg");
+        if (desktopId === DesktopMenu.launcher)
+            return Quickshell.shellPath("assets/dock/launcher.svg");
         const name = desktopEntry(desktopId)?.icon ?? desktopId;
         return Quickshell.iconPath(name, "application-x-executable");
     }
 
-    function activate(row: var): void {
-        if (row.window)
-            Hypr.act("focus", row.window.identifier, "");
-        else if (!row.running || row.id !== DesktopMenu.launcher)
-            DesktopMenu.activate(row.id);
+    function activate(desktopId: string): void {
+        // Resolve the current target even when the visible roles have not changed.
+        const window = dockWindows.get(desktopId);
+        if (window)
+            Hypr.act("focus", window.identifier, "");
+        else if (desktopId !== DesktopMenu.launcher || !Hypr.desktop.runningApps.includes(desktopId))
+            DesktopMenu.activate(desktopId);
     }
 
     function togglePin(id: string): void {
@@ -85,7 +142,7 @@ Singleton {
             return;
         if (pins.includes(id))
             preferences.pins = pins.filter(pin => pin !== id);
-        else if (pins.length < 24 && (DesktopEntries.byId(id) || dock.some(row => row.id === id)))
+        else if (pins.length < 24 && (desktopEntry(id) || dockRows.has(id)))
             preferences.pins = [...pins, id];
     }
 

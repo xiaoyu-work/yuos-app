@@ -174,7 +174,7 @@ ClipRect {
                 const ws = (workspaces.itemAt(event.x, event.y) as Workspace)?.ws;
                 if (!ws)
                     return;
-                if (Hypr.activeWsId !== ws)
+                if (Hypr.navigationPending || Hypr.activeWsId !== ws)
                     Hypr.focusWorkspace(ws);
                 else
                     Hypr.toggleSpecial("special");

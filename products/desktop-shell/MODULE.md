@@ -66,14 +66,21 @@ Host exposes it read-only under `/usr`. The Shell migrates only the exact
 saved path to its retired bundled default; custom selections still take
 precedence. The wallpaper fills each display with an aspect-preserving crop.
 
-The top Dock reads public desktop entries for labels and original SVG
-artwork. Hover labels are single-line, click-through and sit below the bar.
-The icon source is sized for the output's pixel ratio and the largest hover
-scale, without cropping the artwork or changing the click or scroll geometry.
-A muted dot shows a running App; the focused window on that output gets a
-longer accent mark and a selected background. The bar and Quiet panels share
-light/dark surfaces and rounded controls. Closing a panel fades its last page
-out while immediately releasing keyboard focus and pointer input.
+The top Dock reads public desktop entries for labels and artwork. Files and
+Launcher use small, transparent SVGs in the Shell's private `assets/dock/`
+resources; their installed App icons and third-party icons are unchanged.
+Qt loads artwork for the output's pixel ratio and the largest hover scale
+without cropping or changing the click or scroll geometry. Hover labels are
+single-line, click-through and sit below the bar.
+
+The Dock updates its model by desktop ID without resetting unchanged rows.
+A muted dot shows a running App; only a window reported as focused on that
+output gets a solid accent mark and selected background. A hollow mark
+indicates that a focus or launch request is still in progress. It clears when
+the request settles, not when a window is assumed to have opened.
+The bar and Quiet panels share light/dark surfaces and rounded controls.
+Floating panels have a stronger edge, without additional blur. Closing a panel
+fades its last page out while immediately releasing keyboard focus and pointer input.
 
 The Shell starts one `yu __desktop-events` connection, with an
 initial snapshot and subsequent updates only on relevant changes. The Root
@@ -82,6 +89,10 @@ an existing epoch-bound window, otherwise it asks Root to reopen the
 running App or start it if absent. Apps without reopen support do not get a
 second copy when they are already running. A visible unmanaged window can
 still be focused, but it does not establish a managed App lifetime.
+While a desktop action is in flight, only the latest absolute window or
+workspace focus request waits to be sent. Clicking the still-active workspace
+during a switch requests a return to it. Relative navigation, toggles, close and
+other mutations are not queued. The Shell does not retry sent requests.
 Right-clicking an App pins it in the Shell's private data.
 The permanent Launcher entry opens the independent
 `yuos-launcher` GUI; the Shell contains no launcher search.

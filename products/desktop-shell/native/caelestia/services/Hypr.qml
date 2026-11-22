@@ -23,6 +23,12 @@ Singleton {
     readonly property string kbLayoutFull: desktop.keyboard?.active_name ?? ""
     readonly property string kbLayout: desktop.keyboard?.layout ?? ""
     readonly property string defaultKbLayout: desktop.keyboard?.default_layout ?? ""
+    readonly property bool navigationPending: effect.nextNavigation !== null
+        || effect.current?.action === "focus" || effect.current?.action === "focus-workspace"
+    readonly property string pendingFocusId: {
+        const request = effect.nextNavigation ?? effect.current;
+        return request?.action === "focus" ? request.identifier : "";
+    }
 
     function installState(state: var): void {
         const outputs = state.outputs.map(output => ({
@@ -77,16 +83,47 @@ Singleton {
     }
 
     function act(action: string, identifier: string, workspace: string): void {
-        if (effect.pending)
+        const request = { action, identifier, workspace };
+        if (effect.current || effect.nextNavigation) {
+            // Only absolute navigation is safe to defer. A repeated click on the
+            // in-flight target replaces any queued intent without dispatching it twice.
+            if (action === "focus" || (action === "focus-workspace"
+                && /^(?:[1-9][0-9]{0,9}|name:[A-Za-z0-9_-]{1,70})$/.test(workspace))) {
+                const sent = effect.current;
+                effect.nextNavigation = sent?.action === action && sent.identifier === identifier
+                    && sent.workspace === workspace ? null : request;
+            } else {
+                Toaster.toast(Tr.tr("Desktop action busy"), Tr.tr("Wait for the current desktop action to finish."), "error");
+            }
             return;
-        const args = ["/usr/bin/python3", Quickshell.shellPath("utils/scripts/desktop_control.py"), action];
-        if (identifier)
-            args.push("--identifier", identifier);
-        if (workspace)
-            args.push("--workspace", workspace);
-        effect.pending = true;
+        }
+        sendAction(request);
+    }
+
+    function sendAction(request: var): void {
+        const args = ["/usr/bin/python3", Quickshell.shellPath("utils/scripts/desktop_control.py"), request.action];
+        if (request.identifier)
+            args.push("--identifier", request.identifier);
+        if (request.workspace)
+            args.push("--workspace", request.workspace);
+        effect.current = request;
         effect.command = args;
         effect.running = true;
+    }
+
+    function sendNextNavigation(): void {
+        if (!effect.current && effect.nextNavigation) {
+            sendAction(effect.nextNavigation);
+            effect.nextNavigation = null;
+        }
+    }
+
+    function finishAction(error: string): void {
+        effect.current = null;
+        if (error)
+            Toaster.toast(Tr.tr("Desktop action failed"), error, "error");
+        if (effect.nextNavigation)
+            Qt.callLater(sendNextNavigation);
     }
 
     function monitorNames(): list<string> {
@@ -126,18 +163,23 @@ Singleton {
     Process {
         id: effect
 
-        property bool pending: false
+        property var current: null
+        property var nextNavigation: null
         stdout: StdioCollector { id: outcome }
         onExited: exitCode => {
-            pending = false;
-            if (exitCode !== 0 || JSON.parse(outcome.text).result?.action_applied !== true)
-                Toaster.toast(Tr.tr("Desktop action failed"), Tr.tr("The OS did not confirm the requested action."), "error");
+            let applied = false;
+            if (exitCode === 0) {
+                try {
+                    applied = JSON.parse(outcome.text)?.result?.action_applied === true;
+                } catch (error) {
+                    console.warn("Invalid desktop action response:", error);
+                }
+            }
+            root.finishAction(applied ? "" : Tr.tr("The OS did not confirm the requested action."));
         }
         onRunningChanged: {
-            if (pending && !running) {
-                pending = false;
-                Toaster.toast(Tr.tr("Desktop action failed"), Tr.tr("The OS client could not be started."), "error");
-            }
+            if (current && !running)
+                root.finishAction(Tr.tr("The OS client could not be started."));
         }
     }
 }

@@ -21,8 +21,12 @@ StyledWindow {
 
     property string menuPage
     property Item hoveredApp
-    readonly property string dockTooltip: hoveredApp && !hoverDelay.running && !dock.moving
-        ? hoveredApp.Accessible.name : ""
+    readonly property string dockTooltip: {
+        if (!hoveredApp || hoverDelay.running || dock.moving)
+            return "";
+        const { name, description } = hoveredApp.Accessible;
+        return description ? `${name} \u00b7 ${description}` : name;
+    }
     readonly property real dockTooltipX: hoveredApp
         ? leading.x + dock.x + hoveredApp.x - dock.contentX + hoveredApp.width / 2 : 0
 
@@ -115,7 +119,7 @@ StyledWindow {
         ListView {
             id: dock
 
-            width: Math.min(Math.max(0, Quiet.dock.length * 38 - 3),
+            width: Math.min(Math.max(0, count * 38 - 3),
                 Math.max(0, status.x - leading.x - 56))
             height: 36
             orientation: ListView.Horizontal
@@ -134,8 +138,10 @@ StyledWindow {
             delegate: QuietButton {
                 id: app
 
-                required property var modelData
-                readonly property string desktopId: modelData.id
+                required property string desktopId
+                required property bool appRunning
+                required property string focusedOutput
+                readonly property bool waiting: DesktopMenu.pendingDesktopId === desktopId || Quiet.pendingDockId === desktopId
                 readonly property real iconSize: 25
                 readonly property real hoverScale: 1.08
                 // Qt applies the output's DPR to image-provider requests. Budget only for peak hover.
@@ -144,9 +150,9 @@ StyledWindow {
                 width: 35
                 height: 36
                 padding: 3
-                highlighted: modelData.window?.active === true
-                    && modelData.window.monitor?.name === root.screen?.name
+                highlighted: focusedOutput !== "" && focusedOutput === root.screen?.name
                 Accessible.name: Quiet.title(desktopId)
+                Accessible.description: waiting ? Tr.tr("Waiting for Yu OS") : ""
                 onHoveredChanged: {
                     if (hovered)
                         root.hoveredApp = app;
@@ -163,7 +169,7 @@ StyledWindow {
                 onClicked: {
                     clearHover();
                     root.launched();
-                    Quiet.activate(modelData);
+                    Quiet.activate(desktopId);
                 }
 
                 contentItem: Item {
@@ -187,11 +193,13 @@ StyledWindow {
                     Rectangle {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.bottom: parent.bottom
-                        width: app.highlighted ? 10 : 4
+                        width: app.highlighted ? 10 : app.waiting ? 8 : 4
                         height: 3
                         radius: height / 2
-                        color: app.highlighted ? Quiet.accent : Quiet.dim
-                        visible: app.modelData.running
+                        color: app.highlighted ? Quiet.accent : app.waiting ? "transparent" : Quiet.dim
+                        border.color: Quiet.accent
+                        border.width: app.waiting && !app.highlighted ? 1 : 0
+                        visible: app.appRunning || app.waiting
 
                         Behavior on width {
                             Anim { type: Anim.FastEffects }
