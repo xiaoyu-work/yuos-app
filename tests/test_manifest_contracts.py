@@ -1039,6 +1039,11 @@ def test_every_manifest_matches_published_schema_contract() -> None:
                 declaration = by_name[bound_arg]
                 if scope.get("transform") == "parent" and declaration.get("kind") != "path":
                     drift.append(f"{path}:{surface} parent transform requires path")
+                if scope.get("transform") == "brokered-file" and (
+                    kind != "from-arg" or declaration.get("kind") != "path"
+                    or declaration.get("repeatable") or not need.get("verb", "").startswith("fs.")
+                ):
+                    drift.append(f"{path}:{surface} brokered-file requires one fs path arg")
                 if scope.get("transform") == "url-host" and declaration.get("kind") != "text":
                     drift.append(f"{path}:{surface} url-host transform requires text")
                 guaranteed = (
@@ -1359,7 +1364,16 @@ def test_published_schema_rejects_removed_app_contracts() -> None:
     schema = _schema()
     validator = Draft202012Validator(schema)
     for path in _manifests():
-        validator.validate(json.loads(path.read_text(encoding="utf-8")))
+        errors = list(validator.iter_errors(json.loads(path.read_text(encoding="utf-8"))))
+        # `brokered-file` is the unpublished OS Writer broker transform. Until the
+        # pinned schema publishes it, only that exact enum error is tolerated.
+        unexpected = [
+            error for error in errors
+            if not (error.validator == "enum" and error.instance == "brokered-file"
+                    and list(error.absolute_path)[-2:] == ["scope", "transform"]
+                    and "brokered-file" not in error.validator_value)
+        ]
+        assert not unexpected, (path, [error.message for error in unexpected])
 
     operation_first = {
         "id": "strict",

@@ -1,5 +1,5 @@
 from pathlib import Path
-from types import SimpleNamespace
+import sys
 from zipfile import ZipFile
 
 import pytest
@@ -8,6 +8,8 @@ from test_support import load_local_module
 
 
 server = load_local_module(Path(__file__).with_name("server.py"), "yu_office_server")
+FakeBroker = load_local_module(
+    Path(__file__).parents[2] / "writer" / "fake_broker.py", "yu_office_fake_broker").FakeBroker
 
 
 @pytest.mark.parametrize("suffix", [".docx", ".odt"])
@@ -31,34 +33,24 @@ def test_read_and_replace_one_document_text_run(tmp_path, monkeypatch, suffix):
         archive.writestr(server.DOCUMENT_MEMBERS[suffix], document)
         archive.writestr("asset.bin", b"unrelated document bytes")
 
-    calls = []
-
-    def authorize(verb, *, path):
-        calls.append((verb, path))
-        if verb == "fs.write" and not allow_write:
-            raise PermissionError("write denied")
-
-    allow_write = False
-    monkeypatch.setattr(server.policy, "require", authorize)
-    monkeypatch.setattr(server, "current_context", lambda: SimpleNamespace(session_id="test-session"))
-    monkeypatch.setattr(server.snapshot, "snapshot",
-                        lambda path, operation, *, session_id: calls.append((operation, path, session_id)))
+    broker = FakeBroker(deadline_unix_ms=1234).install(monkeypatch, server)
+    broker.deny.add("replace")
 
     original = path.read_bytes()
     result = server.read(str(path))
     assert result["text"] == "Draft report"
-    assert calls == [("fs.read", str(path))]
-    with pytest.raises(PermissionError, match="write denied"):
+    assert broker.calls == [("read", str(path))]
+    with pytest.raises(server.ToolError, match="save_unconfirmed"):
         server.replace_text(str(path), result["sha256"], "Draft", "Final")
-    assert path.read_bytes() == original
+    assert path.read_bytes() == original and broker.calls.count(("replace", str(path))) == 1
 
-    allow_write = True
+    broker.deny.clear()
     with pytest.raises(ValueError, match="spans separate formatting"):
         server.replace_text(str(path), result["sha256"], "Draft report", "Final report")
     assert path.read_bytes() == original
+    broker.calls.clear()
     updated = server.replace_text(str(path), result["sha256"], "Draft", "Final")
-    assert calls[-3:] == [("fs.read", str(path)), ("fs.write", str(path)),
-                          ("write", str(path), "test-session")]
+    assert broker.calls == [("read", str(path)), ("replace", str(path))]
     assert updated["replacements"] == 1
     read_back = server.read(str(path))
     assert read_back["text"] == "Final report"
@@ -70,3 +62,32 @@ def test_read_and_replace_one_document_text_run(tmp_path, monkeypatch, suffix):
     with pytest.raises(ValueError, match="revision changed"):
         server.replace_text(str(path), result["sha256"], "Final", "Outdated")
     assert server.read(str(path)) == read_back
+
+
+def test_existing_files_are_reached_only_through_the_broker(tmp_path, monkeypatch):
+    path = tmp_path / "note.odt"
+    path.write_bytes(b"not read directly")
+
+    # The 0.1.0 SDK has no file broker: refuse, never read the raw path.
+    monkeypatch.setitem(sys.modules, "yuos_sdk.files", None)
+    for call in (lambda: server.read(str(path)),
+                 lambda: server.replace_text(str(path), "0" * 64, "a", "b")):
+        with pytest.raises(server.ToolError, match="broker_unavailable"):
+            call()
+    assert path.read_bytes() == b"not read directly"
+
+    broker = FakeBroker().install(monkeypatch, server)
+    for target in ("note.odt", str(tmp_path / "*.odt"), str(tmp_path / "notes.txt")):
+        with pytest.raises(server.ToolError, match="invalid_target"):
+            server.read(target)
+    assert broker.calls == []
+
+    with ZipFile(path, "w") as archive:
+        archive.writestr("META-INF/documentsignatures.xml", "<signed/>")
+    with pytest.raises(server.ToolError, match="unsupported_content"):
+        server.BrokeredFile(str(path), edit=True).read()
+    source = server.BrokeredFile(str(path), edit=False)
+    source.read()
+    with pytest.raises(server.ToolError, match="unauthorized_target"):
+        source.commit(b"x")
+    assert ("replace", str(path)) not in broker.calls

@@ -1,12 +1,15 @@
 """Writer tools against a real LibreOffice UNO document model.
 
 Set YU_OFFICE_TEST_PROGRAM to a LibreOffice `program` directory whose pyuno
-matches this Python (Yu Office's private runtime, or a distro stand-in).
+matches this Python. A distribution LibreOffice is only a stand-in for the
+shared UNO handlers; it does not verify Yu Office's private runtime. MCP
+calls go through the production `BrokeredFile` adapter over a narrow broker
+mock, because the OS file broker is not in a verified SDK yet.
 """
 
 import os
 from pathlib import Path
-from types import SimpleNamespace
+import sys
 
 import pytest
 
@@ -19,6 +22,7 @@ pytestmark = pytest.mark.skipif(not (PROGRAM / "soffice.bin").is_file(),
                                 reason="needs a LibreOffice program directory with pyuno")
 
 server = load_local_module(MANIFEST.with_name("server.py"), "yu_office_writer_server")
+FakeBroker = load_local_module(WRITER / "fake_broker.py", "yu_writer_fake_broker").FakeBroker
 from yu_writer import document as model, tools  # noqa: E402
 from yu_writer.catalog import Catalog, ToolError  # noqa: E402
 from yu_writer.headless import FILTERS, HeadlessOffice, _properties  # noqa: E402
@@ -62,14 +66,46 @@ def catalog():
 
 
 @pytest.fixture
-def mcp(monkeypatch, catalog):
-    calls = []
+def broker(monkeypatch):
     monkeypatch.setattr(server, "PROGRAM_DIR", PROGRAM)
-    monkeypatch.setattr(server.policy, "require", lambda verb, *, path: calls.append((verb, path)))
-    monkeypatch.setattr(server, "current_context", lambda: SimpleNamespace(session_id="test-session"))
-    monkeypatch.setattr(server.snapshot, "snapshot",
-                        lambda path, operation, *, session_id: calls.append((operation, path)))
-    return calls, lambda name, **arguments: server.writer_tool(catalog, name)(**arguments)
+    return FakeBroker(deadline_unix_ms=4321).install(monkeypatch, server)
+
+
+@pytest.fixture
+def mcp(broker, catalog):
+    return broker.calls, lambda name, **arguments: server.writer_tool(catalog, name)(**arguments)
+
+
+def test_mcp_without_file_broker_refuses_before_reading(tmp_path, monkeypatch, catalog):
+    path = tmp_path / "report.odt"
+    make_document(path)
+    original = path.read_bytes()
+    monkeypatch.setitem(sys.modules, "yuos_sdk.files", None)
+    with pytest.raises(ToolError, match="broker_unavailable"):
+        server.writer_tool(catalog, tools.INSPECT)(path=str(path))
+    with pytest.raises(ToolError, match="broker_unavailable"):
+        server.writer_tool(catalog, tools.APPLY)(path=str(path), revision="0" * 64, action="format",
+                                                 paragraphs=[1], bold=True)
+    assert path.read_bytes() == original and sorted(os.listdir(tmp_path)) == ["report.odt"]
+
+
+def test_mcp_apply_reports_unconfirmed_save_once_without_retry(tmp_path, broker, mcp):
+    calls, run = mcp
+    path = tmp_path / "report.odt"
+    make_document(path)
+    original = path.read_bytes()
+    state = run(tools.INSPECT, path=str(path))
+    plain = by_text(state, "Plain body text.")
+    broker.deny.add("read")
+    with pytest.raises(ToolError, match="read_refused"):
+        run(tools.INSPECT, path=str(path))
+    broker.deny = {"replace"}
+    calls.clear()
+    with pytest.raises(ToolError, match="save_unconfirmed"):
+        run(tools.APPLY, path=str(path), revision=state["revision"], action="format",
+            paragraphs=[plain["index"]], bold=True)
+    assert calls == [("read", str(path)), ("replace", str(path))]
+    assert path.read_bytes() == original and sorted(os.listdir(tmp_path)) == ["report.odt"]
 
 
 @pytest.mark.parametrize("suffix", [".docx", ".odt"])
@@ -84,14 +120,14 @@ def test_mcp_inspect_preview_apply_on_private_copy(tmp_path, mcp, suffix):
     mixed = by_text(state, "Mixed bold")
     table = next(block for block in state["blocks"] if block["kind"] == "table")
     assert heading["heading_level"] == 1 and mixed["mixed_formatting"] and not table["rewritable"]
-    assert calls == [("fs.read", str(path))]
+    assert calls == [("read", str(path))]
     original = path.read_bytes()
     revision = state["revision"]
 
     preview = run(tools.PREVIEW, path=str(path), revision=revision, action="rewrite",
                   paragraphs=[plain["index"]], texts=["Final body text."])
     assert preview["applied"] is False and preview["changes"][0]["before"] == "Plain body text."
-    assert path.read_bytes() == original and ("fs.write", str(path)) not in calls
+    assert path.read_bytes() == original and ("replace", str(path)) not in calls
 
     refusals = [
         ({"action": "rewrite", "paragraphs": [mixed["index"]], "texts": ["x"]}, "mixed_formatting"),
@@ -103,12 +139,14 @@ def test_mcp_inspect_preview_apply_on_private_copy(tmp_path, mcp, suffix):
     for arguments, code in refusals:
         with pytest.raises(ToolError, match=code):
             run(tools.APPLY, path=str(path), **{"revision": revision, **arguments})
-    assert path.read_bytes() == original
+    assert path.read_bytes() == original and ("replace", str(path)) not in calls
 
+    calls.clear()
     rewritten = run(tools.APPLY, path=str(path), revision=revision, action="rewrite",
                     paragraphs=[plain["index"], mixed["index"]], texts=["Final body text.", "Mixed flat"],
                     flatten_formatting=True)
-    assert rewritten["saved"] and rewritten["warnings"] and ("write", str(path)) in calls
+    assert rewritten["saved"] and rewritten["warnings"]
+    assert calls == [("read", str(path)), ("replace", str(path))]
     state = run(tools.INSPECT, path=str(path))
     assert by_text(state, "Final body text.")["format"]["bold"] is False
     assert by_text(state, "Mixed flat")["mixed_formatting"] is False
@@ -123,15 +161,6 @@ def test_mcp_inspect_preview_apply_on_private_copy(tmp_path, mcp, suffix):
     title = by_text(run(tools.INSPECT, path=str(path)), "Draft title")
     assert title["alignment"] == "center" and title["format"]["italic"] and title["format"]["font_size"] == 20
     assert title["heading_level"] == 1
-
-
-def test_mcp_adapter_rejects_wildcards_missing_and_nonregular_targets(tmp_path, mcp):
-    _, run = mcp
-    (tmp_path / "folder.odt").mkdir()
-    for path, code in ((tmp_path / "*.odt", "invalid_target"), (tmp_path / "missing.odt", "missing_target"),
-                       (tmp_path / "folder.odt", "invalid_target"), (tmp_path / "notes.txt", "invalid_target")):
-        with pytest.raises(ToolError, match=code):
-            run(tools.INSPECT, path=str(path))
 
 
 def test_live_document_apply_is_one_undo_step_and_failures_roll_back(tmp_path, catalog, monkeypatch):

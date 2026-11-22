@@ -53,17 +53,31 @@ Target binding comes from the adapter, never from model arguments:
   declares the `ai` policy and the optional install-time need
   `ai.chat.untrusted` scoped to `$configured-ai-model`; there is no App-owned
   enablement flow or fallback.
-- **System Agent (MCP)**: an exact OS-authorized `.docx`/`.odt` path. Wildcard,
-  missing, non-regular, oversized or signed (on edit) targets fail. A private
-  headless soffice (private profile, no macros, no link updates) works on a
-  scratch copy. The current `PathDocumentSource` saves by revision check,
-  snapshot and atomic replace of the path. This interim adapter is **not** a
-  managed save: a task App runs as a separate UID with exact bind mounts, so
-  owner-private files may be unreadable and replacing a bound original is not
-  supported. It is replaceable by an OS staged read/commit capability without
-  changing the tools (`system.file.replace` is limited to 64 KiB today).
+- **System Agent (MCP)**: one exact `.docx`/`.odt` file brokered by the OS.
+  Each tool keeps a scalar `path` argument and declares `fs.read` (apply also
+  `fs.write`) with scope
+  `{"kind": "from-arg", "arg": "path", "transform": "brokered-file"}`.
+  `server.BrokeredFile` passes the literal absolute path to
+  `yuos_sdk.files.read_file` and, for apply, `replace_file` with that read's
+  opaque broker revision, both within the same authenticated call (its
+  deadline and cancellation, host binary `/usr/local/bin/yu`). The App never
+  opens, stats or writes the path or its parent. Relative, wildcard or
+  non-DOCX/ODT targets fail before any broker call; broker refusals fail with
+  `read_refused`; oversized documents, and signed documents on edit, fail.
+  A private headless soffice (private profile, no macros, no link updates)
+  works on a copy in the App's own temporary directory. The Writer revision
+  carried from inspect through preview to apply is checked independently of
+  the broker revision. A replace is attempted at most once; any refusal or
+  uncertain outcome returns `save_unconfirmed` and is never retried. Without
+  `yuos_sdk.files` every file tool fails with `broker_unavailable`; there is no
+  raw-path fallback. The broker is an unpublished OS interface: SDK 0.1.0 has
+  no `yuos_sdk.files` and its schema lacks the `brokered-file` transform, so
+  adapter behaviour is checked only against `writer/fake_broker.py`, a narrow
+  test double that is not staged.
 
-DOCX round trips go through LibreOffice's filters and may normalize content.
+UNO tests run against a distribution LibreOffice as a stand-in; that does not
+verify Yu Office's private runtime. DOCX round trips go through LibreOffice's
+filters and may normalize content.
 
 ## Legacy agent tools
 
@@ -80,9 +94,11 @@ SHA-256 revision. Pass that revision as `expected_sha256` to edit; a stale
 revision, an ambiguous match or a match across formatting runs fails without
 saving. Edits reject signed documents.
 
-Each call requires OS authorization for the exact path; edits also require
-write permission and use the OS snapshot service before atomically saving.
-Neither installation nor the App's GUI grants Agent file access.
+They reach existing files only through the same `BrokeredFile` adapter and
+`brokered-file` scopes as the Writer tools (`replace_text` declares `fs.write`).
+The legacy revision stays the SHA-256 of the brokered bytes. Without the OS
+broker they fail with `broker_unavailable`. Neither installation nor the App's
+GUI grants Agent file access.
 
 ## Patch and build
 

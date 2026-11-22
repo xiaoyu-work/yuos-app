@@ -1,5 +1,6 @@
 """Product packaging must keep the established installed App contract."""
 
+import hashlib
 import importlib.util
 import json
 import os
@@ -27,10 +28,23 @@ def test_product_web_interfaces_are_owned_staged_and_do_not_change_app_manifests
             source, package = stage.load_package(name, kind)
             entries = stage.app_entries(source, package)
             if "web_ui" not in package:
+                # No Web UI means an explicitly declared native App; native MCP is independent.
+                assert kind == "product"
                 app_id = package.get("native_payload", {}).get("app")
                 assert set(entries) == {app_id}
-                manifest = json.loads((entries[app_id] / "app.json").read_text())
-                assert manifest.get("desktop") and "mcp" not in manifest
+                manifest_bytes = (entries[app_id] / "app.json").read_bytes()
+                manifest = json.loads(manifest_bytes)
+                assert manifest.get("desktop")
+                planned = json.loads(subprocess.run(
+                    [sys.executable, str(ROOT / "tools/native_payload.py"), name, "--plan"],
+                    check=True, capture_output=True, text=True, timeout=10,
+                ).stdout)
+                assert planned["app_id"] == app_id
+                assert planned["manifest_sha256"] == hashlib.sha256(manifest_bytes).hexdigest()
+                assert manifest["desktop"].get("entry", manifest["entry"]) in planned["entrypoints"]
+                if "mcp" in manifest:
+                    assert manifest["mcp"]["transport"] == "stdio"
+                    assert manifest["mcp"]["entry"] in planned["entrypoints"]
                 continue
             web_apps = package["web_ui"]["apps"]
             assert set(web_apps) <= set(entries)

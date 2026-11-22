@@ -3,23 +3,23 @@
 `yu-office.read` and `yu-office.replace_text` are the legacy XML tools kept for
 compatibility. The `yu-office.writer.*` tools come from the shared Writer
 catalog and handlers that the in-Office assistant also uses.
+
+Every tool reaches its existing file only through `BrokeredFile`, the OS
+brokered read/replace adapter. The App never opens, snapshots or replaces the
+requested path itself, and there is no raw-path fallback.
 """
 
 from copy import copy
 import hashlib
 import io
 import os
-from pathlib import Path
-import stat
+from pathlib import Path, PurePosixPath
 import sys
 from zipfile import BadZipFile, ZipFile
 
 from lxml import etree
 
-from _shared.atomic import atomic_write_bytes
-from _shared.paths import safe_realpath
-from yuos_runtime import policy, snapshot
-from yuos_sdk.mcp import App, current_context
+from yuos_sdk.mcp import App, CallCancelled, current_context
 
 
 def _writer_pythonpath():
@@ -37,6 +37,7 @@ from yu_writer.catalog import Catalog, ToolError  # noqa: E402
 from yu_writer.headless import FileTarget, HeadlessOffice  # noqa: E402
 
 PROGRAM_DIR = Path(__file__).resolve().parent / "program"
+BROKER_BINARY = "/usr/local/bin/yu"
 
 WORD = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 OFFICE = "{urn:oasis:names:tc:opendocument:xmlns:office:1.0}"
@@ -50,27 +51,87 @@ MAX_BODY_XML = 8 * 1024 * 1024
 MAX_TEXT = 64_000
 
 
-def _revision(info):
-    return (info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+def _broker():
+    """Import the OS file broker at the managed adapter boundary only."""
+    try:
+        from yuos_sdk.files import read_file, replace_file
+    except ImportError:
+        raise ToolError("broker_unavailable",
+                        "This Yu OS SDK has no brokered file service, so Yu Office cannot open or "
+                        "save documents for the System Agent.") from None
+    return read_file, replace_file
 
 
-def _read_package(path, *, edit=False):
-    path = safe_realpath(path)
-    suffix = Path(path).suffix.lower()
-    if suffix not in DOCUMENT_MEMBERS:
-        raise ValueError("Yu Office supports DOCX and ODT documents only.")
-    policy.require("fs.read", path=path)
-    if edit:
-        policy.require("fs.write", path=path)
-    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
-    with os.fdopen(fd, "rb") as stream:
-        info = os.fstat(stream.fileno())
-        if not stat.S_ISREG(info.st_mode) or info.st_size > MAX_PACKAGE:
-            raise ValueError("The document must be a regular file no larger than 32 MiB.")
-        data = stream.read(MAX_PACKAGE + 1)
-        if len(data) > MAX_PACKAGE or _revision(os.fstat(stream.fileno())) != _revision(info):
-            raise ValueError("The document changed while reading it; retry the read.")
-    return path, suffix, data, info
+class BrokeredFile:
+    """One exact, OS-brokered document within one authenticated MCP call.
+
+    The OS establishes authority from the manifest's `brokered-file` scope;
+    the App passes the literal absolute path and never opens it. Reads and the
+    single replace use the same call's deadline and cancellation. An uncertain
+    replace is reported, never retried.
+    """
+
+    def __init__(self, path, *, edit):
+        if (not isinstance(path, str) or not path.startswith("/")
+                or any(ch in path for ch in "*?[\0")):
+            raise ToolError("invalid_target",
+                            "Name one exact absolute DOCX or ODT path; wildcards are not accepted.")
+        self.path, self.edit = path, edit
+        self.suffix = PurePosixPath(path).suffix.lower()
+        if self.suffix not in DOCUMENT_MEMBERS:
+            raise ToolError("invalid_target", "Yu Office supports DOCX and ODT documents only.")
+        self._data = self._revision = None
+        self._committed = False
+
+    @staticmethod
+    def _call_options():
+        context = current_context()
+        return {"binary": BROKER_BINARY, "deadline_unix_ms": context.deadline_unix_ms,
+                "check_cancelled": context.raise_if_cancelled}
+
+    def read(self):
+        if self._data is None:
+            read_file, _ = _broker()
+            try:
+                snapshot = read_file(self.path, **self._call_options())
+            except CallCancelled:
+                raise
+            except Exception as error:  # noqa: BLE001 - broker refusal, missing or non-regular file
+                raise ToolError("read_refused", f"The file broker did not provide the document ({error}).") from error
+            data = snapshot.content
+            if not isinstance(data, bytes) or not isinstance(snapshot.revision, str):
+                raise ToolError("broker_invalid", "The file broker returned an invalid snapshot.")
+            if len(data) > MAX_PACKAGE:
+                raise ToolError("document_too_large", "The document must be no larger than 32 MiB.")
+            if self.edit:
+                try:
+                    with ZipFile(io.BytesIO(data)) as archive:
+                        names = [name.lower() for name in archive.namelist()]
+                except BadZipFile:
+                    raise ToolError("unreadable_document", "The document is not a DOCX or ODT package.") from None
+                if any(name.startswith("_xmlsignatures/") or (name.startswith("meta-inf/") and "signatures" in name)
+                       for name in names):
+                    raise ToolError("unsupported_content", "Yu Office does not change signed documents.")
+            self._data, self._revision = data, snapshot.revision
+        return self._data
+
+    def commit(self, data):
+        if not self.edit:
+            raise ToolError("unauthorized_target", "This call may not change the document.")
+        if self._revision is None or self._committed:
+            raise ToolError("invalid_state", "A document is saved once, after it was read in the same call.")
+        if len(data) > MAX_PACKAGE:
+            raise ToolError("document_too_large", "The updated document exceeds 32 MiB.")
+        _, replace_file = _broker()
+        self._committed = True
+        try:
+            replace_file(self.path, self._revision, data, **self._call_options())
+        except CallCancelled:
+            raise
+        except Exception as error:  # noqa: BLE001 - broker refusal or uncertain outcome
+            raise ToolError("save_unconfirmed",
+                            f"The save was not confirmed ({error}); inspect the document before retrying.") from error
+        return {"saved": True, "path": self.path, "sha256": hashlib.sha256(data).hexdigest()}
 
 
 def _body(archive, suffix, *, edit=False):
@@ -146,7 +207,8 @@ def _paragraphs(body, suffix):
 
 
 def read(path: str) -> dict:
-    path, suffix, data, _ = _read_package(path)
+    source = BrokeredFile(path, edit=False)
+    data, suffix = source.read(), source.suffix
     with ZipFile(io.BytesIO(data)) as archive:
         _, body = _body(archive, suffix)
         paragraphs = ["".join(value for _, _, value in parts) for parts in _paragraphs(body, suffix)]
@@ -182,7 +244,8 @@ def _replace_one(body, suffix, find, replacement):
 def replace_text(path: str, expected_sha256: str, find: str, replacement: str) -> dict:
     if not find or find == replacement or any(ch in find or ch in replacement for ch in "\t\r\n"):
         raise ValueError("Provide nonempty find text and a different single-line replacement.")
-    path, suffix, data, original = _read_package(path, edit=True)
+    document_file = BrokeredFile(path, edit=True)
+    data, suffix = document_file.read(), document_file.suffix
     if hashlib.sha256(data).hexdigest() != expected_sha256:
         raise ValueError("Document revision changed; read it again before editing.")
 
@@ -204,95 +267,17 @@ def replace_text(path: str, expected_sha256: str, find: str, replacement: str) -
     result = updated.getvalue()
     if len(result) > MAX_PACKAGE:
         raise ValueError("The updated document exceeds 32 MiB.")
-
-    if _revision(os.stat(path, follow_symlinks=False)) != _revision(original):
-        raise ValueError("Document revision changed; read it again before editing.")
-    snapshot.snapshot(path, "write", session_id=current_context().session_id)
-    if _revision(os.stat(path, follow_symlinks=False)) != _revision(original):
-        raise ValueError("Document revision changed; read it again before editing.")
-    atomic_write_bytes(path, result, mode=stat.S_IMODE(original.st_mode) & 0o777, strict=True)
+    document_file.commit(result)
     return {"path": path, "replacements": 1, "sha256": hashlib.sha256(result).hexdigest()}
 
 
-class PathDocumentSource:
-    """Interim MCP file adapter for one exact, already-visible Writer file.
-
-    It only reads bytes for a private scratch copy and commits exported bytes;
-    the headless engine never sees this path. Under the OS task-UID model an
-    owner-private file may be unreadable and replacing a bind-mounted original
-    is unsupported, so this is not a managed-save guarantee. A future OS staged
-    read/commit capability replaces this class without changing any tool.
-    """
-
-    def __init__(self, path, *, edit):
-        if not isinstance(path, str) or not path or any(ch in path for ch in "*?[\0"):
-            raise ToolError("invalid_target", "Name one exact DOCX or ODT file; wildcards are not accepted.")
-        self.edit = edit
-        self.path = safe_realpath(path)
-        self.suffix = Path(self.path).suffix.lower()
-        if self.suffix not in DOCUMENT_MEMBERS:
-            raise ToolError("invalid_target", "Yu Office Writer tools support DOCX and ODT documents only.")
-        policy.require("fs.read", path=self.path)
-        if edit:
-            policy.require("fs.write", path=self.path)
-        try:
-            fd = os.open(self.path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
-        except FileNotFoundError:
-            raise ToolError("missing_target", "The document does not exist.") from None
-        except PermissionError:
-            raise ToolError("unreadable_target", "Yu Office cannot read this document.") from None
-        try:
-            info = os.fstat(fd)
-        except BaseException:
-            os.close(fd)
-            raise
-        if not stat.S_ISREG(info.st_mode):
-            os.close(fd)
-            raise ToolError("invalid_target", "The document must be a regular file.")
-        with os.fdopen(fd, "rb") as stream:
-            if info.st_size > MAX_PACKAGE:
-                raise ToolError("document_too_large", "The document must be no larger than 32 MiB.")
-            data = stream.read(MAX_PACKAGE + 1)
-            if len(data) > MAX_PACKAGE or _revision(os.fstat(stream.fileno())) != _revision(info):
-                raise ToolError("stale_revision", "The document changed while reading it; retry.")
-        if edit:
-            try:
-                with ZipFile(io.BytesIO(data)) as archive:
-                    names = [name.lower() for name in archive.namelist()]
-            except BadZipFile:
-                raise ToolError("unreadable_document", "The document is not a DOCX or ODT package.") from None
-            if any(name.startswith("_xmlsignatures/") or (name.startswith("meta-inf/") and "signatures" in name)
-                   for name in names):
-                raise ToolError("unsupported_content", "Yu Office does not change signed documents.")
-        self.info, self.data = info, data
-
-    def read(self):
-        return self.data
-
-    def commit(self, data):
-        if not self.edit:
-            raise ToolError("unauthorized_target", "This call may not change the document.")
-        if len(data) > MAX_PACKAGE:
-            raise ToolError("document_too_large", "The updated document exceeds 32 MiB.")
-        try:
-            if _revision(os.stat(self.path, follow_symlinks=False)) != _revision(self.info):
-                raise ToolError("stale_revision", "The document changed on disk; inspect it again.")
-            snapshot.snapshot(self.path, "write", session_id=current_context().session_id)
-            if _revision(os.stat(self.path, follow_symlinks=False)) != _revision(self.info):
-                raise ToolError("stale_revision", "The document changed on disk; inspect it again.")
-            atomic_write_bytes(self.path, data, mode=stat.S_IMODE(self.info.st_mode) & 0o777, strict=True)
-        except OSError as error:
-            raise ToolError("save_unavailable",
-                            f"Yu Office could not save this document in place ({error.strerror or error}).") from None
-        return {"saved": True, "path": self.path, "sha256": hashlib.sha256(data).hexdigest()}
-
-
 def writer_tool(catalog, name):
-    """Bind one catalog tool to the shared handler with an MCP file target."""
+    """Bind one catalog tool to the shared handler with a brokered file target."""
 
     def handler(**arguments):
         catalog.validate(name, arguments, bound_target=False)
-        source = PathDocumentSource(arguments["path"], edit=name == writer_tools.APPLY)
+        source = BrokeredFile(arguments["path"], edit=name == writer_tools.APPLY)
+        source.read()
         with HeadlessOffice(PROGRAM_DIR) as office:
             result = writer_tools.call(catalog, name, arguments, FileTarget(source, office))
         result.setdefault("path", source.path)

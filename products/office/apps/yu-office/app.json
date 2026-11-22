@@ -27,7 +27,7 @@
         "needs": [
           {
             "verb": "fs.read",
-            "scope": {"kind": "from-arg", "arg": "path"},
+            "scope": {"kind": "from-arg", "arg": "path", "transform": "brokered-file"},
             "why": {"en": "Read only the Office document you asked to inspect.", "zh-CN": "只读取你指定的办公文档。"}
           }
         ],
@@ -50,12 +50,12 @@
         "needs": [
           {
             "verb": "fs.read",
-            "scope": {"kind": "from-arg", "arg": "path"},
+            "scope": {"kind": "from-arg", "arg": "path", "transform": "brokered-file"},
             "why": {"en": "Verify the document revision and locate the unique text match.", "zh-CN": "核对文档版本并定位唯一匹配。"}
           },
           {
             "verb": "fs.write",
-            "scope": {"kind": "from-arg", "arg": "path"},
+            "scope": {"kind": "from-arg", "arg": "path", "transform": "brokered-file"},
             "why": {"en": "Save the replacement only to the same requested document.", "zh-CN": "只将替换结果保存到你指定的原文档。"}
           }
         ],
@@ -78,7 +78,7 @@
         "needs": [
           {
             "verb": "fs.read",
-            "scope": {"kind": "from-arg", "arg": "path"},
+            "scope": {"kind": "from-arg", "arg": "path", "transform": "brokered-file"},
             "why": {"en": "Read only the Writer document you asked to inspect.", "zh-CN": "只读取你指定的 Writer 文档。"}
           }
         ],
@@ -110,7 +110,7 @@
         "needs": [
           {
             "verb": "fs.read",
-            "scope": {"kind": "from-arg", "arg": "path"},
+            "scope": {"kind": "from-arg", "arg": "path", "transform": "brokered-file"},
             "why": {"en": "Read only the Writer document whose change you asked to preview.", "zh-CN": "只读取你要求预览修改的 Writer 文档。"}
           }
         ],
@@ -142,12 +142,12 @@
         "needs": [
           {
             "verb": "fs.read",
-            "scope": {"kind": "from-arg", "arg": "path"},
+            "scope": {"kind": "from-arg", "arg": "path", "transform": "brokered-file"},
             "why": {"en": "Verify the revision of the Writer document you asked to change.", "zh-CN": "核对你要求修改的 Writer 文档的版本。"}
           },
           {
             "verb": "fs.write",
-            "scope": {"kind": "from-arg", "arg": "path"},
+            "scope": {"kind": "from-arg", "arg": "path", "transform": "brokered-file"},
             "why": {"en": "Save the confirmed change only to the same requested document.", "zh-CN": "只将确认的修改保存到你指定的原文档。"}
           }
         ],
