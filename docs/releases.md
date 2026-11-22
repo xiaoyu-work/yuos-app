@@ -14,8 +14,10 @@ trust-root override.
 [Yu Office](../products/office/MODULE.md) is an independent product selection
 (`office`), not a stock LibreOffice dependency or an OS preinstall. Its desktop
 package builds the ordered patches against the checked upstream source and
-enters **Yu OS Apps** through this same signed APT channel. Distribution
-LibreOffice remains available separately under **Linux Apps**.
+enters **Yu OS Apps** through this same signed APT channel. On both amd64 and
+arm64, `yuos-app-office-desktop` owns the `yu-office` App and is not part of
+`yuos-apps-agent`. Distribution LibreOffice remains available separately under
+**Linux Apps**.
 
 ## Platform publication status
 
