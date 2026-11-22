@@ -193,8 +193,8 @@ commands retain their meaning; capability selection is explicit, never a
 filesystem fallback. Names cannot collide across kinds. Document Engine owns
 `doc`; Storage SDK owns `db` and `kv`; HTTP owns `net`; AI Helpers owns
 `summarize`. Independent App releases select 63 identities across 24 business
-products and four shared-capability groups: 51 Agent and 12 desktop. Desktop
-Shell is an additional OS build input. Native preparation remains product-only.
+products and four shared-capability groups: 51 Agent and 12 desktop. Native
+preparation remains product-only.
 Source completion does not complete shared-state/backend or identity cutovers,
 new UI work, or installed visual/hardware acceptance. Eleven messaging connectors were explicitly
 retired after the original 75-identity source relocation; their previous
@@ -283,14 +283,12 @@ interactive acceptance. See
 [Storage SDK's dependency contract](capabilities/storage-sdk/MODULE.md#dependency-contracts-and-independent-evolution).
 
 The native Calendar library accepts an `AgendaProvider` callback rather than
-depending on another App. The OS shell links the library and injects its
-shared read-only Calendar provider; policy checks remain before database
-access. UI resources and build inputs are product-owned. Development checks
-out only the locked shared `desktop/toolkit` source, including its iced tree,
-into a separate native dependency cache. OS builds use their own forked
-toolkit and immutable App source pin. The panel manifest and compiled shell
-remain in `yuos-desktop`; Calendar's Python backend remains in
-`yuos-agent`. Installed state, grants and signed APT updates do not change.
+depending on another App. Its independent panel reads the OS Calendar service
+through the public SDK, with policy checks before database access. UI resources
+and build inputs are product-owned; native development uses the verified
+platform's toolkit and SDK. The OS shell does not link the Calendar UI. The
+panel retains its manifest and grants, and Calendar's data and App APT
+ownership do not change.
 
 Clipboard's complete native popup and resources use the same native
 staging/build mechanism. The existing `panel-clipboard` identity owns its
