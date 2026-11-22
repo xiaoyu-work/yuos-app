@@ -30,16 +30,6 @@ EXTRA_NATIVE = {
         "libglu1-mesa-dev", "libavahi-client-dev", "libgstreamer1.0-dev",
         "libgstreamer-plugins-base1.0-dev", "libicu-dev", "libcurl4-openssl-dev",
     ],
-    "desktop-shell": [
-        "ninja-build", "patchelf", "libpam0g-dev", "libgl-dev", "libgles-dev",
-        "libwayland-dev/trixie-backports", "wayland-protocols/trixie-backports",
-        "libharfbuzz-dev", "libicu-dev", "libglib2.0-dev", "libssl-dev", "libzstd-dev",
-        "libpng-dev", "libjpeg-dev", "libwebp-dev", "libsqlite3-dev", "libpulse-dev", "libpipewire-0.3-dev",
-        "libgstreamer1.0-dev", "libgstreamer-plugins-base1.0-dev",
-        "libgstreamer-plugins-bad1.0-dev", "libqalculate-dev",
-        "libaubio-dev", "libfftw3-dev", "libsensors-dev", "libcli11-dev", "libjemalloc-dev",
-        "libunwind-dev", "libvulkan-dev",
-    ],
 }
 
 
@@ -51,8 +41,6 @@ def dependencies(plan, mode, architecture):
         result.extend(NATIVE)
         for selection in plan["selections"]:
             result.extend(EXTRA_NATIVE.get(selection, []))
-        if "desktop-shell" in plan["selections"]:
-            result.remove("libwayland-dev")
     return sorted(set(result))
 
 
@@ -60,34 +48,20 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=["test", "build"])
     parser.add_argument("--plan", type=Path)
-    parser.add_argument("--desktop-shell", action="store_true", help="Provision the OS Desktop Shell build")
     parser.add_argument("--architecture", choices=["all", "amd64", "arm64"], default="all")
     options = parser.parse_args()
-    if options.desktop_shell and (options.plan or options.mode != "build" or options.architecture == "all"):
-        parser.error("--desktop-shell requires a native build without an App APT plan")
     if os.environ.get("GITHUB_ACTIONS") != "true":
         raise ValueError("CI provisioning is forbidden on a developer's host")
     scratch = ROOT / "build/ci-work"
     scratch.mkdir(parents=True, exist_ok=True)
     environment = {**os.environ, "TMPDIR": str(scratch), "DEBIAN_FRONTEND": "noninteractive"}
-    plan = load_plan(options.plan) if options.plan else {
-        "selections": ["desktop-shell"] if options.desktop_shell else [],
-    }
+    plan = load_plan(options.plan) if options.plan else {"selections": []}
     sources = next((path for path in [
         Path("/etc/apt/sources.list.d/debian.sources"),
         Path("/etc/apt/sources.list.d/ubuntu.sources"),
     ] if path.is_file() and path.stat().st_size), None)
     if sources is None:
         raise ValueError("The runner has no declared Debian/Ubuntu distribution sources")
-    if options.mode == "build" and options.architecture != "all" and "desktop-shell" in plan["selections"]:
-        if sources.name != "debian.sources" or "VERSION_CODENAME=trixie" not in Path("/etc/os-release").read_text().splitlines():
-            raise ValueError("The desktop shell's native release build requires Debian 13")
-        selected_sources = scratch / "desktop-shell.sources"
-        selected_sources.write_text(sources.read_text().rstrip() + "\n\n"
-                                    "Types: deb\nURIs: https://deb.debian.org/debian\n"
-                                    "Suites: trixie-backports\nComponents: main\n"
-                                    "Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg\n")
-        sources = selected_sources
     sudo = [] if os.geteuid() == 0 else ["sudo"]
     apt = [*sudo, "apt-get", "-o", f"Dir::Etc::sourcelist={sources}", "-o", "Dir::Etc::sourceparts=-"]
     subprocess.run([*apt, "update", "-qq"], check=True, env=environment)

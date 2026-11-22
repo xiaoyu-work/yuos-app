@@ -68,12 +68,6 @@ source group's `MODULE.md` before changing its boundary.
   bytes, use the existing signer and common Host, and keep unsupported
   resource/argument/authority integration explicitly gated.
 
-The replacement desktop UI source baseline starts at
-[`products/desktop-shell/MODULE.md`](products/desktop-shell/MODULE.md).
-It is a registered GUI-only App, not yet the activated desktop session. Keep compositor, login/session
-and permission authority in `yuos`; source import does not authorize an
-upstream installer or unmanaged desktop launch.
-
 ```bash
 python3 tools/test.py mail
 python3 tools/test.py mail calendar
@@ -92,7 +86,8 @@ completion separate from pending backend/state/identity consolidation or new
 UI work. AI Helpers owns only the `summarize` client; other products use SDK AI
 directly. Its tests must use isolated synthetic public AI/policy/memory wire
 fixtures, never paid/live models or another product's consent/budget.
-Desktop Shell is an additional GUI identity and product, built as an OS input.
+The Desktop Shell is an OS component built and sealed in `xiaoyu-work/Yu-OS`;
+do not restore it here as an App product or build input.
 
 Independent release work starts at [`packaging/MODULE.md`](packaging/MODULE.md)
 and [`docs/releases.md`](docs/releases.md). `tools/release.py plan --select ...`

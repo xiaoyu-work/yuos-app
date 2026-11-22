@@ -383,7 +383,7 @@ pin, complete OS integration or declare release readiness.
 
 The Yu OS App builds target `/usr/local/bin/yu` and require the new
 `yuos-app-runtime-v1` package provider. Use matching App packages for the
-corresponding OS build, which builds its Desktop Shell from pinned source.
+corresponding OS build, which builds its own Desktop Shell.
 Previously published assets keep their original bytes and are not a Yu OS
 runtime fallback.
 
@@ -488,25 +488,11 @@ incomplete or altered artifacts block the build; source fixtures are not a
 fallback. Image composition installs the same checked App `.deb` bytes as
 separate dpkg owners in the ordinary transaction.
 
-### Desktop Shell build input
+### Desktop Shell
 
-The GUI-only `desktop-shell` is included in `yuos-desktop`, not published
-as an App `.deb` or offered by the Store. OS release CI checks out the exact
-pinned App source commit and runs these commands on native Debian 13 for each
-`ARCHITECTURE` (`amd64` or `arm64`):
-
-```bash
-python3 tools/release_ci.py build --desktop-shell --architecture "$ARCHITECTURE"
-python3 tools/build_desktop_shell.py --architecture "$ARCHITECTURE"
-```
-
-`build/desktop-shell/unsigned-<arch>.tar.gz` contains the unchanged App
-manifest, native payload and `build.json` (`yuos.desktop-shell-build/v1`).
-The metadata records `architecture`, the full checkout SHA as
-`source_revision`, Debian `depends`, and the App manifest's version as
-`release_version`. No separate Shell release or signing credentials are needed
-to build it. The OS sign/package job validates the input and seals the App
-before embedding it.
+The Desktop Shell is an OS component: `xiaoyu-work/Yu-OS` owns its source,
+native build and sealing for `yuos-desktop`. This repository provides no Shell
+source, build input, App `.deb` or Store entry.
 
 The OS shell no longer links Calendar/Clipboard UI or
 Notifications-private config/util. App packages retain the original panel

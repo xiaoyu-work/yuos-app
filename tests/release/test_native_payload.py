@@ -210,15 +210,15 @@ def test_gui_only_native_plan_needs_no_placeholder_mcp(tmp_path, monkeypatch):
 
 def test_private_qml_resources_stay_inside_the_signed_app(installer, tmp_path):
     selected, installed = installer("capture")
-    private = installed / "usr/share/desktop-shell/qml/Panel.qml"
+    private = installed / "usr/share/capture-panel/qml/Panel.qml"
     private.parent.mkdir(parents=True)
     private.write_bytes(b"import QtQuick\nItem {}\n")
-    selected = replace(selected, private_resources=("usr/share/desktop-shell",))
+    selected = replace(selected, private_resources=("usr/share/capture-panel",))
     destination = tmp_path / "installed"
     native_payload.install(selected, installed, destination, ARCHITECTURE)
     retained = destination / selected.installed_app / "resources" / private.relative_to(installed)
     assert retained.read_bytes() == private.read_bytes()
-    assert not (destination / "usr/share/desktop-shell").exists()
+    assert not (destination / "usr/share/capture-panel").exists()
 
 
 @pytest.mark.parametrize("product", PRODUCTS)

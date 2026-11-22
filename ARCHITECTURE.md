@@ -63,7 +63,6 @@ already been published or that every physical device has been exercised.
 
 | Surface | Owner |
 | --- | --- |
-| `products/desktop-shell/` | Registered GUI-only Caelestia/CLI/Material-shape source and bundled Quickshell engine, with a CMake payload and common-Host entry; not yet the installed session; display authority and system services remain OS-owned |
 | `products/mail/` | Thunderbird source, Mail AI, native-account Email, extension UI and product packaging; legacy SMTP gateway retired |
 | `products/calendar/` | Local events, Google/Outlook integration, Calendar MCP and the complete native panel UI library/assets |
 | `products/files/` | Complete native Files UI/library/companion, filesystem MCP and private reviewed file plans, owner-scoped Recoll, shared document parsing and SDK AI |
@@ -104,9 +103,9 @@ already been published or that every physical device has been exercised.
 
 App release CI builds selected independently versioned Debian packages. OS
 images and installed systems consume named packages from the separately signed
-App APT channel, not product source copied into an OS package. OS release CI
-builds Desktop Shell from a pinned App source commit and seals it before
-embedding it in `yuos-desktop`. There is no separate Shell Debian package.
+App APT channel, not product source copied into an OS package. The Desktop
+Shell is an OS component whose source and build belong to `yuos`; there is no
+separate Shell Debian package.
 Existing installed App paths, exact identities, grants and publisher
 provenance checks remain intact.
 The OS still owns privileged package transactions and its security-floor gates;

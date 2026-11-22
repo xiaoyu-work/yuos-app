@@ -18,9 +18,6 @@ construction or a privileged updater.
 - `../tools/release.py` builds exact kinded App payloads as real Debian packages;
   `release_apt.py` retains and authenticates the complete repository;
   `release_publish.py` handles immutable Releases, state commits and refresh.
-- `../tools/build_desktop_shell.py` builds the unsigned Desktop Shell archive
-  from the pinned App checkout in OS CI. The OS validates and seals it for
-  `yuos-desktop`; there is no App APT or Store entry.
 - `../tools/native_payload.py` consumes original native installer output,
   prepares complete package-local App executables/resources/licenses and emits
   only common-Host compatibility launchers. Its unsigned preparation is input

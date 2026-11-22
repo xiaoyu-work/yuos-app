@@ -50,10 +50,8 @@ source ownership is not backend consolidation or visual acceptance.
 | Notifications | [products/notifications](products/notifications/README.md) | Complete native Layer Shell UI/crates/build and Python `notify` send/list; shared authoritative OS state/delivery with distinct producer grants; old JSON preserved in place, not imported |
 
 Start with [ARCHITECTURE.md](ARCHITECTURE.md) and [AGENTS.md](AGENTS.md).
-The new [Desktop Shell source baseline](products/desktop-shell/README.md)
-contains the complete editable Caelestia frontend and matching source
-dependencies. It is a registered GUI-only App built as an OS input, outside
-the independent App release counts above.
+The Desktop Shell is an OS component owned and built by `xiaoyu-work/Yu-OS`,
+not an App in this repository.
 Messaging connector sources are grouped under
 [products/messaging-channels](products/messaging-channels/README.md), starting
 with Discord, Telegram, Slack and WhatsApp.
