@@ -441,6 +441,11 @@ impl cosmic::Application for SettingsApp {
 
             Message::PageMessage(message) => match message {
                 crate::pages::Message::CloseContextDrawer => return self.close_context_drawer(),
+                crate::pages::Message::AiBudget(message) => {
+                    if let Some(page) = self.pages.page_mut::<system::ai_budget::Page>() {
+                        return page.update(message).map(Into::into);
+                    }
+                }
                 crate::pages::Message::MachineSettings(login, message) => {
                     let task = if login {
                         self.pages

@@ -54,7 +54,7 @@ def test_original_manifest_authority_and_sdk_catalog_are_preserved(sdk_app):
     manifest = json.loads(Path(__file__).with_name("app.json").read_text())
     assert manifest["id"] == "doc"
     assert manifest["ai"] == {
-        "budget": {"monthly_units": 200000}, "safety": "strict",
+        "safety": "strict",
         "origins": ["external-content"],
     }
     operations = manifest["operations"]

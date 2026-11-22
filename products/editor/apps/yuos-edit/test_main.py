@@ -26,7 +26,6 @@ def test_manifest_preserves_exact_authority_and_ai_identity():
     for verb in ("fs.read", "fs.write"):
         assert optional[verb]["scope"] == {"kind": "owner-path", "path": "**"}
     assert manifest["ai"] == {
-        "budget": {"monthly_units": 200000},
         "safety": "strict", "origins": ["external-content"],
     }
     tools = {tool["name"]: tool for tool in manifest["mcp"]["tools"]}

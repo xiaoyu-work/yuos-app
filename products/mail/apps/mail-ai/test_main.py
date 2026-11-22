@@ -143,7 +143,7 @@ def test_invalid_input_has_no_effects(verb, args, effects):
 
 
 @pytest.mark.parametrize("error,expected", [
-    (main.ai.AiBudgetExceeded({"error": "over"}), {"error": "AI budget exceeded for this app", "detail": {"error": "over"}}),
+    (main.ai.AiBudgetExceeded({"error": "over"}), {"error": "Monthly AI budget exceeded", "detail": {"error": "over"}}),
     (main.ai.AiSafetyViolation({"error": "unsafe"}), {"error": "safety violation", "detail": {"error": "unsafe"}}),
     (main.ai.AiDenied({"error": "no consent"}), {"error": "AI call denied", "detail": {"error": "no consent"}}),
     (main.ai.AiUnavailable("offline"), {"error": "AI unavailable: offline"}),
@@ -242,7 +242,7 @@ def test_manifest_is_single_schema_and_headless():
     assert all(need["why"]["en"].strip() for need in native_host["needs"])
     assert "thunderbird" not in MANIFEST.get("dependencies", {}).get("binaries", [])
     assert MANIFEST["ai"] == {
-        "budget": {"monthly_units": 500000}, "safety": "strict", "origins": ["external-content"],
+        "safety": "strict", "origins": ["external-content"],
     }
     assert len(MANIFEST["mcp"]["tools"]) == len(main.HANDLERS) == 6
     for tool in MANIFEST["mcp"]["tools"]:

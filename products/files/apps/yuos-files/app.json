@@ -85,9 +85,6 @@
     }
   },
   "ai": {
-    "budget": {
-      "monthly_units": 200000
-    },
     "safety": "strict",
     "origins": [
       "external-content"

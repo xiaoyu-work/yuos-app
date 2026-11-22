@@ -24,9 +24,9 @@ The OS supplies SDK/runtime; the separately staged App common runtime supplies
 
 Read/info retain their exact file/metadata checks and descriptor-safe behavior;
 convert retains its existing read/write declaration and output behavior.
-Summarize/explain/rewrite keep the `external-content` origin, strict safety,
-200,000-unit monthly App budget and existing per-call bounds. Summary memory
-remains `doc`-scoped under the unchanged manifest. No data or grants move, and
+Summarize/explain/rewrite keep the `external-content` origin, strict safety
+and existing per-call bounds. Monthly usage counts against the owner-set App AI
+limit. Summary memory remains `doc`-scoped. No data or grants move, and
 source grouping neither retires the identity nor completes backend redesign.
 First-party source remains covered by the repository root license.
 

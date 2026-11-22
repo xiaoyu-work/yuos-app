@@ -10,7 +10,7 @@ model policy and signed installation.
 | --- | --- |
 | `comm/` | Full Thunderbird source; native account, message and compose engine |
 | `apps/mail-ai/` | Existing six shared AI operations and manifest |
-| `apps/email/` | Thunderbird-backed Agent operations, account-scoped needs, stable objects, arrival cursors and submission receipts |
+| `apps/email/` | Thunderbird-backed Mail MCP adapter, stable objects, arrival cursors and submission receipts |
 | `extension/` | AI UI plus native mailbox business operations using Thunderbird's existing account/message APIs |
 | `build.py`, `mozconfig`, `upstream.json` | Matched native source build |
 | `build-extension.py`, `package.json` | Deterministic XPI and installed asset ownership |
@@ -22,18 +22,17 @@ grant access to a user's profile. Retained `mail-ai` and `email` identities and
 paths remain separate. The legacy `gateway-email` App is explicitly retired;
 its source and active installation selection are removed, not aliased to Email.
 Existing credentials and installed user data are not deleted or migrated.
-The Email backend cutover does not merge identities or move account data. Its newly declared mail
-permissions require the normal owner authorization; old provider grants are
-not converted into mailbox or sender authority.
+Email operates on the owner's signed-in Thunderbird accounts. Mailbox calls
+are product-owned, not grantable SDK permissions. Filesystem, event, App
+storage and AI/memory needs still use their own grants.
 
 ## Activity message objects
 
 `email` declares `thunderbird-message` and `thunderbird-draft` object types.
 Their IDs encode the profile-qualified account, native folder and RFC Message-ID,
 not Thunderbird's numeric IDs, which change on restart or movement.
-`native_message` and `native_draft` resolve through the ordinary mailbox client.
-Their wildcard declarations inherit already bounded mailbox rights; the OS
-checks the exact account encoded in the ID. They do not grant all-account access.
+`native_message` and `native_draft` resolve through Mail's private dispatch.
+The exact profile and account encoded in the ID are still checked.
 Read/search/list results include canonical `app://email/TYPE?id=...` references.
 References do not fetch data, grant access or merge accounts. Moved, missing
 or ambiguous messages fail explicitly. Old provider object types/arguments
@@ -59,12 +58,12 @@ Event failures preserve the original operation result and never repeat its
 external effect. Exact `ipc.publish:app:email` needs are disclosed separately.
 
 `draft_save` saves a real draft through Thunderbird's background message API.
-Replacing a draft additionally requires its explicit `source-account` and
-separate read/draft rights there. The sender's configured Drafts folder can
+Replacing a draft additionally requires its explicit matching `source-account`.
+The sender's configured Drafts folder can
 belong to another mailbox; returned references identify that actual mailbox.
 `native_draft` exposes To/Cc/Bcc, text/HTML and attachment byte fingerprints.
 `draft_send` requires the complete current review, explicit confirmation,
-mailbox read/draft rights and independent `sender-account` send authority.
+and an explicit `sender-account` from the same Thunderbird profile.
 The bytes and recipients sent come from the captured reviewed snapshot.
 Only an unchanged source draft is removed after successful save/send;
 concurrent edits or cleanup failures retain it and are reported explicitly.
@@ -87,14 +86,21 @@ parents must exist; private atomic creation never overwrites an existing
 entry. Failed durability after creation is reported as indeterminate.
 Attachment filenames never select a destination. `attachment-file` references
 resolve through `attachment_file` with only exact metadata authority, while
-downloads require `mail.read` plus exact `fs.write`. The OS persists bytes
+downloads require exact `fs.write`. The OS persists bytes
 through its existing pinned non-overwriting filesystem target and task-bound
 snapshot path. Attachment bytes do not cross the Python SDK response limit.
 
-Email uses the published SDK's explicit-binary/cancellable kernel transport
-for `yu __mail request --request-stdin`. The ordinary Host supplies the real
-session. `yuosd` validates closed requests, account grants and owner identity;
-no caller can choose a provider socket, UID, profile path or executable.
+Email calls `yu __mail request --request-stdin` using the SDK's existing
+explicit-binary/cancellable transport. The wire is private to authenticated
+`email` Host dispatch; it is not a public mailbox client. `yuosd` validates
+closed requests, the owner and active Thunderbird profile. No caller can
+choose a provider socket, UID, profile path or executable.
+The signed Email App tree carries `mail-private-protocol.json` with protocol
+version 2. The matching XPI announces version 2 in `mailbox.ready`; request,
+response and AI-only message shapes are unchanged.
+Standalone CLI mailbox operations and same-App Web tools are retained, and
+must both reach the verified OS Host. Ordinary relay handles cannot use this
+private dispatch. Verify both paths against the matching OS before publishing.
 When needed it starts fixed Thunderbird through the owner's service manager,
 without the Agent UI or model loop. Installed session/display prerequisites
 still apply; unavailable services are explicit errors.

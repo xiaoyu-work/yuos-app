@@ -140,7 +140,6 @@ def test_manifest_retains_ai_consent_and_exact_memory_ownership(client):
     assert client.manifest["version"] == "0.1.0"
     assert not client.manifest.get("operations")
     assert client.manifest["ai"] == {
-        "budget": {"monthly_units": 100000},
         "safety": "strict", "origins": ["external-content"],
     }
     needs = client.manifest["mcp"]["tools"][0]["needs"]

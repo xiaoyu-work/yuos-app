@@ -10,7 +10,12 @@ YuOsApp.ready.then((app) => {
     if (value.model) details.push(`Model: ${value.model}`);
     if (value.provider) details.push(`Provider: ${value.provider}`);
     if (value.usage) details.push(`App-reported usage: ${value.usage.units} units`);
-    if (value.budget) details.push(`App budget ${value.budget.period}: ${value.budget.units_used} / ${value.budget.units_cap} units`);
+    if (value.budget) {
+      const { period, units_used, units_cap } = value.budget;
+      const usage = units_cap === 0 ? `${units_used} units used (unlimited)` :
+        `${units_used} of ${units_cap} units used`;
+      details.push(`Shared App AI budget ${period}: ${usage}`);
+    }
     document.querySelector("#usage").textContent = details.join(" - ");
   }
   form.onsubmit = (event) => {

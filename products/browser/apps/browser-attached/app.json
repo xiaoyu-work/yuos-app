@@ -11,9 +11,6 @@
   "icon": "🦾",
   "runtime": "python",
   "ai": {
-    "budget": {
-      "monthly_units": 0
-    },
     "safety": "strict",
     "origins": [
       "external-content"

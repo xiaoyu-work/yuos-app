@@ -49,6 +49,10 @@ from not running the AI Agent. An unavailable daemon must produce an explicit
 error, including for independent Root clients; Root is not a second App
 integration path. Only features that explicitly request AI depend on the
 OS AI gate and its consent, capability and budget checks.
+The owner sets one monthly limit for AI calls from Apps in System & accounts
+→ AI Budget. App manifests declare AI safety and origin policy, not spend
+limits. The OS tracks aggregate usage, warns near the limit and blocks calls
+that would exceed it.
 
 The shared OS launch and installation/update/rollback coordination are tracked
 in [contract status](docs/releases.md#one-app-integration-contract).
@@ -206,7 +210,7 @@ rejects conflicting bytes, modes, symlinks or extra installed files; it never
 merges library trees. The OS supplies the SDK/runtime; the common App support dependency supplies the
 canonical argument module. No other App implementation or mutable runtime
 loader is imported.
-Doc's six operations, CLI bindings, signed schema, AI budget/safety/origin,
+Doc's six operations, CLI bindings, signed schema, AI safety/origin,
 existing grants, document outputs and `doc` memory identity are unchanged.
 This is source ownership, not identity retirement, a grant union, new backend
 authority, user-data relocation or completion of the broader product redesign.
@@ -257,13 +261,13 @@ only after commit, and explicitly use private file modes. Corruption is an
 error, not an empty-store or repair fallback; installed state is not migrated.
 
 Summarize retains explicit text input, the strict external-content AI policy,
-100,000 monthly units and the 4,000-unit request cap. Its public SDK call does
+and the 4,000-unit request cap. Its public SDK call does
 not select a provider/model or call the Agent. It returns the same summary,
 usage/budget/review fields and asks the OS memory export to record a bounded
 first line under `self:summarize`; no local store or other product consent is
 borrowed. The AI need now uses fixed wildcard binding to match its unchanged
-runtime check rather than borrowing incompatible named-model grants. Consent's
-AI snapshot and stored grants remain unchanged; see
+runtime check rather than borrowing incompatible named-model grants. AI safety
+and origin declarations and stored grants remain unchanged; see
 [AI Helpers](capabilities/ai-helpers/MODULE.md). Other products use SDK AI directly,
 not this App.
 

@@ -47,18 +47,21 @@ class TestThunderbirdEmail(unittest.TestCase):
         self.call.return_value = {"accounts": [{"id": ACCOUNT}], "backend": "thunderbird"}
         self.assertEqual(email.run("accounts", [])["accounts"], [{"id": ACCOUNT}])
         self.assertNotIn("account", self.request())
-        self.require.assert_called_with("mail.accounts", wild=True)
         self.call.return_value = {"account": ACCOUNT, "messages": [{"id": reference()}]}
         result = email.run("list", [
             f"--account={ACCOUNT}", "--max-results=3", "--unread=false",
         ])
         self.assertEqual(self.request()["args"], {"max_results": 3, "unread": False})
         self.assertIn("thunderbird-message", result["messages"][0]["object"])
-        self.require.assert_called_with("mail.read", name=ACCOUNT)
         self.call.return_value = {"account": ACCOUNT, "id": reference(), "body": "Native body"}
         result = email.run("read", [f"--account={ACCOUNT}", f"--id={reference()}"])
         self.assertEqual(result["body"], "Native body")
         self.assertEqual(self.request()["action"], "read")
+        result = email.run("native_message", [f"--id={reference()}"])
+        self.assertEqual(result["body"], "Native body")
+        self.assertEqual(self.request()["action"], "read")
+        self.assertEqual(self.request()["account"], ACCOUNT)
+        self.require.assert_not_called()
 
     def test_missing_account_legacy_providers_and_cross_account_ids_do_not_dispatch(self):
         for command, args in [
@@ -70,22 +73,19 @@ class TestThunderbirdEmail(unittest.TestCase):
         self.call.assert_not_called()
         self.require.assert_not_called()
 
-    def test_draft_confirmation_and_source_account_are_validated_before_policy(self):
+    def test_draft_confirmation_and_source_account_are_validated_before_dispatch(self):
         args = [
             f"--account={ACCOUNT}", f"--sender-account={OTHER}",
             f"--id={reference()}", "--review=sha256:" + "a" * 64,
         ]
         self.assertIn("error", email.run("draft_send", [*args, "--confirm=false"]))
-        self.require.assert_not_called()
+        self.call.assert_not_called()
         self.call.return_value = {"account": ACCOUNT, "error": "draft changed", "conflicted": True}
         result = email.run("draft_send", [*args, "--confirm=true"])
         self.assertTrue(result["conflicted"])
         self.assertEqual(self.request()["args"]["sender_account"], OTHER)
-        self.assertEqual(self.require.call_args_list[-3].args, ("mail.read",))
-        self.assertEqual(self.require.call_args_list[-2].args, ("mail.draft",))
-        self.assertEqual(self.require.call_args_list[-1].kwargs, {"name": OTHER})
+        self.assertIs(self.request()["args"]["confirm"], True)
         self.publish.assert_not_called()
-        self.require.reset_mock()
         self.call.reset_mock()
         result = email.run("draft_save", [
             f"--account={OTHER}", f"--id={reference()}",
@@ -108,7 +108,7 @@ class TestThunderbirdEmail(unittest.TestCase):
             self.assertNotIn("error", result)
             self.assertEqual(self.request()["args"]["output"], path)
             self.assertEqual(self.request()["args"]["max_bytes"], 16777216)
-            self.require.assert_any_call("fs.write", path=path)
+            self.require.assert_called_once_with("fs.write", path=path)
             self.assertNotIn("data", result)
             self.call.reset_mock()
             result = email.run("attachment_download", [

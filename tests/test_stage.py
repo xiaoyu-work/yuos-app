@@ -791,6 +791,7 @@ def test_mail_stage_contains_matching_app_and_ui_without_os_runtime(tmp_path):
     email = tmp_path / "usr/lib/yuos/apps/email"
     assert (email / "main.py").is_file()
     assert (email / "server.py").is_file()
+    assert json.loads((email / "mail-private-protocol.json").read_bytes()) == {"version": 2}
     assert not (email / "test_main.py").exists()
     assert not (tmp_path / "usr/lib/yuos/apps/_shared").exists()
     gateway = tmp_path / "usr/lib/yuos/apps/gateway/email"

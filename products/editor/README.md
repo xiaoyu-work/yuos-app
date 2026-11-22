@@ -10,7 +10,7 @@ OS desktop packages consume an immutable source revision; no source cache,
 credentials, user documents or editor settings are shipped by this move.
 
 The interactive AI actions and MCP AI tools share the gated SDK helper as
-`yuos-edit`, with strict safety, `external-content` origin and the existing
-200,000-unit monthly budget. Interactive requests operate on the unsaved
+`yuos-edit`, with strict safety and `external-content` origin. Monthly usage
+counts against the owner-set App AI limit. Interactive requests operate on the unsaved
 buffer; file-based MCP requests retain controlled bounded reads. Summaries,
 explanations and replacement proposals do not silently save files or memory.

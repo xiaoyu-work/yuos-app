@@ -819,6 +819,20 @@ legacy-app-scaling = X11 窗口系统应用程序缩放
 ## System
 
 system = 系统与账户
+ai-budget = AI 预算
+ai-budget-description = 查看和设置所有应用共用的每月 AI 使用上限。
+ai-budget-help = 上限按应用合计的整数用量单位计算，不是金额。输入 0 表示不限额。接近上限时，Yu OS 会提醒你，并阻止会超出上限的新调用。
+ai-budget-period = 统计月份
+ai-budget-used = 已使用单位
+ai-budget-saved-limit = 上次确认的每月上限
+ai-budget-limit = 新的每月上限
+ai-budget-unlimited = 不限额
+ai-budget-invalid = 请用 0–9 输入 0 到 9223372036854775807 之间的整数。
+ai-budget-refresh = 刷新
+ai-budget-loading = 正在加载 AI 预算…
+ai-budget-saving = 正在保存 AI 预算…
+ai-budget-load-failed = 无法加载 AI 预算。{ $detail }
+ai-budget-save-failed = 无法确认新的 AI 预算。{ $detail }
 yuos-sign-in = 登录
 yuos-sign-in-description = 自动登录每次开机只执行一次。解锁屏幕和管理员操作仍需要验证。
 yuos-auto-login = 开机自动登录

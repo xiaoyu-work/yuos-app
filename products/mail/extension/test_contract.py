@@ -156,17 +156,22 @@ const ctx = vm.createContext({
 });
 vm.runInContext(fs.readFileSync(process.argv[1], "utf8"), ctx);
 ctx.self.YuOsNative.connect("os.yuos.mail_ai");
-for (const args of [false, null, [], "", {body: true}]) {
-  ctx.self.YuOsNative.call("summarize", args);
-}
-process.stdout.write(JSON.stringify(sent.map(request => request.args)));
+ctx.self.YuOsNative.setMailboxHandler(() => {}, Promise.resolve());
+Promise.resolve().then(() => {
+  for (const args of [false, null, [], "", {body: true}]) {
+    ctx.self.YuOsNative.call("summarize", args);
+  }
+  process.stdout.write(JSON.stringify([sent[0], sent.slice(1).map(request => request.args)]));
+});
 """
     process = subprocess.run(
         ["node", "-e", script, str(HERE / "lib" / "native.js")],
         capture_output=True, text=True, timeout=10, cwd=HERE,
     )
     assert process.returncode == 0, process.stderr
-    assert json.loads(process.stdout) == [False, None, [], "", {"body": True}]
+    assert json.loads(process.stdout) == [
+        {"type": "mailbox.ready", "version": 2}, [False, None, [], "", {"body": True}],
+    ]
 
 
 MAILBOX_DRIVER = r"""

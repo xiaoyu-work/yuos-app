@@ -35,7 +35,7 @@
     if (!mailboxHandler || !mailboxReady || !port) return;
     const current = port;
     mailboxReady.then(() => {
-      if (port === current) current.postMessage({ type: "mailbox.ready", version: 1 });
+      if (port === current) current.postMessage({ type: "mailbox.ready", version: 2 });
     }).catch(() => console.error("[yuos-mail] mailbox initialization failed"));
   }
 

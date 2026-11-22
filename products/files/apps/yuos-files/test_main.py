@@ -61,7 +61,7 @@ def test_preserves_native_catalog_and_exact_authority():
     panel = next(need for need in applet["needs"] if need["verb"] == "ui.panel")
     assert panel["scope"] == {"kind": "fixed", "scope": {"kind": "wild"}}
     assert manifest["ai"] == {
-        "budget": {"monthly_units": 200000}, "safety": "strict",
+        "safety": "strict",
         "origins": ["external-content"],
     }
     tools = {tool["name"]: tool for tool in manifest["mcp"]["tools"]}

@@ -48,9 +48,6 @@
     }
   },
   "ai": {
-    "budget": {
-      "monthly_units": 100000
-    },
     "safety": "standard",
     "origins": [
       "trusted"
@@ -62,17 +59,7 @@
         "en": "List the owner's existing Thunderbird accounts and sender identities"
       },
       "args": [],
-      "needs": [
-        {
-          "verb": "mail.accounts",
-          "scope": {
-            "kind": "wild"
-          },
-          "why": {
-            "en": "List configured account metadata, not messages or credentials."
-          }
-        }
-      ],
+      "needs": [],
       "effects": [
         {
           "kind": "read",
@@ -109,18 +96,7 @@
           "binding": "flag"
         }
       ],
-      "needs": [
-        {
-          "verb": "mail.read",
-          "scope": {
-            "kind": "from-arg",
-            "arg": "account"
-          },
-          "why": {
-            "en": "Read only the explicitly selected Thunderbird mailbox."
-          }
-        }
-      ],
+      "needs": [],
       "effects": [
         {
           "kind": "read",
@@ -177,18 +153,7 @@
           "default": false
         }
       ],
-      "needs": [
-        {
-          "verb": "mail.read",
-          "scope": {
-            "kind": "from-arg",
-            "arg": "account"
-          },
-          "why": {
-            "en": "Read only the explicitly selected Thunderbird mailbox."
-          }
-        }
-      ],
+      "needs": [],
       "effects": [
         {
           "kind": "read",
@@ -244,18 +209,7 @@
           "default": 10
         }
       ],
-      "needs": [
-        {
-          "verb": "mail.read",
-          "scope": {
-            "kind": "from-arg",
-            "arg": "account"
-          },
-          "why": {
-            "en": "Read only the explicitly selected Thunderbird mailbox."
-          }
-        }
-      ],
+      "needs": [],
       "effects": [
         {
           "kind": "read",
@@ -298,18 +252,7 @@
           "binding": "flag"
         }
       ],
-      "needs": [
-        {
-          "verb": "mail.read",
-          "scope": {
-            "kind": "from-arg",
-            "arg": "account"
-          },
-          "why": {
-            "en": "Read only the explicitly selected Thunderbird mailbox."
-          }
-        }
-      ],
+      "needs": [],
       "effects": [
         {
           "kind": "read",
@@ -346,17 +289,7 @@
           "binding": "flag"
         }
       ],
-      "needs": [
-        {
-          "verb": "mail.read",
-          "scope": {
-            "kind": "wild"
-          },
-          "why": {
-            "en": "Inherit existing mailbox rights; the OS checks the account encoded in the reference."
-          }
-        }
-      ],
+      "needs": [],
       "effects": [
         {
           "kind": "read",
@@ -393,17 +326,7 @@
           "binding": "flag"
         }
       ],
-      "needs": [
-        {
-          "verb": "mail.read",
-          "scope": {
-            "kind": "wild"
-          },
-          "why": {
-            "en": "Inherit existing mailbox rights; the OS checks the draft's referenced account."
-          }
-        }
-      ],
+      "needs": [],
       "effects": [
         {
           "kind": "read",
@@ -471,16 +394,6 @@
         }
       ],
       "needs": [
-        {
-          "verb": "mail.send",
-          "scope": {
-            "kind": "from-arg",
-            "arg": "account"
-          },
-          "why": {
-            "en": "Send through this explicitly selected Thunderbird sender account."
-          }
-        },
         {
           "verb": "ipc.publish",
           "scope": {
@@ -626,16 +539,6 @@
       ],
       "needs": [
         {
-          "verb": "mail.draft",
-          "scope": {
-            "kind": "from-arg",
-            "arg": "account"
-          },
-          "why": {
-            "en": "Save or replace drafts in the explicitly selected account."
-          }
-        },
-        {
           "verb": "ipc.publish",
           "scope": {
             "kind": "fixed",
@@ -680,34 +583,6 @@
           "when": {
             "kind": "arg-present",
             "arg": "request-id"
-          }
-        },
-        {
-          "verb": "mail.read",
-          "scope": {
-            "kind": "from-arg",
-            "arg": "source-account"
-          },
-          "why": {
-            "en": "Read the existing draft only in its declared source mailbox."
-          },
-          "when": {
-            "kind": "arg-present",
-            "arg": "id"
-          }
-        },
-        {
-          "verb": "mail.draft",
-          "scope": {
-            "kind": "from-arg",
-            "arg": "source-account"
-          },
-          "why": {
-            "en": "Replace the old draft only in its declared source mailbox."
-          },
-          "when": {
-            "kind": "arg-present",
-            "arg": "id"
           }
         }
       ],
@@ -788,36 +663,6 @@
         }
       ],
       "needs": [
-        {
-          "verb": "mail.read",
-          "scope": {
-            "kind": "from-arg",
-            "arg": "account"
-          },
-          "why": {
-            "en": "Read only the explicitly selected Thunderbird mailbox."
-          }
-        },
-        {
-          "verb": "mail.draft",
-          "scope": {
-            "kind": "from-arg",
-            "arg": "account"
-          },
-          "why": {
-            "en": "Save or replace drafts in the explicitly selected account."
-          }
-        },
-        {
-          "verb": "mail.send",
-          "scope": {
-            "kind": "from-arg",
-            "arg": "sender-account"
-          },
-          "why": {
-            "en": "Send only through the explicitly selected sender account."
-          }
-        },
         {
           "verb": "ipc.publish",
           "scope": {
@@ -936,16 +781,6 @@
       ],
       "needs": [
         {
-          "verb": "mail.read",
-          "scope": {
-            "kind": "from-arg",
-            "arg": "account"
-          },
-          "why": {
-            "en": "Read only the explicitly selected Thunderbird mailbox."
-          }
-        },
-        {
           "verb": "ipc.publish",
           "scope": {
             "kind": "fixed",
@@ -1054,16 +889,6 @@
         }
       ],
       "needs": [
-        {
-          "verb": "mail.read",
-          "scope": {
-            "kind": "from-arg",
-            "arg": "account"
-          },
-          "why": {
-            "en": "Read only the explicitly selected Thunderbird mailbox."
-          }
-        },
         {
           "verb": "ipc.publish",
           "scope": {
@@ -1203,17 +1028,7 @@
           "en": "List the owner's existing Thunderbird accounts and sender identities"
         },
         "args": [],
-        "needs": [
-          {
-            "verb": "mail.accounts",
-            "scope": {
-              "kind": "wild"
-            },
-            "why": {
-              "en": "List configured account metadata, not messages or credentials."
-            }
-          }
-        ],
+        "needs": [],
         "effects": [
           {
             "kind": "read",
@@ -1250,18 +1065,7 @@
             "required": true
           }
         ],
-        "needs": [
-          {
-            "verb": "mail.read",
-            "scope": {
-              "kind": "from-arg",
-              "arg": "account"
-            },
-            "why": {
-              "en": "Read only the explicitly selected Thunderbird mailbox."
-            }
-          }
-        ],
+        "needs": [],
         "effects": [
           {
             "kind": "read",
@@ -1315,18 +1119,7 @@
             "default": false
           }
         ],
-        "needs": [
-          {
-            "verb": "mail.read",
-            "scope": {
-              "kind": "from-arg",
-              "arg": "account"
-            },
-            "why": {
-              "en": "Read only the explicitly selected Thunderbird mailbox."
-            }
-          }
-        ],
+        "needs": [],
         "effects": [
           {
             "kind": "read",
@@ -1379,18 +1172,7 @@
             "default": 10
           }
         ],
-        "needs": [
-          {
-            "verb": "mail.read",
-            "scope": {
-              "kind": "from-arg",
-              "arg": "account"
-            },
-            "why": {
-              "en": "Read only the explicitly selected Thunderbird mailbox."
-            }
-          }
-        ],
+        "needs": [],
         "effects": [
           {
             "kind": "read",
@@ -1432,18 +1214,7 @@
             "required": true
           }
         ],
-        "needs": [
-          {
-            "verb": "mail.read",
-            "scope": {
-              "kind": "from-arg",
-              "arg": "account"
-            },
-            "why": {
-              "en": "Read only the explicitly selected Thunderbird mailbox."
-            }
-          }
-        ],
+        "needs": [],
         "effects": [
           {
             "kind": "read",
@@ -1480,17 +1251,7 @@
             "required": true
           }
         ],
-        "needs": [
-          {
-            "verb": "mail.read",
-            "scope": {
-              "kind": "wild"
-            },
-            "why": {
-              "en": "Inherit existing mailbox rights; the OS checks the account encoded in the reference."
-            }
-          }
-        ],
+        "needs": [],
         "effects": [
           {
             "kind": "read",
@@ -1527,17 +1288,7 @@
             "required": true
           }
         ],
-        "needs": [
-          {
-            "verb": "mail.read",
-            "scope": {
-              "kind": "wild"
-            },
-            "why": {
-              "en": "Inherit existing mailbox rights; the OS checks the draft's referenced account."
-            }
-          }
-        ],
+        "needs": [],
         "effects": [
           {
             "kind": "read",
@@ -1600,16 +1351,6 @@
           }
         ],
         "needs": [
-          {
-            "verb": "mail.send",
-            "scope": {
-              "kind": "from-arg",
-              "arg": "account"
-            },
-            "why": {
-              "en": "Send through this explicitly selected Thunderbird sender account."
-            }
-          },
           {
             "verb": "ipc.publish",
             "scope": {
@@ -1748,16 +1489,6 @@
         ],
         "needs": [
           {
-            "verb": "mail.draft",
-            "scope": {
-              "kind": "from-arg",
-              "arg": "account"
-            },
-            "why": {
-              "en": "Save or replace drafts in the explicitly selected account."
-            }
-          },
-          {
             "verb": "ipc.publish",
             "scope": {
               "kind": "fixed",
@@ -1802,34 +1533,6 @@
             "when": {
               "kind": "arg-present",
               "arg": "request-id"
-            }
-          },
-          {
-            "verb": "mail.read",
-            "scope": {
-              "kind": "from-arg",
-              "arg": "source-account"
-            },
-            "why": {
-              "en": "Read the existing draft only in its declared source mailbox."
-            },
-            "when": {
-              "kind": "arg-present",
-              "arg": "id"
-            }
-          },
-          {
-            "verb": "mail.draft",
-            "scope": {
-              "kind": "from-arg",
-              "arg": "source-account"
-            },
-            "why": {
-              "en": "Replace the old draft only in its declared source mailbox."
-            },
-            "when": {
-              "kind": "arg-present",
-              "arg": "id"
             }
           }
         ],
@@ -1905,36 +1608,6 @@
           }
         ],
         "needs": [
-          {
-            "verb": "mail.read",
-            "scope": {
-              "kind": "from-arg",
-              "arg": "account"
-            },
-            "why": {
-              "en": "Read only the explicitly selected Thunderbird mailbox."
-            }
-          },
-          {
-            "verb": "mail.draft",
-            "scope": {
-              "kind": "from-arg",
-              "arg": "account"
-            },
-            "why": {
-              "en": "Save or replace drafts in the explicitly selected account."
-            }
-          },
-          {
-            "verb": "mail.send",
-            "scope": {
-              "kind": "from-arg",
-              "arg": "sender-account"
-            },
-            "why": {
-              "en": "Send only through the explicitly selected sender account."
-            }
-          },
           {
             "verb": "ipc.publish",
             "scope": {
@@ -2049,16 +1722,6 @@
         ],
         "needs": [
           {
-            "verb": "mail.read",
-            "scope": {
-              "kind": "from-arg",
-              "arg": "account"
-            },
-            "why": {
-              "en": "Read only the explicitly selected Thunderbird mailbox."
-            }
-          },
-          {
             "verb": "ipc.publish",
             "scope": {
               "kind": "fixed",
@@ -2166,16 +1829,6 @@
           }
         ],
         "needs": [
-          {
-            "verb": "mail.read",
-            "scope": {
-              "kind": "from-arg",
-              "arg": "account"
-            },
-            "why": {
-              "en": "Read only the explicitly selected Thunderbird mailbox."
-            }
-          },
           {
             "verb": "ipc.publish",
             "scope": {

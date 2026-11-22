@@ -776,6 +776,23 @@ about-os = 作業系統
 about-related = 相關設定
     .support = 取得支援
 
+## System: AI Budget
+
+ai-budget = AI 預算
+ai-budget-description = 檢視及設定所有應用程式共用的每月 AI 使用上限。
+ai-budget-help = 上限以應用程式合計的整數用量單位計算，不是金額。輸入 0 表示不設上限。接近上限時，Yu OS 會提醒你，並阻止會超出上限的新呼叫。
+ai-budget-period = 統計月份
+ai-budget-used = 已使用單位
+ai-budget-saved-limit = 上次確認的每月上限
+ai-budget-limit = 新的每月上限
+ai-budget-unlimited = 不設上限
+ai-budget-invalid = 請用 0–9 輸入 0 至 9223372036854775807 之間的整數。
+ai-budget-refresh = 重新整理
+ai-budget-loading = 正在載入 AI 預算…
+ai-budget-saving = 正在儲存 AI 預算…
+ai-budget-load-failed = 無法載入 AI 預算。{ $detail }
+ai-budget-save-failed = 無法確認新的 AI 預算。{ $detail }
+
 ## System: Firmware
 
 firmware = 韌體

@@ -5,7 +5,7 @@ resources, translations, build inputs and descriptor.
 
 | Path | Responsibility |
 | --- | --- |
-| `apps/yuos-edit/app.json` | Seven tools, exact file scopes, fixed desktop launch and AI budget |
+| `apps/yuos-edit/app.json` | Seven tools, exact file scopes, fixed desktop launch and AI safety/origin policy |
 | `native/yuos-edit/src/main.rs` | Native editor UI and unsaved-buffer AI requests |
 | `native/yuos-edit/src/cli.rs`, `native/yuos-edit/test/unit/cli.rs` | OS-native startup paths and bounded GUI argv regressions |
 | `native/yuos-edit/src/mcp.rs` | Authenticated MCP handlers |

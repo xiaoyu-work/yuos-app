@@ -8,6 +8,7 @@ pub mod about;
 pub mod info;
 #[cfg(feature = "page-users")]
 pub mod users;
+pub mod ai_budget;
 pub mod machine;
 
 use yuos_settings_page as page;
@@ -31,7 +32,10 @@ impl page::AutoBind<crate::pages::Message> for Page {
     fn sub_pages(
         mut page: page::Insert<crate::pages::Message>,
     ) -> page::Insert<crate::pages::Message> {
-        page = page.sub_page::<machine::UpdatesPage>().sub_page::<machine::SignInPage>();
+        page = page
+            .sub_page::<machine::UpdatesPage>()
+            .sub_page::<machine::SignInPage>()
+            .sub_page::<ai_budget::Page>();
         #[cfg(feature = "page-users")]
         {
             page = page.sub_page::<users::Page>();

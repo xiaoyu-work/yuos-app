@@ -65,6 +65,12 @@ from the system-launched Settings window. The App displays confirmed state;
 automatic login, signed APT, administrator authentication, and restart
 decisions remain OS-owned. These controls are not exposed through MCP.
 
+**System & accounts → AI Budget** uses the same protected Settings transport
+to show the owner's confirmed aggregate App AI usage and edit the monthly
+limit in whole units (0 is unlimited). Usage storage, alerts and enforcement
+stay in the OS; this page does not change Activity or system Agent budgets
+and is not an MCP operation.
+
 **Agent → Decision model** is a separate local model page. The system-launched
 Settings window reads, saves, tests and resets the owner's Decision selection
 through the closed OS Settings interface. The App does not read the owner's

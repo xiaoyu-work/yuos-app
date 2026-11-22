@@ -113,13 +113,11 @@ def _message(result):
 
 def cmd_accounts(args):
     _parser("accounts").parse_args(args)
-    policy.require("mail.accounts", wild=True)
     return _mail("accounts")
 
 
 def cmd_folders(args):
     options = _account_parser("folders").parse_args(args)
-    policy.require("mail.read", name=options.account)
     return _mail("folders", options.account)
 
 
@@ -131,7 +129,6 @@ def cmd_list(args):
     options = parser.parse_args(args)
     if not 1 <= options.max_results <= 100:
         raise ValueError("max-results must be between 1 and 100")
-    policy.require("mail.read", name=options.account)
     return _message(_mail(
         "list", options.account, folder=options.folder,
         max_results=options.max_results, unread=options.unread,
@@ -148,7 +145,6 @@ def cmd_search(args):
         raise ValueError("query must be bounded nonempty Thunderbird search text")
     if not 1 <= options.max_results <= 100:
         raise ValueError("max-results must be between 1 and 100")
-    policy.require("mail.read", name=options.account)
     return _message(_mail(
         "search", options.account, query=options.query,
         folder=options.folder, max_results=options.max_results,
@@ -161,7 +157,6 @@ def cmd_read(args):
     options = parser.parse_args(args)
     if _message_account(options.id) != options.account:
         raise ValueError("message reference belongs to a different Thunderbird account")
-    policy.require("mail.read", name=options.account)
     return _message(_mail("read", options.account, id=options.id))
 
 
@@ -178,7 +173,6 @@ def cmd_native_draft(args):
     parser.add_argument("--id", required=True)
     options = parser.parse_args(args)
     account = _message_account(options.id)
-    policy.require("mail.read", name=account)
     result = _mail("native_draft", account, id=options.id)
     if "error" not in result:
         draft = result["draft"]
@@ -221,7 +215,6 @@ def _outgoing_parser(command):
 def cmd_send(args):
     options = _outgoing_parser("send").parse_args(args)
     _headers(options)
-    policy.require("mail.send", name=options.account)
     result = _mail(
         "send", options.account, to=options.to, subject=options.subject,
         body=options.body, cc=options.cc,
@@ -244,10 +237,6 @@ def cmd_draft_save(args):
             raise ValueError("draft and sender must use the same Thunderbird profile")
     elif options.source_account:
         raise ValueError("source-account requires the stored draft id")
-    policy.require("mail.draft", name=options.account)
-    if options.id:
-        policy.require("mail.read", name=options.source_account)
-        policy.require("mail.draft", name=options.source_account)
     result = _mail(
         "draft_save", options.account, id=options.id, source_account=options.source_account,
         to=options.to, subject=options.subject, body=options.body, cc=options.cc,
@@ -278,9 +267,6 @@ def cmd_draft_send(args):
         or any(character not in "0123456789abcdef" for character in options.review[7:])
     ):
         raise ValueError("draft send requires its current SHA-256 review fingerprint")
-    policy.require("mail.read", name=options.account)
-    policy.require("mail.draft", name=options.account)
-    policy.require("mail.send", name=options.sender_account)
     return _message(_mail(
         "draft_send", options.account, id=options.id, sender_account=options.sender_account,
         review=options.review, confirm=True,
@@ -323,7 +309,6 @@ def cmd_attachment_download(args):
     path = safe_realpath(options.output)
     if not os.path.isabs(options.output) or path != options.output:
         raise ValueError("attachment output must be absolute and canonical")
-    policy.require("mail.read", name=options.account)
     policy.require("fs.write", path=path)
     result = _mail(
         "attachment_download", options.account, id=options.id,
@@ -386,7 +371,6 @@ def cmd_sync(args):
     parser = _account_parser("sync")
     parser.add_argument("--reset", action="store_true")
     options = parser.parse_args(args)
-    policy.require("mail.read", name=options.account)
     policy.require("data.db.read", name="mail-sync")
     policy.require("data.db.write", name="mail-sync")
     directory = _private_directory("mail-sync")
@@ -460,7 +444,7 @@ def cmd_draft(args):
             system=_DRAFT_SYSTEMS[options.style], max_units=3000,
         )
     except ai.AiBudgetExceeded as error:
-        return {"error": "AI budget exceeded for this app", "detail": error.payload}
+        return {"error": "Monthly AI budget exceeded", "detail": error.payload}
     except ai.AiSafetyViolation as error:
         return {"error": "safety violation", "detail": error.payload}
     except ai.AiDenied as error:

@@ -130,7 +130,7 @@ def _ai_call(prompt: str, *, system: str, max_units: int) -> dict:
     except policy.PolicyUnavailable as exc:
         return {"error": f"capability check failed: {exc}"}
     except ai.AiBudgetExceeded as exc:
-        return {"error": "AI budget exceeded for this app", "detail": exc.payload}
+        return {"error": "Monthly AI budget exceeded", "detail": exc.payload}
     except ai.AiSafetyViolation as exc:
         return {"error": "safety violation", "detail": exc.payload}
     except ai.AiDenied as exc:

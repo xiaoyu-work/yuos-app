@@ -112,7 +112,8 @@ checkout.
 All model calls require exact `ai.chat.untrusted` authority and use
 `yuos_sdk.ai.chat(origin="external-content")`. Core retains provider
 credentials, owner identity, consent, budgets, safety, and audit. The manifest
-retains strict safety and a 500,000-unit monthly budget. Only summaries and the
+retains strict safety. Monthly usage counts against the owner-set App AI limit.
+Only summaries and the
 existing notable-triage cases write memory under the `mail-ai` self scope;
 only `memory.MemoryError` is ignored for that optional write.
 The `native-host` operation explicitly declares the wildcard AI check performed

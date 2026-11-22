@@ -1053,6 +1053,20 @@ legacy-app-scaling = X11 window system application scaling
 ## System
 
 system = System & accounts
+ai-budget = AI Budget
+ai-budget-description = View and set the monthly AI limit shared by your apps.
+ai-budget-help = This limit counts whole usage units across your apps, not money. Enter 0 for no limit. Yu OS warns you when you approach the limit and blocks new calls that would exceed it.
+ai-budget-period = Usage period
+ai-budget-used = Units used
+ai-budget-saved-limit = Last confirmed monthly limit
+ai-budget-limit = New monthly limit
+ai-budget-unlimited = Unlimited
+ai-budget-invalid = Enter a whole number from 0 to 9223372036854775807 using digits 0–9.
+ai-budget-refresh = Refresh
+ai-budget-loading = Loading AI budget…
+ai-budget-saving = Saving AI budget…
+ai-budget-load-failed = Could not load the AI budget. { $detail }
+ai-budget-save-failed = Could not confirm the new AI budget. { $detail }
 yuos-sign-in = Sign-in
 yuos-sign-in-description = Automatic login applies once after boot. Unlocking the screen and administrator actions still require authentication.
 yuos-auto-login = Automatic login at startup

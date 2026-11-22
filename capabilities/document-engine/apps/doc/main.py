@@ -54,7 +54,7 @@ def _ai_call(*, text, source, system, max_units):
             prompt=text, origin="external-content", system=system, max_units=max_units,
         )
     except ai.AiBudgetExceeded as exc:
-        return {"error": "AI budget exceeded for this app", "detail": exc.payload}
+        return {"error": "Monthly AI budget exceeded", "detail": exc.payload}
     except ai.AiSafetyViolation as exc:
         return {"error": "safety violation", "detail": exc.payload}
     except ai.AiDenied as exc:

@@ -17,10 +17,10 @@ Their installed identity remains `mail-ai`; moving repositories does not
 change user consent, accounts, installed paths or native-host authority.
 The Agent client retains the installed `email` identity but now reads and sends
 through Thunderbird's existing accounts. `email.accounts` lists profile-qualified
-account IDs; mailbox operations require an explicit `--account`, without
-credential detection or Gmail/Outlook API/SMTP fallback. Separate `mail.read`,
-`mail.draft` and `mail.send` grants replace those operation needs; existing
-credentials and grants are not copied, deleted or silently converted.
+account IDs; account-specific operations still use explicit account bindings,
+without credential detection or Gmail/Outlook API/SMTP fallback. The `email`
+adapter alone uses the private Mail broker route; other Apps cannot request
+mailbox access as permissions. Existing login and profile state stay in place.
 `gateway-email` source and its active App selection are removed explicitly.
 Its old credentials and installed user data remain untouched; it is not an
 Email fallback or another source-owned mailbox.
@@ -43,8 +43,8 @@ Copy returned IDs rather than Thunderbird's session-local numeric message IDs.
 `native_draft --id DRAFT_REFERENCE_ID` returns a complete review fingerprint.
 Sending it requires the draft's mailbox `--account`, an explicit
 `--sender-account`, the current `--review` and `--confirm`.
-These accounts can differ when Thunderbird stores drafts in Local Folders;
-rights remain independent. See [MODULE.md](MODULE.md).
+These accounts can differ within one profile when Thunderbird stores drafts
+in Local Folders. See [MODULE.md](MODULE.md).
 
 The OS repository retains the native authority launcher, SDK/runtime,
 Thunderbird registration and signed package installation. It pins this

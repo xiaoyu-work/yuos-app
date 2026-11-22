@@ -36,6 +36,11 @@ This verifies the same public artifact format in a separate cache. A local
 archive can build a private acceptance fixture, but cannot stage a release
 or install payload or select another source at runtime.
 
+The owner AI Budget and private Mail dispatch are coordinated source changes.
+The pinned 0.1.0 schema still requires `ai.budget`, which the new manifests
+omit. Before publication, validate the matching OS schema, the provenance
+signer and the verified Mail Host (including CLI and same-App Web calls).
+
 Any future release, release tag, version bump or dependency-pin adoption needs
 explicit owner approval. Source development, successful validation and requests
 to commit or push do not authorize publication.

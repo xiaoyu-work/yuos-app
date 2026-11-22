@@ -14,8 +14,8 @@ call the SDK directly; they do not call this App.
 | `package.json` | Explicit capability kind, App and test selection; no native assets or provider exports |
 
 `summarize` retains version `0.1.0`, one required text argument and no implicit
-file/URL input. The AI block remains byte-for-byte equivalent: 100,000 monthly
-units, strict safety and only `external-content`. The client requests at most
+file/URL input. The AI block keeps strict safety and only `external-content`.
+Monthly usage is subject to the owner-set App AI limit. The client requests at most
 4,000 units per call and does not choose a provider/model or expose tools to
 the model. The OS owns classification, consent and overrides, budget reservation
 and settlement, input/output limits, safety, credentials and audited provider
@@ -27,8 +27,7 @@ wildcard rejected a caller's unbounded AI grant, while inheriting named-model
 grants that could not satisfy that runtime check. No stored grant is rewritten,
 unioned or automatically widened. A named-model grant alone remains insufficient
 for this client's existing wildcard check; ordinary OS approval still governs
-missing authority. The unchanged AI policy snapshot does not invalidate consent.
-No SDK or broker implementation change is needed.
+missing authority. AI safety and origin policy remain unchanged.
 
 Successful results retain `summary`, `source="<input>"`, model/provider, usage,
 budget and review fields. Empty model output fails. Before success returns, the
@@ -67,8 +66,7 @@ not establish that the entire unified integration is already implemented.
 
 All four original files came from
 [`xiaoyu-work/Yu-OS` at `de07416d4b8146d05354b8e80ed3e9f47794240e`](https://github.com/xiaoyu-work/Yu-OS/tree/de07416d4b8146d05354b8e80ed3e9f47794240e/apps/summarize).
-Implementation, server, original tests and file modes are preserved; only the
-AI scope binding is corrected as described above. First-party Apache-2.0
+The entrypoint and file modes are preserved. First-party Apache-2.0
 attribution remains covered by the root [LICENSE](../../LICENSE).
 
 From this repository root on Linux/WSL:

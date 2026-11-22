@@ -39,6 +39,7 @@ pub enum Message {
     About(system::about::Message),
     #[cfg(feature = "page-agent")]
     Agent(agent::Modality, agent::Message),
+    AiBudget(system::ai_budget::Message),
     Appearance(desktop::appearance::Message),
     Applications(applications::Message),
     #[cfg(feature = "page-bluetooth")]
