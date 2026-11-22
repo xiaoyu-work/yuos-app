@@ -1,4 +1,9 @@
-"""Yu Office Writer document tools over the public MCP SDK."""
+"""Yu Office document tools over the public MCP SDK.
+
+`yu-office.read` and `yu-office.replace_text` are the legacy XML tools kept for
+compatibility. The `yu-office.writer.*` tools come from the shared Writer
+catalog and handlers that the in-Office assistant also uses.
+"""
 
 from copy import copy
 import hashlib
@@ -6,7 +11,8 @@ import io
 import os
 from pathlib import Path
 import stat
-from zipfile import ZipFile
+import sys
+from zipfile import BadZipFile, ZipFile
 
 from lxml import etree
 
@@ -15,6 +21,22 @@ from _shared.paths import safe_realpath
 from yuos_runtime import policy, snapshot
 from yuos_sdk.mcp import App, current_context
 
+
+def _writer_pythonpath():
+    here = Path(__file__).resolve().parent
+    for candidate in (here / "share" / "extensions" / "yu-writer-ai" / "pythonpath",
+                      here.parents[1] / "writer" / "extension" / "pythonpath"):
+        if (candidate / "yu_writer" / "tools.py").is_file():
+            return str(candidate)
+    raise ImportError("The Yu Writer tool package is missing.")
+
+
+sys.path.insert(0, _writer_pythonpath())
+from yu_writer import tools as writer_tools  # noqa: E402
+from yu_writer.catalog import Catalog, ToolError  # noqa: E402
+from yu_writer.headless import FileTarget, HeadlessOffice  # noqa: E402
+
+PROGRAM_DIR = Path(__file__).resolve().parent / "program"
 
 WORD = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 OFFICE = "{urn:oasis:names:tc:opendocument:xmlns:office:1.0}"
@@ -192,10 +214,102 @@ def replace_text(path: str, expected_sha256: str, find: str, replacement: str) -
     return {"path": path, "replacements": 1, "sha256": hashlib.sha256(result).hexdigest()}
 
 
+class PathDocumentSource:
+    """Interim MCP file adapter for one exact, already-visible Writer file.
+
+    It only reads bytes for a private scratch copy and commits exported bytes;
+    the headless engine never sees this path. Under the OS task-UID model an
+    owner-private file may be unreadable and replacing a bind-mounted original
+    is unsupported, so this is not a managed-save guarantee. A future OS staged
+    read/commit capability replaces this class without changing any tool.
+    """
+
+    def __init__(self, path, *, edit):
+        if not isinstance(path, str) or not path or any(ch in path for ch in "*?[\0"):
+            raise ToolError("invalid_target", "Name one exact DOCX or ODT file; wildcards are not accepted.")
+        self.edit = edit
+        self.path = safe_realpath(path)
+        self.suffix = Path(self.path).suffix.lower()
+        if self.suffix not in DOCUMENT_MEMBERS:
+            raise ToolError("invalid_target", "Yu Office Writer tools support DOCX and ODT documents only.")
+        policy.require("fs.read", path=self.path)
+        if edit:
+            policy.require("fs.write", path=self.path)
+        try:
+            fd = os.open(self.path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+        except FileNotFoundError:
+            raise ToolError("missing_target", "The document does not exist.") from None
+        except PermissionError:
+            raise ToolError("unreadable_target", "Yu Office cannot read this document.") from None
+        try:
+            info = os.fstat(fd)
+        except BaseException:
+            os.close(fd)
+            raise
+        if not stat.S_ISREG(info.st_mode):
+            os.close(fd)
+            raise ToolError("invalid_target", "The document must be a regular file.")
+        with os.fdopen(fd, "rb") as stream:
+            if info.st_size > MAX_PACKAGE:
+                raise ToolError("document_too_large", "The document must be no larger than 32 MiB.")
+            data = stream.read(MAX_PACKAGE + 1)
+            if len(data) > MAX_PACKAGE or _revision(os.fstat(stream.fileno())) != _revision(info):
+                raise ToolError("stale_revision", "The document changed while reading it; retry.")
+        if edit:
+            try:
+                with ZipFile(io.BytesIO(data)) as archive:
+                    names = [name.lower() for name in archive.namelist()]
+            except BadZipFile:
+                raise ToolError("unreadable_document", "The document is not a DOCX or ODT package.") from None
+            if any(name.startswith("_xmlsignatures/") or (name.startswith("meta-inf/") and "signatures" in name)
+                   for name in names):
+                raise ToolError("unsupported_content", "Yu Office does not change signed documents.")
+        self.info, self.data = info, data
+
+    def read(self):
+        return self.data
+
+    def commit(self, data):
+        if not self.edit:
+            raise ToolError("unauthorized_target", "This call may not change the document.")
+        if len(data) > MAX_PACKAGE:
+            raise ToolError("document_too_large", "The updated document exceeds 32 MiB.")
+        try:
+            if _revision(os.stat(self.path, follow_symlinks=False)) != _revision(self.info):
+                raise ToolError("stale_revision", "The document changed on disk; inspect it again.")
+            snapshot.snapshot(self.path, "write", session_id=current_context().session_id)
+            if _revision(os.stat(self.path, follow_symlinks=False)) != _revision(self.info):
+                raise ToolError("stale_revision", "The document changed on disk; inspect it again.")
+            atomic_write_bytes(self.path, data, mode=stat.S_IMODE(self.info.st_mode) & 0o777, strict=True)
+        except OSError as error:
+            raise ToolError("save_unavailable",
+                            f"Yu Office could not save this document in place ({error.strerror or error}).") from None
+        return {"saved": True, "path": self.path, "sha256": hashlib.sha256(data).hexdigest()}
+
+
+def writer_tool(catalog, name):
+    """Bind one catalog tool to the shared handler with an MCP file target."""
+
+    def handler(**arguments):
+        catalog.validate(name, arguments, bound_target=False)
+        source = PathDocumentSource(arguments["path"], edit=name == writer_tools.APPLY)
+        with HeadlessOffice(PROGRAM_DIR) as office:
+            result = writer_tools.call(catalog, name, arguments, FileTarget(source, office))
+        result.setdefault("path", source.path)
+        return result
+
+    handler.__name__ = name.rsplit(".", 1)[-1]
+    return handler
+
+
 def create_app():
-    app = App.from_manifest()
+    manifest = os.environ.get("YUOS_APP_MANIFEST") or "app.json"
+    app = App.from_manifest(manifest)
     app.tool("yu-office.read")(read)
     app.tool("yu-office.replace_text")(replace_text)
+    catalog = writer_tools.check_catalog(Catalog.load(manifest))
+    for name in catalog.tools:
+        app.tool(name)(writer_tool(catalog, name))
     return app
 
 

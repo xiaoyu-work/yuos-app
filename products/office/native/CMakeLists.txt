@@ -26,5 +26,9 @@ install(PROGRAMS "${runtime}/program/soffice.bin" "${runtime}/program/xpdfimport
     DESTINATION share/yu-office/program)
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../apps/yu-office/server.py"
     DESTINATION share/yu-office RENAME mcp_server.py)
+# Unpacked bundled extension: registered by the runtime without unopkg.
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../writer/extension/"
+    DESTINATION share/yu-office/share/extensions/yu-writer-ai
+    PATTERN "__pycache__" EXCLUDE)
 install(FILES com.yuos.Office.desktop DESTINATION share/applications)
 install(FILES com.yuos.Office.svg DESTINATION share/icons/hicolor/scalable/apps)

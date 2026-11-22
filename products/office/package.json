@@ -1,6 +1,6 @@
 {
   "apps": ["apps/yu-office"],
-  "tests": ["apps/yu-office/test_server.py"],
+  "tests": ["apps/yu-office/test_server.py", "writer/test_writer.py", "writer/test_writer_uno.py"],
   "native": {"yu-office": "native"},
   "native_kind": "binary",
   "native_build_system": "cmake",

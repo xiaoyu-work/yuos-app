@@ -63,11 +63,115 @@
           {"kind": "read", "label": {"en": "Verify the document version and find the requested text."}, "target_arg": "path", "recovery": "not_applicable"},
           {"kind": "update", "label": {"en": "Save one text replacement to the requested document."}, "target_arg": "path", "recovery": "unknown"}
         ]
+      },
+      {
+        "name": "yu-office.writer.inspect",
+        "summary": {
+          "en": "Inspect a Writer document's paragraphs, styles, formatting, unsupported objects and revision with Yu Office's document engine.",
+          "zh-CN": "使用 Yu Office 文档引擎读取 Writer 文档的段落、样式、格式、不支持的对象和版本。"
+        },
+        "args": [
+          {"name": "path", "kind": "path", "required": true, "label": {"en": "DOCX or ODT Writer document"}},
+          {"name": "start", "kind": "integer", "default": 0, "label": {"en": "First body block index to return"}},
+          {"name": "limit", "kind": "integer", "default": 200, "label": {"en": "Maximum body blocks to return (1-500)"}}
+        ],
+        "needs": [
+          {
+            "verb": "fs.read",
+            "scope": {"kind": "from-arg", "arg": "path"},
+            "why": {"en": "Read only the Writer document you asked to inspect.", "zh-CN": "只读取你指定的 Writer 文档。"}
+          }
+        ],
+        "effects": [
+          {"kind": "read", "label": {"en": "Read the requested Writer document."}, "target_arg": "path", "recovery": "not_applicable"}
+        ]
+      },
+      {
+        "name": "yu-office.writer.preview",
+        "summary": {
+          "en": "Preview rewriting or formatting selected Writer paragraphs at an expected revision without changing the document.",
+          "zh-CN": "在预期版本上预览对选定 Writer 段落的改写或格式设置，不修改文档。"
+        },
+        "args": [
+          {"name": "path", "kind": "path", "required": true, "label": {"en": "DOCX or ODT Writer document"}},
+          {"name": "revision", "kind": "text", "required": true, "label": {"en": "Revision returned by the latest inspect, preview or apply"}},
+          {"name": "action", "kind": "name", "required": true, "choices": ["rewrite", "format"], "label": {"en": "rewrite paragraph text, or format paragraphs"}},
+          {"name": "paragraphs", "kind": "integer", "required": true, "repeatable": true, "label": {"en": "Paragraph or heading block indices from inspect"}},
+          {"name": "texts", "kind": "text", "repeatable": true, "label": {"en": "rewrite only: one single-paragraph replacement per index, in order"}},
+          {"name": "flatten_formatting", "kind": "bool", "label": {"en": "rewrite only: accept replacing mixed character formatting with the first run's formatting"}},
+          {"name": "paragraph_style", "kind": "name", "label": {"en": "format only: existing paragraph style name from inspect"}},
+          {"name": "alignment", "kind": "name", "choices": ["left", "center", "right", "justify"], "label": {"en": "format only: paragraph alignment"}},
+          {"name": "bold", "kind": "bool", "label": {"en": "format only: bold on or off"}},
+          {"name": "italic", "kind": "bool", "label": {"en": "format only: italic on or off"}},
+          {"name": "underline", "kind": "bool", "label": {"en": "format only: single underline on or off"}},
+          {"name": "font_name", "kind": "name", "label": {"en": "format only: font family name"}},
+          {"name": "font_size", "kind": "number", "label": {"en": "format only: font size in points (1-999)"}}
+        ],
+        "needs": [
+          {
+            "verb": "fs.read",
+            "scope": {"kind": "from-arg", "arg": "path"},
+            "why": {"en": "Read only the Writer document whose change you asked to preview.", "zh-CN": "只读取你要求预览修改的 Writer 文档。"}
+          }
+        ],
+        "effects": [
+          {"kind": "read", "label": {"en": "Read the requested Writer document to preview the change."}, "target_arg": "path", "recovery": "not_applicable"}
+        ]
+      },
+      {
+        "name": "yu-office.writer.apply",
+        "summary": {
+          "en": "Apply a previewed rewrite or formatting change to selected Writer paragraphs at the expected revision.",
+          "zh-CN": "在预期版本上对选定 Writer 段落应用已预览的改写或格式设置。"
+        },
+        "args": [
+          {"name": "path", "kind": "path", "required": true, "label": {"en": "DOCX or ODT Writer document"}},
+          {"name": "revision", "kind": "text", "required": true, "label": {"en": "Revision returned by the latest inspect, preview or apply"}},
+          {"name": "action", "kind": "name", "required": true, "choices": ["rewrite", "format"], "label": {"en": "rewrite paragraph text, or format paragraphs"}},
+          {"name": "paragraphs", "kind": "integer", "required": true, "repeatable": true, "label": {"en": "Paragraph or heading block indices from inspect"}},
+          {"name": "texts", "kind": "text", "repeatable": true, "label": {"en": "rewrite only: one single-paragraph replacement per index, in order"}},
+          {"name": "flatten_formatting", "kind": "bool", "label": {"en": "rewrite only: accept replacing mixed character formatting with the first run's formatting"}},
+          {"name": "paragraph_style", "kind": "name", "label": {"en": "format only: existing paragraph style name from inspect"}},
+          {"name": "alignment", "kind": "name", "choices": ["left", "center", "right", "justify"], "label": {"en": "format only: paragraph alignment"}},
+          {"name": "bold", "kind": "bool", "label": {"en": "format only: bold on or off"}},
+          {"name": "italic", "kind": "bool", "label": {"en": "format only: italic on or off"}},
+          {"name": "underline", "kind": "bool", "label": {"en": "format only: single underline on or off"}},
+          {"name": "font_name", "kind": "name", "label": {"en": "format only: font family name"}},
+          {"name": "font_size", "kind": "number", "label": {"en": "format only: font size in points (1-999)"}}
+        ],
+        "needs": [
+          {
+            "verb": "fs.read",
+            "scope": {"kind": "from-arg", "arg": "path"},
+            "why": {"en": "Verify the revision of the Writer document you asked to change.", "zh-CN": "核对你要求修改的 Writer 文档的版本。"}
+          },
+          {
+            "verb": "fs.write",
+            "scope": {"kind": "from-arg", "arg": "path"},
+            "why": {"en": "Save the confirmed change only to the same requested document.", "zh-CN": "只将确认的修改保存到你指定的原文档。"}
+          }
+        ],
+        "effects": [
+          {"kind": "read", "label": {"en": "Verify the Writer document revision."}, "target_arg": "path", "recovery": "not_applicable"},
+          {"kind": "update", "label": {"en": "Save the paragraph change to the requested document."}, "target_arg": "path", "recovery": "unknown"}
+        ]
       }
     ]
   },
+  "ai": {
+    "budget": {"monthly_units": 200000},
+    "safety": "strict",
+    "origins": ["external-content"]
+  },
   "desktop": {
     "exec": "--gui",
-    "needs": []
+    "needs": [],
+    "optional_needs": [
+      {
+        "verb": "ai.chat.untrusted",
+        "scope": {"kind": "fixed", "scope": {"kind": "name", "value": "$configured-ai-model"}},
+        "why": {"en": "Use the owner's configured AI to suggest changes to the current document.", "zh-CN": "使用所有者配置的 AI 为当前文档提出修改建议。"}
+      }
+    ]
   }
 }
