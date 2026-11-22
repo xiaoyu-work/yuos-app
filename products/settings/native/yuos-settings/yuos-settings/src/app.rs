@@ -443,7 +443,9 @@ impl cosmic::Application for SettingsApp {
                 crate::pages::Message::CloseContextDrawer => return self.close_context_drawer(),
                 crate::pages::Message::AiBudget(message) => {
                     if let Some(page) = self.pages.page_mut::<system::ai_budget::Page>() {
-                        return page.update(message).map(Into::into);
+                        return page
+                            .update(message)
+                            .map(|message| Message::PageMessage(message).into());
                     }
                 }
                 crate::pages::Message::MachineSettings(login, message) => {
