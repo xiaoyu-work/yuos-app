@@ -17,8 +17,9 @@ the distribution's LibreOffice remains a separate Linux Apps entry.
 
 ## Writer tools (shared by the in-Office assistant and the System Agent)
 
-`yu-office.writer.inspect`, `yu-office.writer.preview` and
-`yu-office.writer.apply` are declared once in the signed `app.json`. That
+`yu-office.writer.inspect`, `yu-office.writer.preview`, `yu-office.writer.apply`,
+`yu-office.writer.preview_workflow` and `yu-office.writer.apply_workflow`
+are declared once in the signed `app.json`. That
 declaration is the only catalog: `yu_writer.catalog` reads it for names,
 argument schemas, choices and validation, and `yu_writer.tools.call` is the
 only dispatcher. The MCP server binds each manifest tool to that dispatcher;
@@ -49,6 +50,18 @@ A stale revision, unknown target or unsupported content fails explicitly.
 Only the fixed Writer review commands
 are dispatched; models cannot supply arbitrary UNO commands or macros.
 
+For a task with several operations, inspect the document and call
+`preview_workflow` with its initial `revision` and `steps_json`, a JSON array
+of one to eight `writer.preview` argument objects (omit `path` and `revision`
+inside each step). A step sees the changes from earlier steps, so it can fill
+a table created by the previous step. The preview rehearses the sequence on
+a private document and returns each step's effects and a `preview_digest`.
+Call `apply_workflow` with the same initial revision and ordered actions
+plus that digest. The digest checks the plan and effects, not consent or file
+authority. A stale revision, a failed step, or a nonreproducible preview
+forces an explicit error. Use inspect again after saving to see any format
+filter normalization.
+
 Target binding comes from the adapter, never from model arguments:
 
 - **In-Office assistant**: the current live Writer document, including unsaved
@@ -58,18 +71,26 @@ Target binding comes from the adapter, never from model arguments:
   undo step and are reported accordingly. AI is optional: the assistant calls
   `yuos_sdk.ai.chat(..., origin="external-content", system=...)` only on an
   explicit button press, without SDK `tools=`. The model must return a closed
-  `{tool, arguments}` preview proposal, which is validated locally against the
-  catalog and the user's selection, previewed, and applied only after the user
-  confirms. Choose **Whole document** to propose actions on tables, page
+  `{tool, steps}` workflow proposal. The same catalog validates every step.
+  The dialog rehearses with an ODT copy of the live document, shows all the
+  proposed steps, and applies the workflow only after the user confirms.
+  In a paragraph selection, insert new body blocks last so earlier indices
+  still refer to the selected paragraphs. Choose **Whole document** to propose actions on tables, page
   styles, existing notes or review state. Manual formatting needs no AI.
+  If a live workflow fails during replay, Writer attempts rollback and
+  reports a separate error if restoration cannot be verified. Page settings,
+  headers/footers, page-number insertion and change-recording settings must
+  be previewed and applied individually in a live window because they are
+  not reliably part of Writer's undo stack. They may be combined with other
+  steps when the System Agent operates on a private file copy.
   Missing SDK, grant, budget or safety
   refusal is shown as an error and leaves the document unchanged. The App
   declares the `ai` policy and the optional install-time need
   `ai.chat.untrusted` scoped to `$configured-ai-model`; there is no App-owned
   enablement flow or fallback.
 - **System Agent (MCP)**: one exact `.docx`/`.odt` file brokered by the OS.
-  Each tool keeps a scalar `path` argument and declares `fs.read` (apply also
-  `fs.write`) with scope
+  Each tool keeps a scalar `path` argument and declares `fs.read` (apply and
+  apply_workflow also declare `fs.write`) with scope
   `{"kind": "from-arg", "arg": "path", "transform": "brokered-file"}`.
   `server.BrokeredFile` passes the literal absolute path to
   `yuos_sdk.files.read_file` and, for apply, `replace_file` with that read's
@@ -79,7 +100,9 @@ Target binding comes from the adapter, never from model arguments:
   non-DOCX/ODT targets fail before any broker call; broker refusals fail with
   `read_refused`; oversized documents, and signed documents on edit, fail.
   A private headless soffice (private profile, no macros, no link updates)
-  works on a copy in the App's own temporary directory. The Writer revision
+  works on a copy in the App's own temporary directory. A workflow preview
+  never saves, and a workflow apply saves once only after the complete
+  checked sequence succeeds. The Writer revision
   carried from inspect through preview to apply is checked independently of
   the broker revision. A replace is attempted at most once; any refusal or
   uncertain outcome returns `save_unconfirmed` and is never retried. Without

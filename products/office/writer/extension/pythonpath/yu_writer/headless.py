@@ -130,7 +130,9 @@ class HeadlessOffice:
             try:
                 components = self.desktop.getComponents().createEnumeration()
                 while components.hasMoreElements():
-                    components.nextElement().close(True)
+                    component = components.nextElement()
+                    component.setModified(False)
+                    component.close(True)
                 self.desktop.terminate()
             except Exception:  # noqa: BLE001 - the bridge closes during terminate
                 pass
@@ -154,10 +156,15 @@ class FileTarget(Target):
     The adapter alone establishes authority for the target.
     """
 
-    def __init__(self, source, office):
+    def __init__(self, source, office, check_cancelled=None):
         self.source = source
         self.office = office
+        self._check_cancelled = check_cancelled
         self._document = None
+
+    def check_cancelled(self):
+        if self._check_cancelled is not None:
+            self._check_cancelled()
 
     def document(self):
         if self._document is None:

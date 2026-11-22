@@ -276,10 +276,11 @@ def writer_tool(catalog, name):
 
     def handler(**arguments):
         catalog.validate(name, arguments, bound_target=False)
-        source = BrokeredFile(arguments["path"], edit=name == writer_tools.APPLY)
+        source = BrokeredFile(arguments["path"], edit=name in writer_tools.WRITE_TOOLS)
         source.read()
         with HeadlessOffice(PROGRAM_DIR) as office:
-            result = writer_tools.call(catalog, name, arguments, FileTarget(source, office))
+            target = FileTarget(source, office, check_cancelled=current_context().raise_if_cancelled)
+            result = writer_tools.call(catalog, name, arguments, target)
         result.setdefault("path", source.path)
         return result
 

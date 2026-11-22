@@ -3,7 +3,7 @@
 The dialog binds the live Writer document (including unsaved text) and calls
 the same catalog-validated handlers as the System Agent MCP tools. Manual
 formatting works without AI; the optional AI path only produces a validated
-preview, and every change needs an explicit Apply that is one Writer undo step.
+preview, and the user must explicitly apply it.
 """
 
 import json
@@ -23,6 +23,7 @@ PROTOCOL = "vnd.yuos.writer:"
 UNCHANGED = "(unchanged)"
 SWITCH = (UNCHANGED, "on", "off")
 SCOPES = ("Selected paragraphs", "Whole document")
+MAX_DIALOG_PREVIEW = 60_000
 
 
 def _selected_indices(document, descriptions, elements):
@@ -101,7 +102,7 @@ class AssistantDialog:
         self._row(12)
         self._add("Edit", "instruction", 36, MultiLine=True, VScroll=True)
         self._row(36)
-        self._add("Button", "ask", 14, "Ask AI for a preview", width=120)
+        self._add("Button", "ask", 14, "Ask AI to preview a workflow", width=160)
         self._row()
         self._add("FixedLine", "format_line", 8, "Formatting")
         self._row(8)
@@ -136,9 +137,11 @@ class AssistantDialog:
             try:
                 callback()
             except ToolError as error:
-                self._show(f"Not changed: {error}")
+                if error.code == "rollback_unconfirmed":
+                    self.allow_undo = False
+                self._show(str(error))
             except Exception as error:  # noqa: BLE001 - keep Writer usable on any failure
-                self._show(f"Not changed: unexpected error: {error}")
+                self._show(f"Writer operation failed: {error}")
         return run
 
     def _show(self, text, pending=None):
@@ -197,18 +200,26 @@ class AssistantDialog:
         text = self._describe(result["preview"])
         if result["explanation"]:
             text = f"AI: {result['explanation']}\n\n{text}"
-        self._show(text, result["arguments"])
+        if len(text.encode("utf-16-le")) // 2 > MAX_DIALOG_PREVIEW:
+            raise ToolError("preview_too_large", "This preview cannot fit in the dialog; request a smaller workflow.")
+        self._show(text)
+        if self.dialog.getControl("preview").getText().replace("\r\n", "\n") != text.replace("\r\n", "\n"):
+            raise ToolError("preview_too_large", "Writer did not display the full preview; request a smaller workflow.")
+        self.pending = result["arguments"]
+        self.model.getByName("apply").Enabled = True
 
     def apply(self):
         if self.pending is None:
             return
-        result = call(self.catalog, APPLY, self.pending, self.target)
+        result = assistant.confirm(self.catalog, self.target, self.pending)
         self.allow_undo = bool(result["undo"])
         if result["undo"]:
             suffix = " Use Undo or Ctrl+Z to revert."
         else:
-            suffix = " Writer did not record an undo step for this action."
-        self._show(f"Applied {len(result['changes'])} change(s).{suffix}")
+            suffix = " This change is not fully covered by Writer Undo."
+        count = len(result["steps"]) if "steps" in result else len(result["changes"])
+        subject = "workflow step(s)" if "steps" in result else "change(s)"
+        self._show(f"Applied {count} {subject}.{suffix}")
 
     def undo(self):
         manager = self.document.getUndoManager()
@@ -218,9 +229,12 @@ class AssistantDialog:
         self._show("Undid the last Yu Writer Assistant change.")
 
     @staticmethod
-    def _describe(preview):
+    def _describe(preview, *, complete=False):
+        if "steps" in preview:
+            return "\n\n".join(f"{step['step']}. {AssistantDialog._describe(step, complete=True)}"
+                               for step in preview["steps"])
         lines = [f"Preview: {preview['action']} ({len(preview['changes'])} change(s)):"]
-        for change in preview["changes"][:50]:
+        for change in preview["changes"] if complete else preview["changes"][:50]:
             if "paragraph" not in change:
                 lines.append(f"\n{change['target']}: {json.dumps(change['before'], ensure_ascii=False)}"
                              f"\n    → {json.dumps(change['after'], ensure_ascii=False)}")
@@ -229,7 +243,7 @@ class AssistantDialog:
             else:
                 lines.append(f"\n[{change['paragraph']}] {change['text'][:80]}\n    set: "
                              + json.dumps(change["after"], ensure_ascii=False))
-        if len(preview["changes"]) > 50:
+        if not complete and len(preview["changes"]) > 50:
             lines.append(f"\n… {len(preview['changes']) - 50} more")
         lines.extend(f"\nWarning: {warning}" for warning in preview["warnings"])
         return "\n".join(lines)

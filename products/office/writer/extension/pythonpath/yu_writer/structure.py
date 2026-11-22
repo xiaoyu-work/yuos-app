@@ -73,6 +73,7 @@ def _restorable(apply, restore):
         except Exception:
             restore()
             raise
+    edit.restore = restore
     return edit
 
 

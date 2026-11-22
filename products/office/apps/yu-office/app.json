@@ -221,6 +221,57 @@
           {"kind": "read", "label": {"en": "Verify the Writer document revision."}, "target_arg": "path", "recovery": "not_applicable"},
           {"kind": "update", "label": {"en": "Save the previewed Writer change to the requested document."}, "target_arg": "path", "recovery": "unknown"}
         ]
+      },
+      {
+        "name": "yu-office.writer.preview_workflow",
+        "summary": {
+          "en": "Rehearse up to eight ordered Writer actions on one document without saving. Inspect first, and get the action arguments from writer.preview.",
+          "zh-CN": "在一份文档副本上依次预演最多八步 Writer 操作，不保存修改。先读取文档，再参照 writer.preview 的操作参数。"
+        },
+        "args": [
+          {"name": "path", "kind": "path", "required": true, "label": {"en": "DOCX or ODT Writer document"}},
+          {"name": "revision", "kind": "text", "required": true, "label": {"en": "Initial revision returned by writer.inspect"}},
+          {"name": "steps_json", "kind": "text", "required": true, "label": {"en": "JSON array of 1-8 writer.preview argument objects without path or revision. Steps use the document state after earlier steps."}}
+        ],
+        "needs": [
+          {
+            "verb": "fs.read",
+            "scope": {"kind": "from-arg", "arg": "path", "transform": "brokered-file"},
+            "why": {"en": "Read only the Writer document whose workflow you asked to preview.", "zh-CN": "只读取你要求预演操作的 Writer 文档。"}
+          }
+        ],
+        "effects": [
+          {"kind": "read", "label": {"en": "Read the requested document and preview changes on a private copy."}, "target_arg": "path", "recovery": "not_applicable"}
+        ]
+      },
+      {
+        "name": "yu-office.writer.apply_workflow",
+        "summary": {
+          "en": "Apply the previously previewed Writer workflow in order, and save the authorized document once after all steps succeed.",
+          "zh-CN": "按顺序应用已预览的 Writer 操作；全部成功后，只保存一次已授权的文档。"
+        },
+        "args": [
+          {"name": "path", "kind": "path", "required": true, "label": {"en": "Same DOCX or ODT path used by writer.preview_workflow"}},
+          {"name": "revision", "kind": "text", "required": true, "label": {"en": "Same initial revision used by writer.preview_workflow"}},
+          {"name": "steps_json", "kind": "text", "required": true, "label": {"en": "Same ordered JSON step array used by writer.preview_workflow"}},
+          {"name": "preview_digest", "kind": "text", "required": true, "label": {"en": "Preview digest returned by writer.preview_workflow; verifies the plan, not permission to write"}}
+        ],
+        "needs": [
+          {
+            "verb": "fs.read",
+            "scope": {"kind": "from-arg", "arg": "path", "transform": "brokered-file"},
+            "why": {"en": "Verify the document revision and repeat the reviewed workflow.", "zh-CN": "核对文档版本并复现已预览的操作。"}
+          },
+          {
+            "verb": "fs.write",
+            "scope": {"kind": "from-arg", "arg": "path", "transform": "brokered-file"},
+            "why": {"en": "Save the finished workflow only to the same requested document.", "zh-CN": "只将完整执行后的结果保存到你指定的原文档。"}
+          }
+        ],
+        "effects": [
+          {"kind": "read", "label": {"en": "Verify the document and the previously previewed workflow."}, "target_arg": "path", "recovery": "not_applicable"},
+          {"kind": "update", "label": {"en": "Save the completed Writer workflow to the requested document."}, "target_arg": "path", "recovery": "unknown"}
+        ]
       }
     ]
   },
