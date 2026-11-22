@@ -27,22 +27,23 @@ def test_release_versions_cannot_inject_tags_paths_or_shell(value):
         version(value)
 
 
-def test_all_identities_have_exactly_one_headless_or_desktop_package_owner():
+@pytest.mark.parametrize("architecture", ["amd64", "arm64"])
+def test_all_identities_have_exactly_one_headless_or_desktop_package_owner(architecture):
     plan = release.make_plan("all", "1.0.0")
-    assert len([item for item in plan["selections"] if item not in ("support", "sets")]) == 28
+    assert len([item for item in plan["selections"] if item not in ("support", "sets")]) == 29
     agent, desktop = {}, {}
     for entry in plan["packages"]:
-        if entry["architecture"] == "arm64":
+        if entry["architecture"] not in ("all", architecture):
             continue
         for app_id in entry["apps"]:
             destination = agent if entry["variant"] == "agent" else desktop
             assert app_id not in destination
             destination[app_id] = entry["package"]
     assert len(agent) == 51
-    assert len(desktop) == 12
+    assert len(desktop) == 13
     assert not set(agent).intersection(desktop)
-    assert len(set(agent) | set(desktop)) == 63
     assert desktop["yuos-files"] == "yuos-app-files-desktop"
+    assert desktop["yu-office"] == "yuos-app-office-desktop"
     assert agent["db"] == agent["kv"] == "yuos-cap-storage-sdk"
     (headless_set,) = release.packages_for("sets")
     assert headless_set["package"] == "yuos-apps-agent"
