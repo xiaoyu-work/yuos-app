@@ -27,28 +27,42 @@ live document. Tests check the derived schema equals the SDK's MCP schema and
 that handlers and catalog name the same tools.
 
 Operations use LibreOffice's UNO Writer model, not XML editing. `inspect`
-returns top-level body paragraphs (text, style, outline level, alignment,
-uniform character attributes) and a revision. `preview` and `apply` take that
-revision, an `action` (`rewrite` or `format`) and paragraph indices. Rewrites
-replace whole paragraph text. Mixed character formatting is refused unless
-`flatten_formatting` is true; fields, frames, images and other non-text
-content in a target paragraph always refuse. Format applies the
-requested paragraph style, alignment, bold/italic/underline, font name or size.
-Tables, headers/footers, frames, footnotes, comments and tracked changes are
-reported but not editable. A stale revision, unknown paragraph, invalid
-argument or unsupported content fails without changes. Macros and arbitrary
-UNO calls are never exposed.
+returns a revision and a paged view: `body` (default), `tables` (optionally
+with `table_name` for cells), `layout`, `notes`, or `review`. Use names and
+indices from those views. Each edit preview and apply takes the revision and
+one explicit action; arguments for other actions are refused.
+
+| Area | Shared actions | Scope |
+| --- | --- | --- |
+| Body | `rewrite`, `find_replace`, `insert_paragraphs`, `link` | Replace whole paragraphs, perform literal find/replace in the selected paragraphs, insert paragraphs at an anchor, or set/clear an HTTP(S) or bookmark link on one paragraph |
+| Formatting | `format` | Paragraph/list styles, heading level, indentation, spacing, alignment, page breaks, bold/italic/underline, font name and size |
+| Tables | `insert_table`, `set_cells`, `table_axis` | Create and fill tables, edit plain text cells, insert rows/columns or remove only empty rows/columns in rectangular tables |
+| Page layout | `page_setup`, `header_footer`, `page_number` | Set margins, size and orientation for a named page style; change shared header/footer text or append a page-number field |
+| Notes | `insert_note`, `edit_note`, `delete_note` | Footnotes and endnotes anchored to the body; only single plain-text paragraphs can be replaced or removed |
+| Review | `track_changes`, `review_changes` | Set recording and accept or reject a selected tracked change or all pending changes in documents without a tracking protection key; inspect reports current display state |
+
+Rewrites and find/replace always reject protected inline content. Mixed
+character formatting is changed only with explicit permission to flatten it.
+Table formulas, merged-cell resizing, distinct first/left/right header or
+footer content, frame/shape editing and comment editing are not covered.
+A stale revision, unknown target or unsupported content fails explicitly.
+Only the fixed Writer review commands
+are dispatched; models cannot supply arbitrary UNO commands or macros.
 
 Target binding comes from the adapter, never from model arguments:
 
 - **In-Office assistant**: the current live Writer document, including unsaved
-  edits. `path` is rejected. Apply is one undo step titled “Yu Writer AI” and
-  does not save. AI is optional: the assistant calls
+  edits. `path` is rejected. Apply does not save. Changes Writer records in
+  its undo stack are grouped as “Yu Writer AI”; actions such as changing page
+  styles, header/footer properties or tracking settings may have no native
+  undo step and are reported accordingly. AI is optional: the assistant calls
   `yuos_sdk.ai.chat(..., origin="external-content", system=...)` only on an
   explicit button press, without SDK `tools=`. The model must return a closed
   `{tool, arguments}` preview proposal, which is validated locally against the
   catalog and the user's selection, previewed, and applied only after the user
-  confirms. Manual formatting needs no AI. Missing SDK, grant, budget or safety
+  confirms. Choose **Whole document** to propose actions on tables, page
+  styles, existing notes or review state. Manual formatting needs no AI.
+  Missing SDK, grant, budget or safety
   refusal is shown as an error and leaves the document unchanged. The App
   declares the `ai` policy and the optional install-time need
   `ai.chat.untrusted` scoped to `$configured-ai-model`; there is no App-owned

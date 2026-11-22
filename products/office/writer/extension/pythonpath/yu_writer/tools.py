@@ -41,6 +41,7 @@ class LiveDocumentTarget(Target):
         if not model_document.supportsService("com.sun.star.text.TextDocument"):
             raise ToolError("unsupported_document", "The Yu Writer assistant works only in Writer documents.")
         self._document = model_document
+        self._did_add_undo = False
 
     def document(self):
         return self._document
@@ -50,6 +51,8 @@ class LiveDocumentTarget(Target):
         if document.isReadonly():
             raise ToolError("read_only", "The document is read-only.")
         undo = document.getUndoManager()
+        previous = tuple(undo.getAllUndoActionTitles())
+        self._did_add_undo = False
         undo.enterUndoContext(UNDO_TITLE)
         document.lockControllers()
         completed = False
@@ -59,15 +62,20 @@ class LiveDocumentTarget(Target):
         finally:
             document.unlockControllers()
             undo.leaveUndoContext()
-            if not completed and undo.isUndoPossible() and undo.getCurrentUndoActionTitle() == UNDO_TITLE:
+            current = tuple(undo.getAllUndoActionTitles())
+            self._did_add_undo = current != previous and bool(current) and current[0] == UNDO_TITLE
+            if not completed and self._did_add_undo:
                 undo.undo()
+                self._did_add_undo = False
 
     def commit(self, document):
-        return {"saved": False, "undo": {"kind": "writer-undo", "title": UNDO_TITLE, "steps": 1}}
+        return {"saved": False, "undo": {"kind": "writer-undo", "title": UNDO_TITLE, "steps": 1}
+                if self._did_add_undo else None}
 
 
 def _inspect(target, args):
-    return model.inspect(target.document(), args["start"], args["limit"])
+    return model.inspect(target.document(), args["start"], args["limit"],
+                         args.get("view", "body"), args.get("table_name"))
 
 
 def _preview(target, args):
@@ -79,9 +87,9 @@ def _preview(target, args):
 
 def _apply(target, args):
     document = target.document()
-    elements, current, changes, warnings = model.plan(document, args)
+    edit, current, changes, warnings = model.plan(document, args)
     with target.edit(document):
-        model.apply_changes(document, elements, args)
+        model.apply_changes(edit)
     result = {"previous_revision": current, "revision": model.revision(document),
               "action": args["action"], "changes": changes, "warnings": warnings, "applied": True}
     result.update(target.commit(document))

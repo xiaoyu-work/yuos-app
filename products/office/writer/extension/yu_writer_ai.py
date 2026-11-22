@@ -67,6 +67,7 @@ class AssistantDialog:
         self.target = LiveDocumentTarget(self.document)
         self.catalog = Catalog.load()
         self.pending = None
+        self.allow_undo = True
         self.y = 6
 
     def _add(self, kind, name, height, label=None, x=6, width=248, **properties):
@@ -144,6 +145,10 @@ class AssistantDialog:
         self.pending = pending
         self.dialog.getControl("preview").setText(text)
         self.model.getByName("apply").Enabled = pending is not None
+        manager = self.document.getUndoManager()
+        self.model.getByName("undo").Enabled = (
+            self.allow_undo and manager.isUndoPossible() and manager.getCurrentUndoActionTitle() == UNDO_TITLE
+        )
 
     def _choice(self, name):
         position = self.dialog.getControl(name).getSelectedItemPos()
@@ -198,20 +203,28 @@ class AssistantDialog:
         if self.pending is None:
             return
         result = call(self.catalog, APPLY, self.pending, self.target)
-        self._show(f"Applied {len(result['changes'])} paragraph change(s). Use Undo or Ctrl+Z to revert.")
+        self.allow_undo = bool(result["undo"])
+        if result["undo"]:
+            suffix = " Use Undo or Ctrl+Z to revert."
+        else:
+            suffix = " Writer did not record an undo step for this action."
+        self._show(f"Applied {len(result['changes'])} change(s).{suffix}")
 
     def undo(self):
         manager = self.document.getUndoManager()
-        if not manager.isUndoPossible() or manager.getCurrentUndoActionTitle() != UNDO_TITLE:
+        if not self.allow_undo or not manager.isUndoPossible() or manager.getCurrentUndoActionTitle() != UNDO_TITLE:
             raise ToolError("nothing_to_undo", "The last Writer action was not a Yu Writer Assistant change.")
         manager.undo()
         self._show("Undid the last Yu Writer Assistant change.")
 
     @staticmethod
     def _describe(preview):
-        lines = [f"Preview of {preview['action']} for {len(preview['changes'])} paragraph(s):"]
+        lines = [f"Preview: {preview['action']} ({len(preview['changes'])} change(s)):"]
         for change in preview["changes"][:50]:
-            if preview["action"] == "rewrite":
+            if "paragraph" not in change:
+                lines.append(f"\n{change['target']}: {json.dumps(change['before'], ensure_ascii=False)}"
+                             f"\n    → {json.dumps(change['after'], ensure_ascii=False)}")
+            elif preview["action"] in {"rewrite", "find_replace"}:
                 lines.append(f"\n[{change['paragraph']}] before: {change['before']}\n    after: {change['after']}")
             else:
                 lines.append(f"\n[{change['paragraph']}] {change['text'][:80]}\n    set: "
