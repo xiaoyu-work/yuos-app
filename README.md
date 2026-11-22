@@ -17,11 +17,11 @@ partitions. KV is not Agent memory.
 SDK/runtime, network authority and the shared transport remain OS-owned.
 [`capabilities/ai-helpers`](capabilities/ai-helpers/MODULE.md) owns `summarize`,
 an explicit-text AI client, not a provider or another product's AI gateway.
-The selected source now contains **63 App identities**: **24 business product
+The independent App release selects **63 App identities**: **24 business product
 groups plus four shared-capability groups (51 Agent, 12 desktop)**. Eleven
-messaging connectors were explicitly retired after the original 75-identity
-source relocation, followed by the legacy `gateway-email` App. Retained identities, consent and user namespaces are not
-merged; source ownership is not backend consolidation or visual acceptance.
+messaging connectors, the legacy `gateway-email` App and Widget Rail were
+retired. Retained identities, consent and user namespaces are not merged;
+source ownership is not backend consolidation or visual acceptance.
 
 | Product | Source | Migration state |
 | --- | --- | --- |
@@ -43,7 +43,6 @@ merged; source ownership is not backend consolidation or visual acceptance.
 | Clipboard | [products/clipboard](products/clipboard/README.md) | Selection client and complete native CopyQ history panel have moved; Wayland authority stays OS-owned, and selection/history backend integration remains pending |
 | Notification Delivery | [products/notification-delivery](products/notification-delivery/README.md) | One-shot `gateway-ntfy`, `gateway-pushover` and `gateway-webhook` have moved; durable notification service and Rust ntfy dispatcher stay OS-owned; service integration remains separate |
 | Home Integration | [products/home-integration](products/home-integration/README.md) | `gateway-homeassistant` REST adapter has moved; external server/device state, OS egress and credentials remain separate; no new UI |
-| Desktop Widgets | [products/desktop-widgets](products/desktop-widgets/README.md) | Native and Web Widget Rail; reads only authorized OS resource telemetry |
 | Editor | [products/editor](products/editor/README.md) | Complete native UI, MCP, AI presentation, resources and build; filesystem/snapshot authority and AI providers remain OS-owned |
 | Yu Office | [products/office](products/office/MODULE.md) | LibreOffice source pin, ordered downstream patches, independent native build and signed App APT release path; no OS preinstallation |
 | Capture | [products/capture](products/capture/README.md) | Complete native portal client, MCP, translations/resources and original build; interactive UI stays in the OS portal, and non-interactive capture uses scoped OS authority |
@@ -53,8 +52,8 @@ merged; source ownership is not backend consolidation or visual acceptance.
 Start with [ARCHITECTURE.md](ARCHITECTURE.md) and [AGENTS.md](AGENTS.md).
 The new [Desktop Shell source baseline](products/desktop-shell/README.md)
 contains the complete editable Caelestia frontend and matching source
-dependencies. It is not yet a registered App, release input or installed
-session and does not change the retained identity counts above.
+dependencies. It is a registered GUI-only App built as an OS input, outside
+the independent App release counts above.
 Messaging connector sources are grouped under
 [products/messaging-channels](products/messaging-channels/README.md), starting
 with Discord, Telegram, Slack and WhatsApp.

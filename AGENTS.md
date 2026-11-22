@@ -84,15 +84,15 @@ python3 tools/stage.py document-engine --kind capability --root build/doc-stage
 
 These tests do not replace the native product's build or UI acceptance.
 
-The 63 retained App identities are source-owned here (24 business products,
+The independent App release selects 63 identities (24 business products,
 four capability groups; 51 Agent and 12 desktop identities). Eleven messaging
-connectors and the legacy `gateway-email` App were explicitly retired; do not
-restore them as source fallbacks. Keep source
+connectors, the legacy `gateway-email` App and `widget-rail` were explicitly
+retired; do not restore them as source fallbacks. Keep source
 completion separate from pending backend/state/identity consolidation or new
 UI work. AI Helpers owns only the `summarize` client; other products use SDK AI
 directly. Its tests must use isolated synthetic public AI/policy/memory wire
 fixtures, never paid/live models or another product's consent/budget.
-Desktop Shell adds one new GUI identity and product beyond that retained set.
+Desktop Shell is an additional GUI identity and product, built as an OS input.
 
 Independent release work starts at [`packaging/MODULE.md`](packaging/MODULE.md)
 and [`docs/releases.md`](docs/releases.md). `tools/release.py plan --select ...`

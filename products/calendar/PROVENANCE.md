@@ -12,8 +12,8 @@ This repository owns the complete standalone Calendar executable, UI library,
 localization, desktop entry, icon and native build/installer. The OS
 `cosmic-applets` dispatcher no longer links the product or reads its resources.
 The original callback seam now uses the public SDK's fixed, versioned OS
-applet provider. Provider implementation and policy remain OS-owned; neither
-Calendar nor Widget Rail calls another App.
+applet provider. Provider implementation and policy remain OS-owned.
+Calendar does not call another App.
 
 Development links the shared Yu OS toolkit (including its vendored iced
 tree) from the immutable [`platform.lock.json`](../../platform.lock.json).

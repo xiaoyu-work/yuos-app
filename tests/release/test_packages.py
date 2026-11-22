@@ -30,7 +30,8 @@ def test_release_versions_cannot_inject_tags_paths_or_shell(value):
 @pytest.mark.parametrize("architecture", ["amd64", "arm64"])
 def test_all_identities_have_exactly_one_headless_or_desktop_package_owner(architecture):
     plan = release.make_plan("all", "1.0.0")
-    assert len([item for item in plan["selections"] if item not in ("support", "sets")]) == 29
+    assert len([item for item in plan["selections"] if item not in ("support", "sets")]) == 28
+    assert "desktop-widgets" not in plan["selections"]
     agent, desktop = {}, {}
     for entry in plan["packages"]:
         if entry["architecture"] not in ("all", architecture):
@@ -40,7 +41,8 @@ def test_all_identities_have_exactly_one_headless_or_desktop_package_owner(archi
             assert app_id not in destination
             destination[app_id] = entry["package"]
     assert len(agent) == 51
-    assert len(desktop) == 13
+    assert len(desktop) == 12
+    assert "widget-rail" not in desktop
     assert not set(agent).intersection(desktop)
     assert desktop["yuos-files"] == "yuos-app-files-desktop"
     assert desktop["yu-office"] == "yuos-app-office-desktop"
@@ -61,7 +63,7 @@ def test_selected_python_products_do_not_schedule_unrelated_native_builds():
     assert {entry["package"] for entry in plan["packages"]} == {"yuos-app-files", "yuos-app-files-desktop"}
 
 
-@pytest.mark.parametrize("product", ["calendar", "clipboard", "desktop-widgets", "launcher"])
+@pytest.mark.parametrize("product", ["calendar", "clipboard", "launcher"])
 def test_standalone_applet_packages_require_the_versioned_os_service_only_for_desktop(product, tmp_path):
     packages = release.packages_for(product)
     native = [entry for entry in packages if entry["variant"] == "desktop"]
@@ -74,9 +76,6 @@ def test_standalone_applet_packages_require_the_versioned_os_service_only_for_de
         )
         assert ("yuos-calendar-read-v1 (= 1)" in dependencies) == (
             product == "calendar" and entry["variant"] == "desktop"
-        )
-        assert ("yuos-observation-v1 (= 1)" in dependencies) == (
-            product == "desktop-widgets" and entry["variant"] == "desktop"
         )
         assert ("yuos-launcher-backend-v1 (= 1)" in dependencies) == (
             product == "launcher" and entry["variant"] == "desktop"

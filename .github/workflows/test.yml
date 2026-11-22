@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        product: [mail, calendar, files, browser, terminal, containers, backup-recovery, store, diagnostics, storage, settings, security, maintenance, events-audit, launcher, clipboard, messaging-channels, notification-delivery, home-integration, desktop-widgets, editor, capture, media-player, notifications, desktop-shell, office]
+        product: [mail, calendar, files, browser, terminal, containers, backup-recovery, store, diagnostics, storage, settings, security, maintenance, events-audit, launcher, clipboard, messaging-channels, notification-delivery, home-integration, editor, capture, media-player, notifications, desktop-shell, office]
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
@@ -93,7 +93,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        product: [calendar, clipboard, desktop-widgets, launcher, editor, files, terminal, store, settings, capture, media-player, notifications]
+        product: [calendar, clipboard, launcher, editor, files, terminal, store, settings, capture, media-player, notifications]
     env:
       CARGO_BUILD_JOBS: "2"
       CARGO_PROFILE_DEV_DEBUG: "0"

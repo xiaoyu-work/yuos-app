@@ -102,7 +102,7 @@ marker so Debian resolves each ELF's `$ORIGIN` against its staged private
 libraries. The marker is removed before final control metadata is emitted.
 `release: false` leaves development builds available while excluding an
 unqualified product from both explicit publication and aggregate package sets.
-Calendar, Clipboard and Widget Rail generate localized desktop entries only in
+Calendar and Clipboard generate localized desktop entries only in
 Cargo's `OUT_DIR`. Their original installers use the shared
 `native_desktop_metadata.py` build helper selected by `native_build.py` to
 consume the current package's exact Cargo JSON output, including cached builds.

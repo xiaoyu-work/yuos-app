@@ -113,14 +113,14 @@ physical-device and public deployment qualifications are not App privileges.
 | OS App permission-management service | `system.app-permissions` now accepts independently authorized Apps through the existing High-risk `sys.permissions:manage` capability and authenticated owner, not a fixed Settings identity. It can inspect, request restoration and revoke supported permissions; trusted OS approval, target validation and checked retirement remain mandatory. This does not complete GUI permission acquisition or permit App-owned approval. |
 | OS media-player route | Any independently authorized client uses exact observation/control scopes. Root selects the actual signed running GUI instance; its original UI supplies live status and commands. Caller revocation, ambiguous-window refusal, protected media/thumbnail access, real output-only PCM and checked retirement are verified without an owner bus or compatibility-executable identity. |
 | App persistent storage | The OS binds the existing owner/App data partition through exact-App private idmapped views for service Hosts and, after Root registration authorization, task-host ordinary operations. Host/UID replacement does not copy, chown or delete backing files. Calendar reads now use the owner-scoped OS broker service and a bounded read-only helper, not the consumer's private directory; this does not complete installed-App or GUI resource acceptance. |
-| Native Calendar, Clipboard and Widget Rail panels | All three existing identities have real MCP-first package-local native binaries and product-owned Web workflows. Clean OS fixtures verify bounded original read-only panels, normal protected review and checked Host/resource retirement; Agent virtual ABI dependencies replace the Desktop-only applet-provider requirement. Full installed/provider/hardware acceptance remains pending; no new identity, grant or SDK pin is introduced. |
+| Native Calendar and Clipboard panels | Both identities have real MCP-first package-local native binaries and product-owned Web workflows. Clean OS fixtures verify bounded original read-only panels, normal protected review and checked Host/resource retirement; Agent virtual ABI dependencies replace the Desktop-only applet-provider requirement. Full installed/provider/hardware acceptance remains pending; no new identity, grant or SDK pin is introduced. |
 | Clipboard history service | The [bounded native UI proofs](../products/clipboard/MODULE.md) cover the pinned CopyQ data relay, independent lifetime, two painted synthetic texts, delete/confirmed-clear effects and Restore into an authenticated Root headless display with real plain-text/HTML MIME transfers. Restore spends the original compound rights once; no selection-read union, owner-socket fallback or new collector is introduced. Matching Agent/Desktop 0.2.1 is required for the private OS effect protocol; the public SDK pin is unchanged. Physical display/hardware and full installed/publication acceptance remain separate. The Debian `copyq` dependency is availability only. |
 | Native payload/runtime integration | Actual signed original native programs pass the common Host's software display/resource and checked-retirement lanes. Named auxiliary entries remain independently declared; no default-GUI/MCP grant union is introduced. Physical desktop layout and installed-image qualification remain separate; see [the bounded contract](native-payloads.md). |
 | Settings authority ownership | OS-owned desktop/first-boot policy is preserved. The native UI uses closed Root owner-preference, regional, Network, Bluetooth, Power and Location providers, plus independent file selection. Public config-ID normalization, exact Parent path admission, empty mandatory authority and ungranted optional startup are verified; no App-owned consent or global config mount is added. |
 | Notifications presentation boundary | The published 0.2.1 SDK carries the public presentation contract; config/util stay App-private. Real original popup rendering/reopen, descriptor, mute, durable dismiss/acknowledge, revocation and checked helper/GUI/PAM retirement pass. Root alone owns the desktop delivery consumer, DND and retries; a transport close never acknowledges notification data. |
 
 Parent verification confirms `cosmic-applets` Cargo/main/build no longer
-references Calendar, Clipboard or Widget Rail. That completed separation is
+references Calendar or Clipboard. That completed separation is
 useful but does not resolve the distinct runtime/authority gaps above.
 
 `release_payload.py` enforces the same delivery rules for every package:
@@ -335,6 +335,13 @@ entries and refuse new releases that contain them. The original `.deb` files,
 APT inventory tuples, tags and release assets remain available as historical
 records.
 
+Widget Rail (`widget-rail`, Debian package `yuos-app-desktop-widgets-desktop`)
+is retired. The next signed Store update removes it from discovery but does
+not uninstall an existing package. Once the OS no longer requires it, remove
+the package through the OS package manager if it is still installed, and remove
+the panel from any custom layout that still references it. This change does not
+migrate or delete owner data.
+
 The release order deliberately separates tested inputs from final publication:
 
 1. Authenticate each matrix build record against the original unsigned CI
@@ -448,10 +455,9 @@ library dependencies are computed from the actual installed ELF binaries with
 configuration.
 These dependencies express public interface availability, never a grant, a
 special caller class or a sandbox exemption.
-The standalone Calendar, Clipboard and Desktop Widgets packages use,
-respectively, the OS Calendar, clipboard history and observation interfaces.
-Widget Rail no longer depends on Calendar or reads Agent tasks. None has a hard dependency on the
-full OS Desktop package. The OS retains policy and service
+The standalone Calendar and Clipboard packages use the OS Calendar and
+clipboard history interfaces respectively. Neither has a hard dependency on
+the full OS Desktop package. The OS retains policy and service
 implementations; App packages install only their own presentation
 binaries/resources. Agent-only Ubuntu/WSL installations can select native App
 packages explicitly, subject to the same GUI resources and permissions.
@@ -502,7 +508,7 @@ The metadata records `architecture`, the full checkout SHA as
 to build it. The OS sign/package job validates the input and seals the App
 before embedding it.
 
-The OS shell no longer links Calendar/Clipboard/Widget Rail UI or
+The OS shell no longer links Calendar/Clipboard UI or
 Notifications-private config/util. App packages retain the original panel
 binaries, desktop entries/icons and common-Host launchers; OS notification
 presentation uses the existing public SDK records/proxy with confirmed popup

@@ -37,8 +37,7 @@ The OS service and ordinary task-operation Hosts bind Calendar's existing
 owner/App data partition through private UID-mapped views, so a new Host can read the same
 on-disk state without copying it or changing its owner. This is not a new
 Calendar directory. The panel reads through the owner-scoped OS Calendar
-service; it receives no raw database file access. Widget Rail no longer
-reads this service.
+service; it receives no raw database file access.
 Installed GUI/resource acceptance remains separate.
 
 ## Read-only panel service and Web UI

@@ -93,7 +93,6 @@ already been published or that every physical device has been exercised.
 | `tools/stage.py` | Kind-aware assembly of declared App assets and named shared Python library dependencies |
 | `tools/package_assets.py` | Owner-scoped extra product assets invoked once by canonical staging, without changing common-library ownership |
 | `tools/native_payload.py` | Original-installer output to package-local ELF/resource/license preparation, explicit signer entries and common-Host compatibility launchers; no resource activation or authority |
-| `products/desktop-widgets/` | Widget Rail native and Web presentation; resource telemetry and authority remain OS-owned |
 | `products/home-integration/` | Home Assistant REST adapter source; external server, accounts, devices and automation state are not imported; OS credentials and egress authority remain separate |
 | `products/messaging-channels/` | Selected Discord, Telegram, Slack and WhatsApp outbound/presentation clients; versioned SDK delegates authenticated owner/sender admission, lifecycle and replay to the OS and ordinary Activity triggers |
 | `platform.lock.json`, `tools/platform_dependency.py` | Published, digest-pinned SDK/runtime/toolkit artifact, not an OS source checkout |
@@ -194,11 +193,11 @@ Source composition distinguishes `products/<name>` (business products) from
 commands retain their meaning; capability selection is explicit, never a
 filesystem fallback. Names cannot collide across kinds. Document Engine owns
 `doc`; Storage SDK owns `db` and `kv`; HTTP owns `net`; AI Helpers owns
-`summarize`. The 63 retained identities belong to 24 business product groups
-plus four shared-capability groups, partitioned as 51 Agent and 12 desktop
-identities. Native preparation remains product-only. Source completion does not
-complete shared-state/backend or identity cutovers, new UI work, or installed
-visual/hardware acceptance. Eleven messaging connectors were explicitly
+`summarize`. Independent App releases select 63 identities across 24 business
+products and four shared-capability groups: 51 Agent and 12 desktop. Desktop
+Shell is an additional OS build input. Native preparation remains product-only.
+Source completion does not complete shared-state/backend or identity cutovers,
+new UI work, or installed visual/hardware acceptance. Eleven messaging connectors were explicitly
 retired after the original 75-identity source relocation; their previous
 credentials and installed state are not deleted or migrated here.
 
@@ -308,7 +307,7 @@ write. No grants, installed identity, user history or other App state move.
 `tools/native_build.py <product> test` is the shared native development/CI runner.
 It uses each product's checked-in lock and the common toolkit patch mapping,
 with generated inputs under `build/<product>-native` and a shared native target
-cache. CI compiles and tests Calendar, Clipboard and Desktop Widgets libraries
+cache. CI compiles and tests the Calendar and Clipboard libraries
 and the complete Launcher, Editor, Files, Terminal, Store, Settings, Capture,
 Media Player and Notifications binaries.
 Notifications keeps its original git toolkit/panel graph, config/util crates
@@ -412,11 +411,6 @@ time, then replaces its process with isolated system Python; no mutable App
 script or App intercall is involved. The OS-supplied SDK authenticates native
 calls and the runtime checks exact scopes before the typed launch service.
 The native UI service's catalog/history and per-App MCP data remain separate.
-
-Desktop Widgets reads only OS resource telemetry. Its native and Web surfaces
-do not read the Calendar product's data or the owner's Agent task records.
-The OS owns authorization and sampling. Widget Rail owns presentation, refresh
-guards and native suggestions based on reported memory and storage usage.
 
 Media Player preserves the full standalone native video/audio UI, renderer
 and optional dependency graph, thumbnailer and 72 locales. Its MPRIS backend

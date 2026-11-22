@@ -41,7 +41,6 @@ def test_native_build_uses_pinned_toolkit_and_no_other_app(tmp_path):
     builder = module(NATIVE / "build.py")
     builder.prepare(tmp_path / "platform/desktop/toolkit", tmp_path / "build")
     manifest = tomllib.loads((tmp_path / "build/Cargo.toml").read_text())
-    assert "yuos-applet-widget-rail" not in manifest["dependencies"]
     assert manifest["dependencies"]["yuos-sdk"]["path"] == str(
         tmp_path / "platform/yuos-sdk/rust"
     )
@@ -94,7 +93,6 @@ def test_install_requires_explicit_build_staging_not_live_root(tmp_path):
 
 @pytest.mark.parametrize("product,component,desktop_id", [
     ("calendar", "yuos-applet-calendar", "com.yuos.PanelCalendarButton"),
-    ("desktop-widgets", "yuos-applet-widget-rail", "com.yuos.AppletWidgetRail"),
     ("clipboard", "yuos-applet-clipboard", "com.yuos.AppletClipboard"),
 ])
 def test_desktop_install_uses_only_this_packages_cargo_reported_output(
