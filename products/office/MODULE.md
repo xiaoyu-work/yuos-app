@@ -70,10 +70,12 @@ Target binding comes from the adapter, never from model arguments:
   the broker revision. A replace is attempted at most once; any refusal or
   uncertain outcome returns `save_unconfirmed` and is never retried. Without
   `yuos_sdk.files` every file tool fails with `broker_unavailable`; there is no
-  raw-path fallback. The broker is an unpublished OS interface: SDK 0.1.0 has
-  no `yuos_sdk.files` and its schema lacks the `brokered-file` transform, so
-  adapter behaviour is checked only against `writer/fake_broker.py`, a narrow
-  test double that is not staged.
+  raw-path fallback. No published platform provides the broker yet: its
+  `yuos_sdk.files` and `brokered-file` schema transform exist only in an
+  unpublished development SDK. Tests check the adapter's call shape against
+  that SDK and that a local file without a reachable broker is refused, and
+  check tool behaviour against `writer/fake_broker.py`, an in-memory test
+  double (paths that do not exist locally) that is not staged.
 
 UNO tests run against a distribution LibreOffice as a stand-in; that does not
 verify Yu Office's private runtime. DOCX round trips go through LibreOffice's
