@@ -406,7 +406,12 @@ pub fn submit(op: &Operation) -> io::Result<Tracked> {
     let intent = Intent::for_operation(op)?;
     // Persist only correlation/intent, never authority or a cached success.
     intent.save()?;
-    Ok(refresh(&intent, Mode::Review))
+    let mode = if intent.action == Action::InstallRelease {
+        Mode::Submit
+    } else {
+        Mode::Review
+    };
+    Ok(refresh(&intent, mode))
 }
 
 pub fn refresh(intent: &Intent, mode: Mode) -> Tracked {

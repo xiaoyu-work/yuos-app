@@ -46,10 +46,9 @@ confirm the all-App stop for the exact plan and impact before any such stop.
 Neither Critical package permission, an App-install review nor a client flag
 supplies that confirmation. The owner uses `yu package-transactions [request-id]` or
 `--invocation <id>` outside the affected App to inspect completion. `--recover`
-performs read-only outcome reconciliation and never replays APT. App deliveries
-still need separate protected per-App confirmation; Critical package permission
-does not supply it. Query/search and index/hold metadata operations retain
-their existing behavior. Older clients/brokers must refuse the handoff marker
+performs read-only outcome reconciliation and never replays APT. General
+package permission does not confirm App deliveries. Query/search and index/hold
+metadata operations retain their existing behavior. Older clients/brokers must refuse the handoff marker
 or typed correlation field, rather than fall back to an uncoordinated installer.
 
 ```bash
@@ -99,11 +98,10 @@ Delayed results cannot undo a selection made while those results were pending,
 even when the displayed list still came from an earlier query.
 Explicit search submission or activation still opens its search results.
 Its optional package declaration describes the feature, not consent.
-Root must bind this exact signed GUI, owner/session, action, package set and
-invocation to ordinary protected Critical `sys.package` reviews. Only Root
-redeems the complete decision set and retains its real expiry/revocation bounds
-for one unindexed package use; neither an App dialog nor the review-ready
-status authorizes effects, and the GUI's startup grant is never widened.
+Root binds this exact signed GUI, owner/session, action, package set and
+invocation. Actions outside the official release flow still use protected
+Critical `sys.package` reviews. Only Root redeems these decisions for one
+exact package use; the GUI's startup grant is never widened.
 The package-only private GUI transport/shared wiring needs coordinated OS
 integration; older CLIs/daemons fail closed without a provider fallback.
 
@@ -124,9 +122,8 @@ publication while the controller waits for this GUI provider to retire.
 Only a matching authenticated Root `applied` record with confirmed completion
 can report applied; even the codec helper cannot turn acceptance into success.
 Unknown `/usr` readers still require the separate protected global-impact
-review in top-level OS Approvals (`yu agent serve --open`), and App deliveries
-still need independent per-App confirmation. The active `yuosd` package remains
-refused by the same Root controller.
+review in top-level OS Approvals (`yu agent serve --open`). The same Root
+controller still refuses changes to the active `yuosd` package.
 
 The upstream `packagekit` backend/source identifier stays stable, but Debian
 metadata no longer uses a system D-Bus connection or PackageKit daemon.
@@ -144,8 +141,9 @@ inspection and GStreamer codec resolution also fail explicitly until controlled
 OS providers exist rather than reintroducing a raw PackageKit path.
 
 **Yu Apps** uses the signed `yuos-app` catalog for the native architecture.
-The install and update actions bind to its current Debian version; they do not
-install snapshots or bypass per-App review. **Linux Apps** uses the existing
+For an authorized owner, clicking **Install** or **Update** confirms the exact
+signed version without a second App or permission dialog. It neither installs
+a snapshot nor grants standing App or package permissions. **Linux Apps** uses the existing
 localized AppStream views for OS-approved APT sources and configured signed
 Flatpak remotes. A Flatpak install or update selects one exact application ref
 in one user or system installation. The Root provider binds its resolved signed
