@@ -74,6 +74,9 @@ Run Summarize contracts without live models with
 `python3 tools/stage.py ai-helpers --kind capability --root build/ai-helpers-stage`.
 Native Mail uses `python3 products/mail/build.py build -j 8` after the
 preparation described in its README.
+Third-party Store `.deb` submissions are staged in
+[`submissions/incoming/`](submissions/README.md) for mandatory owner review and
+signing via `python3 tools/store_submission.py review` and `approve`.
 
 The root license covers first-party code imported from Yu OS; vendored
 products retain their own licenses and notices. Thunderbird is principally

@@ -254,6 +254,21 @@ Consistent terminal/desktop review and per-App scoped allow,
 ask, deny and real revocation are OS-owned, not App UI or publisher behavior.
 See [the producer/consumer contract](../docs/releases.md#verified-app-snapshot-producer).
 
+`store_submission.py` provides the review-gated third-party Store submission
+workflow (`review` and `approve`). Third-party developers pack an App into an
+unsigned `.deb` with `yu app pack` and submit it under `submissions/incoming/`;
+submissions are never auto-accepted or auto-published. `review <deb> [--json]`
+validates `.deb` archive structure via `release_payload.validate_deb`, checks
+`DEBIAN/control` (`Package: yuos-app-<id>`, `Version`, `Architecture`,
+`Depends` including `yuos-app-runtime-v1 (>= 0.1.0)`, `X-YuOS-App-Ids: <id>`),
+validates `usr/lib/yuos/apps/<id>/app.json` and static lint rules without
+executing code, and reports entrypoints, payload size, and App permissions vs
+flagged system permissions. `approve <deb> --out <output.deb> --provenance-key <key.json>`
+re-runs all `review` checks, removes any untrusted `.provenance.json`, signs the
+App directory with the publisher key (`yuos.provenance/v1`), refreshes
+`DEBIAN/md5sums`, and repacks a deterministic `.deb` verified again with
+`validate_deb`.
+
 ## Local platform development
 
 Source development need not publish an SDK first. `platform_dependency.py`,
