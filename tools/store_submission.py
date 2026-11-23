@@ -765,11 +765,10 @@ def review_deb(deb_path: Path) -> dict:
         _lint_ai_imports(app_root, manifest, permissions)
 
         provenance_note = (
-            "Submitted package includes a developer .provenance.json; Store approval will strip "
-            "and replace it with the Store publisher signature after owner review."
+            "Submitted package includes .provenance.json; Store approval will "
+            "replace it with the Store publisher signature after owner review."
             if provenance_present
-            else "No .provenance.json in submitted package (expected); Store approval will sign "
-            "the App payload after owner review."
+            else "Store approval signs the App payload after owner review."
         )
 
         return {
@@ -883,7 +882,7 @@ def approve_deb(
     *,
     yu_bin: Path | None = None,
 ) -> dict:
-    """Review, strip untrusted provenance, sign with the publisher key, and repack a clean .deb."""
+    """Review, sign with the publisher key, and repack a clean .deb."""
     deb_path = Path(deb_path)
     out_path = Path(out_path)
     provenance_key = Path(provenance_key)

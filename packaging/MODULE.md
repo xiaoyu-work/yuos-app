@@ -52,16 +52,15 @@ construction or a privileged updater.
   this producer supplies no installer, grant or snapshot/source fallback.
   Public tool pins and signing inputs remain owner-controlled prerequisites.
 - `../tools/store_submission.py` enforces the owner-reviewed third-party Store
-  submission workflow (`review` and `approve`). External developers pack an
-  unsigned `.deb` with `yu app pack <dir>` and submit it to
-  `submissions/incoming/` via Pull Request; nothing is ever auto-accepted or
-  auto-published. `review` validates `.deb` archive safety (`validate_deb`),
-  `DEBIAN/control` fields, `app.json` schema/static lint, and emits a
-  categorized permission summary separating App permissions from flagged system
-  permissions without executing package code. `approve` re-runs `review`, strips
-  any untrusted `.provenance.json`, signs `/usr/lib/yuos/apps/<id>` with the
-  publisher `yuos.provenance/v1` key, and repacks a clean `.deb` for the Store
-  APT pipeline.
+  submission workflow (`review` and `approve`). External developers pack a
+  `.deb` with `yu app pack <dir>` and submit it to `submissions/incoming/` via
+  Pull Request; nothing is ever auto-accepted or auto-published. `review`
+  validates `.deb` archive safety (`validate_deb`), `DEBIAN/control` fields,
+  `app.json` schema/static lint, and emits a categorized permission summary
+  separating App permissions from flagged system permissions without executing
+  package code. `approve` re-runs `review`, signs `/usr/lib/yuos/apps/<id>` with
+  the publisher `yuos.provenance/v1` key, and repacks a clean `.deb` for the
+  Store APT pipeline.
 - `../tools/release_development.py` assembles the complete declared fixture
   staging closure and explicitly exported compatibility crates as a
   digest-addressed development archive; it is never a runtime dependency.

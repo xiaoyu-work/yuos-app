@@ -162,7 +162,7 @@ def _pack_submission_deb(
         return destination
 
 
-def test_review_valid_unsigned_deb_categorizes_app_and_flags_system_permissions(tmp_path, capsys):
+def test_review_valid_deb_categorizes_app_and_flags_system_permissions(tmp_path, capsys):
     deb_path = _pack_submission_deb(tmp_path / "incoming")
     report = store_submission.review_deb(deb_path)
 

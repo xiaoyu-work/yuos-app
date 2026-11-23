@@ -14,7 +14,7 @@ Every submission is reviewed by the Store owner first.
    yu app lint ./my-app
    yu app test ./my-app
    ```
-2. Pack your App directory into an unsigned `.deb` archive:
+2. Pack your App directory into a `.deb` archive:
    ```bash
    yu app pack ./my-app --out submissions/incoming/
    ```
@@ -23,8 +23,7 @@ Every submission is reviewed by the Store owner first.
    - `/usr/lib/yuos/apps/<id>/app.json` and your App entrypoints/assets
    - `DEBIAN/control` (`Package: yuos-app-<id>`, `Depends: yuos-app-runtime-v1 (>= 0.1.0)`, `X-YuOS-App-Ids: <id>`)
    - `DEBIAN/md5sums`
-   - No maintainer scripts (`preinst`, `postinst`, `prerm`, `postrm`) and no
-     developer signature required.
+   - No maintainer scripts (`preinst`, `postinst`, `prerm`, `postrm`).
 3. Open a Pull Request to `xiaoyu-work/yuos-app` placing the `.deb` file under
    `submissions/incoming/`. Never modify the live APT pool or Store index directly.
 
@@ -56,7 +55,6 @@ Every submission is reviewed by the Store owner first.
      --out build/approved/yuos-app-<id>_<version>_<arch>.deb \
      --provenance-key /path/to/store-publisher-key.json
    ```
-   `approve` re-runs all `review` checks, strips any untrusted
-   `.provenance.json`, signs `/usr/lib/yuos/apps/<id>` with the publisher
-   `yuos.provenance/v1` Ed25519 key, updates `DEBIAN/md5sums`, and outputs a
-   verified `.deb` ready for the Store APT release pipeline.
+   `approve` re-runs all `review` checks, signs `/usr/lib/yuos/apps/<id>` with
+   the publisher `yuos.provenance/v1` Ed25519 key, updates `DEBIAN/md5sums`, and
+   outputs a verified `.deb` ready for the Store APT release pipeline.
