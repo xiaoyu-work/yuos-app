@@ -532,3 +532,8 @@ _sdk_command("which")(lambda args, _op="which": run(_op, args))
 _sdk_command("start")(lambda args, _op="start": run(_op, args))
 _sdk_command("stop")(lambda args, _op="stop": run(_op, args))
 _sdk_command("ps")(lambda args, _op="ps": run(_op, args))
+
+from yuos_sdk.app import desktop as _sdk_desktop, launch_app as _sdk_launch_app  # noqa: E402
+@_sdk_desktop
+def _open_desktop_gui():
+    return _sdk_launch_app("yuos-term", ["--gui"])

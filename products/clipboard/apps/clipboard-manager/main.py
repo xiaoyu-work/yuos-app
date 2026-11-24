@@ -157,3 +157,8 @@ def clear(confirm: bool, primary: bool = False) -> dict:
     _validate_selection(primary)
     policy.require("clipboard.write", name="selection")
     return _broker("clear", primary=primary, confirm=True)
+
+from yuos_sdk.app import desktop as _sdk_desktop, launch_app as _sdk_launch_app  # noqa: E402
+@_sdk_desktop
+def _open_desktop_gui():
+    return _sdk_launch_app("yuos-applet-clipboard", ["open"])

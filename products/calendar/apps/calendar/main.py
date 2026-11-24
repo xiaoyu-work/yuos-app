@@ -965,3 +965,8 @@ _sdk_command("create")(lambda args, _op="create": run(_op, args))
 _sdk_command("update")(lambda args, _op="update": run(_op, args))
 _sdk_command("delete")(lambda args, _op="delete": run(_op, args))
 _sdk_command("today")(lambda args, _op="today": run(_op, args))
+
+from yuos_sdk.app import desktop as _sdk_desktop, launch_app as _sdk_launch_app  # noqa: E402
+@_sdk_desktop
+def _open_desktop_gui():
+    return _sdk_launch_app("yuos-applet-calendar", ["open"])

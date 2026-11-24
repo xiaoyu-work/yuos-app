@@ -420,3 +420,8 @@ def copy(src: str, dst: str, *, session_id: str | None = None) -> dict:
     else:
         _copy_file(src, dst)
     return {"from": src, "to": dst, "kind": "dir" if is_dir else "file"}
+
+from yuos_sdk.app import desktop as _sdk_desktop, launch_app as _sdk_launch_app  # noqa: E402
+@_sdk_desktop
+def _open_desktop_gui():
+    return _sdk_launch_app("yuos-files", ["--gui"])

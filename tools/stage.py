@@ -239,7 +239,7 @@ def stage(product: str, destination: Path, app_ids: list[str] | None = None,
         shutil.copytree(app, target, symlinks=True, ignore=IGNORE)
         stage_ui(source, package, app_id, target, kind=kind)
     extension = package.get("extension")
-    if extension and "mail-ai" in installed:
+    if extension and ("email" in installed or "mail-ai" in installed):
         specification = importlib.util.spec_from_file_location(
             "product_extension_builder", source / "build-extension.py"
         )

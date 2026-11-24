@@ -204,7 +204,7 @@ def _remember_summary(subject: str, sender: str, payload: dict) -> None:
         if sentiment:
             tags.append(sentiment)
         memory.remember(
-            source="mail-ai",
+            source="email",
             text=text,
             kind="note",
             tags=tags,
@@ -229,7 +229,7 @@ def _remember_triage(subject: str, sender: str, payload: dict) -> None:
             text += f" — {reason}"
         tags = ["mail-ai", "triage", category, priority]
         memory.remember(
-            source="mail-ai",
+            source="email",
             text=text,
             kind="event",
             tags=tags,

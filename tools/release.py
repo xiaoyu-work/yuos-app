@@ -229,7 +229,7 @@ def stage_payload(root, entry):
     kind, name = source_selection(selection)
     source, package = stage.load_package(name, kind)
     # Mail's existing staging entrypoint builds the XPI together with mail-ai.
-    installed = entry["apps"] if name != "mail" or entry["variant"] == "agent" else ["mail-ai"]
+    installed = entry["apps"] if name != "mail" or entry["variant"] == "agent" else ["email"]
     stage.stage(name, root, installed, kind=kind)
     if name == "mail":
         if entry["variant"] == "agent":

@@ -22,7 +22,7 @@ _HERE = Path(__file__).resolve().parent
 
 
 def _bootstrap_sdk_path() -> None:
-    if _HERE == Path("/usr/lib/yuos/apps/mail-ai"):
+    if _HERE == Path("/usr/lib/yuos/apps/email"):
         paths = [Path("/usr/lib/yuos/python")]
     else:
         sys.dont_write_bytecode = True
@@ -33,7 +33,7 @@ def _bootstrap_sdk_path() -> None:
 
 _bootstrap_sdk_path()
 
-import main as mail_ai  # noqa: E402
+import ai_helpers as mail_ai  # noqa: E402
 
 
 class FrameError(ValueError):

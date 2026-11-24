@@ -679,3 +679,8 @@ def is_running(app_id: str) -> dict[str, object]:
         "running": bool(pids),
         "pids": pids,
     }
+
+from yuos_sdk.app import desktop as _sdk_desktop, launch_app as _sdk_launch_app  # noqa: E402
+@_sdk_desktop
+def _open_desktop_gui():
+    return _sdk_launch_app("yuos-launcher", ["--gui"])

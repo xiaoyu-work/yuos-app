@@ -319,3 +319,8 @@ _sdk_command("hold")(lambda args, _op="hold": run(_op, args))
 _sdk_command("unhold")(lambda args, _op="unhold": run(_op, args))
 _sdk_command("update")(lambda args, _op="update": run(_op, args))
 _sdk_command("upgrade-all")(lambda args, _op="upgrade-all": run(_op, args))
+
+from yuos_sdk.app import desktop as _sdk_desktop, launch_app as _sdk_launch_app  # noqa: E402
+@_sdk_desktop
+def _open_desktop_gui():
+    return _sdk_launch_app("yuos-store", ["--gui"])

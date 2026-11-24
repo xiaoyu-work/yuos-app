@@ -634,7 +634,7 @@ def test_selected_apps_stay_separate_and_existing_output_is_immutable(tmp_path, 
 def test_complete_browser_and_mail_resources_remain_inside_signed_snapshots(tmp_path, runtime, signing):
     _, sign = runtime
     roots, expected = [], {}
-    for product, app_id in (("browser", "browser-attached"), ("mail", "mail-ai")):
+    for product, app_id in (("browser", "browser-attached"), ("mail", "email")):
         staged = tmp_path / f"{product}-stage"
         stage.stage(product, staged, [app_id])
         root = tmp_path / f"{product}-snapshot"
@@ -662,7 +662,7 @@ def test_complete_browser_and_mail_resources_remain_inside_signed_snapshots(tmp_
     assert {path.name for path in (browser / "assets/extension").iterdir()} >= {
         "manifest.json", "background.js", "content.js", "popup.html", "popup.js", "README.md",
     }
-    assert (tmp_path / "extracted-mail-ai/assets/yu-mail-ai@yuos.io.xpi").is_file()
+    assert (tmp_path / "extracted-email/assets/yu-mail-ai@yuos.io.xpi").is_file()
     shutil.copy2(signing.public_key, tmp_path / "archive-key.asc")
 
 

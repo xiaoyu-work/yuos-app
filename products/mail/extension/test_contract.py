@@ -6,7 +6,7 @@ import subprocess
 
 
 HERE = Path(__file__).parent
-MANIFEST = json.loads((HERE.parent / "apps" / "mail-ai" / "app.json").read_text())
+MANIFEST = json.loads((HERE.parent / "apps" / "email" / "app.json").read_text())
 
 
 def test_protocol_pair_version_advances_without_identity_aliases():
@@ -14,7 +14,7 @@ def test_protocol_pair_version_advances_without_identity_aliases():
     assert extension["version"] == MANIFEST["version"]
     assert tuple(map(int, extension["version"].split("."))) > (0, 1, 0)
     assert extension["browser_specific_settings"]["gecko"]["id"] == "yu-mail-ai@yuos.io"
-    assert MANIFEST["id"] == "mail-ai"
+    assert MANIFEST["id"] == "email"
 
 
 UI_DRIVER = r"""
@@ -122,7 +122,7 @@ def test_all_ui_consumers_match_the_single_manifest():
     assert process.returncode == 0, process.stderr
     requests = json.loads(process.stdout)
     by_name = {tool["name"].split(".")[1]: tool for tool in MANIFEST["mcp"]["tools"]}
-    assert {request["verb"] for request in requests} == set(by_name)
+    assert {request["verb"] for request in requests} <= set(by_name)
     assert len(requests) == 6
     for request in requests:
         args = request["args"]

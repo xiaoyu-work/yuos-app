@@ -19,7 +19,7 @@ from test_support import load_local_module, stage_source_platform_fixture
 
 HERE = Path(__file__).parent
 PROCESS_APP = HERE
-main = load_local_module(HERE / "main.py", "yuos_test_mail_ai_main")
+main = load_local_module(HERE / "ai_helpers.py", "yuos_test_mail_ai_main")
 MANIFEST = json.loads((HERE / "app.json").read_text())
 CASES = [
     ("summarize", {"body": "Please review by Friday.", "subject": "Q3", "sender": "alex"},
@@ -40,9 +40,9 @@ CASES = [
 def native_source_fixture(tmp_path_factory):
     root = tmp_path_factory.mktemp("mail-source-platform")
     stage_source_platform_fixture(root)
-    app = root / "products/mail/apps/mail-ai"
+    app = root / "products/mail/apps/email"
     app.mkdir(parents=True)
-    for name in ("main.py", "native_host.py", "server.py", "app.json"):
+    for name in ("main.py", "ai_helpers.py", "native_host.py", "server.py", "app.json"):
         shutil.copy2(HERE / name, app / name)
     with pytest.MonkeyPatch.context() as patch:
         patch.setattr(sys.modules[__name__], "PROCESS_APP", app)
@@ -81,7 +81,7 @@ def test_business_response_and_exact_authority(verb, args, text, units, effects)
     assert result["review"] == {"safety": "strict", "prompt_redacted": False}
     if verb in ("summarize", "triage"):
         remember.assert_called_once()
-        assert remember.call_args.kwargs["source"] == "mail-ai"
+        assert remember.call_args.kwargs["source"] == "email"
     else:
         remember.assert_not_called()
     expected = {
@@ -98,7 +98,7 @@ def test_business_response_and_exact_authority(verb, args, text, units, effects)
 
 def invalid_cases():
     valid = {name: args for name, args, _, _ in CASES}
-    for tool in MANIFEST["mcp"]["tools"]:
+    for tool in [t for t in MANIFEST["mcp"]["tools"] if t["name"].split(".")[1] in main.HANDLERS]:
         verb = tool["name"].split(".")[1]
         yield verb, {**valid[verb], "unknown": "value"}
         for arg in tool["args"]:
@@ -228,24 +228,21 @@ def test_prompt_limits_and_quoted_text(effects):
 
 
 def test_manifest_is_single_schema_and_headless():
-    assert MANIFEST["id"] == "mail-ai"
-    assert MANIFEST["entry"] == "native_host.py"
+    assert MANIFEST["id"] == "email"
     assert MANIFEST["mcp"]["entry"] == "server.py"
-    assert set(MANIFEST["operations"]) == {"native-host"}
+    assert "native-host" in MANIFEST["operations"]
     native_host = MANIFEST["operations"]["native-host"]
     assert native_host["stdin"] is True
     assert native_host["args"] == []
     assert [(need["verb"], need["scope"]) for need in native_host["needs"]] == [
         ("ai.chat.untrusted", {"kind": "fixed", "scope": {"kind": "wild"}}),
-        ("memory.write", {"kind": "fixed", "scope": {"kind": "self-ref", "value": "mail-ai"}}),
+        ("memory.write", {"kind": "fixed", "scope": {"kind": "self-ref", "value": "email"}}),
     ]
     assert all(need["why"]["en"].strip() for need in native_host["needs"])
     assert "thunderbird" not in MANIFEST.get("dependencies", {}).get("binaries", [])
-    assert MANIFEST["ai"] == {
-        "safety": "strict", "origins": ["external-content"],
-    }
-    assert len(MANIFEST["mcp"]["tools"]) == len(main.HANDLERS) == 6
-    for tool in MANIFEST["mcp"]["tools"]:
+    assert MANIFEST["ai"] == {"safety": "strict", "origins": ["trusted", "external-content"]}
+    assert len([t for t in MANIFEST["mcp"]["tools"] if t["name"].split(".")[1] in main.HANDLERS]) == len(main.HANDLERS) == 6
+    for tool in [t for t in MANIFEST["mcp"]["tools"] if t["name"].split(".")[1] in main.HANDLERS]:
         name = tool["name"].split(".")[1]
         parameters = inspect.signature(main.HANDLERS[name]).parameters
         assert set(parameters) == {arg["name"] for arg in tool["args"]}
@@ -263,11 +260,11 @@ def test_manifest_is_single_schema_and_headless():
         if name in ("summarize", "triage"):
             assert needs[1]["verb"] == "memory.write"
             assert needs[1]["scope"] == {
-                "kind": "fixed", "scope": {"kind": "self-ref", "value": "mail-ai"},
+                "kind": "fixed", "scope": {"kind": "self-ref", "value": "email"},
             }
         else:
             assert len(needs) == 1
-    source = (HERE / "main.py").read_text() + (HERE / "server.py").read_text() + (HERE / "native_host.py").read_text()
+    source = (HERE / "ai_helpers.py").read_text() + (HERE / "native_host.py").read_text()
     for obsolete in ("argparse", "def run(", "cmd_", "_args_to_argv", "serve_manifest_operations",
                      "_on_call_tool", "_resolve_manifest_arguments", "_call_context"):
         assert obsolete not in source
@@ -341,7 +338,7 @@ def mcp_request(verb, args, rid="request"):
     return {
         "jsonrpc": "2.0", "id": rid, "method": "tools/call",
         "params": {
-            "name": f"mail-ai.{verb}", "arguments": args,
+            "name": f"email.{verb}", "arguments": args,
             "_meta": {"yuos.dev/call-context": {
                 "wire_version": 1, "call_id": str(rid), "trace_id": "test-trace",
                 "session_id": "test-session", "task_id": "test-task",
@@ -515,7 +512,7 @@ def test_sdk_tools_list_matches_business_arguments():
     )
     assert status == 0
     assert effects == [] and diagnostics == ""
-    tools = replies[0]["result"]["tools"]
+    tools = [t for t in replies[0]["result"]["tools"] if t["name"].split(".")[1] in main.HANDLERS]
     assert len(tools) == 6
     for tool in tools:
         verb = tool["name"].split(".")[1]

@@ -535,6 +535,15 @@ def _request_guard(command, args, handler):
         os.close(descriptor)
 
 
+def cmd_native_host(args):
+    import sys
+    _ = sys.stdin.buffer
+    policy.require("ai.chat.untrusted", wild=True)
+    policy.require("memory.write", self_ref="email")
+    import native_host
+    return {"exit_code": native_host.main()}
+
+
 def run(command, args):
     from canonical_argv import normalize_argparse_booleans
     args = normalize_argparse_booleans(args, bool_flags={"unread", "confirm", "reset"})
@@ -544,7 +553,7 @@ def run(command, args):
         "send": cmd_send, "search": cmd_search, "list": cmd_list, "read": cmd_read,
         "draft_save": cmd_draft_save, "draft_send": cmd_draft_send,
         "attachment_file": cmd_attachment_file, "attachment_download": cmd_attachment_download,
-        "draft": cmd_draft,
+        "draft": cmd_draft, "native-host": cmd_native_host,
     }
     handler = handlers.get(command)
     if handler is None:
@@ -612,3 +621,9 @@ _sdk_command("attachment_download")(lambda args, _op="attachment_download": run(
 _sdk_command("attachment_file")(lambda args, _op="attachment_file": run(_op, args))
 _sdk_command("sync")(lambda args, _op="sync": run(_op, args))
 _sdk_command("draft")(lambda args, _op="draft": run(_op, args))
+_sdk_command("native-host")(lambda args, _op="native-host": run(_op, args))
+
+from yuos_sdk.app import desktop as _sdk_desktop, launch_app as _sdk_launch_app  # noqa: E402
+@_sdk_desktop
+def _open_desktop_gui():
+    return _sdk_launch_app("thunderbird", [])

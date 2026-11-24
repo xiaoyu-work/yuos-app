@@ -26,3 +26,8 @@ def list_notifications(limit: int = 20) -> dict[str, object]:
     if not 1 <= limit <= 100:
         raise ValueError("limit must be 1..100")
     return request({"action": "list", "limit": limit})
+
+from yuos_sdk.app import desktop as _sdk_desktop, launch_app as _sdk_launch_app  # noqa: E402
+@_sdk_desktop
+def _open_desktop_gui():
+    return _sdk_launch_app("yuos-notifications", ["--gui"])

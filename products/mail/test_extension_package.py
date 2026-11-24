@@ -60,7 +60,7 @@ def test_bundled_ui_archive_matches_the_shared_app_version(tmp_path):
     source = product / "extension"
     destination = tmp_path / f"{builder.EXTENSION_ID}.xpi"
     builder.build_extension(source, destination)
-    app = json.loads((product / "apps/mail-ai/app.json").read_text(encoding="utf-8"))
+    app = json.loads((product / "apps/email/app.json").read_text(encoding="utf-8"))
     with zipfile.ZipFile(destination) as archive:
         manifest = json.loads(archive.read("manifest.json"))
         assert manifest["version"] == app["version"]

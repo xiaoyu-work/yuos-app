@@ -783,14 +783,11 @@ def test_broker_products_stage_without_os_services(tmp_path, product, app_ids):
 
 
 def test_mail_stage_contains_matching_app_and_ui_without_os_runtime(tmp_path):
-    assert stage.stage("mail", tmp_path) == ["mail-ai", "email"]
-    app = tmp_path / "usr/lib/yuos/apps/mail-ai"
-    assert (app / "server.py").is_file()
-    assert (app / "native_host.py").is_file()
-    assert not (app / "test_main.py").exists()
+    assert stage.stage("mail", tmp_path) == ["email"]
     email = tmp_path / "usr/lib/yuos/apps/email"
     assert (email / "main.py").is_file()
     assert (email / "server.py").is_file()
+    assert (email / "native_host.py").is_file()
     assert json.loads((email / "mail-private-protocol.json").read_bytes()) == {"version": 2}
     assert not (email / "test_main.py").exists()
     assert not (tmp_path / "usr/lib/yuos/apps/_shared").exists()
@@ -800,7 +797,7 @@ def test_mail_stage_contains_matching_app_and_ui_without_os_runtime(tmp_path):
     assert not (tmp_path / "usr/lib/yuos/apps/gateway/_shared").exists()
     assert not (tmp_path / "usr/lib/yuos/python").exists()
     assert not (tmp_path / "usr/lib/yuos/yuos-mail-ai-host").exists()
-    manifest = json.loads((app / "app.json").read_text())
+    manifest = json.loads((email / "app.json").read_text())
     xpi = tmp_path / "usr/lib/thunderbird/distribution/extensions/yu-mail-ai@yuos.io.xpi"
     with zipfile.ZipFile(xpi) as archive:
         assert json.loads(archive.read("manifest.json"))["version"] == manifest["version"]
