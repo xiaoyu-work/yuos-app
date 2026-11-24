@@ -13,7 +13,7 @@ async fn managed_replacement_swaps_handles_without_closing_the_live_popup_or_ack
         std::collections::HashMap::new(),
         0,
     );
-    let mut ui = CosmicNotifications {
+    let mut ui = YuOsNotifications {
         core: Core::default(),
         active_surface: true,
         autosize_id: iced::id::Id::new("replacement"),
@@ -59,7 +59,7 @@ async fn managed_replacement_swaps_handles_without_closing_the_live_popup_or_ack
 #[tokio::test]
 async fn visible_model_keeps_presentation_and_distinguishes_expiry_from_dismissal() {
     let (tx, mut rx) = mpsc::channel(10);
-    let mut ui = CosmicNotifications {
+    let mut ui = YuOsNotifications {
         core: Core::default(),
         active_surface: false,
         autosize_id: iced::id::Id::new("fixture"),
