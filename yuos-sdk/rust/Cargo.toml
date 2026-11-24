@@ -1,6 +1,6 @@
 [package]
 name = "yuos-sdk"
-version = "0.1.0"
+version = "0.1.0-dev.2026112401"
 edition = "2021"
 license = "Apache-2.0"
 description = "Official Rust SDK for Yu OS Apps: manifest-bound MCP tools, gated AI, desktop integration, and public OS services."

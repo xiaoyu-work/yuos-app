@@ -43,9 +43,8 @@ class DiscordApiError(Exception):
 
 
 def _state_dir() -> str:
-    base = os.environ.get("YUOS_DATA_DIR")
-    if not base:
-        base = os.path.join(os.environ.get("LOCALAPPDATA") or os.path.expanduser("~"), "yuos") if sys.platform == "win32" else "/var/lib/yuos"
+    from yuos_sdk.app import data_dir as _sdk_data_dir
+    base = os.environ.get("YUOS_DATA_DIR") or str(_sdk_data_dir())
     path = os.path.join(base, "apps", "gateway-discord")
     os.makedirs(path, exist_ok=True)
     return path

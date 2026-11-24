@@ -20,12 +20,13 @@ from _shared.atomic import atomic_write_bytes  # noqa: E402
 from _shared.env_scrub import scrub_env  # noqa: E402
 
 from yuos_sdk import policy  # noqa: E402
+from yuos_sdk.app import data_dir  # noqa: E402
 
 
 DesktopEntry = dict[str, object]
 _T = TypeVar("_T")
 
-DATA_DIR = os.environ.get("YUOS_DATA_DIR", "/var/lib/yuos")
+DATA_DIR = os.environ.get("YUOS_DATA_DIR") or str(data_dir())
 LAUNCHER_DIR = os.path.join(DATA_DIR, "launcher")
 RECENT_PATH = os.path.join(LAUNCHER_DIR, "recent.jsonl")
 RECENT_ROTATE_BYTES = 1_000_000

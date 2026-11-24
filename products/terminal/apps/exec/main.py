@@ -15,6 +15,7 @@ from _shared.atomic import atomic_write_json  # noqa: E402
 from _shared.env_scrub import scrub_env  # noqa: E402
 
 from yuos_sdk import policy  # noqa: E402
+from yuos_sdk.app import data_dir  # noqa: E402
 
 DEFAULT_TIMEOUT = int(os.environ.get("YUOS_EXEC_TIMEOUT", "300"))
 MAX_OUTPUT_BYTES = 1_000_000  # 1 MB output limit for stdout/stderr
@@ -23,7 +24,7 @@ MAX_OUTPUT_BYTES = 1_000_000  # 1 MB output limit for stdout/stderr
 # marker can be inserted without further loss.
 HARD_OUTPUT_CAP = 8 * 1024 * 1024  # 8 MiB per stream
 WHICH_TIMEOUT = 10
-DATA_DIR = os.environ.get("YUOS_DATA_DIR", "/var/lib/yuos")
+DATA_DIR = os.environ.get("YUOS_DATA_DIR") or str(data_dir())
 PROC_DIR = os.path.join(DATA_DIR, "proc")
 REGISTRY_FILE = os.path.join(PROC_DIR, "registry.json")
 

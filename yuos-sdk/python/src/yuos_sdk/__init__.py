@@ -82,4 +82,4 @@ __all__ = [
     "snapshot",
     "tools",
 ]
-__version__ = "0.1.0"
+__version__ = "0.1.0.dev2026112401"
