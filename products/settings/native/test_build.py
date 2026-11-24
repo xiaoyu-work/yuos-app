@@ -39,7 +39,7 @@ def test_original_nested_workspace_patches_and_full_default_graph(tmp_path):
     main = tomllib.loads((output / "yuos-settings/Cargo.toml").read_text())
     assert main["features"]["default"] == ["a11y", "linux", "single-instance", "wgpu"]
     assert len([feature for feature in main["features"]["linux"] if feature.startswith("page-")]) == 16
-    for library in ("yuos-sdk", "yuos-runtime"):
+    for library in ("yuos-sdk",):
         assert main["dependencies"][library]["path"] == str(tmp_path / "platform" / library / "rust")
     assert (output / "Cargo.lock").read_bytes() == (NATIVE / "Cargo.lock").read_bytes()
     for path in ("i18n/en/yuos_settings.ftl", "page/src/lib.rs", "pages/wallpapers/src/lib.rs",

@@ -31,7 +31,7 @@ def test_standalone_keeps_original_renderer_filechooser_and_lock(tmp_path):
     destination = tmp_path / "terminal"
     native.prepare("terminal", tmp_path / "platform/desktop/toolkit", destination)
     cargo = tomllib.loads((destination / "Cargo.toml").read_text())
-    for library in ("yuos-sdk", "yuos-runtime"):
+    for library in ("yuos-sdk",):
         assert cargo["dependencies"][library]["path"] == str(tmp_path / "platform" / library / "rust")
     assert cargo["features"]["default"] == ["dbus-config", "wgpu", "wayland", "password_manager"]
     assert cargo["dependencies"]["cosmic-files"]["git"] == "https://github.com/pop-os/cosmic-files.git"

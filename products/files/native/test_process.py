@@ -23,9 +23,7 @@ def main():
         stage("files", installed, ["yuos-files"])
         libraries = prepare_exports(download=False)
         python = stage_shared(installed)
-        shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)
-        shutil.copytree(libraries["python-runtime"] / "yuos_runtime", python / "yuos_runtime", ignore=IGNORE)
-        namespace = "/run/files-fixture"
+        shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)        namespace = "/run/files-fixture"
         (fixture / "owner/.recoll/xapiandb").mkdir(parents=True)
         (fixture / "work").mkdir()
         (fixture / "work/a.txt").write_text("untrusted document")

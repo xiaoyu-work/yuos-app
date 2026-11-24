@@ -23,9 +23,7 @@ def main():
         stage("store", installed, ["yuos-store"])
         libraries = prepare_exports(download=False)
         python = stage_shared(installed)
-        shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)
-        shutil.copytree(libraries["python-runtime"] / "yuos_runtime", python / "yuos_runtime", ignore=IGNORE)
-        subprocess.run([
+        shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)        subprocess.run([
             "just", "--justfile", str(ROOT / "build/store-native/justfile"),
             f"rootdir={installed}", f"bin-src={ROOT / 'build/native-target/debug/yuos-store'}",
             "install",

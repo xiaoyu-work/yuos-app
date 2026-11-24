@@ -27,9 +27,7 @@ def main():
         installed = fixture / "installed"
         stage("launcher", installed, ["yuos-launcher"])
         python = stage_shared(installed)
-        shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)
-        shutil.copytree(libraries["python-runtime"] / "yuos_runtime", python / "yuos_runtime", ignore=IGNORE)
-        applications = fixture / "applications"
+        shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)        applications = fixture / "applications"
         applications.mkdir()
         for name in ("Editor", "Other"):
             (applications / f"{name}.desktop").write_text(

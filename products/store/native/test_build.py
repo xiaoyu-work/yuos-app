@@ -37,7 +37,7 @@ def test_original_default_graph_and_nested_workspace(tmp_path):
     ]
     assert cargo["dependencies"]["libcosmic"]["git"] == "https://github.com/pop-os/libcosmic.git"
     assert "patch" not in cargo
-    for library in ("yuos-sdk", "yuos-runtime"):
+    for library in ("yuos-sdk",):
         assert cargo["dependencies"][library]["path"] == str(tmp_path / "platform" / library / "rust")
     assert (output / "Cargo.lock").read_bytes() == (NATIVE / "Cargo.lock").read_bytes()
     assert (output / "res/icons/hicolor/scalable/apps/com.yuos.Store.svg").is_file()

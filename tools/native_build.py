@@ -55,7 +55,7 @@ def prepare(product: str, toolkit: Path | None, destination: Path):
             content = manifest.read_text().replace(
                 f'"{prefix}desktop/', '"' + toolkit.parent.as_posix() + "/"
             )
-            for library in ("yuos-runtime", "yuos-sdk"):
+            for library in ("yuos-sdk",):
                 content = content.replace(
                     f'"{prefix}{library}/',
                     '"' + (toolkit.parents[1] / library).as_posix() + "/",

@@ -69,7 +69,7 @@ def test_standalone_build_rewrites_only_shared_runtime_paths(tmp_path):
     destination = tmp_path / "native"
     native.prepare("editor", toolkit, destination)
     cargo = tomllib.loads((destination / "Cargo.toml").read_text())
-    for library in ("yuos-sdk", "yuos-runtime"):
+    for library in ("yuos-sdk",):
         assert cargo["dependencies"][library]["path"] == str(
             tmp_path / "platform" / library / "rust",
         )

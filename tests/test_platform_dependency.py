@@ -24,15 +24,14 @@ SPEC = importlib.util.spec_from_file_location("platform_dependency", ROOT / "too
 platform = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(platform)
 EXPORTS = {
-    "python-sdk": "yuos-sdk/python/src", "python-runtime": "yuos-runtime/python/src",
-    "rust-sdk": "yuos-sdk/rust", "rust-runtime": "yuos-runtime/rust",
+    "python-sdk": "yuos-sdk/python/src",
+    "rust-sdk": "yuos-sdk/rust",
     "ui-toolkit": "desktop/toolkit", "launcher-client": "desktop/launcher-backend",
 }
 URL = "https://releases.example.invalid/app-platform-v1.0.0/platform.tar.gz"
 SDK_FILE = "yuos-sdk/python/src/yuos_sdk/__init__.py"
 FILES = {
     SDK_FILE: b"VALUE = 'public SDK'\n",
-    "yuos-runtime/python/src/yuos_runtime/__init__.py": b"VALUE = 'public runtime'\n",
     "yuos-sdk/wire/v1/manifest.schema.json": b'{"$id":"public manifest schema"}\n',
     **{path + "/Cargo.toml": b"[workspace]\n" for name, path in EXPORTS.items() if not name.startswith("python")},
 }
@@ -142,7 +141,7 @@ def test_named_exports_share_one_verified_artifact_and_keep_app_support_local(de
     state = dependency
     paths = platform.prepare()
     payload = cache(state) / "payload"
-    assert paths == [payload / EXPORTS["python-sdk"], payload / EXPORTS["python-runtime"],
+    assert paths == [payload / EXPORTS["python-sdk"],
                      state.root / "shared/python"]
     assert platform.prepare_exports() == {name: payload / path for name, path in EXPORTS.items()}
     toolkit = platform.prepare_native()
@@ -189,9 +188,9 @@ def test_local_input_is_explicit_and_preserves_the_production_pin(dependency, de
 def test_local_input_needs_no_production_lock_or_network(dependency, development):
     (dependency.root / "platform.lock.json").unlink()
     paths = platform.prepare(development=development)
-    assert paths[:2] == [
+    assert paths[:1] == [
         development_cache(dependency, development) / "payload" / EXPORTS[name]
-        for name in ("python-sdk", "python-runtime")
+        for name in ("python-sdk",)
     ]
     assert dependency.calls == []
     assert not (dependency.root / "build/platform-artifacts").exists()
@@ -718,7 +717,7 @@ def test_cache_archive_symlink_is_never_followed(dependency):
 
 
 def test_symlink_cannot_be_an_inventory_parent(dependency):
-    dependency.repin(public_archive(links={"yuos-sdk/python": "../yuos-runtime"}))
+    dependency.repin(public_archive(links={"yuos-sdk/python": "../desktop/toolkit"}))
     with pytest.raises(ValueError, match="nondirectory ancestor"):
         platform.prepare()
     assert_unpublished(dependency)
@@ -734,9 +733,8 @@ def test_source_native_host_uses_only_verified_cached_exports(dependency):
     app.mkdir(parents=True)
     shutil.copy2(ROOT / "products/mail/apps/mail-ai/native_host.py", app / "native_host.py")
     (app / "main.py").write_text(
-        "import yuos_sdk, yuos_runtime\n"
+        "import yuos_sdk\n"
         "assert yuos_sdk.VALUE == 'public SDK'\n"
-        "assert yuos_sdk.VALUE == 'public runtime'\n"
         "HANDLERS = {'fixture': lambda: None}\n"
     )
     driver = (
@@ -795,7 +793,7 @@ def test_real_os_artifact_interoperability(dependency, request):
     python = platform.prepare()
     toolkit = platform.prepare_native()
     assert (toolkit / "Cargo.toml").is_file()
-    assert (toolkit.parents[1] / "yuos-runtime/rust/Cargo.toml").is_file()
+    assert (toolkit.parents[1] / "yuos-sdk/rust/Cargo.toml").is_file()
     script = (
         "import sys\n"
         "sys.path[:0] = sys.argv[1:]\n"

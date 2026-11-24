@@ -35,7 +35,7 @@ def _bootstrap_sdk_path() -> None:
         platform = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(platform)
         exports = platform.prepare_exports(download=False)
-        paths = [exports["python-sdk"], exports["python-runtime"]]
+        paths = [exports["python-sdk"]]
     sys.path[:0] = [str(_HERE), *(str(path) for path in paths)]
 
 

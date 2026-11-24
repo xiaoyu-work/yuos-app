@@ -74,7 +74,7 @@ def test_native_build_keeps_the_original_portal_graph_and_only_rewrites_runtime(
     native = load_local_module(ROOT / "tools/native_build.py", "capture_native_build")
     native.prepare("capture", tmp_path / "platform/desktop/toolkit", tmp_path / "native")
     manifest = tomllib.loads((tmp_path / "native/Cargo.toml").read_text())
-    for library in ("yuos-sdk", "yuos-runtime"):
+    for library in ("yuos-sdk",):
         assert manifest["dependencies"][library]["path"] == str(tmp_path / "platform" / library / "rust")
     assert "libcosmic" not in manifest["dependencies"]
     assert "patch" not in manifest

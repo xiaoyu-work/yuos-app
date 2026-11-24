@@ -16,13 +16,11 @@ import tarfile
 SCHEMA = "yuos.app-platform/v1"
 EXPORTS = {
     "python-sdk": "yuos-sdk/python/src",
-    "python-runtime": "yuos-runtime/python/src",
     "rust-sdk": "yuos-sdk/rust",
-    "rust-runtime": "yuos-runtime/rust",
     "ui-toolkit": "desktop/toolkit",
     "launcher-client": "desktop/launcher-backend",
 }
-SOURCE_ROOTS = ("yuos-sdk", "yuos-runtime", "desktop/toolkit", "desktop/launcher-backend")
+SOURCE_ROOTS = ("yuos-sdk", "desktop/toolkit", "desktop/launcher-backend")
 MAX_ARCHIVE_BYTES = 128 * 1024 * 1024
 MAX_EXPANDED_BYTES = 512 * 1024 * 1024
 MAX_FILE_BYTES = 64 * 1024 * 1024

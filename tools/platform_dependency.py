@@ -251,7 +251,7 @@ def prepare_exports(*, download=True, development=None):
 def prepare(*, download=True, development=None):
     shared = stage.shared_python_root(ROOT)
     exports = prepare_exports(download=download, development=development)
-    return [exports["python-sdk"], exports["python-runtime"], shared]
+    return [exports["python-sdk"], shared]
 
 
 def manifest_schema_path(*, download=True, development=None):

@@ -23,9 +23,7 @@ def main():
         stage("terminal", installed, ["yuos-term"])
         libraries = prepare_exports(download=False)
         python = stage_shared(installed)
-        shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)
-        shutil.copytree(libraries["python-runtime"] / "yuos_runtime", python / "yuos_runtime", ignore=IGNORE)
-        namespace = "/run/terminal-fixture"
+        shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)        namespace = "/run/terminal-fixture"
         (fixture / "owner").mkdir()
         (fixture / "work").mkdir()
         broker = fixture / "yu"

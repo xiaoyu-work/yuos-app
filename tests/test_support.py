@@ -151,10 +151,10 @@ def platform_dependency():
 
 
 def stage_platform_python(python):
-    """Compose verified SDK/runtime exports without fetching during a test."""
+    """Compose verified SDK exports without fetching during a test."""
     platform = platform_dependency()
     exports = platform.prepare_exports(download=False)
-    for export, package in [("python-sdk", "yuos_sdk"), ("python-runtime", "yuos_runtime")]:
+    for export, package in [("python-sdk", "yuos_sdk")]:
         shutil.copytree(
             exports[export] / package, python / package,
             symlinks=True, ignore=platform.stage.IGNORE,

@@ -12,7 +12,7 @@ def install_development_runtime(root):
     import platform_dependency
 
     exports = platform_dependency.prepare_exports()
-    for name, export in (("yuos_sdk", "python-sdk"), ("yuos_runtime", "python-runtime")):
+    for name, export in (("yuos_sdk", "python-sdk"),):
         source = exports[export] / name
         assert source.is_dir(), f"Platform artifact must export {name} through {export}"
         shutil.copytree(source, root / "usr/lib/yuos/python" / name,
