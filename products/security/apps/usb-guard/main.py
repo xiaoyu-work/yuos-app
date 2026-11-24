@@ -9,7 +9,7 @@ import sys
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from yuos_runtime import policy  # noqa: E402
+from yuos_sdk import policy  # noqa: E402
 
 
 DEVICE_RE = re.compile(r"^(?=.{3,64}$)[0-9]+-[0-9]+(?:\.[0-9]+)*$")

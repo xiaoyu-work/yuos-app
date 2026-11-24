@@ -9,7 +9,7 @@ import sys
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from yuos_runtime import policy  # noqa: E402
+from yuos_sdk import policy  # noqa: E402
 
 
 NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,126}$")

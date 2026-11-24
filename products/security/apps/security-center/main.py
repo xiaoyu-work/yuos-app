@@ -8,7 +8,7 @@ import sys
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from yuos_runtime import policy  # noqa: E402
+from yuos_sdk import policy  # noqa: E402
 
 
 TIMEOUT_SECS = int(os.environ.get("YUOS_SECURITY_CENTER_TIMEOUT", "180"))

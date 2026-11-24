@@ -23,7 +23,7 @@ import urllib.request
 from _shared.safe_http import canonical_url, host_scope, open_url, parse_url  # noqa: E402
 
 from yuos_sdk import ai  # noqa: E402
-from yuos_runtime import browser_bridge, memory, policy  # noqa: E402
+from yuos_sdk import browser_bridge, memory, policy  # noqa: E402
 
 TIMEOUT = int(os.environ.get("YUOS_WEB_TIMEOUT", "30"))
 DEFAULT_MAX_LENGTH = int(os.environ.get("YUOS_WEB_MAX_CONTENT_LENGTH", "50000"))

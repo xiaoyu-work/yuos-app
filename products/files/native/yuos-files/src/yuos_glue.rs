@@ -6,7 +6,7 @@ pub(crate) mod product;
 use std::io;
 use std::path::Path;
 
-use yuos_runtime::ask_yu;
+use yuos_sdk::ask_yu;
 use serde::Serialize;
 use serde_json::json;
 

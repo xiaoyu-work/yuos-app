@@ -5,7 +5,7 @@ import json
 import os
 import sys
 
-from yuos_runtime import memory, policy
+from yuos_sdk import memory, policy
 
 
 def dispatch(request):

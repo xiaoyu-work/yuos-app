@@ -10,7 +10,7 @@ import unicodedata
 import urllib.request
 
 from _shared import safe_http  # noqa: E402
-from yuos_runtime import policy  # noqa: E402
+from yuos_sdk import policy  # noqa: E402
 
 
 USER_AGENT = "yuos/" + os.environ.get("YUOS_VERSION", "0.1.0")

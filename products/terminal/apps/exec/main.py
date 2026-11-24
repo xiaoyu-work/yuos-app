@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from _shared.atomic import atomic_write_json  # noqa: E402
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from yuos_runtime import policy  # noqa: E402
+from yuos_sdk import policy  # noqa: E402
 
 DEFAULT_TIMEOUT = int(os.environ.get("YUOS_EXEC_TIMEOUT", "300"))
 MAX_OUTPUT_BYTES = 1_000_000  # 1 MB output limit for stdout/stderr

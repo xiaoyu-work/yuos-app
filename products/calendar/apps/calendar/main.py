@@ -22,7 +22,7 @@ from _shared.safe_http import open_url  # noqa: E402
 from yuos_sdk import events  # noqa: E402
 from yuos_sdk.app import data_dir  # noqa: E402
 from yuos_sdk.objects import format_reference  # noqa: E402
-from yuos_runtime import memory, policy  # noqa: E402
+from yuos_sdk import memory, policy  # noqa: E402
 
 # Ceiling on one provider request. Bounded here rather than left to the
 # platform default so a hung endpoint cannot hold an operation open past

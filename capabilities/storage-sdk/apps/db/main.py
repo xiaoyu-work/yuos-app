@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 import sqlite3
 
-from yuos_runtime import policy
+from yuos_sdk import policy
 from yuos_sdk.app import data_dir
 
 DATA_DIR = os.environ.get("YUOS_DATA_DIR") or str(data_dir())

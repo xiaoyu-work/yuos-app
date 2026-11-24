@@ -9,7 +9,7 @@ import stat
 import subprocess
 import sys
 import time
-from yuos_runtime import policy, snapshot
+from yuos_sdk import policy, snapshot
 from _shared.env_scrub import scrub_env
 
 

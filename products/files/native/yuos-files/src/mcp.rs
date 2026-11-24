@@ -124,8 +124,8 @@ impl Tool for SearchTool {
         let search_context = context.clone();
         let results = tokio::task::spawn_blocking(move || -> Result<Vec<Value>, String> {
             let root = std::fs::canonicalize(&root).map_err(|error| error.to_string())?;
-            yuos_runtime::policy::require(
-                "fs.read", yuos_runtime::policy::Scope::path(
+            yuos_sdk::policy::require(
+                "fs.read", yuos_sdk::policy::Scope::path(
                     root.to_str().ok_or("search root must be UTF-8")?,
                 ),
             ).map_err(|error| error.to_string())?;

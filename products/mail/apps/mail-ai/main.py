@@ -25,7 +25,7 @@ import json
 import re
 
 from yuos_sdk import ai
-from yuos_runtime import memory, policy
+from yuos_sdk import memory, policy
 
 
 # ---------------------------------------------------------------------------

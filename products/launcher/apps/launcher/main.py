@@ -19,7 +19,7 @@ from typing import TypeVar
 from _shared.atomic import atomic_write_bytes  # noqa: E402
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from yuos_runtime import policy  # noqa: E402
+from yuos_sdk import policy  # noqa: E402
 
 
 DesktopEntry = dict[str, object]

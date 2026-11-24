@@ -12,7 +12,7 @@ import urllib.request
 
 from _shared.credentials import load_credential  # noqa: E402
 from _shared.safe_http import open_url  # noqa: E402
-from yuos_runtime import memory, policy  # noqa: E402
+from yuos_sdk import memory, policy  # noqa: E402
 
 
 VERSION = os.environ.get("YUOS_VERSION", "0.1.0")

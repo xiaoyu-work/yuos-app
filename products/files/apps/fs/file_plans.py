@@ -15,7 +15,7 @@ import uuid
 
 from _shared.atomic import _fsync_dir, atomic_write_json
 from yuos_sdk.objects import format_reference
-from yuos_runtime import file_changes, policy, snapshot
+from yuos_sdk import file_changes, policy, snapshot
 
 MAX_TEXT_BYTES = 65536
 MAX_PLAN_BYTES = 1024 * 1024

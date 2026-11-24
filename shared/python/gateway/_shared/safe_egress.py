@@ -29,7 +29,7 @@ raw :mod:`urllib.request` API does not:
    redirect-SSRF jumping-off point.
 
 4. **Policy gating.** Every call routes through
-   ``yuos_runtime.policy.require("net.dial", host=hostname)``. The kernel
+   ``yuos_sdk.policy.require("net.dial", host=hostname)``. The kernel
    is the source of truth on whether *this* session can talk to
    *that* host; the helper raises :class:`PermissionDenied` otherwise.
 
@@ -54,12 +54,12 @@ import urllib.request
 from typing import Mapping, Optional, Tuple
 
 try:
-    from yuos_runtime import policy  # type: ignore[import-not-found]
+    from yuos_sdk import policy  # type: ignore[import-not-found]
 except Exception:  # pragma: no cover - exercised only when runtime is absent
     policy = None  # type: ignore[assignment]
 
 try:
-    from yuos_runtime import egress  # type: ignore[import-not-found]
+    from yuos_sdk import egress  # type: ignore[import-not-found]
 except Exception:  # pragma: no cover - exercised only when runtime is absent
 
     class _NoEgress:
@@ -71,7 +71,7 @@ except Exception:  # pragma: no cover - exercised only when runtime is absent
 
         @staticmethod
         def create_connection(host, port, timeout=None):
-            raise RuntimeError("yuos_runtime.egress is unavailable")
+            raise RuntimeError("yuos_sdk.egress is unavailable")
 
     egress = _NoEgress()  # type: ignore[assignment]
 
@@ -453,7 +453,7 @@ def safe_tls_connect(
         )
     if policy is None:
         raise EgressBlocked(
-            "yuos_runtime.policy unavailable; refusing outbound connection"
+            "yuos_sdk.policy unavailable; refusing outbound connection"
         )
     _ = verb_id
     scope_host = f"[{host}]:{port}" if ":" in host else f"{host}:{port}"
@@ -507,7 +507,7 @@ def safe_urlopen(
         urllib.error.HTTPError: Server returned a non-2xx status,
                        *including* 30x redirects (which are blocked).
         urllib.error.URLError: Network-level failure.
-        yuos_runtime.policy.PermissionDenied: Kernel denied the verb.
+        yuos_sdk.policy.PermissionDenied: Kernel denied the verb.
     """
     scheme, host, port, path = _parse_target(url)
     if not _allow_private() and _is_private_address(host):
@@ -520,7 +520,7 @@ def safe_urlopen(
         # Fail closed: no kernel runtime means no gateway can call
         # out. Tests stub `policy` in by monkey-patching the module.
         raise EgressBlocked(
-            "yuos_runtime.policy unavailable; refusing outbound request"
+            "yuos_sdk.policy unavailable; refusing outbound request"
         )
     _ = verb_id
     scope_host = f"[{host}]:{port}" if ":" in host else f"{host}:{port}"

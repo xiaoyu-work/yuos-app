@@ -11,7 +11,7 @@ import sys
 from _shared.atomic import atomic_write_bytes, atomic_write_json  # noqa: E402
 from _shared.env_scrub import scrub_env  # noqa: E402
 from _shared.paths import safe_realpath  # noqa: E402
-from yuos_runtime import policy, snapshot  # noqa: E402
+from yuos_sdk import policy, snapshot  # noqa: E402
 
 
 WORKSPACE = "/workspace"

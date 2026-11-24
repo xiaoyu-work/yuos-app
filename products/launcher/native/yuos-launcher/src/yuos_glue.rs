@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pub fn ask_yu(query: &str) -> Result<(), yuos_runtime::ask_yu::LaunchError> {
-    yuos_runtime::ask_yu::launch_query(query)
+pub fn ask_yu(query: &str) -> Result<(), yuos_sdk::ask_yu::LaunchError> {
+    yuos_sdk::ask_yu::launch_query(query)
 }
 
 pub async fn open_desktop_entry(id: &str) -> Result<(), String> {

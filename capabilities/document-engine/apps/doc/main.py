@@ -4,7 +4,7 @@ import sys
 
 from yuos_files.document import cmd_convert, cmd_info, cmd_read
 from yuos_sdk import ai
-from yuos_runtime import memory, policy
+from yuos_sdk import memory, policy
 
 
 _SUMMARIZE_SYSTEM = "Summarize the document into exactly 5 short bullet lines."

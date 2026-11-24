@@ -12,7 +12,7 @@ import os
 import re
 from datetime import datetime, timezone
 
-from yuos_runtime import policy
+from yuos_sdk import policy
 from yuos_sdk.app import data_dir
 
 DATA_DIR = os.environ.get("YUOS_DATA_DIR") or str(data_dir())

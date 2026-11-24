@@ -2,7 +2,7 @@
 //! Package effects use the retained Root service, never provider dialogs.
 
 use std::{io, path::Path};
-use yuos_runtime::{ask_yu, policy};
+use yuos_sdk::{ask_yu, policy};
 use yuos_sdk::BridgeError;
 use serde::Serialize;
 

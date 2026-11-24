@@ -90,8 +90,8 @@ pub mod files {
     pub fn mkdir(path: impl AsRef<str>) -> Result<(), yuos_sdk::BridgeError> {
         ui_only()?;
         let path = std::path::absolute(path.as_ref())?;
-        yuos_runtime::policy::require(
-            "fs.write", yuos_runtime::policy::Scope::path(path.to_string_lossy()),
+        yuos_sdk::policy::require(
+            "fs.write", yuos_sdk::policy::Scope::path(path.to_string_lossy()),
         ).map_err(io::Error::other)?;
         std::fs::create_dir_all(path)?;
         Ok(())
@@ -106,7 +106,7 @@ pub mod files {
                 mkdir(parent.to_string_lossy())?;
             }
         }
-        yuos_runtime::filesystem::write(path, content).map(|_| ())
+        yuos_sdk::filesystem::write(path, content).map(|_| ())
     }
 }
 

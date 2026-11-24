@@ -16,7 +16,7 @@ pub async fn transform(
 ) -> Result<String, String> {
     tokio::task::spawn_blocking(move || {
         context.check_cancelled().map_err(|e| e.to_string())?;
-        let document = yuos_runtime::filesystem::read(&path).map_err(|e| e.to_string())?;
+        let document = yuos_sdk::filesystem::read(&path).map_err(|e| e.to_string())?;
         context.check_cancelled().map_err(|e| e.to_string())?;
         let text = transform_text(document.content, operation, instruction)?;
         context.check_cancelled().map_err(|e| e.to_string())?;

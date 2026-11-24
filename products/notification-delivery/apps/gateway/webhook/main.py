@@ -195,7 +195,7 @@ def _send(
             "error": f"URL error: {e.reason}",
         }
     except Exception as e:
-        # Catches yuos_runtime.policy.PermissionDenied (which is not
+        # Catches yuos_sdk.policy.PermissionDenied (which is not
         # importable here without coupling to the kernel) and any
         # other unexpected denial path.
         denial = getattr(e, "denial", None)

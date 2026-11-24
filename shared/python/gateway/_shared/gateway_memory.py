@@ -20,7 +20,7 @@ from __future__ import annotations
 from typing import Any, Iterable
 
 try:
-    from yuos_runtime import memory as _memory
+    from yuos_sdk import memory as _memory
 except Exception:  # pragma: no cover - the runtime is always present in prod
     _memory = None  # type: ignore[assignment]
 

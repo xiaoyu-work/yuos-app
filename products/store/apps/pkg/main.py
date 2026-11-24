@@ -14,7 +14,7 @@ import time
 # Keep credentials out of the OS package client process.
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from yuos_runtime import policy  # noqa: E402
+from yuos_sdk import policy  # noqa: E402
 from yuos_sdk import kernel  # noqa: E402
 
 

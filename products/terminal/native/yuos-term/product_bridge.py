@@ -1,6 +1,6 @@
 """Private adapter over the canonical Terminal command implementation."""
 
-from yuos_runtime import policy
+from yuos_sdk import policy
 
 
 def dispatch(request):

@@ -109,9 +109,9 @@ pub(crate) async fn noninteractive(
         .to_owned();
     let result = tokio::task::spawn_blocking(move || {
         if human_cli {
-            yuos_runtime::capture::screenshot_from_terminal(&dir, modal)
+            yuos_sdk::capture::screenshot_from_terminal(&dir, modal)
         } else {
-            yuos_runtime::capture::screenshot(&dir, modal)
+            yuos_sdk::capture::screenshot(&dir, modal)
         }
     })
     .await

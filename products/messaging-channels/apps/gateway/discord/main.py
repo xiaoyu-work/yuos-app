@@ -18,7 +18,7 @@ from typing import Any
 from gateway._shared import atomic, channels, gateway_memory, safe_egress, safe_subprocess
 
 try:
-    from yuos_runtime import policy as _yu_policy
+    from yuos_sdk import policy as _yu_policy
 except ImportError:
     _yu_policy = None
 

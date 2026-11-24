@@ -9,7 +9,7 @@ import sys
 
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from yuos_runtime import policy  # noqa: E402
+from yuos_sdk import policy  # noqa: E402
 
 
 SNAPSHOT_ID_RE = re.compile(r"^snap_[0-9a-f]{32}$")

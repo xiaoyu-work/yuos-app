@@ -18,7 +18,7 @@ use std::os::unix::process::ExitStatusExt;
 use std::path::Path;
 use std::process::{ExitStatus, Output};
 
-use yuos_runtime::ask_yu;
+use yuos_sdk::ask_yu;
 use yuos_sdk::BridgeError;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -53,7 +53,7 @@ fn human_ui() -> io::Result<()> {
 pub fn write_text(path: &Path, contents: &str) -> io::Result<()> {
     human_ui()?;
     let s = path_str(path)?;
-    yuos_runtime::filesystem::write(s, contents).map(|_| ()).map_err(map_err)
+    yuos_sdk::filesystem::write(s, contents).map(|_| ()).map_err(map_err)
 }
 
 /// Create `path` and any missing parents. Mirrors `std::fs::create_dir_all`.

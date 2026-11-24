@@ -6,7 +6,7 @@ import base64
 import os
 from urllib.parse import urlsplit, urlunsplit
 
-from yuos_runtime import browser_bridge, memory, policy
+from yuos_sdk import browser_bridge, memory, policy
 
 from _shared.atomic import atomic_create_bytes
 from _shared.paths import safe_realpath

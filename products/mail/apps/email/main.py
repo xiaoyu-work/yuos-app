@@ -15,7 +15,7 @@ from _shared.paths import safe_realpath
 from yuos_sdk import ai, events, kernel
 from yuos_sdk.mcp import current_context
 from yuos_sdk.objects import format_reference
-from yuos_runtime import memory, policy
+from yuos_sdk import memory, policy
 
 
 MAX_ATTACHMENT_BYTES = 16 * 1024 * 1024

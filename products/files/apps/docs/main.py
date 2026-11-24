@@ -18,7 +18,7 @@ import time
 from _shared.atomic import atomic_write_text  # noqa: E402
 from _shared.env_scrub import scrub_env  # noqa: E402
 
-from yuos_runtime import policy  # noqa: E402
+from yuos_sdk import policy  # noqa: E402
 
 
 def _owner_home() -> pathlib.Path:

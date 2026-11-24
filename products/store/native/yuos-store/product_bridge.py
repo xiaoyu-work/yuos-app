@@ -1,6 +1,6 @@
 """Private adapters over Store's compiled-in catalog and OS policy/snapshots."""
 
-from yuos_runtime import policy, snapshot
+from yuos_sdk import policy, snapshot
 import shutil
 import stat
 
