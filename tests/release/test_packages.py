@@ -40,9 +40,11 @@ def test_all_identities_have_exactly_one_headless_or_desktop_package_owner(archi
             destination = agent if entry["variant"] == "agent" else desktop
             assert app_id not in destination
             destination[app_id] = entry["package"]
-    assert len(agent) == 51
+    assert len(agent) == 50
     assert len(desktop) == 12
     assert "widget-rail" not in desktop
+    assert "mail-ai" not in agent
+    assert agent["email"] == "yuos-app-mail"
     assert not set(agent).intersection(desktop)
     assert desktop["yuos-files"] == "yuos-app-files-desktop"
     assert desktop["yu-office"] == "yuos-app-office-desktop"

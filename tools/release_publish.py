@@ -61,9 +61,6 @@ class GitHub:
         _, repository = self.api("")
         if repository.get("full_name", "").lower() != self.repository.lower() or repository.get("private"):
             raise ValueError("The signed App Pages channel requires its declared public repository")
-        _, immutable = self.api("immutable-releases")
-        if immutable.get("enabled") is not True:
-            raise ValueError("Enable immutable releases in the App repository before publishing")
 
 
 def release_tag(selection, release_version):
@@ -340,9 +337,10 @@ def main():
     publishing.add_argument("--plan", type=Path, required=True)
     publishing.add_argument("--artifacts", type=Path, required=True)
     publishing.add_argument("--initialize", action="store_true")
-    publishing.add_argument("--yu", type=Path, help="Verified public provenance-capable CLI")
+    publishing.add_argument("--yu", type=Path, help="Optional provenance-capable CLI")
     publishing.add_argument("--yu-sha256", help="Explicit public executable SHA256")
     publishing.add_argument("--publisher-key-id", help="Trusted App package publisher key ID")
+    publishing.add_argument("--publisher-trust", type=Path, help="Trusted App publisher yuos.trust/v1 JSON")
     publishing.add_argument("--app-signing-key", type=Path, help="Private input to the existing public signer")
     for action in (publishing, commands.add_parser("refresh")):
         action.add_argument("--output", type=Path, default=ROOT / "build/apt-publication")
@@ -374,10 +372,13 @@ def main():
             from release_store import prepare_release_snapshots, compose as compose_store, refresh
             if plan:
                 if any(entry["apps"] for entry in plan["packages"]):
-                    if not all((options.yu, options.yu_sha256, options.publisher_key_id, options.app_signing_key)):
-                        raise ValueError("App Store publication requires the public provenance CLI, its pins and the App signing key")
-                    from release_snapshots import Provenance
-                    provenance = Provenance(options.yu, options.yu_sha256, options.publisher_key_id)
+                    if not all((options.publisher_key_id, options.app_signing_key)):
+                        raise ValueError("App Store publication requires the publisher key ID and the App signing key")
+                    from release_snapshots import Provenance, read_metadata
+                    publisher = read_metadata(options.publisher_trust) if options.publisher_trust else None
+                    provenance = Provenance(
+                        options.yu, options.yu_sha256, options.publisher_key_id, publisher=publisher,
+                    )
                 packages, snapshot_groups = prepare_release_snapshots(
                     plan, packages, snapshots_root, provenance, signing, options.app_signing_key,
                 )

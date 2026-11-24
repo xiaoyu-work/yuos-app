@@ -135,39 +135,107 @@ def tree_inventory(root, architecture):
     return records
 
 
-class Provenance:
-    """Use the existing public verifier, including its ordinary trust roots."""
+def validate_publisher_trust(publisher, requested_key_id=None):
+    import store_submission
+    key_id, _ = store_submission.validate_publisher_trust(publisher, requested_key_id)
+    return key_id
 
-    def __init__(self, binary, binary_sha256, publisher_key_id):
-        self.binary = Path(binary).resolve(strict=True)
-        self.binary_sha256 = sha256_value(binary_sha256)
+
+class Provenance:
+    """Verify and sign yuos.provenance/v1 App envelopes against pinned publisher trust."""
+
+    def __init__(self, binary=None, binary_sha256=None, publisher_key_id=None, *, publisher=None):
+        if publisher_key_id is None and binary_sha256 is None and isinstance(binary, str) and binary.startswith("sha256:"):
+            publisher_key_id = binary
+            binary = None
+        self.publisher = publisher
+        if publisher is not None and publisher_key_id is None:
+            publisher_key_id = validate_publisher_trust(publisher)
         self.publisher_key_id = sha256_value(publisher_key_id, prefixed=True)
-        self.check_binary()
+        if publisher is not None:
+            validate_publisher_trust(publisher, self.publisher_key_id)
+        if binary is not None or binary_sha256 is not None:
+            if binary is None or binary_sha256 is None:
+                raise ValueError("Explicit provenance CLI requires both binary path and SHA256 pin")
+            self.binary = Path(binary).resolve(strict=True)
+            self.binary_sha256 = sha256_value(binary_sha256)
+            self.check_binary()
+        else:
+            self.binary = None
+            self.binary_sha256 = None
 
     def check_binary(self):
+        if self.binary is None:
+            return
         if not self.binary.is_file() or not os.access(self.binary, os.X_OK) or (
             digest(self.binary) != self.binary_sha256
         ):
             raise ValueError("Public provenance CLI does not match its executable SHA256 pin")
 
+    def sign(self, root, key_path, *, entrypoints=None, resources=None):
+        root = Path(root)
+        manifest = read_metadata(root / "app.json")
+        if self.binary is not None:
+            self.check_binary()
+            arguments = [
+                self.binary, "provenance", "sign", "--kind", "app",
+                "--id", manifest["id"], "--version", manifest["version"],
+                "--path", root, "--key", key_path,
+            ]
+            for selected in (entrypoints if entrypoints is not None else [e for _, e in manifest_entries(manifest)]):
+                arguments.extend(("--entrypoint", selected))
+            for resource in (resources or ()):
+                arguments.extend(("--resource", resource))
+            run(arguments)
+            return
+        import store_submission
+        store_submission.sign_app_directory(
+            root, manifest, Path(key_path),
+            entrypoints=entrypoints, resources=resources,
+        )
+
     def verify(self, root):
-        self.check_binary()
-        result = run([self.binary, "provenance", "verify", "--kind", "app", "--path", root], check=False)
-        if len(result.stdout) > MAX_METADATA or len(result.stderr) > MAX_METADATA:
-            raise ValueError("Public provenance verifier returned excessive output")
+        if self.binary is not None:
+            self.check_binary()
+            result = run([self.binary, "provenance", "verify", "--kind", "app", "--path", root], check=False)
+            if len(result.stdout) > MAX_METADATA or len(result.stderr) > MAX_METADATA:
+                raise ValueError("Public provenance verifier returned excessive output")
+            try:
+                value = json.loads(result.stdout, object_pairs_hook=unique_object, parse_constant=invalid_constant)
+            except (ValueError, UnicodeDecodeError) as error:
+                raise ValueError("Public provenance verifier did not return valid JSON") from error
+            if result.returncode or not isinstance(value, dict) or value.get("verified") is not True:
+                detail = value.get("error", "verification failed") if isinstance(value, dict) else "verification failed"
+                raise ValueError(f"Public provenance verification failed: {detail}")
+            package = value.get("package")
+            if not isinstance(package, dict) or package.get("kind") != "app" or (
+                package.get("trust") != "publisher" or package.get("publisher_key_id") != self.publisher_key_id
+            ):
+                raise ValueError("App snapshot requires its pinned package-signing publisher, not development trust")
+            return value
+        import store_submission
+        root = Path(root)
         try:
-            value = json.loads(result.stdout, object_pairs_hook=unique_object, parse_constant=invalid_constant)
-        except (ValueError, UnicodeDecodeError) as error:
-            raise ValueError("Public provenance verifier did not return valid JSON") from error
-        if result.returncode or not isinstance(value, dict) or value.get("verified") is not True:
-            detail = value.get("error", "verification failed") if isinstance(value, dict) else "verification failed"
-            raise ValueError(f"Public provenance verification failed: {detail}")
-        package = value.get("package")
-        if not isinstance(package, dict) or package.get("kind") != "app" or (
-            package.get("trust") != "publisher" or package.get("publisher_key_id") != self.publisher_key_id
-        ):
-            raise ValueError("App snapshot requires its pinned package-signing publisher, not development trust")
-        return value
+            envelope = store_submission.verify_provenance_envelope(
+                root, expected_key_id=self.publisher_key_id, publisher=self.publisher,
+                check_manifest_entries=False,
+            )
+        except ValueError as error:
+            if "pinned package-signing publisher" in str(error):
+                raise
+            raise ValueError(f"Public provenance verification failed: {error}") from error
+        package = envelope["package"]
+        signature = envelope["signature"]
+        return {
+            "verified": True,
+            "manifest_path": package["manifest_path"],
+            "entrypoints": package["entrypoints"],
+            "package": {
+                **package,
+                "trust": "publisher",
+                "publisher_key_id": signature["key_id"],
+            },
+        }
 
 
 def manifest_entries(manifest):
@@ -524,11 +592,15 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--release-version")
     parser.add_argument("--architecture", choices=("all", "amd64", "arm64"), default="all")
-    parser.add_argument("--yu", type=Path, required=True, help="Public provenance-capable CLI, not an OS checkout")
-    parser.add_argument("--yu-sha256", required=True, help="Executable digest from the verified public tool artifact")
+    parser.add_argument("--yu", type=Path, help="Optional provenance-capable CLI")
+    parser.add_argument("--yu-sha256", help="Executable digest when --yu is provided")
     parser.add_argument("--publisher-key-id", required=True, help="Checked-in Ed25519 package-signing key ID")
+    parser.add_argument("--publisher-trust", type=Path, help="Trusted App publisher yuos.trust/v1 JSON")
     arguments = parser.parse_args()
-    provenance = Provenance(arguments.yu, arguments.yu_sha256, arguments.publisher_key_id)
+    publisher = read_metadata(arguments.publisher_trust) if arguments.publisher_trust else None
+    provenance = Provenance(
+        arguments.yu, arguments.yu_sha256, arguments.publisher_key_id, publisher=publisher,
+    )
     output = work_path(arguments.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=".snapshot-signing-", dir=output.parent) as scratch:

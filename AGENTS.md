@@ -78,8 +78,8 @@ python3 tools/stage.py document-engine --kind capability --root build/doc-stage
 
 These tests do not replace the native product's build or UI acceptance.
 
-The independent App release selects 63 identities (24 business products,
-four capability groups; 51 Agent and 12 desktop identities). Eleven messaging
+The independent App release selects 62 identities (24 business products,
+four capability groups; 50 Agent and 12 desktop identities). Eleven messaging
 connectors, the legacy `gateway-email` App and `widget-rail` were explicitly
 retired; do not restore them as source fallbacks. Keep source
 completion separate from pending backend/state/identity consolidation or new

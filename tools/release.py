@@ -60,6 +60,28 @@ def library_interface(name):
 
 
 def require_platform_artifact(lock=None):
+    if lock is None:
+        if not (ROOT / "yuos-sdk/rust/Cargo.toml").is_file() or not (
+            ROOT / "yuos-sdk/python/src/yuos_sdk/__init__.py"
+        ).is_file():
+            raise ValueError("Missing checked-in Yu OS SDK")
+        return None
+    required = {"version", "url", "sha256", "runtime_abi"}
+    if not isinstance(lock, dict) or set(lock) not in (required, required | {"schema"}):
+        raise ValueError(
+            "platform.lock.json must pin a published artifact with version, url, sha256 and "
+            "runtime_abi; legacy OS Git/source fields are not supported"
+        )
+    if lock.get("schema", "yuos.app-platform/v1") != "yuos.app-platform/v1":
+        raise ValueError("Unsupported App platform lock schema")
+    if not isinstance(lock["version"], str) or not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", lock["version"]):
+        raise ValueError("Invalid App platform version")
+    if not isinstance(lock["sha256"], str) or not re.fullmatch(r"[0-9A-Fa-f]{64}", lock["sha256"]):
+        raise ValueError("Invalid App platform SHA-256")
+    if type(lock["runtime_abi"]) is not int or lock["runtime_abi"] != 1:
+        raise ValueError("Unsupported App platform runtime ABI")
+    if not isinstance(lock["url"], str) or not lock["url"].startswith("https://"):
+        raise ValueError("App platform URL must be HTTPS")
     return None
 
 

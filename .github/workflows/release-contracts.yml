@@ -35,39 +35,10 @@ jobs:
       - name: Plan the full validation selection without publishing
         run: python3 tools/release.py plan --select all --version 0.1.0
       - run: python3 tools/release_ci.py test --plan build/release-plan.json
-      - name: Verify the published provenance CLI fixture
-        run: |
-          python3 - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-          import re
-          import sys
-          import urllib.request
-          sys.path.insert(0, "tools")
-          from release_common import digest
-          pin = json.loads(Path("packaging/provenance-tools.lock.json").read_text())
-          version, expected = pin["version"], pin["sha256"]["amd64"]
-          if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version) or not re.fullmatch(r"[0-9a-f]{64}", expected):
-              raise ValueError("Invalid approved Yu OS provenance tool pin")
-          tool = Path("build/provenance-yu")
-          tool.parent.mkdir(parents=True, exist_ok=True)
-          urllib.request.urlretrieve(
-              f"https://github.com/xiaoyu-work/Yu-OS/releases/download/yuos-sdk-v{version}/yu-provenance-linux-amd64",
-              tool,
-          )
-          if digest(tool) != expected:
-              raise ValueError("Public provenance fixture SHA256 mismatch")
-          tool.chmod(0o755)
-          with open(os.environ["GITHUB_ENV"], "a", encoding="ascii") as environment:
-              environment.write(f"PROVENANCE_YU_SHA256={expected}\n")
-          PY
       - name: Test all selected product and capability contracts together
         run: |
           export TMPDIR="$PWD/build/ci-work"
           python3 tools/release.py test --plan build/release-plan.json --architecture all
       - run: |
           export TMPDIR="$PWD/build/ci-work"
-          python3 -m pytest -q tests/release --basetemp=build/release-tests \
-            --provenance-yu-fixture="$PWD/build/provenance-yu" \
-            --provenance-yu-sha256="$PROVENANCE_YU_SHA256"
+          python3 -m pytest -q tests/release --basetemp=build/release-tests

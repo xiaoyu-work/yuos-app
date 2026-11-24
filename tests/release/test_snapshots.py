@@ -21,8 +21,28 @@ import stage
 @pytest.fixture
 def runtime(request, tmp_path, monkeypatch):
     selected = request.config.getoption("--provenance-yu-fixture")
+    key_path = tmp_path / "package-key.json"
     if not selected:
-        pytest.skip("Real signature checks require an explicit --provenance-yu-fixture")
+        import store_submission
+        key = store_submission.generate_signing_key(key_path, comment="isolated App snapshot fixture")
+        trust_entry = store_submission.trust_entry_for_key(key)
+        write_json(tmp_path / "publisher.json", trust_entry)
+        verifier = snapshots.Provenance(publisher_key_id=key["key_id"], publisher=trust_entry)
+
+        def sign(root, entries=("server.py",), resources=()):
+            manifest = json.loads((root / "app.json").read_bytes())
+            store_submission.sign_app_directory(
+                root, manifest, key_path,
+                entrypoints=list(entries), resources=list(resources),
+                check_manifest_entries=False,
+            )
+            return root
+
+        try:
+            yield verifier, sign
+        finally:
+            key_path.unlink(missing_ok=True)
+        return
     binary = Path(selected).resolve(strict=True)
     expected_digest = request.config.getoption("--provenance-yu-sha256")
     if expected_digest:
@@ -167,9 +187,13 @@ def test_cli_build_and_verify_use_existing_signing_contracts(
     monkeypatch.setenv("YUOS_APPS_APT_SIGNING_PRIVATE_KEY", private.decode())
     monkeypatch.setenv("YUOS_APPS_APT_SIGNING_PASSPHRASE", signing.passphrase.decode())
     monkeypatch.setattr(snapshots, "Signing", lambda workspace: type(signing)(workspace, signing.settings))
+    cli_args = (
+        ["--yu", str(verifier.binary), "--yu-sha256", verifier.binary_sha256]
+        if verifier.binary else ["--publisher-trust", str(tmp_path / "publisher.json")]
+    )
     arguments = [
         "release_snapshots.py", "build", "--app-directory", str(root), "--release-version", "1.0.0",
-        "--output", str(output), "--yu", str(verifier.binary), "--yu-sha256", verifier.binary_sha256,
+        "--output", str(output), *cli_args,
         "--publisher-key-id", verifier.publisher_key_id,
     ]
     monkeypatch.setattr(sys, "argv", arguments)
@@ -179,7 +203,7 @@ def test_cli_build_and_verify_use_existing_signing_contracts(
     assert "YUOS_APPS_APT_SIGNING_PASSPHRASE" not in os.environ
     monkeypatch.setattr(sys, "argv", [
         "release_snapshots.py", "verify", "--output", str(output),
-        "--yu", str(verifier.binary), "--yu-sha256", verifier.binary_sha256,
+        *cli_args,
         "--publisher-key-id", verifier.publisher_key_id,
     ])
     snapshots.main()
@@ -898,7 +922,7 @@ def test_public_provenance_does_not_sign_or_silently_dereference_symlinks(runtim
     (root / "linked-entry.py").symlink_to("server.py")
     with pytest.raises(ValueError, match="cannot sign symlinks"):
         snapshots.tree_inventory(root, "all")
-    with pytest.raises(AssertionError, match="symlinks cannot be signed"):
+    with pytest.raises((AssertionError, ValueError), match="symlinks cannot be signed"):
         sign(root)
     assert not (root / ".provenance.json").exists()
 

@@ -221,6 +221,50 @@ def generate_signing_key(path: Path | None = None, *, comment: str | None = None
     return key_data
 
 
+def trust_entry_for_key(key_data: dict, *, kinds: tuple[str, ...] = ("app",)) -> dict:
+    entry = {
+        "key_id": key_data["key_id"],
+        "algorithm": ALG_ED25519,
+        "public_key": key_data["public_key"],
+        "usages": ["package-signing"],
+        "kinds": list(kinds),
+        "status": "active",
+    }
+    if "comment" in key_data:
+        entry["comment"] = key_data["comment"]
+    return {"schema": "yuos.trust/v1", "keys": [entry]}
+
+
+def validate_publisher_trust(publisher: dict, requested_key_id: str | None = None) -> tuple[str, str]:
+    if not isinstance(publisher, dict) or publisher.get("schema") != "yuos.trust/v1":
+        raise ValueError("Publisher trust requires schema yuos.trust/v1")
+    keys = publisher.get("keys")
+    if not isinstance(keys, list) or not keys:
+        raise ValueError("Publisher trust requires at least one key entry")
+    matched = []
+    for entry in keys:
+        if not isinstance(entry, dict):
+            raise ValueError("Invalid publisher trust key entry")
+        key_id = snapshots.sha256_value(entry.get("key_id", ""), prefixed=True)
+        raw_public = entry.get("public_key", "")
+        if not isinstance(raw_public, str) or not re.fullmatch(r"[0-9a-f]{64}", raw_public):
+            raise ValueError("Publisher trust requires a 32-byte lowercase hex public_key")
+        if key_id_for(bytes.fromhex(raw_public)) != key_id:
+            raise ValueError("Publisher trust key_id does not match public_key")
+        if (
+            entry.get("algorithm") != ALG_ED25519
+            or entry.get("status") != "active"
+            or "package-signing" not in entry.get("usages", [])
+            or "app" not in entry.get("kinds", [])
+        ):
+            continue
+        if requested_key_id is None or key_id == requested_key_id:
+            matched.append((key_id, raw_public))
+    if len(matched) != 1:
+        raise ValueError("App snapshot requires its pinned package-signing publisher, not development trust")
+    return matched[0]
+
+
 def load_signing_key(path: Path) -> tuple[dict, bytes, bytes, str]:
     path = Path(path)
     data = snapshots.read_metadata(path)
@@ -253,7 +297,7 @@ def _collect_provenance_files(app_root: Path) -> list[dict]:
         info = path.lstat()
         mode = stat.S_IMODE(info.st_mode) & 0o7777
         if stat.S_ISLNK(info.st_mode):
-            raise ValueError(f"yuos.provenance/v1 cannot sign symlinks: {rel}")
+            raise ValueError(f"yuos.provenance/v1: symlinks cannot be signed: {rel}")
         if mode & 0o7022:
             raise ValueError(f"Unsafe App payload mode: {rel}")
         if stat.S_ISDIR(info.st_mode):
@@ -296,14 +340,20 @@ def sign_app_directory(
     key_path: Path,
     *,
     yu_bin: Path | None = None,
+    entrypoints: list[str] | tuple[str, ...] | None = None,
+    resources: list[str] | tuple[str, ...] | None = None,
+    check_manifest_entries: bool = True,
 ) -> dict:
     """Sign an extracted App directory with `yu provenance sign` or `yuos.provenance/v1`."""
     app_root = Path(app_root)
     envelope_path = app_root / ENVELOPE_FILE
     if envelope_path.exists() or envelope_path.is_symlink():
         envelope_path.unlink()
-    entrypoints = [entry for _, entry in snapshots.manifest_entries(manifest)]
-    resources = _declared_resources(app_root)
+    entrypoints = (
+        [entry for _, entry in snapshots.manifest_entries(manifest)]
+        if entrypoints is None else list(entrypoints)
+    )
+    resources = _declared_resources(app_root) if resources is None else list(resources)
     if yu_bin is not None:
         yu_bin = Path(yu_bin).resolve(strict=True)
         arguments = [
@@ -316,12 +366,21 @@ def sign_app_directory(
         for resource in resources:
             arguments.extend(("--resource", resource))
         run(arguments)
-        return verify_provenance_envelope(app_root)
+        return verify_provenance_envelope(app_root, check_manifest_entries=check_manifest_entries)
 
     _, seed, public, key_id = load_signing_key(key_path)
     from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
     files = _collect_provenance_files(app_root)
+    regular_files = {item["path"] for item in files if item["type"] == "file"}
+    for entry in entrypoints:
+        snapshots.app_path(entry)
+        if entry not in regular_files:
+            raise ValueError(f"App entrypoint is not a regular file in the package tree: {entry}")
+    for resource in resources:
+        snapshots.app_path(resource)
+        if resource not in regular_files:
+            raise ValueError(f"App resource is not a regular file in the package tree: {resource}")
     body = {
         "kind": "app",
         "id": manifest["id"],
@@ -348,10 +407,18 @@ def sign_app_directory(
     }
     write_json(envelope_path, envelope)
     envelope_path.chmod(0o644)
-    return verify_provenance_envelope(app_root, expected_key_id=key_id)
+    return verify_provenance_envelope(
+        app_root, expected_key_id=key_id, check_manifest_entries=check_manifest_entries,
+    )
 
 
-def verify_provenance_envelope(app_root: Path, *, expected_key_id: str | None = None) -> dict:
+def verify_provenance_envelope(
+    app_root: Path,
+    *,
+    expected_key_id: str | None = None,
+    publisher: dict | None = None,
+    check_manifest_entries: bool = True,
+) -> dict:
     """Verify a signed `.provenance.json` envelope and file inventory in `app_root`."""
     app_root = Path(app_root)
     envelope_path = app_root / ENVELOPE_FILE
@@ -375,34 +442,53 @@ def verify_provenance_envelope(app_root: Path, *, expected_key_id: str | None = 
     entrypoints = package.get("entrypoints")
     if not isinstance(entrypoints, list) or not entrypoints:
         raise ValueError("App provenance requires signed entrypoints")
-    snapshots.validate_manifest_entries(app_root, manifest, entrypoints)
+    resources = package.get("resources", [])
+    if not isinstance(resources, list):
+        raise ValueError("App provenance resources must be a list")
+    if check_manifest_entries:
+        snapshots.validate_manifest_entries(app_root, manifest, entrypoints)
     actual_files = _collect_provenance_files(app_root)
     if package.get("files") != actual_files:
         raise ValueError("App payload files differ from signed provenance inventory")
+    regular_files = {item["path"] for item in actual_files if item["type"] == "file"}
+    for entry in entrypoints:
+        snapshots.app_path(entry)
+        if entry not in regular_files:
+            raise ValueError(f"Signed entrypoint is missing from package inventory: {entry}")
+    for resource in resources:
+        snapshots.app_path(resource)
+        if resource not in regular_files:
+            raise ValueError(f"Signed resource is missing from package inventory: {resource}")
     expected_content_digest = content_digest(actual_files)
     if package.get("content_digest") != expected_content_digest:
         raise ValueError("App provenance content_digest mismatch")
     key_id = snapshots.sha256_value(signature.get("key_id", ""), prefixed=True)
     if expected_key_id is not None and key_id != expected_key_id:
-        raise ValueError("App provenance publisher key_id mismatch")
-    if "public_key" in signature:
-        raw_public = signature["public_key"]
-        if not isinstance(raw_public, str) or not re.fullmatch(r"[0-9a-f]{64}", raw_public):
-            raise ValueError("Invalid Ed25519 public_key in provenance signature")
-        public_bytes = bytes.fromhex(raw_public)
-        if key_id_for(public_bytes) != key_id:
-            raise ValueError("Provenance key_id does not match signature public_key")
-        raw_sig = signature.get("value", "")
-        if not isinstance(raw_sig, str) or not re.fullmatch(r"[0-9a-f]{128}", raw_sig):
-            raise ValueError("Invalid Ed25519 signature value in provenance envelope")
-        from cryptography.exceptions import InvalidSignature
-        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+        raise ValueError("App snapshot requires its pinned package-signing publisher, not development trust")
+    expected_public = None
+    if publisher is not None:
+        trusted_id, expected_public = validate_publisher_trust(publisher, expected_key_id or key_id)
+        if key_id != trusted_id:
+            raise ValueError("App snapshot requires its pinned package-signing publisher, not development trust")
+    raw_public = signature.get("public_key", "")
+    if not isinstance(raw_public, str) or not re.fullmatch(r"[0-9a-f]{64}", raw_public):
+        raise ValueError("Invalid Ed25519 public_key in provenance signature")
+    if expected_public is not None and raw_public != expected_public:
+        raise ValueError("Provenance public_key does not match trusted publisher")
+    public_bytes = bytes.fromhex(raw_public)
+    if key_id_for(public_bytes) != key_id:
+        raise ValueError("Provenance key_id does not match signature public_key")
+    raw_sig = signature.get("value", "")
+    if not isinstance(raw_sig, str) or not re.fullmatch(r"[0-9a-f]{128}", raw_sig):
+        raise ValueError("Invalid Ed25519 signature value in provenance envelope")
+    from cryptography.exceptions import InvalidSignature
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
-        message = canonical_envelope_bytes(package, ALG_ED25519, key_id, raw_public)
-        try:
-            Ed25519PublicKey.from_public_bytes(public_bytes).verify(bytes.fromhex(raw_sig), message)
-        except InvalidSignature as error:
-            raise ValueError("Ed25519 signature verification failed for .provenance.json") from error
+    message = canonical_envelope_bytes(package, ALG_ED25519, key_id, raw_public)
+    try:
+        Ed25519PublicKey.from_public_bytes(public_bytes).verify(bytes.fromhex(raw_sig), message)
+    except InvalidSignature as error:
+        raise ValueError("Ed25519 signature verification failed for .provenance.json") from error
     return envelope
 
 

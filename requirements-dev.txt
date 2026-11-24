@@ -1,4 +1,5 @@
 pytest>=8,<9
 idna>=3.3,<4
 jsonschema>=4,<5
+cryptography>=42,<47
 git+https://github.com/xiaoyu-work/Yu-OS.git#subdirectory=yuos-sdk/python

@@ -147,14 +147,14 @@ def desktop(handler: Union[Handler, str]) -> Any:
             raise ValueError("desktop operation name must be a nonempty string")
 
         def register(fn: Handler) -> Handler:
-            if name in _desktop_commands:
+            if _is_same_module_duplicate(_desktop_commands.get(name), fn):
                 raise ValueError(f"desktop operation {name!r} already has a function")
             _desktop_commands[name] = fn
             return fn
 
         return register
 
-    if _desktop is not None:
+    if _is_same_module_duplicate(_desktop, handler):
         raise ValueError("the desktop window already has a function")
     _desktop = handler
     return handler

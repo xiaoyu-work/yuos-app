@@ -23,14 +23,8 @@ on:
         description: "Build and validate packages without signing, releases or APT publication"
         default: false
         type: boolean
-      provenance_cli_url:
-        description: "Owner-approved published provenance-capable yu executable URL"
-        type: string
-      provenance_cli_sha256:
-        description: "Exact SHA256 of that public signing tool"
-        type: string
       publisher_key_id:
-        description: "Trusted App package Ed25519 publisher key ID (sha256:...)"
+        description: "Trusted App package Ed25519 publisher key ID (sha256:...); defaults to YUOS_APPS_PROVENANCE_PUBLISHER_JSON"
         type: string
   workflow_call:
     inputs:
@@ -49,14 +43,7 @@ on:
       build_only:
         default: false
         type: boolean
-      provenance_cli_url:
-        required: true
-        type: string
-      provenance_cli_sha256:
-        required: true
-        type: string
       publisher_key_id:
-        required: true
         type: string
     secrets:
       YUOS_APPS_APT_SIGNING_PRIVATE_KEY:
@@ -86,15 +73,7 @@ jobs:
           SELECTION: ${{ inputs.select }}
           RELEASE_VERSION: ${{ inputs.version }}
           INCLUDE_FIXTURES: ${{ inputs.fixtures }}
-          BUILD_ONLY: ${{ inputs.build_only }}
-          PROVENANCE_URL: ${{ inputs.provenance_cli_url }}
-          PROVENANCE_SHA256: ${{ inputs.provenance_cli_sha256 }}
-          PUBLISHER_KEY_ID: ${{ inputs.publisher_key_id }}
         run: |
-          if [ "$BUILD_ONLY" != true ] && { [ -z "$PROVENANCE_URL" ] || [ -z "$PROVENANCE_SHA256" ] || [ -z "$PUBLISHER_KEY_ID" ]; }; then
-            echo "Publication requires the approved provenance CLI URL, SHA256 and publisher key ID."
-            exit 1
-          fi
           args=()
           if [ "$INCLUDE_FIXTURES" = true ]; then args+=(--fixtures); fi
           matrix=$(python3 tools/release.py plan --select "$SELECTION" --version "$RELEASE_VERSION" "${args[@]}")
@@ -206,52 +185,40 @@ jobs:
           YUOS_APPS_APT_SIGNING_PRIVATE_KEY: ${{ secrets.YUOS_APPS_APT_SIGNING_PRIVATE_KEY }}
           YUOS_APPS_APT_SIGNING_PASSPHRASE: ${{ secrets.YUOS_APPS_APT_SIGNING_PASSPHRASE }}
           INITIALIZE: ${{ inputs.initialize }}
-          PROVENANCE_URL: ${{ inputs.provenance_cli_url }}
-          PROVENANCE_SHA256: ${{ inputs.provenance_cli_sha256 }}
           PROVENANCE_KEY_ID: ${{ inputs.publisher_key_id }}
           PROVENANCE_PUBLISHER: ${{ vars.YUOS_APPS_PROVENANCE_PUBLISHER_JSON }}
           YUOS_APPS_PROVENANCE_SIGNING_PRIVATE_KEY: ${{ secrets.YUOS_APPS_PROVENANCE_SIGNING_PRIVATE_KEY }}
         run: |
-          env -u YUOS_APPS_REPO_SETTINGS_TOKEN python3 - <<'PY'
-          import json, os, re
+          publisher_key_id=$(env -u YUOS_APPS_REPO_SETTINGS_TOKEN python3 - <<'PY'
+          import json, os, sys
           from pathlib import Path
-          import sys
-          from urllib.parse import urlsplit
-          import urllib.request
           sys.path.insert(0, "tools")
-          from release_common import digest, run
-          from release_publish import require_publication_contract
           from release_common import config
+          from release_publish import require_publication_contract
+          from release_snapshots import validate_publisher_trust
           require_publication_contract(config())
-          url = os.environ["PROVENANCE_URL"]
-          parsed = urlsplit(url)
-          checksum = os.environ["PROVENANCE_SHA256"]
-          if parsed.scheme != "https" or parsed.hostname != "github.com" or not parsed.path.startswith(
-              "/xiaoyu-work/Yu-OS/releases/download/"
-          ) or not re.fullmatch(r"[0-9a-f]{64}", checksum):
-              raise ValueError("A pinned published OS provenance tool is required")
-          tool = Path("build/provenance-yu")
-          tool.parent.mkdir(parents=True, exist_ok=True)
-          urllib.request.urlretrieve(url, tool)
-          if digest(tool) != checksum:
-              raise ValueError("Public provenance tool SHA256 mismatch")
-          tool.chmod(0o755)
           publisher = json.loads(os.environ["PROVENANCE_PUBLISHER"])
+          requested_key_id = os.environ.get("PROVENANCE_KEY_ID", "").strip() or None
+          key_id = validate_publisher_trust(publisher, requested_key_id)
           trust = Path("build/provenance-publisher.json")
+          trust.parent.mkdir(parents=True, exist_ok=True)
           trust.write_text(json.dumps(publisher))
-          run([tool, "provenance", "trust", "add", "--file", trust])
           key = Path("build/provenance-signing-key.json")
           descriptor = os.open(key, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
           with os.fdopen(descriptor, "w") as output:
               output.write(os.environ.pop("YUOS_APPS_PROVENANCE_SIGNING_PRIVATE_KEY"))
+          print(key_id)
           PY
+          )
+          unset YUOS_APPS_PROVENANCE_SIGNING_PRIVATE_KEY
           trap 'rm -f build/provenance-signing-key.json' EXIT
           args=()
           if [ "$INITIALIZE" = true ]; then args+=(--initialize); fi
           python3 tools/release_publish.py publish --plan build/release-plan.json \
             --artifacts build/release "${args[@]}" \
-            --yu build/provenance-yu --yu-sha256 "$PROVENANCE_SHA256" \
-            --publisher-key-id "$PROVENANCE_KEY_ID" --app-signing-key build/provenance-signing-key.json
+            --publisher-key-id "$publisher_key_id" \
+            --publisher-trust build/provenance-publisher.json \
+            --app-signing-key build/provenance-signing-key.json
       - uses: actions/upload-pages-artifact@v3
         with:
           path: build/apt-publication

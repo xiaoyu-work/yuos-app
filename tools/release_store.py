@@ -417,22 +417,15 @@ def prepare_release_snapshots(plan, packages, output, provenance, signing, key):
                 if provenance is None or key is None:
                     raise ValueError("App release requires the pinned public provenance signer and signing key")
                 manifest = snapshots.read_metadata(path / "app.json")
-                provenance.check_binary()
-                arguments = [
-                    provenance.binary, "provenance", "sign", "--kind", "app",
-                    "--id", manifest["id"], "--version", manifest["version"],
-                    "--path", path, "--key", key,
-                ]
-                for _, selected in snapshots.manifest_entries(manifest):
-                    arguments.extend(("--entrypoint", selected))
-                arguments.extend(("--resource", DESCRIPTOR, "--resource", "web/index.html"))
+                entrypoints = [selected for _, selected in snapshots.manifest_entries(manifest)]
+                resources = [DESCRIPTOR, "web/index.html"]
                 for desktop in sorted((path / "resources/usr/share/applications").glob("*.desktop")):
                     if desktop.is_symlink() or not desktop.is_file() or not re.fullmatch(
                         r"[a-zA-Z0-9][a-zA-Z0-9._-]{0,254}", desktop.stem,
                     ):
                         raise ValueError(f"Invalid native desktop resource: {desktop.name}")
-                    arguments.extend(("--resource", desktop.relative_to(path).as_posix()))
-                snapshots.run(arguments)
+                    resources.append(desktop.relative_to(path).as_posix())
+                provenance.sign(path, key, entrypoints=entrypoints, resources=resources)
                 snapshots.verified_binding(path, provenance)
             validate_install_tree(root)
             after = payload_inventory(root)
@@ -521,16 +514,18 @@ def main():
     parser.add_argument("--yu", type=Path)
     parser.add_argument("--yu-sha256")
     parser.add_argument("--publisher-key-id")
+    parser.add_argument("--publisher-trust", type=Path)
     options = parser.parse_args()
     workspace = work_path(options.output).parent / ".store-signing"
     with Signing(workspace) as signing:
         if options.action == "verify":
             result = verified_index(options.output, signing)
         else:
-            if not all((options.yu, options.yu_sha256, options.publisher_key_id)):
-                parser.error("build requires the existing public provenance CLI and its exact pins")
+            if not options.publisher_key_id:
+                parser.error("build requires --publisher-key-id")
+            publisher = snapshots.read_metadata(options.publisher_trust) if options.publisher_trust else None
             provenance = snapshots.Provenance(
-                options.yu, options.yu_sha256, options.publisher_key_id,
+                options.yu, options.yu_sha256, options.publisher_key_id, publisher=publisher,
             )
             signing.import_environment()
             result = compose(
