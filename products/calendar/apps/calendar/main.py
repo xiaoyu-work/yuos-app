@@ -953,3 +953,15 @@ def run(command, args):
         return {"error": str(denied), "denial": denied.denial}
     except policy.PolicyUnavailable as exc:
         return {"error": f"capability check failed: {exc}"}
+
+from yuos_sdk.app import command as _sdk_command  # noqa: E402
+_sdk_command("invite")(lambda args, _op="invite": run(_op, args))
+_sdk_command("respond")(lambda args, _op="respond": run(_op, args))
+_sdk_command("local_event")(lambda args, _op="local_event": run(_op, args))
+_sdk_command("google_event")(lambda args, _op="google_event": run(_op, args))
+_sdk_command("outlook_event")(lambda args, _op="outlook_event": run(_op, args))
+_sdk_command("list")(lambda args, _op="list": run(_op, args))
+_sdk_command("create")(lambda args, _op="create": run(_op, args))
+_sdk_command("update")(lambda args, _op="update": run(_op, args))
+_sdk_command("delete")(lambda args, _op="delete": run(_op, args))
+_sdk_command("today")(lambda args, _op="today": run(_op, args))

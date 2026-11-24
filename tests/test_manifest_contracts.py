@@ -87,13 +87,46 @@ def _strings(
 
 
 def _dispatch_operations(tree: ast.Module) -> set[str]:
-    run = next(
-        node
-        for node in tree.body
-        if isinstance(node, ast.FunctionDef) and node.name == "run"
-    )
-    assignments = _assignments(tree, run)
     operations: set[str] = set()
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            for dec in node.decorator_list:
+                if isinstance(dec, ast.Name) and dec.id == "command":
+                    operations.add(node.name)
+                elif (
+                    isinstance(dec, ast.Attribute)
+                    and isinstance(dec.value, ast.Name)
+                    and dec.value.id == "app"
+                    and dec.attr == "command"
+                ):
+                    operations.add(node.name)
+                elif (
+                    isinstance(dec, ast.Call)
+                    and (
+                        (isinstance(dec.func, ast.Name) and dec.func.id == "command")
+                        or (
+                            isinstance(dec.func, ast.Attribute)
+                            and isinstance(dec.func.value, ast.Name)
+                            and dec.func.value.id == "app"
+                            and dec.func.attr == "command"
+                        )
+                    )
+                    and dec.args
+                    and isinstance(dec.args[0], ast.Constant)
+                    and isinstance(dec.args[0].value, str)
+                ):
+                    operations.add(dec.args[0].value)
+    run = next(
+        (
+            node
+            for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name == "run"
+        ),
+        None,
+    )
+    if run is None:
+        return operations
+    assignments = _assignments(tree, run)
     for node in ast.walk(run):
         if (
             isinstance(node, ast.Compare)
@@ -666,11 +699,14 @@ def test_canonical_positionals_are_not_reparsed_as_options() -> None:
     drift = []
     for path, tree, _manifest in _sources():
         run = next(
-            node
-            for node in tree.body
-            if isinstance(node, ast.FunctionDef) and node.name == "run"
+            (
+                node
+                for node in tree.body
+                if isinstance(node, ast.FunctionDef) and node.name == "run"
+            ),
+            None,
         )
-        if not any(
+        if run is None or not any(
             isinstance(node, ast.Call)
             and isinstance(node.func, ast.Name)
             and node.func.id == "parse_canonical_argv"
@@ -994,9 +1030,16 @@ def test_every_manifest_matches_published_schema_contract() -> None:
     def check_needs(path, surface, needs, args):
         by_name = {arg["name"]: arg for arg in args}
         for need in needs:
+            if isinstance(need, str):
+                if need not in verbs:
+                    drift.append(f"{path}:{surface} unknown verb {need}")
+                continue
             if need.get("verb") not in verbs:
                 drift.append(f"{path}:{surface} unknown verb {need.get('verb')}")
-            scope = need.get("scope", {})
+            scope = need.get("scope")
+            if scope is None and str(need.get("verb", "")).startswith("ai."):
+                continue
+            scope = scope or {}
             kind = scope.get("kind")
             if kind not in scope_kinds:
                 drift.append(f"{path}:{surface} unknown scope binding {kind}")

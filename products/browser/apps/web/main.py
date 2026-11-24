@@ -502,5 +502,12 @@ def main():
         sys.exit(1)
 
 
+from yuos_sdk.app import command as _sdk_command  # noqa: E402
+_sdk_command("read")(lambda args, _op="read": run(_op, args))
+_sdk_command("scrape")(lambda args, _op="scrape": run(_op, args))
+_sdk_command("screenshot")(lambda args, _op="screenshot": run(_op, args))
+_sdk_command("submit")(lambda args, _op="submit": run(_op, args))
+_sdk_command("summarize")(lambda args, _op="summarize": run(_op, args))
+
 if __name__ == "__main__":
     main()

@@ -596,3 +596,19 @@ def run(command, args):
         return {"error": str(error), "denied": True}
     except kernel.KernelUnavailable as error:
         return {"error": str(error), "indeterminate": command in {"send", "draft_save", "draft_send"}, "retryable": False}
+
+from yuos_sdk.app import command as _sdk_command  # noqa: E402
+_sdk_command("accounts")(lambda args, _op="accounts": run(_op, args))
+_sdk_command("folders")(lambda args, _op="folders": run(_op, args))
+_sdk_command("list")(lambda args, _op="list": run(_op, args))
+_sdk_command("search")(lambda args, _op="search": run(_op, args))
+_sdk_command("read")(lambda args, _op="read": run(_op, args))
+_sdk_command("native_message")(lambda args, _op="native_message": run(_op, args))
+_sdk_command("native_draft")(lambda args, _op="native_draft": run(_op, args))
+_sdk_command("send")(lambda args, _op="send": run(_op, args))
+_sdk_command("draft_save")(lambda args, _op="draft_save": run(_op, args))
+_sdk_command("draft_send")(lambda args, _op="draft_send": run(_op, args))
+_sdk_command("attachment_download")(lambda args, _op="attachment_download": run(_op, args))
+_sdk_command("attachment_file")(lambda args, _op="attachment_file": run(_op, args))
+_sdk_command("sync")(lambda args, _op="sync": run(_op, args))
+_sdk_command("draft")(lambda args, _op="draft": run(_op, args))

@@ -147,3 +147,11 @@ def run(command, args):
         return {"error": str(denied), "denial": denied.denial}
     except policy.PolicyUnavailable as exc:
         return {"error": f"capability check failed: {exc}"}
+
+from yuos_sdk.app import command as _sdk_command  # noqa: E402
+_sdk_command("read")(lambda args, _op="read": run(_op, args))
+_sdk_command("info")(lambda args, _op="info": run(_op, args))
+_sdk_command("convert")(lambda args, _op="convert": run(_op, args))
+_sdk_command("summarize")(lambda args, _op="summarize": run(_op, args))
+_sdk_command("explain")(lambda args, _op="explain": run(_op, args))
+_sdk_command("rewrite")(lambda args, _op="rewrite": run(_op, args))

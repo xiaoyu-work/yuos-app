@@ -304,3 +304,18 @@ def run(command, args):
         return {"error": str(denied), "denial": denied.denial}
     except policy.PolicyUnavailable as exc:
         return {"error": f"capability check failed: {exc}"}
+
+from yuos_sdk.app import command as _sdk_command  # noqa: E402
+_sdk_command("need")(lambda args, _op="need": run(_op, args))
+_sdk_command("has")(lambda args, _op="has": run(_op, args))
+_sdk_command("list")(lambda args, _op="list": run(_op, args))
+_sdk_command("search")(lambda args, _op="search": run(_op, args))
+_sdk_command("show")(lambda args, _op="show": run(_op, args))
+_sdk_command("remove")(lambda args, _op="remove": run(_op, args))
+_sdk_command("purge")(lambda args, _op="purge": run(_op, args))
+_sdk_command("upgrade")(lambda args, _op="upgrade": run(_op, args))
+_sdk_command("install-version")(lambda args, _op="install-version": run(_op, args))
+_sdk_command("hold")(lambda args, _op="hold": run(_op, args))
+_sdk_command("unhold")(lambda args, _op="unhold": run(_op, args))
+_sdk_command("update")(lambda args, _op="update": run(_op, args))
+_sdk_command("upgrade-all")(lambda args, _op="upgrade-all": run(_op, args))

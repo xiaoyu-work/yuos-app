@@ -170,6 +170,13 @@ def run(command: str, args):
     return {"ok": False, "error": f"unknown command: {command}"}
 
 
+from yuos_sdk.app import command as _sdk_command  # noqa: E402
+_sdk_command("send")(lambda args, _op="send": run(_op, args))
+_sdk_command("status")(lambda args, _op="status": run(_op, args))
+_sdk_command("start")(lambda args, _op="start": run(_op, args))
+_sdk_command("stop")(lambda args, _op="stop": run(_op, args))
+_sdk_command("reply")(lambda args, _op="reply": run(_op, args))
+
 if __name__ == "__main__":
     cmd = os.environ.get("YUOS_COMMAND") or (sys.argv[1] if len(sys.argv) > 1 else "")
     raw_args = os.environ.get("YUOS_ARGS_JSON")
