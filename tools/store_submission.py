@@ -525,12 +525,11 @@ def _validate_manifest_schema(manifest: dict, app_id: str) -> None:
     if runtime not in snapshots.RUNTIME_ENTRIES:
         raise ValueError(f"Unsupported manifest runtime: {runtime!r}")
 
-    # Validate against the public JSON schema when the platform cache is available.
+    # Validate against the public JSON schema when available.
     try:
-        import platform_dependency
         from jsonschema import Draft202012Validator
 
-        schema_path = platform_dependency.manifest_schema_path(download=False)
+        schema_path = Path(__file__).resolve().parents[1] / "yuos-sdk/wire/v1/manifest.schema.json"
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
         Draft202012Validator(schema).validate(manifest)
     except FileNotFoundError:

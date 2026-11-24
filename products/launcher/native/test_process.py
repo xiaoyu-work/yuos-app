@@ -14,7 +14,6 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "tools"))
-from platform_dependency import prepare_exports  # noqa: E402
 from stage import IGNORE, stage, stage_shared  # noqa: E402
 
 
@@ -22,12 +21,10 @@ def main():
     fixture = ROOT / "build/launcher-process-fixture"
     fixture.mkdir()
     process = None
-    try:
-        libraries = prepare_exports(download=False)
-        installed = fixture / "installed"
+    try:        installed = fixture / "installed"
         stage("launcher", installed, ["yuos-launcher"])
         python = stage_shared(installed)
-        shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)        applications = fixture / "applications"
+        shutil.copytree(ROOT / "yuos-sdk/python/src/yuos_sdk", python / "yuos_sdk", ignore=IGNORE)        applications = fixture / "applications"
         applications.mkdir()
         for name in ("Editor", "Other"):
             (applications / f"{name}.desktop").write_text(

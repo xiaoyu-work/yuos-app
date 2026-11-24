@@ -1,0 +1,832 @@
+"""Cross-language wire validator contract tests."""
+
+from __future__ import annotations
+
+import copy
+import json
+import subprocess
+import unittest
+from base64 import b64encode
+from decimal import Decimal
+from pathlib import Path
+from unittest import mock
+
+from yuos_sdk import ai, objects, tools
+from yuos_sdk.generated import (
+    WIRE_ENUM,
+    WIRE_MAX_LENGTH,
+    WIRE_MAXIMUM,
+    WIRE_MIN_LENGTH,
+    WIRE_MINIMUM,
+    WIRE_PATTERN,
+    WIRE_REQUIRED,
+    WIRE_TYPE,
+    WIRE_UNKNOWN_FIELD,
+    FileChangePlan,
+    Manifest,
+    Mcptool,
+    Operation,
+    Operationeffect,
+    WireDecodeError,
+    WireDecimal,
+    _validate_wire_schema,
+    decode_wire_json,
+    encode_wire_json,
+    validate_ai,
+    validate_budget_show,
+    validate_envelope,
+    validate_file_change_plan,
+    validate_mcp_call_context,
+    validate_tool,
+    validate_tool_catalog,
+    wire_integer_to_int,
+)
+
+
+def _wire_success_json(data_json: str) -> str:
+    return f'{{"ok":true,"wire_version":1,"data":{data_json}}}'
+
+
+def _wire_error(error: str, code: str) -> str:
+    return json.dumps(
+        {"ok": False, "wire_version": 1, "error": error, "code": code}
+    )
+
+
+def _valid_ai() -> dict:
+    return {
+        "text": "hello",
+        "model": "m",
+        "provider": "p",
+        "verb": "ai.chat",
+        "usage": {"input_tokens": 1, "output_tokens": 2, "units": 3},
+        "budget": {"period": "2026-08", "units_used": 3, "units_cap": 100},
+        "review": {"safety": "strict", "prompt_redacted": False},
+        "tool_calls": [{"id": "c1", "name": "echo", "input": {"value": "ok"}}],
+    }
+
+
+class WireValidationTests(unittest.TestCase):
+    def test_envelope_contract_is_strict(self) -> None:
+        validate_envelope(
+            {"ok": True, "wire_version": 1, "data": {"value": 1}}
+        )
+        validate_envelope(
+            {
+                "ok": False,
+                "wire_version": 1,
+                "error": "denied",
+                "code": "PERMISSION_DENIED",
+            }
+        )
+        for payload in (
+            {"value": 1},
+            {"ok": False, "wire_version": 1, "error": "missing code"},
+            {"ok": True, "wire_version": 2, "data": {}},
+        ):
+            with self.subTest(payload=payload), self.assertRaises(WireDecodeError):
+                validate_envelope(payload)
+
+    def test_ai_validator_enforces_shared_contract(self) -> None:
+        cases = []
+
+        payload = _valid_ai()
+        del payload["text"]
+        cases.append((payload, WIRE_REQUIRED, "$.text"))
+
+        payload = _valid_ai()
+        payload["usage"]["input_tokens"] = "1"
+        cases.append((payload, WIRE_TYPE, "$.usage.input_tokens"))
+
+        payload = _valid_ai()
+        payload["usage"]["units"] = -1
+        cases.append((payload, WIRE_MINIMUM, "$.usage.units"))
+
+        payload = _valid_ai()
+        payload["verb"] = "ai.unknown"
+        cases.append((payload, WIRE_ENUM, "$.verb"))
+
+        payload = _valid_ai()
+        payload["usage"]["extra"] = True
+        cases.append((payload, WIRE_UNKNOWN_FIELD, "$.usage.extra"))
+
+        payload = _valid_ai()
+        del payload["tool_calls"][0]["name"]
+        cases.append((payload, WIRE_REQUIRED, "$.tool_calls[0].name"))
+
+        payload = _valid_ai()
+        for payload, code, path in cases:
+            with self.subTest(code=code, path=path):
+                with self.assertRaises(WireDecodeError) as raised:
+                    validate_ai(payload)
+                self.assertEqual(raised.exception.code, code)
+                self.assertEqual(raised.exception.path, path)
+
+    def test_integer_semantics_and_adapter_conversion(self) -> None:
+        template = json.dumps(_valid_ai())
+        accepted = {
+            "1.0": 1,
+            "1e0": 1,
+            "1.5e1": 15,
+            "9007199254740992": 9007199254740992,
+            "18446744073709551615": 18446744073709551615,
+        }
+        for literal, expected in accepted.items():
+            payload = decode_wire_json(
+                template.replace('"units": 3', f'"units": {literal}')
+            )
+            validate_ai(payload)
+            self.assertEqual(wire_integer_to_int(payload["usage"]["units"]), expected)
+            self.assertEqual(ai._parse_response(payload).usage.units, expected)
+
+        for literal in ("1.5", "15e-1", "1e-400", "9007199254740990.5"):
+            payload = decode_wire_json(
+                template.replace('"units": 3', f'"units": {literal}')
+            )
+            with self.assertRaises(WireDecodeError) as raised:
+                validate_ai(payload)
+            self.assertEqual(raised.exception.code, WIRE_TYPE)
+            self.assertEqual(raised.exception.path, "$.usage.units")
+
+        oversized = decode_wire_json(
+            template.replace('"units": 3', '"units": 18446744073709551616')
+        )
+        with self.assertRaises(WireDecodeError) as raised:
+            validate_ai(oversized)
+        self.assertEqual(raised.exception.code, WIRE_MAXIMUM)
+
+        fractional_above = decode_wire_json(
+            template.replace('"units": 3', '"units": 18446744073709551615.5')
+        )
+        with self.assertRaises(WireDecodeError) as raised:
+            validate_ai(fractional_above)
+        self.assertEqual(raised.exception.code, WIRE_TYPE)
+    def test_adapter_preserves_all_valid_v1_tool_inputs(self) -> None:
+        for tool_input in ("scalar", [1, True], None):
+            payload = copy.deepcopy(_valid_ai())
+            payload["tool_calls"][0]["input"] = tool_input
+            response = ai._parse_response(payload)
+            self.assertEqual(response.tool_calls[0].input, tool_input)
+
+    def test_adapter_rejects_entire_response_for_malformed_tool_call(self) -> None:
+        payload = _valid_ai()
+        del payload["tool_calls"][0]["name"]
+        with self.assertRaises(ai.AiUnavailable) as raised:
+            ai._parse_response(payload)
+        self.assertIn("WIRE_REQUIRED", str(raised.exception))
+        self.assertIn("$.tool_calls[0].name", str(raised.exception))
+
+    def test_structured_items_are_not_skipped(self) -> None:
+        with self.assertRaises(WireDecodeError) as raised:
+            validate_tool_catalog(
+                {
+                    "tools": [
+                        {
+                            "name": "echo",
+                            "summary": "Echo",
+                            "verb": "ipc.invoke",
+                            "stability": "stable",
+                            "args_schema": {},
+                            "returns_schema": {},
+                        },
+                        7,
+                    ]
+                }
+            )
+        self.assertEqual(raised.exception.code, WIRE_TYPE)
+        self.assertEqual(raised.exception.path, "$.tools[1]")
+        validate_tool(
+            {"tool": "echo", "app_id": "app", "status": "ok", "result": None}
+        )
+
+    def test_root_type_and_budget_show_contract(self) -> None:
+        for validator in (
+            validate_ai,
+            validate_mcp_call_context,
+            validate_tool,
+            validate_tool_catalog,
+        ):
+            with self.subTest(validator=validator.__name__):
+                with self.assertRaises(WireDecodeError) as raised:
+                    validator(None)
+                self.assertEqual(raised.exception.code, WIRE_TYPE)
+                self.assertEqual(raised.exception.path, "$")
+
+        validate_budget_show(
+            {"app": "notes", "period": "2026-08", "units_used": 7}
+        )
+        with mock.patch.object(ai, "_yu_binary", return_value="yu"), mock.patch.object(
+            subprocess,
+            "run",
+            return_value=subprocess.CompletedProcess(
+                ["yu"],
+                0,
+                _wire_success_json(
+                    '{"app":"notes","period":"2026-08","units_used":7}'
+                ),
+                "",
+            ),
+        ) as run:
+            budget = ai.budget("notes")
+        self.assertEqual(vars(budget), {"app": "notes", "period": "2026-08", "units_used": 7})
+        self.assertEqual(run.call_args.args[0][:2], ["yu", "--wire=1"])
+
+    def test_mcp_call_context_is_closed(self) -> None:
+        context = {
+            "wire_version": 1,
+            "call_id": "call-1",
+            "trace_id": "trace-1",
+            "caller": {
+                "kind": "system-agent",
+                "id": "session-1",
+                "owner_uid": 1000,
+            },
+        }
+        validate_mcp_call_context(context)
+
+        unknown = copy.deepcopy(context)
+        unknown["caller"]["token"] = "forged"
+        with self.assertRaises(WireDecodeError) as raised:
+            validate_mcp_call_context(unknown)
+        self.assertEqual(raised.exception.code, WIRE_UNKNOWN_FIELD)
+        self.assertEqual(raised.exception.path, "$.caller.token")
+
+        too_deep = copy.deepcopy(context)
+        too_deep["depth"] = 17
+        with self.assertRaises(WireDecodeError) as raised:
+            validate_mcp_call_context(too_deep)
+        self.assertEqual(raised.exception.code, WIRE_UNKNOWN_FIELD)
+        self.assertEqual(raised.exception.path, "$.depth")
+
+        for call_id, code in (
+            ("", WIRE_MIN_LENGTH),
+            ("x" * 129, WIRE_MAX_LENGTH),
+            ("call id", WIRE_PATTERN),
+            ("call-1\n", WIRE_PATTERN),
+        ):
+            malformed = copy.deepcopy(context)
+            malformed["call_id"] = call_id
+            with self.assertRaises(WireDecodeError) as raised:
+                validate_mcp_call_context(malformed)
+            self.assertEqual(raised.exception.code, code)
+            self.assertEqual(raised.exception.path, "$.call_id")
+
+    def test_adapter_rejects_scalar_root_with_stable_error(self) -> None:
+        with self.assertRaises(ai.AiUnavailable) as raised:
+            ai._parse_response(None)
+        self.assertIn("WIRE_TYPE", str(raised.exception))
+        self.assertIn(" at $:", str(raised.exception))
+
+        with mock.patch.object(tools, "_yu_binary", return_value="yu"), mock.patch.object(
+            tools,
+            "_run_with_timeout",
+            return_value=subprocess.CompletedProcess(["yu"], 0, "null", ""),
+        ):
+            with self.assertRaises(tools.ToolUnavailable) as tool_error:
+                tools.call("echo", app_id="notes")
+        self.assertIn("WIRE_ONE_OF", str(tool_error.exception))
+        self.assertIn(" at $:", str(tool_error.exception))
+
+    def test_proposed_input_round_trips_directly_through_tools_call(self) -> None:
+        lexeme = "0.12345678901234567890"
+        payload = decode_wire_json(
+            json.dumps(_valid_ai()).replace(
+                '"input": {"value": "ok"}',
+                f'"input": {lexeme}',
+            )
+        )
+        response = ai._parse_response(payload)
+        self.assertEqual(response.tool_calls[0].input, Decimal(lexeme))
+
+        completed = subprocess.CompletedProcess(
+            ["yu"],
+            0,
+            _wire_success_json(
+                '{"tool":"echo","app_id":"notes","status":"ok","result":null}'
+            ),
+            "",
+        )
+        with mock.patch.object(tools, "_yu_binary", return_value="yu"), mock.patch.object(
+            tools, "_run_with_timeout", return_value=completed
+        ) as run:
+            tools.call(
+                "echo",
+                response.tool_calls[0].input,
+                app_id="notes",
+            )
+        command = run.call_args.args[0]
+        self.assertEqual(command[command.index("--args") + 1], lexeme)
+
+    def test_public_lossless_values_and_catalog_schemas_encode_exactly(self) -> None:
+        lexeme = "0.12345678901234567890"
+        tool_completed = subprocess.CompletedProcess(
+            ["yu"],
+            0,
+            _wire_success_json(
+                f'{{"tool":"echo","app_id":"notes","status":"ok","result":{lexeme}}}'
+            ),
+            "",
+        )
+        with mock.patch.object(tools, "_yu_binary", return_value="yu"), mock.patch.object(
+            tools, "_run_with_timeout", return_value=tool_completed
+        ):
+            result = tools.call("echo", {}, app_id="notes")
+        self.assertEqual(result.value, Decimal(lexeme))
+        self.assertEqual(encode_wire_json(result.value), lexeme)
+
+        catalog_completed = subprocess.CompletedProcess(
+            ["yu"],
+            0,
+            (
+                _wire_success_json(
+                    '{"tools":[{"name":"echo","summary":"Echo","verb":"ipc.invoke",'
+                    '"stability":"stable","args_schema":{"minimum":'
+                    + lexeme
+                    + '},"returns_schema":{"maximum":'
+                    + lexeme
+                    + "}}]}"
+                )
+            ),
+            "",
+        )
+        with mock.patch.object(tools, "_yu_binary", return_value="yu"), mock.patch.object(
+            tools, "_run_with_timeout", return_value=catalog_completed
+        ):
+            entry = tools.catalog()[0]
+        self.assertEqual(encode_wire_json(entry.args_schema), f'{{"minimum":{lexeme}}}')
+        self.assertEqual(encode_wire_json(entry.returns_schema), f'{{"maximum":{lexeme}}}')
+
+    def test_tool_call_preserves_null_scalar_and_array_arguments(self) -> None:
+        completed = subprocess.CompletedProcess(
+            ["yu"],
+            0,
+            _wire_success_json(
+                '{"tool":"echo","app_id":"notes","status":"ok","result":null}'
+            ),
+            "",
+        )
+        for args in (None, "scalar", [1, True]):
+            with self.subTest(args=args), mock.patch.object(
+                tools, "_yu_binary", return_value="yu"
+            ), mock.patch.object(
+                tools, "_run_with_timeout", return_value=completed
+            ) as run:
+                tools.call("echo", args, app_id="notes")
+            command = run.call_args.args[0]
+            self.assertEqual(command[command.index("--args") + 1], encode_wire_json(args))
+
+    def test_compact_huge_exponent_round_trip_and_typed_failure(self) -> None:
+        lexeme = "1e999999999999999999999999"
+        value = decode_wire_json(lexeme)
+        self.assertIsInstance(value, WireDecimal)
+        self.assertEqual(value.lexeme, lexeme)
+        self.assertEqual(encode_wire_json(value), lexeme)
+
+        payload_text = json.dumps(_valid_ai()).replace(
+            '"input": {"value": "ok"}',
+            f'"input": {lexeme}',
+        )
+        response = ai._parse_response(decode_wire_json(payload_text))
+        self.assertIsInstance(response.tool_calls[0].input, WireDecimal)
+        self.assertEqual(encode_wire_json(response.tool_calls[0].input), lexeme)
+
+        invalid_units = json.dumps(_valid_ai()).replace(
+            '"units": 3',
+            f'"units": {lexeme}',
+        )
+        with self.assertRaises(ai.AiUnavailable) as raised:
+            ai._parse_response(decode_wire_json(invalid_units))
+        self.assertIn("WIRE_MAXIMUM", str(raised.exception))
+
+    def test_huge_wire_decimal_integer_classification_is_lexical(self) -> None:
+        huge_exponent = "999999999999999999999999"
+        template = json.dumps(_valid_ai())
+
+        zero = decode_wire_json(
+            template.replace('"units": 3', f'"units": 0e{huge_exponent}')
+        )
+        validate_ai(zero)
+        self.assertEqual(ai._parse_response(zero).usage.units, 0)
+
+        nonzero = decode_wire_json(
+            template.replace('"units": 3', f'"units": 1e{huge_exponent}')
+        )
+        with self.assertRaises(WireDecodeError) as raised:
+            validate_ai(nonzero)
+        self.assertEqual(raised.exception.code, WIRE_MAXIMUM)
+        self.assertEqual(raised.exception.path, "$.usage.units")
+
+    def test_wire_decimal_rejects_invalid_or_injectable_lexemes(self) -> None:
+        for lexeme in ("NaN", "Infinity", "01", "0} , \"injected\": true, {"):
+            with self.subTest(lexeme=lexeme):
+                with self.assertRaises(ValueError):
+                    WireDecimal(lexeme)
+
+        forged = object.__new__(WireDecimal)
+        object.__setattr__(forged, "lexeme", "NaN")
+        with self.assertRaises(ValueError):
+            encode_wire_json(forged)
+
+    def test_long_integer_lexeme_stays_compact(self) -> None:
+        lexeme = "1" * 5000
+        value = decode_wire_json(lexeme)
+        self.assertIsInstance(value, WireDecimal)
+        self.assertEqual(value.lexeme, lexeme)
+        self.assertEqual(encode_wire_json(value), lexeme)
+
+    def test_stable_error_code_determines_typed_error(self) -> None:
+        with self.assertRaises(ai.AiBudgetExceeded):
+            ai._raise_for_error(
+                {"error": "safety words", "code": "BUDGET_EXCEEDED"}
+            )
+        with self.assertRaises(ai.AiSafetyViolation):
+            ai._raise_for_error(
+                {"error": "budget words", "code": "SAFETY_VIOLATION"}
+            )
+        with self.assertRaises(ai.AiUnavailable) as unavailable:
+            ai._raise_for_error({"error": "opaque", "code": "KERNEL_UNAVAILABLE"})
+        self.assertEqual(unavailable.exception.code, "KERNEL_UNAVAILABLE")
+        with self.assertRaises(ai.AiInvalidArgs):
+            ai._raise_for_error({"error": "opaque", "code": "INVALID_ARGS"})
+
+    def test_model_calls_take_and_return_media_bytes(self) -> None:
+        png, wav = b"\x89PNG\r\n\x1a\nfixture", b"RIFF\x24\0\0\0WAVEfmt "
+
+        def reply(data: dict) -> subprocess.CompletedProcess:
+            return subprocess.CompletedProcess(
+                ["yu"], 0, _wire_success_json(json.dumps(data)).encode(), b""
+            )
+
+        def inference(output: dict) -> subprocess.CompletedProcess:
+            return reply({"provider": "p", "model": "m", "units": 50, "output": output})
+
+        with mock.patch.object(ai, "_yu_binary", return_value="yu"), mock.patch.object(
+            subprocess,
+            "run",
+            side_effect=[
+                reply(_valid_ai()),
+                inference({"kind": "stt", "text": "hello"}),
+                inference({"kind": "tts", "format": "wav", "audio_base64": b64encode(wav).decode()}),
+                inference({"kind": "imagegen", "format": "png", "image_base64": b64encode(png).decode()}),
+            ],
+        ) as run:
+            ai.chat("Describe this image.", images=[png])
+            self.assertEqual(ai.stt(wav).output.text, "hello")
+            speech = ai.tts("Hello").output
+            image = ai.imagegen("A cat").output
+        sent = [json.loads(call.kwargs["input"]) for call in run.call_args_list[:2]]
+        self.assertEqual(sent[0]["images"], [b64encode(png).decode()])
+        self.assertEqual(sent[1]["input"], {"kind": "stt", "audio_base64": b64encode(wav).decode()})
+        self.assertEqual((speech.format, speech.audio), ("wav", wav))
+        self.assertEqual((image.format, image.image), ("png", png))
+        with self.assertRaises(ai.AiInvalidArgs):
+            ai.stt(b64encode(wav).decode())  # type: ignore[arg-type]
+
+    def test_dev_ai_url_and_session_override(self) -> None:
+        import http.server
+        import os
+        import threading
+
+        requests_seen: list[tuple[str, Optional[str], dict]] = []
+
+        class DevHandler(http.server.BaseHTTPRequestHandler):
+            def do_POST(self) -> None:  # noqa: N802
+                length = int(self.headers.get("Content-Length", "0"))
+                body = json.loads(self.rfile.read(length).decode("utf-8"))
+                requests_seen.append((self.path, self.headers.get("Authorization"), body))
+                if self.path == "/v1/chat/completions":
+                    payload = {
+                        "model": "llama3.2",
+                        "choices": [{"message": {"role": "assistant", "content": "dev chat reply"}}],
+                        "usage": {"prompt_tokens": 2, "completion_tokens": 3, "total_tokens": 5},
+                    }
+                elif self.path == "/v1/embeddings":
+                    payload = {
+                        "model": "llama3.2",
+                        "data": [{"embedding": [0.25, -0.5, 0.75]}],
+                        "usage": {"total_tokens": 4},
+                    }
+                else:
+                    self.send_response(404)
+                    self.end_headers()
+                    return
+                raw = json.dumps(payload).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+
+            def log_message(self, format: str, *args: object) -> None:
+                pass
+
+        server = http.server.HTTPServer(("127.0.0.1", 0), DevHandler)
+        port = server.server_port
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            dev_env = {
+                "YUOS_DEV_AI_URL": f"http://127.0.0.1:{port}/v1/",
+                "YUOS_DEV_AI_KEY": "secret-dev-key",
+            }
+            with mock.patch.dict(os.environ, dev_env, clear=False):
+                os.environ.pop("YUOS_SESSION", None)
+                os.environ.pop("YUOS_APP_ID", None)
+                chat_res = ai.chat("hello dev", system="be brief")
+                embed_res = ai.embed("embed this")
+
+            self.assertEqual(chat_res.text, "dev chat reply")
+            self.assertEqual(chat_res.output.text, "dev chat reply")
+            self.assertEqual(chat_res.provider, "dev")
+            self.assertEqual(chat_res.model, "llama3.2")
+            self.assertEqual(chat_res.units, 5)
+            self.assertEqual(embed_res.provider, "dev")
+            self.assertEqual(embed_res.output.vector, [0.25, -0.5, 0.75])
+            self.assertEqual(len(requests_seen), 2)
+            self.assertEqual(requests_seen[0][0], "/v1/chat/completions")
+            self.assertEqual(requests_seen[0][1], "Bearer secret-dev-key")
+            self.assertEqual(requests_seen[1][0], "/v1/embeddings")
+
+            # When YUOS_SESSION is set, YUOS_DEV_AI_URL must be ignored and `yu` binary used.
+            requests_seen.clear()
+            session_env = {
+                "YUOS_DEV_AI_URL": f"http://127.0.0.1:{port}/v1",
+                "YUOS_SESSION": "sandbox-session-1",
+                "YUOS_APP_ID": "notes",
+            }
+            completed = subprocess.CompletedProcess(
+                ["yu"], 0, _wire_success_json(json.dumps(_valid_ai())).encode("utf-8"), b""
+            )
+            with mock.patch.dict(os.environ, session_env, clear=False), mock.patch.object(
+                ai, "_yu_binary", return_value="yu"
+            ), mock.patch.object(subprocess, "run", return_value=completed) as run_mock:
+                res = ai.chat("hello sandbox")
+            self.assertEqual(res.text, "hello")
+            self.assertEqual(res.provider, "p")
+            self.assertEqual(len(requests_seen), 0)
+            self.assertTrue(run_mock.called)
+        finally:
+            server.shutdown()
+            server.server_close()
+
+    def test_transport_rejects_flat_and_incoherent_wire_replies(self) -> None:
+        for completed in (
+            subprocess.CompletedProcess(["yu"], 0, '{"value":1}', ""),
+            subprocess.CompletedProcess(
+                ["yu"],
+                1,
+                _wire_success_json('{"value":1}'),
+                "",
+            ),
+            subprocess.CompletedProcess(
+                ["yu"],
+                0,
+                _wire_error("denied", "PERMISSION_DENIED"),
+                "",
+            ),
+        ):
+            with self.subTest(completed=completed), mock.patch.object(
+                tools, "_yu_binary", return_value="yu"
+            ), mock.patch.object(
+                tools, "_run_with_timeout", return_value=completed
+            ):
+                with self.assertRaises(tools.ToolUnavailable):
+                    tools.call("echo", {}, app_id="notes")
+
+
+class FileChangePlanWireTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        root = Path(__file__).resolve().parents[3] / "wire" / "v1"
+        cls.vectors = json.loads((root / "file_change_plan.vectors.json").read_text(encoding="utf-8"))
+        cls.schema = json.loads((root / "file_change_plan.schema.json").read_text(encoding="utf-8"))
+
+    def test_file_change_plan_shared_vectors(self) -> None:
+        for case in self.vectors["cases"]:
+            value = copy.deepcopy(case["root"] if "root" in case else self.vectors["base"])
+            if "set" in case:
+                value.update(case["set"])
+            with self.subTest(name=case["name"]):
+                if case["code"] is None:
+                    validate_file_change_plan(value)
+                else:
+                    with self.assertRaises(WireDecodeError) as raised:
+                        validate_file_change_plan(value)
+                    self.assertEqual(raised.exception.code, case["code"])
+                    self.assertEqual(raised.exception.path, case["path"])
+
+    def test_file_change_plan_required_and_nullable_fields(self) -> None:
+        self.assertEqual(FileChangePlan.__required_keys__, set(self.vectors["base"]))
+        self.assertEqual(
+            FileChangePlan.__optional_keys__,
+            {"snapshot", "applied_at", "changed", "diagnostic"},
+        )
+        for field in self.vectors["base"]:
+            value = copy.deepcopy(self.vectors["base"])
+            del value[field]
+            with self.subTest(field=field), self.assertRaises(WireDecodeError) as raised:
+                validate_file_change_plan(value)
+            self.assertEqual(raised.exception.code, WIRE_REQUIRED)
+            self.assertEqual(raised.exception.path, f"$.{field}")
+        value = copy.deepcopy(self.vectors["base"])
+        value.update(snapshot=None, applied_at=None, changed=None, diagnostic=None)
+        validate_file_change_plan(value)
+        self.assertEqual(json.loads(encode_wire_json(value)), value)
+
+    def test_file_change_plan_schema_distinguishes_wire_and_semantic_bounds(self) -> None:
+        self.assertFalse(self.schema["additionalProperties"])
+        properties = self.schema["properties"]
+        for field in ("before_bytes", "after_bytes"):
+            self.assertEqual(properties[field]["minimum"], 0)
+            self.assertEqual(properties[field]["maximum"], 65536)
+        self.assertEqual(properties["warnings"]["maxItems"], 16)
+        self.assertIn("65536 UTF-8 bytes", properties["diff"]["description"])
+        self.assertIn("4096 UTF-8 bytes", properties["path"]["description"])
+        self.assertIn("1024 UTF-8 bytes", properties["warnings"]["items"]["description"])
+        for field in ("diff", "path"):
+            self.assertNotIn("maxLength", properties[field])
+        self.assertNotIn("wire_version", properties)
+
+    def test_file_change_plan_reference_uses_existing_object_helpers(self) -> None:
+        value = self.vectors["base"]
+        reference = objects.parse_reference(value["reference"])
+        self.assertEqual(reference["app_id"], "fs")
+        self.assertEqual(reference["object_type"], "change-plan")
+        self.assertEqual(reference["object_id"], value["path"])
+        self.assertEqual(reference["revision"], value["plan_id"])
+        self.assertEqual(objects.format_reference(reference), value["reference"])
+
+
+class OperationEffectSchemaTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        path = Path(__file__).resolve().parents[3] / "wire" / "v1" / "manifest.schema.json"
+        cls.schema = json.loads(path.read_text(encoding="utf-8"))
+        cls.operation = cls.schema["$defs"]["operation"]
+        cls.effect = cls.schema["$defs"]["operationEffect"]
+
+    def validate_effect(self, value: object) -> None:
+        _validate_wire_schema(self.effect, self.schema, value, "OperationEffect", "$")
+
+    def test_mcp_and_activity_manifest_contracts_coexist_without_legacy_session(self) -> None:
+        self.assertEqual(self.schema["properties"]["schema_version"]["const"], 2)
+        self.assertNotIn("session", self.schema["properties"])
+        self.assertEqual(self.schema["properties"]["mcp"]["$ref"], "#/$defs/mcpService")
+        self.assertEqual(self.schema["properties"]["objects"]["additionalProperties"], {"$ref": "#/$defs/objectType"})
+        self.assertNotIn("operations", self.schema["required"])
+        self.assertIn("mcp", Manifest.__optional_keys__)
+        self.assertIn("objects", Manifest.__optional_keys__)
+        self.assertNotIn("effects", self.schema["$defs"]["mcpTool"]["required"])
+        self.assertEqual(
+            self.schema["$defs"]["mcpTool"]["properties"]["effects"],
+            self.operation["properties"]["effects"],
+        )
+        self.assertIn("effects", Mcptool.__optional_keys__)
+        vectors_path = Path(__file__).resolve().parents[3] / "wire" / "v1" / "manifest_extensions.vectors.json"
+        vectors = json.loads(vectors_path.read_text(encoding="utf-8"))
+        for case in vectors["cases"]:
+            with self.subTest(case=case["name"]):
+                _validate_wire_schema(self.schema, self.schema, case["manifest"], "Manifest", "$")
+                self.assertEqual(json.loads(encode_wire_json(case["manifest"])), case["manifest"])
+                with self.assertRaises(WireDecodeError) as raised:
+                    _validate_wire_schema(self.schema, self.schema, {**case["manifest"], "session": {}}, "Manifest", "$")
+                self.assertEqual(raised.exception.code, WIRE_UNKNOWN_FIELD)
+                self.assertEqual(raised.exception.path, "$.session")
+
+    def test_operation_effect_schema_declares_optional_bounded_guidance(self) -> None:
+        self.assertNotIn("effects", self.operation["required"])
+        effects = self.operation["properties"]["effects"]
+        self.assertEqual(effects["type"], "array")
+        self.assertEqual(effects["maxItems"], 16)
+        self.assertEqual(effects["items"], {"$ref": "#/$defs/operationEffect"})
+        self.assertNotIn("default", effects)
+        self.assertEqual(self.effect["required"], ["kind", "label"])
+        self.assertFalse(self.effect["additionalProperties"])
+        properties = self.effect["properties"]
+        self.assertEqual(set(properties), {"kind", "label", "target_arg", "recovery"})
+        self.assertEqual(
+            properties["kind"]["enum"],
+            ["read", "create", "update", "delete", "external", "execute"],
+        )
+        self.assertEqual(
+            properties["recovery"]["enum"],
+            ["not_applicable", "reversible", "compensatable", "irreversible", "unknown"],
+        )
+        self.assertEqual(properties["recovery"]["default"], "unknown")
+        self.assertEqual(properties["label"]["$ref"], "#/$defs/localizedText")
+        self.assertIn("512 UTF-8 bytes", properties["label"]["description"])
+        self.assertEqual(properties["target_arg"]["type"], "string")
+
+    def test_operation_effect_structural_rules_accept_declared_kinds_and_recovery(self) -> None:
+        for kind in self.effect["properties"]["kind"]["enum"]:
+            self.validate_effect({"kind": kind, "label": {"en": "Declared effect"}})
+            for recovery in self.effect["properties"]["recovery"]["enum"]:
+                self.validate_effect(
+                    {
+                        "kind": kind,
+                        "label": {"en": "Declared effect", "fr": "Effet declare"},
+                        "target_arg": "paths",
+                        "recovery": recovery,
+                    }
+                )
+        for effects in ([], [{"kind": "read", "label": {"en": "Read"}}] * 16):
+            _validate_wire_schema(
+                self.operation["properties"]["effects"],
+                self.schema,
+                effects,
+                "OperationEffects",
+                "$",
+            )
+
+    def test_operation_effect_structural_rules_reject_invalid_or_authoritative_fields(self) -> None:
+        label = {"en": "Declared effect"}
+        cases = [
+            ({}, WIRE_REQUIRED, "$.kind"),
+            ({"kind": "read"}, WIRE_REQUIRED, "$.label"),
+            ({"kind": "write", "label": label}, WIRE_ENUM, "$.kind"),
+            ({"kind": False, "label": label}, WIRE_TYPE, "$.kind"),
+            ({"kind": "read", "label": "Read"}, WIRE_TYPE, "$.label"),
+            ({"kind": "read", "label": {"fr": "Lire"}}, WIRE_REQUIRED, "$.label.en"),
+            ({"kind": "read", "label": {"en": "Read", "fr": 1}}, WIRE_TYPE, "$.label.fr"),
+            ({"kind": "read", "label": label, "target_arg": []}, WIRE_TYPE, "$.target_arg"),
+            ({"kind": "read", "label": label, "recovery": None}, WIRE_TYPE, "$.recovery"),
+            ({"kind": "read", "label": label, "recovery": "automatic"}, WIRE_ENUM, "$.recovery"),
+        ]
+        for field in ("authority", "grant", "receipt", "file_diff", "inverse"):
+            cases.append(
+                ({"kind": "read", "label": label, field: True}, WIRE_UNKNOWN_FIELD, f"$.{field}")
+            )
+        for value, code, path in cases:
+            with self.subTest(value=value), self.assertRaises(WireDecodeError) as raised:
+                self.validate_effect(value)
+            self.assertEqual(raised.exception.code, code)
+            self.assertEqual(raised.exception.path, path)
+
+    def test_operation_effect_codegen_preserves_omission_and_explicit_declarations(self) -> None:
+        self.assertIn("effects", Operation.__optional_keys__)
+        self.assertEqual(Operationeffect.__required_keys__, {"kind", "label"})
+        self.assertEqual(Operationeffect.__optional_keys__, {"target_arg", "recovery"})
+        minimal: Operation = {"label": {"en": "Inspect"}}
+        self.assertNotIn("effects", json.loads(encode_wire_json(minimal)))
+        effect: Operationeffect = {"kind": "read", "label": {"en": "Read requested paths"}}
+        for effects in ([], [effect]):
+            operation: Operation = {"label": {"en": "Inspect"}, "effects": effects}
+            decoded = json.loads(encode_wire_json(operation))
+            self.assertEqual(decoded, operation)
+            if effects:
+                self.assertNotIn("recovery", decoded["effects"][0])
+                self.assertNotIn("target_arg", decoded["effects"][0])
+
+
+class McpEffectBindingTests(unittest.TestCase):
+    def test_mcp_effect_bindings_preserve_omission_empty_and_declared_values(self) -> None:
+        legacy: Mcptool = {"name": "notes.get", "summary": {"en": "Get note"}}
+        self.assertNotIn("effects", json.loads(encode_wire_json(legacy)))
+        minimal: Operationeffect = {"kind": "read", "label": {"en": "Read note"}}
+        for effects in (
+            [],
+            [minimal],
+            [{**minimal, "target_arg": "note_id", "recovery": "not_applicable"}],
+        ):
+            value: Mcptool = {**legacy, "effects": effects}
+            decoded = json.loads(encode_wire_json(value))
+            self.assertEqual(decoded, value)
+            self.assertIn("effects", decoded)
+        self.assertNotIn("recovery", minimal)
+        self.assertNotIn("target_arg", minimal)
+
+    def test_app_and_gui_helpers_work_in_local_dev_mode(self) -> None:
+        import os
+        import tempfile
+        from . import app as app_mod, gui as gui_mod
+
+        with tempfile.TemporaryDirectory() as tmp:
+            old_data = os.environ.get("YUOS_DATA_DIR")
+            os.environ["YUOS_DATA_DIR"] = tmp
+            try:
+                self.assertEqual(app_mod.data_dir(), Path(tmp))
+            finally:
+                if old_data is None:
+                    os.environ.pop("YUOS_DATA_DIR", None)
+                else:
+                    os.environ["YUOS_DATA_DIR"] = old_data
+
+        app_mod.clipboard_write("hello clipboard")
+        self.assertEqual(app_mod.clipboard_read(), "hello clipboard")
+        self.assertEqual(app_mod.notify("Done", "ok")["status"], "dev")
+
+        os.environ["YUOS_DEV_OPEN_FILE"] = "/tmp/open.txt"
+        os.environ["YUOS_DEV_SAVE_FILE"] = "/tmp/save.txt"
+        os.environ["YUOS_DEV_SELECT_FOLDER"] = "/tmp/folder"
+        try:
+            self.assertEqual(gui_mod.open_file(), "/tmp/open.txt")
+            self.assertEqual(gui_mod.save_file("out.txt"), "/tmp/save.txt")
+            self.assertEqual(gui_mod.select_folder(), "/tmp/folder")
+        finally:
+            os.environ.pop("YUOS_DEV_OPEN_FILE", None)
+            os.environ.pop("YUOS_DEV_SAVE_FILE", None)
+            os.environ.pop("YUOS_DEV_SELECT_FOLDER", None)
+
+
+if __name__ == "__main__":
+    unittest.main()

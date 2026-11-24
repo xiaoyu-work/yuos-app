@@ -1,0 +1,645 @@
+//! # yuos-sdk
+//!
+//! Official Rust SDK for [Yu OS](https://github.com/xiaoyu-work/Yu-OS).
+//! This crate is the typed, language-idiomatic surface a Rust app uses
+//! to add AI capabilities to itself — call the system LLM, expose
+//! tools to the agent, discover the kernel tool catalogue.
+//!
+//! See [the SDK README](https://github.com/xiaoyu-work/Yu-OS/tree/main/yuos-sdk)
+//! and `wire/v1/README.md` for the protocol specification this crate
+//! implements.
+//!
+//! ## Scope
+//!
+//! yuos-sdk is **the AI-facing public surface**. It deliberately
+//! does *not* contain the helpers yuos's own bundled apps use for
+//! self-gating (`policy`) or filesystem-mutation routing (`fs`,
+//! `exec`, `pkg`, `notify`, `net`). Those live in the internal
+//! [`yuos-runtime`](../../../yuos-runtime/) crate, which is not
+//! published. A regular Linux app written for yuos does not need
+//! `yuos-runtime`; it imports `yuos-sdk` only when it wants to call
+//! the system LLM or be invoked as a tool by the system agent.
+//!
+//! ## What's in here
+//!
+//! | Module        | Wire family | Equivalent CLI                  |
+//! |---------------|-------------|---------------------------------|
+//! | [`app`]       | —           | `yu app <id> <command>` and `--gui` |
+//! | [`ai`]        | `ai`        | stable `yu ai chat`            |
+//! | [`applet`]    | data v1     | public OS App data services      |
+//! | [`mcp`]       | MCP         | App-hosted tools over JSON-RPC  |
+//! | [`tools`]     | `tool`      | `yu ai tool <name> --app <id>` |
+//! | [`envelope`]  | shared      | the common reply envelope       |
+//! | [`objects`]   | object_ref  | pure App object identifiers; no dispatch |
+//! | [`generated`] | shared      | typed structs codegen'd from `wire/v1/*.schema.json` |
+//!
+//! Everything except `generated` is hand-written. `generated.rs` is
+//! recomputed by `yuos-sdk/wire/codegen.py` whenever the schemas
+//! change.
+//!
+//! ## Manifest-bound MCP Apps
+//!
+//! Native Apps load [`mcp::App`] from the authoritative App manifest, bind one
+//! [`mcp::Tool`] implementation for every declared name, and serve MCP over
+//! stdio. Tool descriptions and schemas are never authored in Rust. Each
+//! handler receives validated arguments and a Gateway-authenticated
+//! [`mcp::CallContext`] with immutable caller/lineage data, deadline,
+//! cancellation, and optional progress reporting.
+//!
+//! ## Transport
+//!
+//! Transport-backed calls shell out to the `yu` binary on `$PATH`. The
+//! subprocess model is intentional — identity, audit, and session
+//! context come from process ancestry. Set `YUOS_KERNEL_BIN` to override
+//! the resolved binary (used by tests + dev setups). Installed native clients
+//! can use [`yu_call_json_with_binary`] to select their fixed executable
+//! without changing process-wide environment or duplicating the wire decoder.
+//!
+use std::ffi::OsStr;
+use std::io::{IsTerminal, Write};
+use std::process::{Command, Stdio};
+
+use serde::de::DeserializeOwned;
+
+pub mod ai;
+pub mod app;
+pub mod applet;
+pub mod ask_yu;
+pub mod capture;
+pub mod channels;
+pub mod desktop;
+pub mod envelope;
+pub mod events;
+pub mod exec;
+pub mod files;
+pub mod filesystem;
+pub mod fs;
+pub mod generated;
+pub mod gui;
+pub mod manifest;
+pub mod mcp;
+pub mod net;
+pub mod notify;
+pub mod objects;
+pub mod pkg;
+pub mod policy;
+pub mod tools;
+
+pub use objects::ObjectRefError;
+
+/// Errors returned by every bridge call.
+#[derive(Debug, thiserror::Error)]
+pub enum BridgeError {
+    /// The `yu` binary couldn't be spawned. Usually means it's not
+    /// on `$PATH` and `YUOS_KERNEL_BIN` is unset.
+    #[error("yu binary not found (set YUOS_KERNEL_BIN or install yu): {0}")]
+    BinaryNotFound(std::io::Error),
+
+    /// The app dispatcher returned a structured JSON error
+    /// (`{"error": "...", "code": "..."}`). This is the common case —
+    /// e.g. a denied capability or a missing file.
+    #[error("yu app {app} {verb}: {message}")]
+    AppError {
+        app: String,
+        verb: String,
+        message: String,
+        code: String,
+    },
+
+    /// The subprocess exited non-zero but stdout didn't parse as a
+    /// structured error. Stderr is bubbled up for diagnostics.
+    #[error("yu app {app} {verb} exited {status}: {stderr}")]
+    NonZeroExit {
+        app: String,
+        verb: String,
+        status: i32,
+        stderr: String,
+    },
+
+    /// stdout produced bytes but they couldn't be parsed as JSON, or
+    /// the JSON shape didn't match the typed wrapper's expectation.
+    #[error("invalid response from yu app {app} {verb}: {message}")]
+    Decode {
+        app: String,
+        verb: String,
+        message: String,
+    },
+
+    /// Bare IO failure spawning the subprocess or writing stdin.
+    #[error("io: {0}")]
+    Io(#[from] std::io::Error),
+}
+
+impl BridgeError {
+    /// True if the underlying app reported `code = "denied"` (the
+    /// kebab-cased `caps::Denial::reason`). GUI callers use this to
+    /// pop up an approval dialog instead of an error toast.
+    pub fn is_denied(&self) -> bool {
+        matches!(
+            self,
+            BridgeError::AppError { code, .. } if code == "PERMISSION_DENIED"
+        )
+    }
+}
+
+/// Truncate a diagnostic string to ``limit`` bytes, appending a marker
+/// for the number of bytes elided. Used to keep `Decode` /
+/// `AppError` messages from leaking large request/response payloads
+/// (e.g. AI prompt text, embedding vectors, file contents) into log
+/// streams that may be world-readable.
+fn truncate_diag(s: &str, limit: usize) -> String {
+    if s.len() <= limit {
+        return s.to_string();
+    }
+    let mut cut = limit;
+    // Don't slice mid-codepoint — UTF-8 safe rewind.
+    while cut > 0 && !s.is_char_boundary(cut) {
+        cut -= 1;
+    }
+    format!("{}… [{} more bytes elided]", &s[..cut], s.len() - cut)
+}
+
+const DIAG_LIMIT: usize = 256;
+const WIRE_V1_FLAG: &str = "--wire=1";
+/// Bounded CLI MCP JSON body: the 1 MiB broker request minus 16 KiB for framing.
+/// Keep in sync with core's `yuosd::wire::bounded::APP_ARGS_STDIN_MAX_BYTES`.
+#[doc(hidden)]
+pub const APP_ARGS_STDIN_MAX_BYTES: usize = 1024 * 1024 - 16 * 1024;
+
+/// Idiomatic alias preferred by external SDK consumers. New code
+/// should `use yuos_sdk::Error;` rather than the historical
+/// `BridgeError` name (kept as an alias to avoid churn inside the
+/// crate's own modules).
+pub type Error = BridgeError;
+
+// ---------------------------------------------------------------------------
+// Raw call — every typed wrapper funnels through here.
+// ---------------------------------------------------------------------------
+
+/// Build the command invocation but don't run it. Tests use this to
+/// inspect the argv that would be spawned without actually shelling
+/// out to a `yu` binary.
+fn build_command<A>(app: &str, verb: &str, args: A) -> Command
+where
+    A: IntoIterator,
+    A::Item: AsRef<OsStr>,
+{
+    let bin = std::env::var("YUOS_KERNEL_BIN").unwrap_or_else(|_| "yu".into());
+    let mut cmd = Command::new(bin);
+    cmd.arg(WIRE_V1_FLAG).arg("app").arg(app).arg(verb);
+    for a in args {
+        cmd.arg(a);
+    }
+    cmd
+}
+
+/// Invoke `yu --wire=1 app <app> <verb> <args...>` and return the
+/// request-specific success payload.
+///
+/// This is a human CLI/desktop client, not an App-to-App transport.
+/// The broker rejects App processes and agents using this owner frontend.
+/// Apps use gated AI, controlled
+/// system services, and shared libraries; the system Agent orchestrates Apps.
+///
+/// `stdin` is the body to forward to the subprocess on stdin for operations
+/// that explicitly support it. For MCP-only Apps pass exactly `["--args-stdin"]`
+/// and a bounded JSON object of manifest-declared business arguments. This never
+/// supplies caller identity or context. Pass `None` for ordinary argv calls.
+pub fn call<A>(
+    app: &str,
+    verb: &str,
+    args: A,
+    stdin: Option<&[u8]>,
+) -> Result<serde_json::Value, BridgeError>
+where
+    A: IntoIterator,
+    A::Item: AsRef<OsStr>,
+{
+    let mut cmd = build_command(app, verb, args);
+    if cmd.get_args().skip(4).eq([OsStr::new("--args-stdin")])
+        && stdin.is_some_and(|bytes| bytes.len() > APP_ARGS_STDIN_MAX_BYTES)
+    {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("MCP arguments exceed the {APP_ARGS_STDIN_MAX_BYTES}-byte limit"),
+        )
+        .into());
+    }
+    cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
+    if stdin.is_some() {
+        cmd.stdin(Stdio::piped());
+    }
+
+    let mut child = cmd.spawn().map_err(|e| match e.kind() {
+        std::io::ErrorKind::NotFound => BridgeError::BinaryNotFound(e),
+        _ => BridgeError::Io(e),
+    })?;
+
+    // Drain output while writing: early refusals may close stdin or fill stdout.
+    // Always reap the child, and prefer its typed error over a resulting EPIPE.
+    let pipe = child.stdin.take();
+    let (output, written) = std::thread::scope(|scope| {
+        let writer = stdin
+            .zip(pipe)
+            .map(|(bytes, mut pipe)| scope.spawn(move || pipe.write_all(bytes)));
+        let output = child.wait_with_output();
+        let written = match writer {
+            Some(writer) => writer
+                .join()
+                .unwrap_or_else(|_| Err(std::io::Error::other("yu stdin writer panicked"))),
+            None => Ok(()),
+        };
+        (output, written)
+    });
+    let result =
+        decode_wire_response(app, verb, output?).map_err(StructuredCosError::into_bridge)?;
+    written?;
+    Ok(result)
+}
+
+/// Typed variant of [`call`] — deserialises stdout into the caller's
+/// chosen struct. Used by the typed app wrappers (`fs::read`,
+/// `pkg::has`, …) — both inside this crate and inside the internal
+/// `yuos-runtime` crate.
+#[doc(hidden)]
+pub fn call_typed<A, R>(
+    app: &str,
+    verb: &str,
+    args: A,
+    stdin: Option<&[u8]>,
+) -> Result<R, BridgeError>
+where
+    A: IntoIterator,
+    A::Item: AsRef<OsStr>,
+    R: DeserializeOwned,
+{
+    let v = call(app, verb, args, stdin)?;
+    serde_json::from_value(v.clone()).map_err(|e| BridgeError::Decode {
+        app: app.to_string(),
+        verb: verb.to_string(),
+        message: format!(
+            "type mismatch ({e}): {}",
+            truncate_diag(&v.to_string(), DIAG_LIMIT)
+        ),
+    })
+}
+
+// ---------------------------------------------------------------------------
+// Raw yuos-CLI call — used by ai/policy/tools modules whose request
+// surface lives outside `yu app <id> <verb>`. The `family` and
+// `verb` strings are propagated into [`BridgeError`] for diagnostics.
+// ---------------------------------------------------------------------------
+
+/// Invoke any `yu` sub-command through wire v1 and return its success
+/// data. Used by [`ai`] and [`tools`] for `yu ai ...`.
+///
+/// `family` and `verb` are surfaced in [`BridgeError`] variants when
+/// the call fails — pass any human-meaningful strings.
+#[doc(hidden)]
+pub fn yu_call_json<A>(family: &str, verb: &str, args: A) -> Result<serde_json::Value, BridgeError>
+where
+    A: IntoIterator,
+    A::Item: AsRef<OsStr>,
+{
+    yu_call_json_structured(family, verb, args).map_err(StructuredCosError::into_bridge)
+}
+
+/// Invoke a controlled CLI primitive using an explicitly selected executable.
+///
+/// Unlike [`yu_call_json`], this does not consult `YUOS_KERNEL_BIN`. An absolute
+/// path also avoids PATH lookup, as needed by installed native clients launched
+/// with a closed environment. Wire decoding, errors and broker authorization
+/// are unchanged; choosing a binary confers no additional authority.
+pub fn yu_call_json_with_binary<A>(
+    binary: impl AsRef<OsStr>,
+    family: &str,
+    verb: &str,
+    args: A,
+) -> Result<serde_json::Value, BridgeError>
+where
+    A: IntoIterator,
+    A::Item: AsRef<OsStr>,
+{
+    yu_call_json_structured_input(
+        family, verb, args, None, Stdio::piped(), Some(binary.as_ref()),
+    )
+    .map_err(StructuredCosError::into_bridge)
+}
+
+/// Async counterpart of [`yu_call_json_with_binary`], with identical wire
+/// decoding. Dropping the future kills the CLI child, so MCP cancellation and
+/// deadlines do not leave a blocking client behind. This cannot undo an action
+/// the OS already accepted; the OS still owns dispatch authorization.
+pub async fn yu_call_json_async_with_binary<A>(
+    binary: impl AsRef<OsStr>,
+    family: &str,
+    verb: &str,
+    args: A,
+) -> Result<serde_json::Value, BridgeError>
+where
+    A: IntoIterator,
+    A::Item: AsRef<OsStr>,
+{
+    yu_call_json_async_input(binary, family, verb, args, None).await
+}
+
+/// Cancellable controlled primitive with an explicit executable and bounded
+/// stdin. Business text never enters argv; errors use the common wire decoder.
+pub async fn yu_call_json_async_with_stdin_binary<A>(
+    binary: impl AsRef<OsStr>,
+    family: &str,
+    verb: &str,
+    args: A,
+    input: &[u8],
+) -> Result<serde_json::Value, BridgeError>
+where
+    A: IntoIterator,
+    A::Item: AsRef<OsStr>,
+{
+    if input.len() > APP_ARGS_STDIN_MAX_BYTES {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "primitive input exceeds the request limit",
+        ).into());
+    }
+    yu_call_json_async_input(binary, family, verb, args, Some(input)).await
+}
+
+async fn yu_call_json_async_input<A>(
+    binary: impl AsRef<OsStr>,
+    family: &str,
+    verb: &str,
+    args: A,
+    input: Option<&[u8]>,
+) -> Result<serde_json::Value, BridgeError>
+where
+    A: IntoIterator,
+    A::Item: AsRef<OsStr>,
+{
+    use tokio::io::AsyncWriteExt;
+    let mut child = tokio::process::Command::new(binary)
+        .arg("--wire=1")
+        .args(args)
+        .stdin(if input.is_some() { Stdio::piped() } else { Stdio::null() })
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .kill_on_drop(true)
+        .spawn()
+        .map_err(|error| match error.kind() {
+            std::io::ErrorKind::NotFound => BridgeError::BinaryNotFound(error),
+            _ => BridgeError::Io(error),
+        })?;
+    let pipe = child.stdin.take();
+    let write = async {
+        if let Some((input, mut pipe)) = input.zip(pipe) {
+            pipe.write_all(input).await?;
+        }
+        Ok::<_, std::io::Error>(())
+    };
+    let (output, written) = tokio::join!(child.wait_with_output(), write);
+    let result = decode_wire_response(family, verb, output?)
+        .map_err(StructuredCosError::into_bridge)?;
+    written?;
+    Ok(result)
+}
+
+/// Invoke a controlled CLI primitive with bounded business data on stdin.
+/// Uses the same wire envelope/error decoder as [`yu_call_json`].
+pub fn yu_call_json_with_stdin<A>(
+    family: &str,
+    verb: &str,
+    args: A,
+    input: &[u8],
+) -> Result<serde_json::Value, BridgeError>
+where
+    A: IntoIterator,
+    A::Item: AsRef<OsStr>,
+{
+    yu_call_json_stdin(family, verb, args, input, false)
+}
+
+/// Preserve an already-connected human stderr terminal while sending business
+/// data on stdin. No terminal is opened or fabricated; headless callers retain
+/// captured diagnostics. The OS still owns all session-bootstrap restrictions.
+#[doc(hidden)]
+pub fn yu_call_json_with_stdin_terminal<A>(
+    family: &str,
+    verb: &str,
+    args: A,
+    input: &[u8],
+) -> Result<serde_json::Value, BridgeError>
+where
+    A: IntoIterator,
+    A::Item: AsRef<OsStr>,
+{
+    yu_call_json_stdin(family, verb, args, input, std::io::stderr().is_terminal())
+}
+
+fn yu_call_json_stdin<A>(
+    family: &str,
+    verb: &str,
+    args: A,
+    input: &[u8],
+    terminal: bool,
+) -> Result<serde_json::Value, BridgeError>
+where
+    A: IntoIterator,
+    A::Item: AsRef<OsStr>,
+{
+    if input.len() > APP_ARGS_STDIN_MAX_BYTES {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "primitive input exceeds the request limit",
+        )
+        .into());
+    }
+    let stderr = if terminal { Stdio::inherit() } else { Stdio::piped() };
+    yu_call_json_structured_input(family, verb, args, Some(input), stderr, None)
+        .map_err(StructuredCosError::into_bridge)
+}
+
+#[derive(Debug)]
+pub(crate) struct StructuredAppError {
+    pub app: String,
+    pub verb: String,
+    pub message: String,
+    pub code: String,
+    pub payload: serde_json::Value,
+}
+
+#[derive(Debug)]
+pub(crate) enum StructuredCosError {
+    App(Box<StructuredAppError>),
+    Bridge(BridgeError),
+}
+
+impl StructuredCosError {
+    fn into_bridge(self) -> BridgeError {
+        match self {
+            StructuredCosError::App(error) => {
+                let error = *error;
+                BridgeError::AppError {
+                    app: error.app,
+                    verb: error.verb,
+                    message: error.message,
+                    code: error.code,
+                }
+            }
+            StructuredCosError::Bridge(error) => error,
+        }
+    }
+}
+
+fn decode_wire_response(
+    family: &str,
+    verb: &str,
+    out: std::process::Output,
+) -> Result<serde_json::Value, StructuredCosError> {
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    let stderr = String::from_utf8_lossy(&out.stderr);
+    if stdout.trim().is_empty() {
+        return Err(BridgeError::NonZeroExit {
+            app: family.to_string(),
+            verb: verb.to_string(),
+            status: out.status.code().unwrap_or(-1),
+            stderr: truncate_diag(&stderr, DIAG_LIMIT),
+        }
+        .into());
+    }
+
+    let raw: serde_json::Value =
+        serde_json::from_str(stdout.trim()).map_err(|error| BridgeError::Decode {
+            app: family.to_string(),
+            verb: verb.to_string(),
+            message: format!("not JSON ({error}): {}", truncate_diag(&stdout, DIAG_LIMIT)),
+        })?;
+    let envelope =
+        crate::envelope::Envelope::decode(raw.clone()).map_err(|error| BridgeError::Decode {
+            app: family.to_string(),
+            verb: verb.to_string(),
+            message: error,
+        })?;
+
+    if envelope.ok {
+        if !out.status.success() {
+            return Err(BridgeError::Decode {
+                app: family.to_string(),
+                verb: verb.to_string(),
+                message: format!(
+                    "wire success envelope accompanied exit status {}",
+                    out.status.code().unwrap_or(-1)
+                ),
+            }
+            .into());
+        }
+        return envelope.data.ok_or_else(|| {
+            BridgeError::Decode {
+                app: family.to_string(),
+                verb: verb.to_string(),
+                message: "wire success envelope omitted data".to_string(),
+            }
+            .into()
+        });
+    }
+
+    if out.status.success() {
+        return Err(BridgeError::Decode {
+            app: family.to_string(),
+            verb: verb.to_string(),
+            message: "wire error envelope accompanied exit status 0".to_string(),
+        }
+        .into());
+    }
+    Err(StructuredCosError::App(Box::new(StructuredAppError {
+        app: family.to_string(),
+        verb: verb.to_string(),
+        message: envelope
+            .error
+            .expect("validated error envelope must include error"),
+        code: envelope
+            .code
+            .expect("validated error envelope must include code"),
+        payload: raw,
+    })))
+}
+
+impl From<BridgeError> for StructuredCosError {
+    fn from(error: BridgeError) -> Self {
+        StructuredCosError::Bridge(error)
+    }
+}
+
+impl From<std::io::Error> for StructuredCosError {
+    fn from(error: std::io::Error) -> Self {
+        StructuredCosError::Bridge(BridgeError::Io(error))
+    }
+}
+
+pub(crate) fn yu_call_json_structured<A>(
+    family: &str,
+    verb: &str,
+    args: A,
+) -> Result<serde_json::Value, StructuredCosError>
+where
+    A: IntoIterator,
+    A::Item: AsRef<OsStr>,
+{
+    yu_call_json_structured_input(family, verb, args, None, Stdio::piped(), None)
+}
+
+fn yu_call_json_structured_input<A>(
+    family: &str,
+    verb: &str,
+    args: A,
+    input: Option<&[u8]>,
+    stderr: Stdio,
+    binary: Option<&OsStr>,
+) -> Result<serde_json::Value, StructuredCosError>
+where
+    A: IntoIterator,
+    A::Item: AsRef<OsStr>,
+{
+    let bin = binary.map(OsStr::to_os_string).unwrap_or_else(|| {
+        std::env::var("YUOS_KERNEL_BIN").unwrap_or_else(|_| "yu".into()).into()
+    });
+    let mut cmd = Command::new(bin);
+    cmd.arg(WIRE_V1_FLAG);
+    for a in args {
+        cmd.arg(a);
+    }
+    cmd.stdout(Stdio::piped()).stderr(stderr);
+    cmd.stdin(if input.is_some() {
+        Stdio::piped()
+    } else {
+        Stdio::null()
+    });
+
+    let mut child = cmd.spawn().map_err(|e| match e.kind() {
+        std::io::ErrorKind::NotFound => BridgeError::BinaryNotFound(e),
+        _ => BridgeError::Io(e),
+    })?;
+    if let Some(input) = input {
+        use std::io::Write;
+        let result = child.stdin.take().expect("piped stdin").write_all(input);
+        if let Err(error) = result {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err(BridgeError::Io(error).into());
+        }
+    }
+
+    decode_wire_response(family, verb, child.wait_with_output()?)
+}
+
+#[cfg(test)]
+mod tests {
+    include!(concat!(env!("CARGO_MANIFEST_DIR"), "/test/unit/lib.rs"));
+}
+
+#[cfg(test)]
+mod generated_tests {
+    include!(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/test/unit/generated.rs"
+    ));
+}

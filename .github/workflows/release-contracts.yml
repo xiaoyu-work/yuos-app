@@ -7,8 +7,6 @@ on:
       - "tools/native_build.py"
       - "tools/stage.py"
       - "tools/package_assets.py"
-      - "tools/platform_dependency.py"
-      - "platform.lock.json"
       - "shared/python/**"
       - "products/*/package.json"
       - "products/browser/extension/**"
@@ -45,15 +43,16 @@ jobs:
           from pathlib import Path
           import re
           import sys
+          import urllib.request
           sys.path.insert(0, "tools")
-          from platform_dependency import _download
           from release_common import digest
           pin = json.loads(Path("packaging/provenance-tools.lock.json").read_text())
           version, expected = pin["version"], pin["sha256"]["amd64"]
           if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version) or not re.fullmatch(r"[0-9a-f]{64}", expected):
               raise ValueError("Invalid approved Yu OS provenance tool pin")
           tool = Path("build/provenance-yu")
-          _download(
+          tool.parent.mkdir(parents=True, exist_ok=True)
+          urllib.request.urlretrieve(
               f"https://github.com/xiaoyu-work/Yu-OS/releases/download/yuos-sdk-v{version}/yu-provenance-linux-amd64",
               tool,
           )

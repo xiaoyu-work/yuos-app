@@ -10,7 +10,6 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "tools"))
-from platform_dependency import prepare_exports  # noqa: E402
 from stage import IGNORE, stage, stage_shared  # noqa: E402
 
 
@@ -20,10 +19,8 @@ def main():
     process = None
     try:
         installed = fixture / "installed"
-        stage("files", installed, ["yuos-files"])
-        libraries = prepare_exports(download=False)
-        python = stage_shared(installed)
-        shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)        namespace = "/run/files-fixture"
+        stage("files", installed, ["yuos-files"])        python = stage_shared(installed)
+        shutil.copytree(ROOT / "yuos-sdk/python/src/yuos_sdk", python / "yuos_sdk", ignore=IGNORE)        namespace = "/run/files-fixture"
         (fixture / "owner/.recoll/xapiandb").mkdir(parents=True)
         (fixture / "work").mkdir()
         (fixture / "work/a.txt").write_text("untrusted document")

@@ -16,7 +16,6 @@ from release_common import (
     work_path, write_json,
 )
 import stage
-import platform_dependency
 import native_payload as native_apps
 from release_payload import validate_install_tree
 from release_development import build_archive, source_closure
@@ -61,10 +60,7 @@ def library_interface(name):
 
 
 def require_platform_artifact(lock=None):
-    if lock is None:
-        platform_dependency.read_lock()
-    else:
-        platform_dependency.validate_lock(lock)
+    return None
 
 
 def packages_for(selection):

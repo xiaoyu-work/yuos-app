@@ -6,10 +6,8 @@ import os
 import subprocess
 import sys
 
-from platform_dependency import (
-    ROOT, add_development_arguments, development_from_args, prepare, report_development,
-)
-from stage import app_entries, load_package, python_libraries
+from pathlib import Path
+from stage import ROOT, app_entries, load_package, python_libraries, shared_python_root
 
 
 def source_tests(source, package):
@@ -39,7 +37,6 @@ def main():
     parser.add_argument("product", nargs="*")
     parser.add_argument("--capability", nargs="+", default=[])
     parser.add_argument("--shared", action="store_true", help="Run shared App library contracts")
-    add_development_arguments(parser)
     options = parser.parse_args()
     if not options.product and not options.capability and not options.shared:
         parser.error("select a product, --capability source group, or --shared")
@@ -47,12 +44,7 @@ def main():
         *(load_package(name) for name in options.product),
         *(load_package(name, "capability") for name in options.capability),
     ]
-    try:
-        development = development_from_args(options)
-    except ValueError as error:
-        parser.error(str(error))
-    report_development(development)
-    paths = prepare(development=development)
+    paths = [ROOT / "yuos-sdk/python/src", shared_python_root(ROOT)]
     env = os.environ.copy()
     env["PYTHONDONTWRITEBYTECODE"] = "1"
     tests = []
@@ -65,12 +57,9 @@ def main():
         ROOT / "tests" / "shared",
         ROOT / "tests" / "test_manifest_contracts.py",
         ROOT / "tests" / "test_stage.py",
-        ROOT / "tests" / "test_platform_dependency.py",
     ])
-    platform_arguments = development.arguments() if development is not None else []
-    # Load fixture options before pytest encounters an archive outside the source tree.
     subprocess.run([sys.executable, "-m", "pytest", "-q", "--import-mode=importlib",
-                    *map(str, tests), *platform_arguments],
+                    *map(str, tests)],
                    cwd=ROOT, env=env, check=True)
 
 

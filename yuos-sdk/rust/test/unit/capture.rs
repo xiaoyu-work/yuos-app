@@ -1,0 +1,72 @@
+use super::*;
+use std::os::unix::fs::PermissionsExt;
+
+#[test]
+fn capture_uses_typed_sdk_stdin_and_validates_before_contacting_os() {
+    let dir = tempfile::tempdir_in(std::env::current_dir().unwrap()).unwrap();
+    let script = dir.path().join("yuos");
+    std::fs::write(
+        &script,
+        "#!/bin/sh\nprintf '%s\\n' \"$@\" > \"$0.args\"\ncat > \"$0.input\"\ncat \"$0.reply\"\ntest ! -e \"$0.denied\"\n",
+    )
+    .unwrap();
+    std::fs::set_permissions(&script, std::fs::Permissions::from_mode(0o755)).unwrap();
+    let old = std::env::var_os("YUOS_KERNEL_BIN");
+    std::env::set_var("YUOS_KERNEL_BIN", &script);
+    for path in ["", "relative", "/work/\0bad"] {
+        assert!(screenshot(path, true).is_err());
+        assert!(screenshot_from_terminal(path, true).is_err());
+    }
+    assert!(!dir.path().join("yuos.args").exists());
+    let cases = [
+        (
+            serde_json::json!({"cancelled":false,"path":"/work/shots/shot.png"}),
+            true,
+        ),
+        (serde_json::json!({"cancelled":true,"path":null}), true),
+        (
+            serde_json::json!({"cancelled":true,"path":"/work/shots/shot.png"}),
+            false,
+        ),
+        (
+            serde_json::json!({"cancelled":false,"path":"/other/shot.png"}),
+            false,
+        ),
+        (
+            serde_json::json!({"cancelled":false,"path":"/work/shots/shot.txt"}),
+            false,
+        ),
+        (serde_json::json!({"cancelled":false,"path":null}), false),
+    ];
+    for (data, ok) in cases {
+        std::fs::write(
+            dir.path().join("yuos.reply"),
+            serde_json::json!({"ok":true,"wire_version":1,"data":data}).to_string(),
+        )
+        .unwrap();
+        assert_eq!(screenshot("/work/shots", false).is_ok(), ok);
+        assert_eq!(screenshot_from_terminal("/work/shots", false).is_ok(), ok);
+    }
+    std::fs::write(
+        dir.path().join("yuos.reply"),
+        r#"{"ok":false,"wire_version":1,"code":"PERMISSION_DENIED","error":"fixture denied"}"#,
+    )
+    .unwrap();
+    std::fs::write(dir.path().join("yuos.denied"), "").unwrap();
+    let error = screenshot("/work/shots", false).unwrap_err();
+    match old {
+        Some(old) => std::env::set_var("YUOS_KERNEL_BIN", old),
+        None => std::env::remove_var("YUOS_KERNEL_BIN"),
+    }
+    assert!(error.to_string().contains("fixture denied"), "{error}");
+    assert_eq!(
+        std::fs::read_to_string(dir.path().join("yuos.args")).unwrap(),
+        "--wire=1\n__capture\nscreenshot\n--request-stdin\n"
+    );
+    let request: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(dir.path().join("yuos.input")).unwrap()).unwrap();
+    assert_eq!(
+        request,
+        serde_json::json!({"directory":"/work/shots","modal":false})
+    );
+}

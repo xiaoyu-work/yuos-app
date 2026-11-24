@@ -217,8 +217,8 @@ jobs:
           from pathlib import Path
           import sys
           from urllib.parse import urlsplit
+          import urllib.request
           sys.path.insert(0, "tools")
-          from platform_dependency import _download
           from release_common import digest, run
           from release_publish import require_publication_contract
           from release_common import config
@@ -231,7 +231,8 @@ jobs:
           ) or not re.fullmatch(r"[0-9a-f]{64}", checksum):
               raise ValueError("A pinned published OS provenance tool is required")
           tool = Path("build/provenance-yu")
-          _download(url, tool)
+          tool.parent.mkdir(parents=True, exist_ok=True)
+          urllib.request.urlretrieve(url, tool)
           if digest(tool) != checksum:
               raise ValueError("Public provenance tool SHA256 mismatch")
           tool.chmod(0o755)

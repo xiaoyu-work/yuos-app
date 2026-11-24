@@ -17,7 +17,7 @@ from pathlib import Path, PurePosixPath
 
 import pytest
 
-from test_support import load_local_module, platform_dependency
+from test_support import load_local_module
 
 
 APPS_ROOT = Path(__file__).resolve().parents[1]
@@ -34,7 +34,7 @@ def _manifests():
 
 
 def _schema():
-    return json.loads(platform_dependency().manifest_schema_path(download=False).read_text(encoding="utf-8"))
+    return json.loads((APPS_ROOT / "yuos-sdk/wire/v1/manifest.schema.json").read_text(encoding="utf-8"))
 
 
 def _binding(arg: dict[str, object]) -> str:

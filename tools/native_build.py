@@ -48,17 +48,25 @@ def prepare(product: str, toolkit: Path | None, destination: Path):
         shutil.rmtree(destination)
     shutil.copytree(component, destination, symlinks=True)
     stage_native.stage_assets(source, package, name, destination)
+    if toolkit.name == "rust" and toolkit.parent.name == "yuos-sdk":
+        sdk_parent = toolkit.parents[1]
+        desktop_parent = ROOT / "shared/rust"
+        toolkit_dir = ROOT / "shared/rust/toolkit"
+    else:
+        sdk_parent = toolkit.parents[1]
+        desktop_parent = toolkit.parent
+        toolkit_dir = toolkit
     if package.get("native_kind") == "binary":
         for manifest in destination.rglob("Cargo.toml"):
             depth = len(manifest.relative_to(destination).parts) - 1
             prefix = "../" * (3 + depth)
             content = manifest.read_text().replace(
-                f'"{prefix}desktop/', '"' + toolkit.parent.as_posix() + "/"
+                f'"{prefix}desktop/', '"' + desktop_parent.as_posix() + "/"
             )
             for library in ("yuos-sdk",):
                 content = content.replace(
                     f'"{prefix}{library}/',
-                    '"' + (toolkit.parents[1] / library).as_posix() + "/",
+                    '"' + (sdk_parent / library).as_posix() + "/",
                 )
             shared_prefix = "../" * (4 + depth)
             content = content.replace(
@@ -69,7 +77,7 @@ def prepare(product: str, toolkit: Path | None, destination: Path):
     else:
         shutil.copy2(source / "native/Cargo.lock", destination / "Cargo.lock")
         patches = (ROOT / "tools/native-patches.toml").read_text()
-        patches = patches.replace('"../toolkit', '"' + toolkit.as_posix())
+        patches = patches.replace('"../toolkit', '"' + toolkit_dir.as_posix())
         with (destination / "Cargo.toml").open("a") as manifest:
             manifest.write("\n" + patches)
     return destination
@@ -113,11 +121,6 @@ def install_payload(product, package, prepared, output, environment, *, app_only
 
 
 def main(product=None):
-    specification = importlib.util.spec_from_file_location(
-        "platform_dependency", ROOT / "tools/platform_dependency.py"
-    )
-    platform = importlib.util.module_from_spec(specification)
-    specification.loader.exec_module(platform)
     parser = argparse.ArgumentParser(description=__doc__)
     if product is None:
         parser.add_argument("product", choices=[
@@ -132,22 +135,15 @@ def main(product=None):
     parser.add_argument("--app-root", type=Path,
                         help="Prepare a release App directory for the existing provenance signer")
     parser.add_argument("--acceptance-root", type=Path,
-                        help="Prepare an unsigned private acceptance fixture from a development platform")
-    platform.add_development_arguments(parser)
+                        help="Prepare an unsigned private acceptance fixture")
     options = parser.parse_args()
-    try:
-        development = platform.development_from_args(options)
-    except ValueError as error:
-        parser.error(str(error))
-    if development is not None and (options.install_root or options.app_root):
-        parser.error("A local development platform cannot be used for release payload or install staging")
     if options.install_root and (options.command != "build" or not options.release):
         parser.error("--install-root requires build --release")
     if options.app_root and (options.command != "build" or not options.release):
         parser.error("--app-root requires build --release")
     if options.acceptance_root:
-        if development is None or options.command != "build" or not options.release:
-            parser.error("--acceptance-root requires build --release and an explicit development platform")
+        if options.command != "build" or not options.release:
+            parser.error("--acceptance-root requires build --release")
         acceptance = ROOT / "build/acceptance"
         output = options.acceptance_root.resolve()
         if output == acceptance or not output.is_relative_to(acceptance):
@@ -159,8 +155,6 @@ def main(product=None):
     system = build_system(package)
     if system == "cmake" and options.command == "test":
         parser.error("This CMake product has no test target; use build or check")
-    if system == "cmake" and development is not None:
-        parser.error("This CMake product does not consume the native Rust toolkit")
     output = options.install_root or options.app_root or options.acceptance_root
     if output:
         if package.get("native_kind") != "binary":
@@ -168,11 +162,9 @@ def main(product=None):
         install_root = output.resolve()
         if install_root == ROOT / "build" or not install_root.is_relative_to(ROOT / "build"):
             raise ValueError("Native install root must be an explicit directory under build/")
-    platform.report_development(development)
     if system == "cargo":
-        toolkit = platform.prepare_native(development=development)
+        toolkit = ROOT / "yuos-sdk/rust"
     else:
-        platform.read_lock()
         toolkit = None
     destination = ROOT / "build" / f"{product}-native"
     prepared = prepare(product, toolkit, destination)

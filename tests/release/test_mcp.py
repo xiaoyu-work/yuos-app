@@ -8,15 +8,9 @@ from test_support import authenticated_mcp_params, mcp_process
 
 
 def install_development_runtime(root):
-    release.require_platform_artifact()
-    import platform_dependency
-
-    exports = platform_dependency.prepare_exports()
-    for name, export in (("yuos_sdk", "python-sdk"),):
-        source = exports[export] / name
-        assert source.is_dir(), f"Platform artifact must export {name} through {export}"
-        shutil.copytree(source, root / "usr/lib/yuos/python" / name,
-                        ignore=shutil.ignore_patterns("__pycache__", "test_*.py"))
+    source = ROOT / "yuos-sdk/python/src/yuos_sdk"
+    shutil.copytree(source, root / "usr/lib/yuos/python/yuos_sdk",
+                    ignore=shutil.ignore_patterns("__pycache__", "test_*.py"))
 
 
 def test_packaged_doc_and_kv_use_public_mcp_and_installed_support_without_os_sources(tmp_path):

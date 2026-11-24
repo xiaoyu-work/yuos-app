@@ -140,56 +140,24 @@ def load_local_module(path, name, *, clear_modules=()):
     return module
 
 
-def platform_dependency():
-    root = Path(__file__).resolve().parents[1]
-    module = load_local_module(root / "tools/platform_dependency.py", "_fixture_platform_dependency")
-    if _development_platform is not None:
-        development = module.DevelopmentArtifact(*_development_platform)
-        for name in ("prepare_exports", "prepare", "manifest_schema_path", "prepare_native"):
-            setattr(module, name, partial(getattr(module, name), development=development))
-    return module
-
-
 def stage_platform_python(python):
     """Compose verified SDK exports without fetching during a test."""
-    platform = platform_dependency()
-    exports = platform.prepare_exports(download=False)
-    for export, package in [("python-sdk", "yuos_sdk")]:
-        shutil.copytree(
-            exports[export] / package, python / package,
-            symlinks=True, ignore=platform.stage.IGNORE,
-        )
+    root = Path(__file__).resolve().parents[1]
+    stage = load_local_module(root / "tools/stage.py", "_fixture_stage")
+    shutil.copytree(
+        root / "yuos-sdk/python/src/yuos_sdk", python / "yuos_sdk",
+        symlinks=True, ignore=stage.IGNORE,
+    )
 
 
 def stage_source_platform_fixture(destination):
-    """Stage a test-only pinned bootstrap without changing runtime selection."""
-    source = platform_dependency()
-    exports = source.prepare_exports(download=False)
-    if _development_platform is None:
-        identity = source.read_lock()
-    else:
-        selected = source.DevelopmentArtifact(*_development_platform)
-        identity = {
-            "version": selected.version, "sha256": selected.sha256,
-            "runtime_abi": source.RUNTIME_ABI,
-        }
-    archive = exports["ui-toolkit"].parents[1].parent / "archive.tar.gz"
-    fixture_url = "https://platform-fixture.invalid/archive.tar.gz"
+    """Stage a test-only SDK bootstrap."""
     destination = Path(destination)
-    tools = destination / "tools"
-    tools.mkdir(parents=True)
     root = Path(__file__).resolve().parents[1]
-    for name in ("platform_dependency.py", "platform_archive.py", "stage.py", "web_ui.py"):
+    tools = destination / "tools"
+    tools.mkdir(parents=True, exist_ok=True)
+    for name in ("stage.py", "web_ui.py"):
         shutil.copy2(root / "tools" / name, tools / name)
-    (destination / "platform.lock.json").write_text(json.dumps({
-        "version": identity["version"], "sha256": identity["sha256"],
-        "runtime_abi": identity["runtime_abi"], "url": fixture_url,
-    }))
-    fixture = load_local_module(tools / "platform_dependency.py", "_source_platform_fixture")
-
-    def provide(url, output):
-        assert url == fixture_url
-        fixture.artifact.copy_verified_archive(archive, output, identity["sha256"])
-
-    fixture._download = provide
-    fixture.prepare_exports()
+    sdk_dest = destination / "yuos-sdk/python/src/yuos_sdk"
+    sdk_dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(root / "yuos-sdk/python/src/yuos_sdk", sdk_dest, symlinks=True)

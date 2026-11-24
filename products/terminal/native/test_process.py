@@ -10,7 +10,6 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "tools"))
-from platform_dependency import prepare_exports
 from stage import IGNORE, stage, stage_shared
 
 
@@ -20,10 +19,8 @@ def main():
     process = None
     try:
         installed = fixture / "installed"
-        stage("terminal", installed, ["yuos-term"])
-        libraries = prepare_exports(download=False)
-        python = stage_shared(installed)
-        shutil.copytree(libraries["python-sdk"] / "yuos_sdk", python / "yuos_sdk", ignore=IGNORE)        namespace = "/run/terminal-fixture"
+        stage("terminal", installed, ["yuos-term"])        python = stage_shared(installed)
+        shutil.copytree(ROOT / "yuos-sdk/python/src/yuos_sdk", python / "yuos_sdk", ignore=IGNORE)        namespace = "/run/terminal-fixture"
         (fixture / "owner").mkdir()
         (fixture / "work").mkdir()
         broker = fixture / "yu"

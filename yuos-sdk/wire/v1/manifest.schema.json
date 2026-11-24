@@ -1,0 +1,576 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://yuos.dev/wire/v1/manifest.schema.json",
+  "title": "App manifest (app.json)",
+  "description": "The manifest every app under YUOS_APPS_DIR must provide. MCP Apps declare one versioned service with tools, lifecycle, caller restrictions, capability needs, and optional AI and desktop surfaces.",
+  "type": "object",
+  "required": ["id", "version", "name"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$", "description": "Stable app identifier; must equal the directory name under YUOS_APPS_DIR." },
+    "version": { "type": "string", "description": "Semantic version of the app." },
+    "schema_version": { "type": "integer", "const": 2, "description": "MCP-first App contract version. Required whenever the mcp field is present." },
+    "name": { "$ref": "#/$defs/localizedText", "description": "Human-friendly display name (localized; English required)." },
+    "summary": { "$ref": "#/$defs/localizedText", "description": "One-line description (localized)." },
+    "icon": { "type": "string", "description": "Emoji or icon name shown in launchers / the app store." },
+    "runtime": { "type": "string", "enum": ["python", "node", "shell", "binary"], "description": "Which interpreter the bridge invokes for the entry point. Defaults to python." },
+    "entry": { "type": "string", "description": "Entry file relative to the app dir. Defaults to the runtime's default (main.py / main.js / main.sh / main)." },
+    "operations": {
+      "type": "object",
+      "description": "Optional human CLI operations keyed by command name. Each is invokable as `yu app <id> <op>` but is never an Agent tool. Values conform to #/$defs/operation.",
+      "additionalProperties": { "$ref": "#/$defs/operation" }
+    },
+    "ai": { "$ref": "#/$defs/aiPolicy", "description": "AI policy. Required iff any operation, MCP tool or GUI entry declares an ai.* need." },
+    "mcp": { "$ref": "#/$defs/mcpService", "description": "The App's authenticated MCP service and sole Agent/App tool interface." },
+    "objects": {
+      "type": "object",
+      "description": "Optional App-owned object types. These declarations identify data and select ordinary App commands for operation/MCP resolution; they do not grant authority or promise that a resolver is pure.",
+      "maxProperties": 64,
+      "propertyNames": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$(?![\\s\\S])", "maxLength": 64 },
+      "additionalProperties": { "$ref": "#/$defs/objectType" }
+    },
+    "desktop": { "$ref": "#/$defs/desktop", "description": "Optional desktop GUI surface. Declaring it makes the app a launchable GUI; the installer generates a .desktop entry whose Exec routes through `yu app <id> --gui` so the GUI process is kernel-spawned and shares the app's identity, caps, consent, and audit." },
+    "dependencies": { "type": "object", "additionalProperties": true, "description": "Free-form dependency declarations (e.g. {\"binaries\": [...]}) consumed by the bridge's resolver." }
+  },
+  "allOf": [
+    {
+      "not": { "required": ["session"] }
+    },
+    {
+      "if": { "required": ["mcp"] },
+      "then": {
+        "required": ["schema_version"]
+      }
+    }
+  ],
+  "$defs": {
+    "objectType": {
+      "type": "object",
+      "required": ["label", "resolve"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "$ref": "#/$defs/localizedText" },
+        "summary": { "$ref": "#/$defs/localizedText" },
+        "resolve": { "$ref": "#/$defs/objectResolver" }
+      }
+    },
+    "objectResolver": {
+      "type": "object",
+      "description": "The kernel verifies the ordinary App command and argument bindings. The operation field retains its name for compatibility; resolution uses normal App operation/MCP dispatch, capabilities, approvals, and audit, never an SDK or App-local fallback.",
+      "required": ["operation", "id_arg"],
+      "additionalProperties": false,
+      "properties": {
+        "operation": { "type": "string" },
+        "id_arg": { "type": "string" },
+        "revision_arg": { "type": "string" }
+      }
+    },
+    "localizedText": {
+      "type": "object",
+      "description": "Localized string map. The `en` key is required; other locales (zh-CN, ...) are optional fallbacks.",
+      "required": ["en"],
+      "additionalProperties": { "type": "string" },
+      "properties": { "en": { "type": "string" } }
+    },
+    "operation": {
+      "type": "object",
+      "description": "A one-shot operation: its inputs, capability needs, and optional App-declared effect guidance.",
+      "required": ["label"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "$ref": "#/$defs/localizedText" },
+        "summary": { "$ref": "#/$defs/localizedText" },
+        "stdin": { "type": "boolean", "description": "Forward piped caller input. Interactive stdin is always closed." },
+        "args": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/arg" },
+          "description": "Declared input parameters; order is significant for the UI.",
+          "not": {
+            "allOf": [
+              { "contains": { "$ref": "#/$defs/optionalPositionalGap" } },
+              { "contains": { "$ref": "#/$defs/defaultedPositional" } }
+            ]
+          }
+        },
+        "needs": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "string", "enum": ["ai.chat", "ai.chat.untrusted", "ai.embed", "ai.audio.tts", "ai.audio.stt", "ai.image.generate", "ai.decide"] },
+              { "$ref": "#/$defs/need" }
+            ]
+          },
+          "description": "Capability requirements checked before dispatch."
+        },
+        "effects": {
+          "type": "array",
+          "x-go-type": "*[]Operationeffect",
+          "maxItems": 16,
+          "items": { "$ref": "#/$defs/operationEffect" },
+          "description": "Optional App-declared effect metadata, not authority or confirmed outcomes. Missing effects means unknown effects, never purity or read-only behavior."
+        }
+      }
+    },
+    "operationEffect": {
+      "type": "object",
+      "description": "App-declared guidance for a metadata-only preview, not authority, an OS-confirmed effect, or proof that an inverse exists.",
+      "required": ["kind", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "type": "string", "enum": ["read", "create", "update", "delete", "external", "execute"] },
+        "label": { "$ref": "#/$defs/localizedText", "description": "English (en) is required. Core manifest validation limits every locale's label to 512 UTF-8 bytes." },
+        "target_arg": {
+          "type": "string",
+          "x-go-type": "*string",
+          "description": "A declared path/host/name argument; repeatable arguments are allowed. Core validates the binding and conditions. Preview values are requested values, not canonicalized or authorized final targets; runtime-selected values remain unresolved."
+        },
+        "recovery": {
+          "type": "string",
+          "x-go-type": "*string",
+          "enum": ["not_applicable", "reversible", "compensatable", "irreversible", "unknown"],
+          "default": "unknown",
+          "description": "App-declared recovery guidance only. Omission means unknown; no value proves that an inverse or compensation is available."
+        }
+      }
+    },
+    "arg": {
+      "type": "object",
+      "required": ["name", "kind"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "required": { "const": true } }, "required": ["required"] },
+          "then": { "not": { "required": ["default"] } }
+        },
+        {
+          "if": { "required": ["required_when"] },
+          "then": {
+            "properties": {
+              "required": { "const": false },
+              "repeatable": { "const": false }
+            },
+            "not": { "required": ["default"] }
+          }
+        },
+        {
+          "if": { "properties": { "kind": { "enum": ["path", "host", "name", "text"] } }, "required": ["kind"] },
+          "then": { "properties": {
+            "default": { "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" } }] },
+            "choices": { "items": { "type": "string" } }
+          } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "number" } }, "required": ["kind"] },
+          "then": { "properties": {
+            "default": { "oneOf": [{ "type": "number" }, { "type": "array", "items": { "type": "number" } }] },
+            "choices": { "items": { "type": "number" } }
+          } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "integer" } }, "required": ["kind"] },
+          "then": { "properties": {
+            "default": { "oneOf": [{ "type": "integer" }, { "type": "array", "items": { "type": "integer" } }] },
+            "choices": { "items": { "type": "integer" } }
+          } }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "bool" } }, "required": ["kind"] },
+          "then": { "properties": {
+            "default": { "type": "boolean" },
+            "choices": { "items": { "type": "boolean" } }
+          } }
+        },
+        {
+          "if": { "properties": { "repeatable": { "const": true } }, "required": ["repeatable"] },
+          "then": {
+            "properties": {
+              "default": { "type": "array" },
+              "kind": { "not": { "const": "bool" } }
+            }
+          },
+          "else": { "properties": { "default": { "not": { "type": "array" } } } }
+        }
+      ],
+      "properties": {
+        "name": { "type": "string", "description": "Identifier referenced by from-arg scope bindings." },
+        "kind": { "type": "string", "enum": ["path", "host", "name", "text", "number", "integer", "bool"], "description": "Value kind. path/host/name can populate a scope; text/number/integer/bool cannot." },
+        "binding": { "type": "string", "enum": ["positional", "flag"], "description": "How one-shot CLI argv binds this value. Omitted booleans retain their historical flag form; every other omitted binding is positional. On an MCP tool arg this is CLI-only metadata: it keeps `yu app <id> <command>` syntax stable without operations and is never emitted into the model-facing MCP inputSchema." },
+        "required": { "type": "boolean" },
+        "required_when": { "$ref": "#/$defs/needCondition", "description": "Require and accept this argument only when an earlier declared argument satisfies the condition." },
+        "repeatable": { "type": "boolean", "description": "Bind every occurrence in order and expose an array value. Repeatable positional args must be last; repeatable booleans are rejected." },
+        "choices": { "type": "array", "uniqueItems": true, "description": "Optional closed set of accepted scalar values." },
+        "default": { "description": "Optional non-null default whose JSON type must match kind. Omit this property when there is no default." },
+        "label": { "$ref": "#/$defs/localizedText" }
+      }
+    },
+    "positionalArg": {
+      "anyOf": [
+        {
+          "properties": { "binding": { "const": "positional" } },
+          "required": ["binding"]
+        },
+        {
+          "properties": { "kind": { "not": { "const": "bool" } } },
+          "not": { "required": ["binding"] }
+        }
+      ]
+    },
+    "optionalPositionalGap": {
+      "allOf": [
+        { "$ref": "#/$defs/positionalArg" },
+        {
+          "anyOf": [
+            { "properties": { "required": { "const": false } }, "required": ["required"] },
+            { "not": { "required": ["required"] } }
+          ]
+        },
+        { "not": { "required": ["default"] } }
+      ]
+    },
+    "defaultedPositional": {
+      "allOf": [
+        { "$ref": "#/$defs/positionalArg" },
+        { "required": ["default"] }
+      ]
+    },
+    "need": {
+      "type": "object",
+      "description": "A capability request. Supported App AI verbs use the user's configured model when scope is omitted. Other requests require an explicit scope.",
+      "required": ["verb"],
+      "additionalProperties": true,
+      "not": {
+        "properties": { "verb": { "const": "ai.bypass" } },
+        "required": ["verb"]
+      },
+      "allOf": [{
+        "if": {"properties": {"scope": {"properties": {"kind": {"const": "owner-path"}}, "required": ["kind"]}}, "required": ["scope"]},
+        "then": {"properties": {"verb": {"enum": ["fs.read", "fs.write", "fs.delete", "fs.exec", "fs.watch", "fs.meta", "sys.config", "sys.mount", "data.backup"]}}}
+      }, {
+        "if": {"properties": {"scope": {"properties": {"transform": {"const": "brokered-file"}}, "required": ["transform"]}}, "required": ["scope"]},
+        "then": {"properties": {"verb": {"enum": ["fs.read", "fs.write"]}, "scope": {"properties": {"kind": {"const": "from-arg"}}}}}
+      }, {
+        "if": {"not": {"properties": {"verb": {"pattern": "^ai\\."}}}},
+        "then": {"required": ["why"]}
+      }, {
+        "if": {
+          "anyOf": [
+            {"not": {"required": ["scope"]}},
+            {
+              "properties": {
+                "scope": {
+                  "properties": {
+                    "kind": {"const": "fixed"},
+                    "scope": {
+                      "properties": {"kind": {"const": "name"}, "value": {"const": "$configured-ai-model"}},
+                      "required": ["kind", "value"]
+                    }
+                  },
+                  "required": ["kind", "scope"]
+                }
+              },
+              "required": ["scope"]
+            }
+          ]
+        },
+        "then": {
+          "properties": {
+            "verb": {"enum": ["ai.chat", "ai.chat.untrusted", "ai.embed", "ai.audio.tts", "ai.audio.stt", "ai.image.generate", "ai.decide"]}
+          }
+        }
+      }],
+      "properties": {
+        "verb": {
+          "type": "string",
+          "description": "Capability verb from the Yu OS capability catalog.",
+          "enum": [
+            "fs.read", "fs.write", "fs.delete", "fs.exec", "fs.watch", "fs.meta",
+            "net.dial", "net.listen", "net.raw", "net.resolve", "net.probe", "net.manage", "net.firewall",
+            "proc.spawn", "proc.signal", "proc.observe",
+            "sys.observe", "sys.crash", "sys.container", "sys.config", "sys.events", "sys.identity", "sys.locale", "sys.language", "sys.hostname", "sys.security", "sys.storage",
+            "sys.service", "sys.package", "sys.mount", "sys.snapshot", "sys.time", "sys.power", "sys.kernel", "sys.permissions",
+            "secret.read", "secret.write", "secret.grant",
+            "agent.spawn", "agent.observe", "agent.delegate",
+            "data.kv.read", "data.kv.write", "data.kv.delete", "data.db.read", "data.db.write", "data.log.read", "data.log.write", "data.inbox.read", "data.inbox.write", "data.backup",
+            "memory.write", "memory.read",
+            "ipc.publish", "ipc.subscribe", "ipc.invoke",
+            "ui.notify", "ui.prompt", "ui.window", "ui.panel", "ui.input", "ui.accessibility",
+            "clipboard.read", "clipboard.write",
+            "device.audio", "device.bluetooth", "device.media-route", "device.printer", "device.display", "device.camera", "device.microphone", "device.location", "device.sensor", "device.usb",
+            "time.cron", "time.delay",
+            "ai.chat", "ai.chat.untrusted", "ai.embed", "ai.decide", "ai.image.generate", "ai.image.analyze", "ai.audio.tts", "ai.audio.stt", "ai.vision.analyze", "ai.video.generate", "ai.video.analyze", "ai.bypass",
+            "desktop.launch", "desktop.window", "desktop.capture", "desktop.media.observe", "desktop.media.control",
+            "browser.tabs.read", "browser.nav", "browser.dom.read", "browser.dom.write", "browser.input.secret", "browser.eval"
+          ]
+        },
+        "scope": { "$ref": "#/$defs/scopeBinding", "description": "Omit for supported App AI verbs to use the user's configured model. The explicit $configured-ai-model scope is still accepted." },
+        "when": { "$ref": "#/$defs/needCondition", "description": "Explicit condition under which this capability is required." },
+        "why": { "$ref": "#/$defs/localizedText", "description": "Optional for AI needs. The system always supplies the capability description." }
+      }
+    },
+    "needCondition": {
+      "type": "object",
+      "required": ["kind", "arg"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "arg-present" } }, "required": ["kind"] },
+          "then": { "not": { "required": ["value"] } }
+        },
+        {
+          "if": { "properties": { "kind": { "enum": ["arg-equals", "arg-not-equals"] } }, "required": ["kind"] },
+          "then": { "required": ["value"] }
+        }
+      ],
+      "properties": {
+        "kind": { "type": "string", "enum": ["arg-present", "arg-equals", "arg-not-equals"] },
+        "arg": { "type": "string" },
+        "value": { "not": { "type": "null" } }
+      }
+    },
+    "scopeBinding": {
+      "type": "object",
+      "description": "How an operation's scope is determined at invocation time. kind=from-arg reads a named arg at call time; kind=fixed hard-codes a scope; kind=wild is an explicit wildcard (no implicit '*').",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "from-arg" } }, "required": ["kind"] },
+          "then": {
+            "required": ["arg"],
+            "not": { "anyOf": [{ "required": ["scope"] }, { "required": ["values"] }, { "required": ["wild_when"] }, { "required": ["path"] }] }
+          }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "from-arg-map" } }, "required": ["kind"] },
+          "then": {
+            "required": ["arg", "values"],
+            "not": { "anyOf": [{ "required": ["scope"] }, { "required": ["wild_when"] }, { "required": ["transform"] }, { "required": ["path"] }] }
+          }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "from-arg-or-wild" } }, "required": ["kind"] },
+          "then": {
+            "required": ["arg", "wild_when"],
+            "not": { "anyOf": [{ "required": ["scope"] }, { "required": ["values"] }, { "required": ["transform"] }, { "required": ["path"] }] }
+          }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "fixed" } }, "required": ["kind"] },
+          "then": {
+            "required": ["scope"],
+            "not": { "anyOf": [{ "required": ["arg"] }, { "required": ["values"] }, { "required": ["wild_when"] }, { "required": ["transform"] }, { "required": ["path"] }] }
+          }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "wild" } }, "required": ["kind"] },
+          "then": {
+            "not": { "anyOf": [{ "required": ["arg"] }, { "required": ["scope"] }, { "required": ["values"] }, { "required": ["wild_when"] }, { "required": ["transform"] }, { "required": ["path"] }] }
+          }
+        },
+        {
+          "if": {"properties": {"kind": {"const": "owner-path"}}, "required": ["kind"]},
+          "then": {
+            "required": ["path"],
+            "not": {"anyOf": [{"required": ["arg"]}, {"required": ["scope"]}, {"required": ["values"]}, {"required": ["wild_when"]}, {"required": ["transform"]}]}
+          }
+        }
+      ],
+      "properties": {
+        "kind": { "type": "string", "enum": ["from-arg", "from-arg-map", "from-arg-or-wild", "fixed", "wild", "owner-path"] },
+        "path": {
+          "type": "string", "minLength": 1, "maxLength": 4096, "x-full-match": true,
+          "pattern": "^(\\*\\*|([^./\\\\*$:\\x00-\\x1f\\x7f-\\x9f]|\\.[^./\\\\*$:\\x00-\\x1f\\x7f-\\x9f]|\\.\\.[^/\\\\*$:\\x00-\\x1f\\x7f-\\x9f])[^/\\\\*$:\\x00-\\x1f\\x7f-\\x9f]*(/([^./\\\\*$:\\x00-\\x1f\\x7f-\\x9f]|\\.[^./\\\\*$:\\x00-\\x1f\\x7f-\\x9f]|\\.\\.[^/\\\\*$:\\x00-\\x1f\\x7f-\\x9f])[^/\\\\*$:\\x00-\\x1f\\x7f-\\x9f]*)*(/\\*\\*)?)$",
+          "description": "Owner-relative Path-kind request; Root joins only authenticated PathContext.home and applies normal scope/protected-resource checks. See owner_path_need.schema.json."
+        },
+        "arg": { "type": "string", "description": "Arg name to bind from (kind=from-arg)." },
+        "transform": { "type": "string", "enum": ["identity", "parent", "url-host", "brokered-file"], "description": "Safe transformation after binding a scope source. brokered-file is MCP-only and places an exact fs.read/fs.write need behind the file broker, not a mount." },
+        "values": { "type": "object", "additionalProperties": { "$ref": "#/$defs/scope" }, "description": "Explicit argument-value to scope mapping for kind=from-arg-map." },
+        "wild_when": { "type": "string", "description": "Boolean argument that selects wildcard scope for kind=from-arg-or-wild." },
+        "scope": { "$ref": "#/$defs/scope", "description": "Hard-coded scope (kind=fixed)." }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "description": "A concrete capability scope. value is a glob for path/host/name, the self-reference string for self-ref, and absent for wild.",
+      "required": ["kind"],
+      "additionalProperties": true,
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "const": "path" } }, "required": ["kind"] },
+          "then": {
+            "required": ["value"],
+            "properties": {
+              "value": {
+                "type": "string",
+                "pattern": "^[^$]*$",
+                "description": "Absolute or ~/ path glob; environment placeholders are not expanded."
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "kind": { "type": "string", "enum": ["path", "host", "name", "self-ref", "wild"] },
+        "value": { "type": "string" }
+      }
+    },
+    "aiPolicy": {
+      "type": "object",
+      "description": "App AI origin and safety policy. The owner configures models and budgets in system Settings.",
+      "additionalProperties": true,
+      "properties": {
+        "safety": { "type": "string", "enum": ["strict", "standard", "minimal"], "description": "Safety profile. Defaults to strict." },
+        "origins": { "type": "array", "items": { "type": "string", "enum": ["trusted", "user-input", "external-content"] }, "description": "Prompt origins the app accepts. Defaults to [\"trusted\"]." },
+        "tools": { "type": "array", "items": { "type": "string" }, "description": "Allowlist for legacy standalone catalog operations, not model tools." }
+      }
+    },
+    "mcpService": {
+      "type": "object",
+      "description": "MCP service exposing declared tools to the authenticated System Agent.",
+      "required": ["tools"],
+      "additionalProperties": false,
+      "properties": {
+        "entry": { "type": "string", "description": "MCP server entry file relative to the app dir. Defaults to the runtime's server entry." },
+        "transport": { "type": "string", "enum": ["stdio"], "default": "stdio", "description": "Wire protocol. Only stdio is supported today." },
+        "lifecycle": { "type": "string", "enum": ["lazy", "always-on", "while-app-running"], "default": "lazy", "description": "Host lifecycle." },
+        "access": { "$ref": "#/$defs/mcpAccess", "deprecated": true, "description": "Legacy exposure switches. Omit this object in new manifests." },
+        "tools": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/mcpTool" }, "description": "Tools advertised through this service (authoritative allowlist)." }
+      }
+    },
+    "mcpAccess": {
+      "type": "object",
+      "description": "Read for compatibility with existing App manifests. These fields never grant access to another principal.",
+      "additionalProperties": false,
+      "properties": {
+        "system_agent": { "type": "boolean", "default": true, "description": "If explicitly false, hide this service from the System Agent; it remains available to the owner frontend." },
+        "external_agents": { "type": "boolean", "default": false, "deprecated": true, "description": "Ignored. External agents cannot discover or call an App service." }
+      }
+    },
+    "mcpTool": {
+      "type": "object",
+      "description": "One MCP-callable tool. Args and needs drive the model's view and kernel enforcement; optional effects are App-declared preview metadata, never authority or confirmed outcomes.",
+      "required": ["name", "summary"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z][a-z0-9._-]*$", "description": "Globally unique tool name; convention <app_id>.<verb> (e.g. kv.get)." },
+        "summary": { "$ref": "#/$defs/localizedText" },
+        "args": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/arg" },
+          "description": "Declared input parameters. Same shape as an operation arg. An optional `binding` (positional/flag) is one-shot CLI metadata only: it keeps `yu app <id> <command>` syntax stable when the App has no operations and is never surfaced in the model-facing MCP inputSchema."
+        },
+        "needs": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "string", "enum": ["ai.chat", "ai.chat.untrusted", "ai.embed", "ai.audio.tts", "ai.audio.stt", "ai.image.generate", "ai.decide"] },
+              { "$ref": "#/$defs/need" }
+            ]
+          }
+        },
+        "effects": {
+          "type": "array",
+          "x-go-type": "*[]Operationeffect",
+          "maxItems": 16,
+          "items": { "$ref": "#/$defs/operationEffect" },
+          "description": "Optional App-declared effect metadata, not authority or confirmed outcomes. Missing effects means unknown effects, never purity or read-only behavior."
+        }
+      }
+    },
+    "desktop": {
+      "type": "object",
+      "description": "Default desktop GUI and optional additional named surfaces, all sharing one authenticated App identity. Presentation grants no authority.",
+      "additionalProperties": true,
+      "properties": {
+        "exec": { "type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]+$(?![\\s\\S])", "description": "One literal selector, never a command line or executable. Defaults to --gui. Core limits it to 1024 UTF-8 bytes. The exact existing selector and --gui select the default GUI." },
+        "entry": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?:[\\x20-\\x2e\\x30-\\x5b\\x5d-\\x7e]{0,127}[\\x21-\\x2d\\x30-\\x5b\\x5d-\\x7e]/){0,15}[\\x20-\\x2e\\x30-\\x5b\\x5d-\\x7e]{0,127}[\\x21-\\x2d\\x30-\\x5b\\x5d-\\x7e]$(?![\\s\\S])",
+          "description": "Canonical package-relative signed regular-file entry for the default GUI only. Omission uses top-level entry or the runtime default; never changes the operation or MCP entry."
+        },
+        "needs": {
+          "type": "array",
+          "x-go-type": "*[]interface{}",
+          "items": {
+            "oneOf": [
+              { "type": "string", "enum": ["ai.chat", "ai.chat.untrusted", "ai.embed", "ai.audio.tts", "ai.audio.stt", "ai.image.generate", "ai.decide"] },
+              { "$ref": "#/$defs/need" }
+            ]
+          },
+          "description": "Default GUI's own needs. Present [] means no needs; omission retains legacy constrained fixed/wild operation needs, never MCP needs. Explicit argument-bound/conditional needs remain unsupported and unbound at GUI startup."
+        },
+        "optional_needs": {
+          "type": "array",
+          "x-go-type": "*[]interface{}",
+          "items": {
+            "oneOf": [
+              { "type": "string", "enum": ["ai.chat", "ai.chat.untrusted", "ai.embed", "ai.audio.tts", "ai.audio.stt", "ai.image.generate", "ai.decide"] },
+              { "$ref": "#/$defs/need" }
+            ]
+          },
+          "default": [],
+          "description": "Best-effort default-GUI features, empty when omitted. Only existing authenticated parent or reusable exact-owner approval may authorize them; absent/denied/unapproved rights do not block startup or prompt. Never subtracts from mandatory needs or the legacy operation union, and never inherits optional needs from other surfaces."
+        },
+        "entries": {
+          "type": "object",
+          "maxProperties": 64,
+          "propertyNames": { "type": "string", "pattern": "^[a-z][a-z0-9_-]*$(?![\\s\\S])", "maxLength": 64 },
+          "additionalProperties": { "$ref": "#/$defs/DesktopEntry" },
+          "x-rust-type": "std::collections::BTreeMap<String, DesktopEntry>",
+          "x-python-type": "Dict[str, \"DesktopEntry\"]",
+          "x-ts-type": "Record<string, DesktopEntry>",
+          "x-go-type": "map[string]DesktopEntry",
+          "description": "Additional GUI surfaces, selected only by yu app <id> --gui:<name> [literal user args...]. No executable/path input or capability inheritance from other surfaces."
+        },
+        "name": { "$ref": "#/$defs/localizedText", "description": "Display name for the launcher entry. Defaults to the manifest name." },
+        "icon": { "type": "string", "description": "Icon name (XDG icon theme) or path for the .desktop Icon= field. Defaults to com.yuos.<Id>." },
+        "categories": { "type": "array", "items": { "type": "string" }, "description": "XDG menu categories (e.g. [\"Utility\"]). YuOS is always prepended." },
+        "mime_types": { "type": "array", "items": { "type": "string" }, "description": "MIME types this app can open (generates MimeType= + file associations)." },
+        "single_instance": { "type": "boolean", "description": "If true, the launcher reuses a running instance instead of spawning a new one." },
+        "panel_applet": { "type": "boolean", "description": "Presentation metadata only: admit panel layout environment. Defaults false; grants no LayerShell, display or capability authority." }
+      }
+    },
+    "DesktopEntry": {
+      "type": "object",
+      "description": "An additional explicitly selected signed GUI executable under the same authenticated App identity. Required needs are exclusive to this surface; no default-GUI, operation or MCP union.",
+      "required": ["entry", "exec", "name", "needs"],
+      "additionalProperties": false,
+      "properties": {
+        "entry": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?:[\\x20-\\x2e\\x30-\\x5b\\x5d-\\x7e]{0,127}[\\x21-\\x2d\\x30-\\x5b\\x5d-\\x7e]/){0,15}[\\x20-\\x2e\\x30-\\x5b\\x5d-\\x7e]{0,127}[\\x21-\\x2d\\x30-\\x5b\\x5d-\\x7e]$(?![\\s\\S])",
+          "description": "Canonical package-relative regular file, required in both signed tree and envelope entrypoints; binary runtime requires executable mode."
+        },
+        "exec": { "type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^(?=[\\s\\S]*\\S)[^\\u0000-\\u001f\\u007f-\\u009f]+$(?![\\s\\S])", "description": "One exact literal selector passed to this entry, not a command line. Core enforces 1024 UTF-8 bytes." },
+        "name": { "$ref": "#/$defs/localizedText", "description": "Localized presentation name, English required; never authority." },
+        "needs": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "string", "enum": ["ai.chat", "ai.chat.untrusted", "ai.embed", "ai.audio.tts", "ai.audio.stt", "ai.image.generate", "ai.decide"] },
+              { "$ref": "#/$defs/need" }
+            ]
+          },
+          "description": "This GUI's own needs, explicitly [] for none. Fixed needs use existing owner authorization; wild needs inherit bounded same-verb delegation. Argument-bound/conditional needs remain unsupported/unbound."
+        },
+        "optional_needs": {
+          "type": "array",
+          "x-go-type": "*[]interface{}",
+          "items": {
+            "oneOf": [
+              { "type": "string", "enum": ["ai.chat", "ai.chat.untrusted", "ai.embed", "ai.audio.tts", "ai.audio.stt", "ai.image.generate", "ai.decide"] },
+              { "$ref": "#/$defs/need" }
+            ]
+          },
+          "default": [],
+          "description": "This GUI's own best-effort feature needs, empty when omitted. Missing/denied/ask-unapproved permissions neither block startup nor mint rights. Required panel-display authority must remain in needs. No default-GUI, operation, MCP or other-entry union; no on-demand widening is implied."
+        },
+        "panel_applet": { "type": "boolean", "description": "Presentation metadata only, defaults false independently of the default desktop; grants no LayerShell or resource authority." }
+      }
+    }
+  }
+}
