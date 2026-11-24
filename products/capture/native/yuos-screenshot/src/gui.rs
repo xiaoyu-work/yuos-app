@@ -52,7 +52,7 @@ fn sdk<T>(result: Result<T, yuos_sdk::BridgeError>) -> Result<T, CaptureError> {
 }
 
 fn save(directory: Option<PathBuf>, modal: bool) -> Result<CaptureOutcome, CaptureError> {
-    let home = std::env::var_os("YUOS_OWNER_HOME").map(PathBuf::from)
+    let home = yuos_sdk::gui::owner_home()
         .ok_or_else(|| CaptureError::Io("GUI capture requires its authenticated owner Home context".into()))?;
     let directory = directory.unwrap_or_else(|| home.join("Pictures"));
     let directory = if directory.is_absolute() { directory } else { home.join(directory) };

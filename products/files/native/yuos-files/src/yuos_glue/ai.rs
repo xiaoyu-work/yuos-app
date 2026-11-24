@@ -54,14 +54,14 @@ pub(crate) async fn transform(
                 .origin("external-content").system(SYSTEM).max_units(max_units),
         ).map_err(|error| error.to_string())?;
         check()?;
-        if !response.tool_calls.is_empty() {
+        if !response.output.tool_calls.is_empty() {
             return Err("Files AI returned tool calls instead of document text".into());
         }
         if operation == "summarize" {
-            product::call("remember", json!({"path": path, "text": response.text}))
+            product::call("remember", json!({"path": path, "text": &response.output.text}))
                 .map_err(|error| format!("Summary generated, but could not remember it: {error}"))?;
         }
-        Ok(response.text)
+        Ok(response.output.text)
     }).await.map_err(|error| format!("Files AI worker: {error}"))?
 }
 

@@ -45,14 +45,14 @@ use std::io;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-/// Convert a `yuos_runtime::BridgeError` to an `io::Error` so the AI module
+/// Convert a `yuos_sdk::BridgeError` to an `io::Error` so the AI module
 /// can keep a simple `io::Result` signature on its public surface.
 ///
 /// We deliberately swallow `BridgeError::BinaryNotFound` here without a
 /// special variant — the upstream caller (`build_runtime`) logs a warning
 /// and disables AI, which is the right behaviour for dev / pre-install
 /// environments where `yu` isn't on `$PATH` yet.
-pub(crate) fn bridge_to_io(e: yuos_runtime::BridgeError) -> io::Error {
+pub(crate) fn bridge_to_io(e: yuos_sdk::BridgeError) -> io::Error {
     io::Error::new(io::ErrorKind::Other, e.to_string())
 }
 

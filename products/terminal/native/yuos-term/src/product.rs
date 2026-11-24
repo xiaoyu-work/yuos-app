@@ -49,7 +49,7 @@ pub fn command(operation: &str, arguments: Value) -> io::Result<Value> {
     Ok(value)
 }
 
-pub fn open(cwd: Option<&str>) -> Result<(), yuos_runtime::BridgeError> {
+pub fn open(cwd: Option<&str>) -> Result<(), yuos_sdk::BridgeError> {
     let mut args = vec![
         "__desktop".to_string(), "launch".into(), "--app-id".into(), "com.yuos.Term".into(),
     ];
@@ -67,7 +67,7 @@ pub fn open(cwd: Option<&str>) -> Result<(), yuos_runtime::BridgeError> {
     if value["launched"] != true || value["app_id"] != "com.yuos.Term"
         || value["launcher"] != "/usr/bin/yuos-term"
     {
-        return Err(yuos_runtime::BridgeError::Decode {
+        return Err(yuos_sdk::BridgeError::Decode {
             app: "desktop".into(), verb: "launch".into(),
             message: "provider did not confirm native Terminal launch".into(),
         });
@@ -87,7 +87,7 @@ pub mod files {
         Ok(())
     }
 
-    pub fn mkdir(path: impl AsRef<str>) -> Result<(), yuos_runtime::BridgeError> {
+    pub fn mkdir(path: impl AsRef<str>) -> Result<(), yuos_sdk::BridgeError> {
         ui_only()?;
         let path = std::path::absolute(path.as_ref())?;
         yuos_runtime::policy::require(
@@ -97,7 +97,7 @@ pub mod files {
         Ok(())
     }
 
-    pub fn write(path: impl AsRef<str>, content: &str) -> Result<(), yuos_runtime::BridgeError> {
+    pub fn write(path: impl AsRef<str>, content: &str) -> Result<(), yuos_sdk::BridgeError> {
         ui_only()?;
         let path = path.as_ref();
         let parent = Path::new(path).parent().filter(|parent| !parent.as_os_str().is_empty());

@@ -17,7 +17,8 @@ pub mod ai;
 use std::io;
 use std::path::Path;
 
-use yuos_runtime::{BridgeError, ask_yu, desktop, filesystem};
+use yuos_runtime::{ask_yu, desktop, filesystem};
+use yuos_sdk::BridgeError;
 use serde::Serialize;
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq)]

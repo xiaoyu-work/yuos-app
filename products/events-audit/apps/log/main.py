@@ -13,8 +13,9 @@ import re
 from datetime import datetime, timezone
 
 from yuos_runtime import policy
+from yuos_sdk.app import data_dir
 
-DATA_DIR = os.environ.get("YUOS_DATA_DIR", "/var/lib/yuos")
+DATA_DIR = os.environ.get("YUOS_DATA_DIR") or str(data_dir())
 LOG_DIR = os.path.join(DATA_DIR, "logs")
 LOG_FILE = os.path.join(LOG_DIR, "audit.jsonl")
 

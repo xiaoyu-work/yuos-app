@@ -47,7 +47,7 @@ fn node(path: &Path) -> Result<Option<u64>, String> {
     if !yuos_sdk::gui::is_gui_launch() {
         return Ok(None);
     }
-    let home = std::env::var_os("YUOS_OWNER_HOME")
+    let home = yuos_sdk::gui::owner_home()
         .ok_or("managed media requires its owner path context")?;
     let home = std::fs::symlink_metadata(home).map_err(|error| error.to_string())?;
     let file = std::fs::symlink_metadata(path).map_err(|error| error.to_string())?;

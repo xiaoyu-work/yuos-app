@@ -19,9 +19,10 @@ import os
 import threading
 
 from _shared.atomic import atomic_write_bytes
+from yuos_sdk.app import data_dir
 from yuos_sdk.mcp import App
 
-DATA_DIR = os.environ.get("YUOS_DATA_DIR", "/var/lib/yuos")
+DATA_DIR = os.environ.get("YUOS_DATA_DIR") or str(data_dir())
 STORE_PATH = os.path.join(DATA_DIR, "kv.json")
 LOCK_PATH = STORE_PATH + ".lock"
 

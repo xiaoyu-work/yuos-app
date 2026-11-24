@@ -7,8 +7,9 @@ import re
 import sqlite3
 
 from yuos_runtime import policy
+from yuos_sdk.app import data_dir
 
-DATA_DIR = os.environ.get("YUOS_DATA_DIR", "/var/lib/yuos")
+DATA_DIR = os.environ.get("YUOS_DATA_DIR") or str(data_dir())
 DB_DIR = os.path.join(DATA_DIR, "db")
 MAX_ROWS = 1000  # Maximum rows returned from a single query
 

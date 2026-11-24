@@ -36,7 +36,7 @@ def summarize(text: str) -> dict:
         system=SYSTEM_PROMPT,
         max_units=4000,
     )
-    summary = response.text
+    summary = response.output.text
     if not isinstance(summary, str) or not summary.strip():
         raise RuntimeError("AI returned an empty summary")
 

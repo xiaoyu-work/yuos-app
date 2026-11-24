@@ -18,7 +18,8 @@ use std::os::unix::process::ExitStatusExt;
 use std::path::Path;
 use std::process::{ExitStatus, Output};
 
-use yuos_runtime::{BridgeError, ask_yu};
+use yuos_runtime::ask_yu;
+use yuos_sdk::BridgeError;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 

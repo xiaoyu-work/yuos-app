@@ -232,10 +232,11 @@ def _cmd_summarize(args):
     except ai.AiError as exc:
         return {"error": str(exc)}
 
+    summary_text = response.output.text
     out = {
         "url": url,
         "title": title,
-        "summary": response.text,
+        "summary": summary_text,
         "source_chars": len(text),
         "model": response.model,
         "provider": response.provider,
@@ -254,7 +255,7 @@ def _cmd_summarize(args):
             "prompt_redacted": response.review.prompt_redacted,
         },
     }
-    _remember_summary(url, title, response.text)
+    _remember_summary(url, title, summary_text)
     return out
 
 

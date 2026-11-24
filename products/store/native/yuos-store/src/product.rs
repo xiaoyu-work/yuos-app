@@ -144,7 +144,7 @@ pub(crate) fn yuos_app_package(name: &str) -> bool {
         && name != "yuos-app-support" && name != "yuos-app-support-v1"
 }
 
-pub fn open(name: Option<&str>) -> Result<(), yuos_runtime::BridgeError> {
+pub fn open(name: Option<&str>) -> Result<(), yuos_sdk::BridgeError> {
     let mut args = vec![
         "__desktop".to_string(), "launch".into(), "--app-id".into(), "com.yuos.Store".into(),
     ];
@@ -158,7 +158,7 @@ pub fn open(name: Option<&str>) -> Result<(), yuos_runtime::BridgeError> {
     if value["launched"] != true || value["app_id"] != "com.yuos.Store"
         || value["launcher"] != "/usr/bin/yuos-store"
     {
-        return Err(yuos_runtime::BridgeError::Decode {
+        return Err(yuos_sdk::BridgeError::Decode {
             app: "desktop".into(), verb: "launch".into(),
             message: "provider did not confirm native Store launch".into(),
         });

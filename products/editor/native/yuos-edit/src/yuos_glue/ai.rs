@@ -44,8 +44,8 @@ pub fn transform_text(
             .max_units(4000),
     )
     .map_err(|e| e.to_string())?;
-    if !response.tool_calls.is_empty() {
+    if !response.output.tool_calls.is_empty() {
         return Err("editor AI returned tool calls instead of document text".into());
     }
-    Ok(response.text)
+    Ok(response.output.text)
 }

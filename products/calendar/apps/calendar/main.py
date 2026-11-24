@@ -19,8 +19,9 @@ from datetime import datetime, timedelta, timezone
 
 from _shared.credentials import load_credential  # noqa: E402
 from _shared.safe_http import open_url  # noqa: E402
-from yuos_sdk.objects import format_reference  # noqa: E402
 from yuos_sdk import events  # noqa: E402
+from yuos_sdk.app import data_dir  # noqa: E402
+from yuos_sdk.objects import format_reference  # noqa: E402
 from yuos_runtime import memory, policy  # noqa: E402
 
 # Ceiling on one provider request. Bounded here rather than left to the
@@ -28,7 +29,7 @@ from yuos_runtime import memory, policy  # noqa: E402
 # its sandbox runtime limit.
 HTTP_TIMEOUT = 30
 
-DATA_DIR = os.environ.get("YUOS_DATA_DIR", "/var/lib/yuos")
+DATA_DIR = os.environ.get("YUOS_DATA_DIR") or str(data_dir())
 
 GOOGLE_CALENDAR_HOST = "www.googleapis.com"
 OUTLOOK_API_HOST = "graph.microsoft.com"
@@ -923,7 +924,7 @@ def run(command, args):
     )
     # Re-read DATA_DIR in case YUOS_DATA_DIR changed (e.g. in tests).
     global DATA_DIR
-    DATA_DIR = os.environ.get("YUOS_DATA_DIR", "/var/lib/yuos")
+    DATA_DIR = os.environ.get("YUOS_DATA_DIR") or str(data_dir())
 
     handler = COMMANDS.get(command)
     if handler is None:
