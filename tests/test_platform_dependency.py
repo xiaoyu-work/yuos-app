@@ -736,7 +736,7 @@ def test_source_native_host_uses_only_verified_cached_exports(dependency):
     (app / "main.py").write_text(
         "import yuos_sdk, yuos_runtime\n"
         "assert yuos_sdk.VALUE == 'public SDK'\n"
-        "assert yuos_runtime.VALUE == 'public runtime'\n"
+        "assert yuos_sdk.VALUE == 'public runtime'\n"
         "HANDLERS = {'fixture': lambda: None}\n"
     )
     driver = (
@@ -800,7 +800,7 @@ def test_real_os_artifact_interoperability(dependency, request):
         "import sys\n"
         "sys.path[:0] = sys.argv[1:]\n"
         "from yuos_sdk.mcp import App\n"
-        "from yuos_runtime import policy\n"
+        "from yuos_sdk import policy\n"
         "assert callable(App.from_manifest) and callable(policy.require)\n"
         "print('verified SDK/runtime imports')\n"
     )

@@ -49,15 +49,15 @@ def test_standalone_keeps_original_renderer_filechooser_and_lock(tmp_path):
 
 def test_ui_and_mcp_do_not_invoke_apps_or_merge_process_state():
     code = "\n".join(path.read_text() for path in (NATIVE / "src").rglob("*.rs"))
-    assert "yuos_runtime::exec::" not in code
-    assert "yuos_runtime::fs::" not in code
+    assert "yuos_sdk::exec::" not in code
+    assert "yuos_sdk::fs::" not in code
     bridge = (NATIVE / "product_bridge.py").read_text()
     assert "backend.cmd_run" in bridge and "backend.cmd_which" in bridge
     assert "cmd_start" not in bridge and "session_id" not in bridge
     source = (NATIVE / "src/product.rs").read_text()
     assert '["-I", "-c"' in source
     assert "YUOS_SESSION" not in source
-    assert "yuos_runtime::filesystem::write" in source
+    assert "yuos_sdk::filesystem::write" in source
 
 
 @pytest.mark.parametrize(("operation", "result", "expected"), [

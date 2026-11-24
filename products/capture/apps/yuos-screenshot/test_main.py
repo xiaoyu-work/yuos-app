@@ -85,9 +85,9 @@ def test_native_build_keeps_the_original_portal_graph_and_only_rewrites_runtime(
     assert manifest["profile"]["release"]["lto"] == "fat"
     assert (tmp_path / "native/Cargo.lock").read_bytes() == (NATIVE / "Cargo.lock").read_bytes()
     production = "\n".join(path.read_text() for path in (NATIVE / "src").glob("*.rs"))
-    assert "yuos_runtime::fs::" not in production
-    assert "yuos_runtime::exec::" not in production
-    assert 'yuos_runtime::capture::screenshot' in production
+    assert "yuos_sdk::fs::" not in production
+    assert "yuos_sdk::exec::" not in production
+    assert 'yuos_sdk::capture::screenshot' in production
     package = json.loads((PRODUCT / "package.json").read_text())
     assert package["native_process_test"] == "native/test_process.py"
     assert package["native_examples"] == ["capture-portal-fixture"]

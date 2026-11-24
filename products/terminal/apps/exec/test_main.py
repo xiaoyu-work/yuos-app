@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from unittest import mock
 
-from yuos_runtime import mcp
+from yuos_sdk import mcp
 from test_support import load_local_module
 
 

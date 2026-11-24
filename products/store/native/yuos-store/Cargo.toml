@@ -8,7 +8,6 @@ rust-version = "1.90"
 yuos-app-gui-argv = { path = "../../../../shared/rust/gui-argv" }
 # OS authority and typed services; no App dispatch.
 yuos-sdk = { path = "../../../yuos-sdk/rust" }
-yuos-runtime = { path = "../../../yuos-runtime/rust" }
 anyhow = "1"
 async-trait = "0.1"
 base64 = "0.22"

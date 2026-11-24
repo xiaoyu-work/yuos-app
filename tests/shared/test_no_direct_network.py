@@ -254,7 +254,7 @@ class NoDirectNetworkTests(unittest.TestCase):
             violations,
             [],
             "shipped sandboxed code gained a direct network call; migrate it to "
-            "yuos_runtime.egress / _shared.safe_http / yuos_runtime.smtp, or add an "
+            "yuos_sdk.egress / _shared.safe_http / yuos_sdk.smtp, or add an "
             "explicit reviewed exception to EXCEPTIONS",
         )
 

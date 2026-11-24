@@ -8,7 +8,6 @@ edition = "2024"
 
 [dependencies]
 yuos-app-gui-argv = { path = "../../../../shared/rust/gui-argv" }
-yuos-runtime = { path = "../../../yuos-runtime/rust" }
 yuos-sdk = { path = "../../../yuos-sdk/rust" }
 ashpd = { version = "0.12", default-features = false, features = ["tokio"] }
 async-trait = "0.1"
