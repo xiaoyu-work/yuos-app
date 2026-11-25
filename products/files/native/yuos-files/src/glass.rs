@@ -7,7 +7,6 @@ use cosmic::{Theme, theme};
 const CHROME_ALPHA: f32 = 0.62;
 const CONTENT_ALPHA: f32 = 0.92;
 const DASHBOARD_ALPHA: f32 = 0.72;
-const MENU_ALPHA: f32 = 0.68;
 const PATH_ALPHA: f32 = 0.58;
 
 fn material(color: impl Into<Color>, alpha: f32, frosted: bool) -> Color {
@@ -48,6 +47,66 @@ fn depth_shadow(theme: &Theme, alpha: f32, y: f32, blur_radius: f32) -> Shadow {
     }
 }
 
+pub const ACCENT: Color = Color::from_rgb(10.0 / 255.0, 132.0 / 255.0, 1.0);
+pub const SIDEBAR_ICON: Color = Color::from_rgb(31.0 / 255.0, 122.0 / 255.0, 224.0 / 255.0);
+pub const FOLDER_ICON: Color = SIDEBAR_ICON;
+pub const FILE_ICON: Color = Color::from_rgb(142.0 / 255.0, 142.0 / 255.0, 147.0 / 255.0);
+pub const ROW_ALT: Color = Color::from_rgb(246.0 / 255.0, 247.0 / 255.0, 249.0 / 255.0);
+pub const BODY_SIZE: f32 = 13.0;
+pub const SMALL_SIZE: f32 = 11.5;
+
+pub fn text_primary(theme: &Theme) -> Color {
+    if theme.cosmic().is_dark {
+        Color::from_rgb8(0xee, 0xf2, 0xf7)
+    } else {
+        Color::from_rgb8(0x1d, 0x1d, 0x1f)
+    }
+}
+
+pub fn text_secondary(theme: &Theme) -> Color {
+    if theme.cosmic().is_dark {
+        Color::from_rgb8(0x9a, 0x9a, 0xa0)
+    } else {
+        Color::from_rgb8(0x6e, 0x6e, 0x73)
+    }
+}
+
+pub fn text_tertiary(theme: &Theme) -> Color {
+    if theme.cosmic().is_dark {
+        Color::from_rgb8(0x7c, 0x7c, 0x82)
+    } else {
+        Color::from_rgb8(0xa1, 0xa1, 0xa6)
+    }
+}
+
+fn rule_color(theme: &Theme) -> Color {
+    // Opaque equivalent of rgba(0,0,0,.09) on white; translucent rules render black.
+    if theme.cosmic().is_dark {
+        Color::from_rgb8(0x32, 0x34, 0x38)
+    } else {
+        Color::from_rgb8(0xe8, 0xe8, 0xe8)
+    }
+}
+
+fn chrome_bg(theme: &Theme) -> Color {
+    if theme.cosmic().is_dark {
+        Color::from_rgb8(0x1b, 0x1d, 0x22)
+    } else {
+        Color::WHITE
+    }
+}
+
+fn plain_surface(bg: Color, fg: Color) -> container::Style {
+    container::Style {
+        icon_color: Some(fg),
+        text_color: Some(fg),
+        background: Some(Background::Color(bg)),
+        border: Border::default(),
+        snap: true,
+        ..Default::default()
+    }
+}
+
 pub fn toolbar(theme: &Theme) -> container::Style {
     top_toolbar_surface(theme)
 }
@@ -83,115 +142,38 @@ pub fn content(theme: &Theme) -> container::Style {
 }
 
 pub fn sidebar_surface(theme: &Theme) -> container::Style {
-    let is_dark = theme.cosmic().is_dark;
-    let bg = if is_dark {
-        Color::from_rgb8(0x18, 0x1d, 0x26)
+    let bg = if theme.cosmic().is_dark {
+        Color::from_rgb8(0x1f, 0x24, 0x2c)
     } else {
-        Color::from_rgb8(0xed, 0xf3, 0xfa)
+        // rgba(226,236,246,.82) composited over the white window.
+        Color::from_rgb8(0xe7, 0xef, 0xf8)
     };
-    let fg = if is_dark {
-        Color::from_rgb8(0xe6, 0xed, 0xf7)
-    } else {
-        Color::from_rgb8(0x25, 0x30, 0x41)
-    };
-    container::Style {
-        icon_color: Some(fg),
-        text_color: Some(fg),
-        background: Some(Background::Color(bg)),
-        border: Border::default(),
-        snap: true,
-        ..Default::default()
-    }
+    plain_surface(bg, text_primary(theme))
 }
 
 pub fn top_toolbar_surface(theme: &Theme) -> container::Style {
-    let is_dark = theme.cosmic().is_dark;
-    let bg = if is_dark {
-        Color::from_rgb8(0x1b, 0x21, 0x2b)
-    } else {
-        Color::from_rgb8(0xf7, 0xf9, 0xfc)
-    };
-    let fg = if is_dark {
-        Color::from_rgb8(0xee, 0xf2, 0xf7)
-    } else {
-        Color::from_rgb8(0x1b, 0x24, 0x32)
-    };
-    container::Style {
-        icon_color: Some(fg),
-        text_color: Some(fg),
-        background: Some(Background::Color(bg)),
-        border: Border::default(),
-        snap: true,
-        ..Default::default()
-    }
+    plain_surface(chrome_bg(theme), text_primary(theme))
 }
 
 pub fn action_strip_surface(theme: &Theme) -> container::Style {
-    let is_dark = theme.cosmic().is_dark;
-    let bg = if is_dark {
-        Color::from_rgb8(0x16, 0x1b, 0x24)
-    } else {
-        Color::from_rgb8(0xfc, 0xfd, 0xff)
-    };
-    let fg = if is_dark {
-        Color::from_rgb8(0xc7, 0xd0, 0xde)
-    } else {
-        Color::from_rgb8(0x46, 0x52, 0x64)
-    };
-    container::Style {
-        icon_color: Some(fg),
-        text_color: Some(fg),
-        background: Some(Background::Color(bg)),
-        border: Border::default(),
-        snap: true,
-        ..Default::default()
-    }
+    plain_surface(chrome_bg(theme), tool_color(theme))
 }
 
 pub fn table_header_surface(theme: &Theme) -> container::Style {
-    let is_dark = theme.cosmic().is_dark;
-    let bg = if is_dark {
-        Color::from_rgb8(0x17, 0x1c, 0x25)
-    } else {
-        Color::from_rgb8(0xfb, 0xfc, 0xfe)
-    };
-    let fg = if is_dark {
-        Color::from_rgb8(0x9a, 0xa5, 0xb5)
-    } else {
-        Color::from_rgb8(0x54, 0x60, 0x72)
-    };
-    container::Style {
-        icon_color: Some(fg),
-        text_color: Some(fg),
-        background: Some(Background::Color(bg)),
-        border: Border::default(),
-        snap: true,
-        ..Default::default()
-    }
+    plain_surface(chrome_bg(theme), text_secondary(theme))
 }
 
 pub fn bottom_bar_surface(theme: &Theme) -> container::Style {
-    let is_dark = theme.cosmic().is_dark;
-    let bg = if is_dark {
-        Color::from_rgb8(0x18, 0x1d, 0x26)
-    } else {
-        Color::from_rgb8(0xf6, 0xf8, 0xfc)
-    };
-    let fg = if is_dark {
-        Color::from_rgb8(0x9a, 0xa5, 0xb5)
-    } else {
-        Color::from_rgb8(0x55, 0x62, 0x75)
-    };
-    container::Style {
-        icon_color: Some(fg),
-        text_color: Some(fg),
-        background: Some(Background::Color(bg)),
-        border: Border::default(),
-        snap: true,
-        ..Default::default()
-    }
+    plain_surface(chrome_bg(theme), text_secondary(theme))
 }
 
+fn tool_color(theme: &Theme) -> Color {
+    if theme.cosmic().is_dark {
+        Color::from_rgb8(0xc8, 0xc8, 0xcd)
+    } else {
+        Color::from_rgb8(0x4a, 0x4a, 0x4f)
+    }
+}
 pub fn ai_drawer_surface(theme: &Theme) -> container::Style {
     let is_dark = theme.cosmic().is_dark;
     let bg = if is_dark {
@@ -325,23 +307,16 @@ pub fn ai_agent_card(theme: &Theme) -> container::Style {
 }
 
 pub fn view_switcher_group(theme: &Theme) -> container::Style {
-    let is_dark = theme.cosmic().is_dark;
-    let (bg, border_col) = if is_dark {
-        (
-            Color::from_rgba(1.0, 1.0, 1.0, 0.05),
-            Color::from_rgba(1.0, 1.0, 1.0, 0.10),
-        )
+    let bg = if theme.cosmic().is_dark {
+        Color::from_rgba(1.0, 1.0, 1.0, 0.06)
     } else {
-        (
-            Color::from_rgba8(25, 39, 64, 0.04),
-            Color::from_rgba8(25, 39, 64, 0.08),
-        )
+        Color::from_rgba(0.0, 0.0, 0.0, 0.045)
     };
     container::Style {
         background: Some(Background::Color(bg)),
         border: Border {
-            color: border_col,
-            width: 1.0,
+            color: Color::TRANSPARENT,
+            width: 0.0,
             radius: 7.0.into(),
         },
         snap: true,
@@ -349,13 +324,43 @@ pub fn view_switcher_group(theme: &Theme) -> container::Style {
     }
 }
 
+pub fn search_input() -> theme::TextInput {
+    fn appearance(theme: &Theme, focused: bool) -> cosmic::widget::text_input::Appearance {
+        let is_dark = theme.cosmic().is_dark;
+        let bg = if is_dark {
+            Color::from_rgba(1.0, 1.0, 1.0, 0.07)
+        } else {
+            Color::from_rgba(0.0, 0.0, 0.0, 0.05)
+        };
+        cosmic::widget::text_input::Appearance {
+            background: Background::Color(bg),
+            border_radius: 8.0.into(),
+            border_offset: None,
+            border_width: if focused { 1.0 } else { 0.0 },
+            border_color: if focused {
+                Color { a: 0.55, ..ACCENT }
+            } else {
+                Color::TRANSPARENT
+            },
+            label_color: text_secondary(theme),
+            placeholder_color: text_tertiary(theme),
+            selected_text_color: Color::WHITE,
+            icon_color: Some(text_tertiary(theme)),
+            text_color: Some(text_primary(theme)),
+            selected_fill: ACCENT,
+        }
+    }
+    theme::TextInput::Custom {
+        active: Box::new(|theme| appearance(theme, false)),
+        error: Box::new(|theme| appearance(theme, true)),
+        hovered: Box::new(|theme| appearance(theme, false)),
+        focused: Box::new(|theme| appearance(theme, true)),
+        disabled: Box::new(|theme| appearance(theme, false)),
+    }
+}
 pub fn divider_rule() -> theme::Rule {
     theme::Rule::Custom(Box::new(|theme| cosmic::iced::widget::rule::Style {
-        color: if theme.cosmic().is_dark {
-            Color::from_rgb8(0x28, 0x30, 0x3e)
-        } else {
-            Color::from_rgb8(0xe3, 0xe8, 0xf0)
-        },
+        color: rule_color(theme),
         radius: 0.0.into(),
         fill_mode: cosmic::iced::widget::rule::FillMode::Full,
         snap: true,
@@ -363,16 +368,7 @@ pub fn divider_rule() -> theme::Rule {
 }
 
 pub fn sidebar_rule() -> theme::Rule {
-    theme::Rule::Custom(Box::new(|theme| cosmic::iced::widget::rule::Style {
-        color: if theme.cosmic().is_dark {
-            Color::from_rgb8(0x25, 0x2d, 0x3a)
-        } else {
-            Color::from_rgb8(0xd9, 0xe1, 0xec)
-        },
-        radius: 0.0.into(),
-        fill_mode: cosmic::iced::widget::rule::FillMode::Full,
-        snap: true,
-    }))
+    divider_rule()
 }
 
 pub fn sidebar_item_button(active: bool) -> theme::Button {
@@ -389,25 +385,44 @@ fn sidebar_item_style(theme: &Theme, active: bool, hovered: bool) -> button::Sty
     let mut style = button::Style::new();
     style.border_radius = 6.0.into();
     if active {
-        style.background = Some(Background::Color(Color::from_rgb8(0x00, 0x7a, 0xff)));
+        style.background = Some(Background::Color(ACCENT));
         style.text_color = Some(Color::WHITE);
         style.icon_color = Some(Color::WHITE);
     } else {
         if hovered {
             style.background = Some(Background::Color(if is_dark {
-                Color::from_rgba(1.0, 1.0, 1.0, 0.07)
+                Color::from_rgba(1.0, 1.0, 1.0, 0.06)
             } else {
-                Color::from_rgba8(25, 39, 64, 0.06)
+                Color::from_rgba(0.0, 0.0, 0.0, 0.045)
             }));
         }
-        style.text_color = Some(if is_dark {
-            Color::from_rgb8(0xe6, 0xed, 0xf7)
-        } else {
-            Color::from_rgb8(0x25, 0x30, 0x41)
-        });
-        style.icon_color = Some(Color::from_rgb8(0x2b, 0x88, 0xff));
+        style.text_color = Some(text_primary(theme));
+        style.icon_color = Some(SIDEBAR_ICON);
     }
     style
+}
+
+pub fn window_light_button(color: Color) -> theme::Button {
+    let style = move |hovered: bool| {
+        let mut s = button::Style::new();
+        let mut c = color;
+        if hovered {
+            c.r *= 0.88;
+            c.g *= 0.88;
+            c.b *= 0.88;
+        }
+        s.background = Some(Background::Color(c));
+        s.border_radius = 6.0.into();
+        s.border_width = 0.5;
+        s.border_color = Color::from_rgba(0.0, 0.0, 0.0, 0.14);
+        s
+    };
+    theme::Button::Custom {
+        active: Box::new(move |_focused, _theme| style(false)),
+        hovered: Box::new(move |_focused, _theme| style(true)),
+        pressed: Box::new(move |_focused, _theme| style(true)),
+        disabled: Box::new(move |_theme| style(false)),
+    }
 }
 
 pub fn toolbar_icon_button(active: bool) -> theme::Button {
@@ -417,8 +432,13 @@ pub fn toolbar_icon_button(active: bool) -> theme::Button {
         pressed: Box::new(move |_focused, theme| toolbar_icon_style(theme, active, true)),
         disabled: Box::new(move |theme| {
             let mut s = toolbar_icon_style(theme, false, false);
-            s.icon_color = Some(Color::from_rgba8(0x87, 0x92, 0xa3, 0.45));
-            s.text_color = Some(Color::from_rgba8(0x87, 0x92, 0xa3, 0.45));
+            let dim = if theme.cosmic().is_dark {
+                Color::from_rgb8(0x5a, 0x5a, 0x60)
+            } else {
+                Color::from_rgb8(0xc3, 0xc3, 0xc7)
+            };
+            s.icon_color = Some(dim);
+            s.text_color = Some(dim);
             s
         }),
     }
@@ -430,33 +450,47 @@ fn toolbar_icon_style(theme: &Theme, active: bool, hovered: bool) -> button::Sty
     style.border_radius = 6.0.into();
     if active {
         style.background = Some(Background::Color(if is_dark {
-            Color::from_rgba8(0x00, 0x5c, 0xfe, 0.24)
+            Color::from_rgba(1.0, 1.0, 1.0, 0.14)
         } else {
-            Color::from_rgba8(0x00, 0x5c, 0xfe, 0.10)
+            Color::WHITE
         }));
-        style.border_width = 1.0;
-        style.border_color = Color::from_rgba8(0x00, 0x5c, 0xfe, 0.28);
-        style.icon_color = Some(Color::from_rgb8(0x00, 0x5c, 0xfe));
-        style.text_color = Some(Color::from_rgb8(0x00, 0x5c, 0xfe));
-    } else {
-        if hovered {
-            style.background = Some(Background::Color(if is_dark {
-                Color::from_rgba(1.0, 1.0, 1.0, 0.08)
-            } else {
-                Color::from_rgba8(25, 39, 64, 0.07)
-            }));
-        }
-        let fg = if is_dark {
-            Color::from_rgb8(0xc7, 0xd0, 0xde)
+        style.border_width = 0.5;
+        style.border_color = Color::from_rgba(0.0, 0.0, 0.0, 0.10);
+        style.shadow_offset = Vector::new(0.0, 1.0);
+    } else if hovered {
+        style.background = Some(Background::Color(if is_dark {
+            Color::from_rgba(1.0, 1.0, 1.0, 0.07)
         } else {
-            Color::from_rgb8(0x46, 0x52, 0x64)
-        };
-        style.icon_color = Some(fg);
-        style.text_color = Some(fg);
+            Color::from_rgba(0.0, 0.0, 0.0, 0.05)
+        }));
     }
+    let fg = tool_color(theme);
+    style.icon_color = Some(fg);
+    style.text_color = Some(fg);
     style
 }
 
+pub fn menu_item_button() -> theme::Button {
+    let style = |theme: &Theme, hovered: bool| {
+        let mut s = button::Style::new();
+        s.border_radius = 5.0.into();
+        if hovered {
+            s.background = Some(Background::Color(ACCENT));
+            s.text_color = Some(Color::WHITE);
+            s.icon_color = Some(Color::WHITE);
+        } else {
+            s.text_color = Some(text_primary(theme));
+            s.icon_color = Some(text_secondary(theme));
+        }
+        s
+    };
+    theme::Button::Custom {
+        active: Box::new(move |focused, theme| style(theme, focused)),
+        hovered: Box::new(move |_focused, theme| style(theme, true)),
+        pressed: Box::new(move |_focused, theme| style(theme, true)),
+        disabled: Box::new(move |theme| style(theme, false)),
+    }
+}
 pub fn ai_chip_button() -> theme::Button {
     theme::Button::Custom {
         active: Box::new(|_focused, theme| ai_chip_style(theme, false)),
@@ -596,25 +630,28 @@ pub fn path_bar(theme: &Theme) -> container::Style {
 
 pub fn menu(theme: &Theme) -> container::Style {
     let cosmic = theme.cosmic();
-    let component = &cosmic.background.component;
+    let base = if cosmic.is_dark {
+        Color::from_rgb8(0x26, 0x28, 0x2e)
+    } else {
+        Color::from_rgb8(0xf6, 0xf6, 0xf8)
+    };
     container::Style {
-        icon_color: Some(component.on.into()),
-        text_color: Some(component.on.into()),
-        background: Some(Background::Color(material(
-            component.base,
-            MENU_ALPHA,
-            cosmic.is_frosted,
-        ))),
+        icon_color: Some(text_secondary(theme)),
+        text_color: Some(text_primary(theme)),
+        background: Some(Background::Color(material(base, 0.86, cosmic.is_frosted))),
         border: Border {
-            color: hairline(theme, 0.12),
-            width: 1.0,
-            radius: cosmic.radius_m().into(),
+            color: Color::from_rgba(0.0, 0.0, 0.0, 0.18),
+            width: 0.5,
+            radius: 10.0.into(),
         },
-        shadow: depth_shadow(theme, 0.18, 8.0, 24.0),
+        shadow: Shadow {
+            color: Color::from_rgba(0.0, 0.0, 0.0, 0.20),
+            offset: Vector::new(0.0, 12.0),
+            blur_radius: 34.0,
+        },
         snap: true,
     }
 }
-
 pub fn dashboard_card(theme: &Theme) -> container::Style {
     let cosmic = theme.cosmic();
     container::Style {

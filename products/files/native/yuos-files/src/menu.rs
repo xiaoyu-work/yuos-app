@@ -33,9 +33,9 @@ macro_rules! menu_button {
             .height(Length::Fixed(24.0))
             .align_y(Alignment::Center)
         )
-        .padding([theme::spacing().space_xxs, 16])
+        .padding([0, 10])
         .width(Length::Fill)
-        .class(theme::Button::MenuItem)
+        .class(crate::glass::menu_item_button())
     );
 }
 
@@ -67,10 +67,8 @@ pub fn context_menu<'a>(
         String::new()
     };
     fn key_style(theme: &cosmic::Theme) -> TextStyle {
-        let mut color = theme.cosmic().background.component.on;
-        color.alpha *= 0.75;
         TextStyle {
-            color: Some(color.into()),
+            color: Some(crate::glass::text_tertiary(theme)),
         }
     }
     fn disabled_style(theme: &cosmic::Theme) -> TextStyle {
@@ -84,9 +82,9 @@ pub fn context_menu<'a>(
     let menu_item = |label, action| {
         let key = find_key(&action);
         menu_button!(
-            text::body(label),
+            widget::text(label).size(crate::glass::BODY_SIZE),
             space::horizontal(),
-            text::body(key).class(theme::Text::Custom(key_style))
+            widget::text(key).size(12.0).class(theme::Text::Custom(key_style))
         )
         .on_press(tab::Message::ContextAction(action))
     };
@@ -94,9 +92,13 @@ pub fn context_menu<'a>(
     let menu_item_disabled = |label, action: Action| {
         let key = find_key(&action);
         menu_button!(
-            text::body(label).class(theme::Text::Custom(disabled_style)),
+            widget::text(label)
+                .size(crate::glass::BODY_SIZE)
+                .class(theme::Text::Custom(disabled_style)),
             space::horizontal(),
-            text::body(key).class(theme::Text::Custom(disabled_style))
+            widget::text(key)
+                .size(12.0)
+                .class(theme::Text::Custom(disabled_style))
         )
     };
 
@@ -422,9 +424,9 @@ pub fn context_menu<'a>(
     }
 
     container(column::with_children(children))
-        .padding(1)
+        .padding(5)
         .style(crate::glass::menu)
-        .width(Length::Fixed(360.0))
+        .width(Length::Fixed(280.0))
         .into()
 }
 

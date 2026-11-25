@@ -250,9 +250,11 @@ fn list_row_appearance(
 ) -> widget::button::Style {
     let is_dark = theme.cosmic().is_dark;
     let mut style = widget::button::Style::new();
-    style.border_radius = 0.0.into();
+    style.border_radius = 5.0.into();
     if selected {
-        style.background = Some(Color::from_rgb8(0x0a, 0x84, 0xff).into());
+        style.background = Some(crate::glass::ACCENT.into());
+        style.border_width = 1.0;
+        style.border_color = Color::from_rgb8(0x00, 0x71, 0xe3);
         style.icon_color = Some(Color::WHITE);
         style.text_color = Some(if cut {
             Color::from_rgba(1.0, 1.0, 1.0, 0.75)
@@ -262,32 +264,30 @@ fn list_row_appearance(
     } else if highlighted {
         style.background = Some(
             if is_dark {
-                Color::from_rgb8(0x1e, 0x29, 0x3b)
+                Color::from_rgba(1.0, 1.0, 1.0, 0.07)
             } else {
-                Color::from_rgb8(0xea, 0xf1, 0xfb)
+                Color::from_rgba(0.0, 0.0, 0.0, 0.045)
             }
             .into(),
         );
-        style.text_color = Some(if is_dark {
-            Color::from_rgb8(0xee, 0xf2, 0xf7)
-        } else {
-            Color::from_rgb8(0x1f, 0x29, 0x37)
-        });
+        style.text_color = Some(crate::glass::text_primary(theme));
     } else {
         let bg = match (is_dark, even) {
             (false, true) => Color::WHITE,
-            (false, false) => Color::from_rgb8(0xf5, 0xf7, 0xfb),
+            (false, false) => crate::glass::ROW_ALT,
             (true, true) => Color::from_rgb8(0x12, 0x16, 0x1f),
             (true, false) => Color::from_rgb8(0x16, 0x1b, 0x25),
         };
         style.background = Some(bg.into());
-        style.text_color = Some(if is_dark {
-            Color::from_rgb8(0xee, 0xf2, 0xf7)
-        } else {
-            Color::from_rgb8(0x1f, 0x29, 0x37)
-        });
+        style.text_color = Some(crate::glass::text_primary(theme));
     }
     style
+}
+
+fn list_secondary_text(theme: &theme::Theme) -> cosmic::iced::widget::text::Style {
+    cosmic::iced::widget::text::Style {
+        color: Some(crate::glass::text_secondary(theme)),
+    }
 }
 
 fn item_kind_label(item: &Item) -> String {
@@ -2356,7 +2356,8 @@ impl Item {
     fn list_display_name<'a>(
         name: impl Into<Cow<'a, str>> + 'a,
     ) -> widget::Text<'a, cosmic::Theme, cosmic::Renderer> {
-        widget::text::body(name)
+        widget::text(name)
+            .size(crate::glass::BODY_SIZE)
             .wrapping(text::Wrapping::WordOrGlyph)
             .ellipsize(text::Ellipsize::Middle(text::EllipsizeHeightLimit::Lines(
                 1,
@@ -5102,26 +5103,30 @@ impl Tab {
 
         //TODO: allow resizing?
         let name_width = 240.0;
-        let modified_width = 150.0;
-        let size_width = 92.0;
-        let kind_width = 150.0;
+        let modified_width = 190.0;
+        let size_width = 90.0;
+        let kind_width = 190.0;
         let condensed = size.width < (name_width + modified_width + size_width);
 
         let (sort_name, sort_direction, _) = self.sort_options();
         let heading_item = |name: String, width: Length, msg: HeadingOptions| -> Element<'_, Message> {
             let mut row = widget::row::with_capacity(3)
                 .align_y(Alignment::Center)
-                .spacing(space_xxxs)
-                .padding([0, 12])
+                .spacing(4)
+                .padding([0, 10])
                 .width(width);
-            row = row.push(widget::text::caption(name));
+            row = row.push(
+                widget::text(name)
+                    .size(crate::glass::SMALL_SIZE)
+                    .wrapping(text::Wrapping::None),
+            );
             row = row.push(widget::space::horizontal());
             match (sort_name == msg, sort_direction) {
                 (true, true) => {
-                    row = row.push(widget::icon::from_name("pan-up-symbolic").size(12));
+                    row = row.push(widget::icon::from_name("pan-up-symbolic").size(9));
                 }
                 (true, false) => {
-                    row = row.push(widget::icon::from_name("pan-down-symbolic").size(12));
+                    row = row.push(widget::icon::from_name("pan-down-symbolic").size(9));
                 }
                 _ => {}
             }
@@ -5131,8 +5136,8 @@ impl Tab {
         };
 
         let col_sep = || -> Element<'_, Message> {
-            rule::vertical(1)
-                .class(crate::glass::divider_rule())
+            widget::container(rule::vertical(1).class(crate::glass::divider_rule()))
+                .height(Length::Fixed(14.0))
                 .into()
         };
 
@@ -5156,13 +5161,18 @@ impl Tab {
                 col_sep(),
                 heading_item(fl!("size"), Length::Fixed(size_width), HeadingOptions::Size),
                 col_sep(),
-                widget::container(widget::text::caption("Kind"))
-                    .padding([0, 12])
+                widget::container(
+                    widget::text("Kind")
+                        .size(crate::glass::SMALL_SIZE)
+                        .wrapping(text::Wrapping::None),
+                )
+                    .padding([0, 10])
                     .width(Length::Fixed(kind_width))
                     .align_y(Alignment::Center)
                     .into(),
             ])
             .align_y(Alignment::Center)
+            .padding([0, 20, 0, 10])
             .height(Length::Fixed(26.0)),
         )
         .width(Length::Fill)
@@ -5822,15 +5832,15 @@ impl Tab {
         let size = self.size_opt.get().unwrap_or_else(|| Size::new(0.0, 0.0));
         //TODO: allow resizing?
         let name_width = 240.0;
-        let modified_width = 150.0;
-        let size_width = 92.0;
-        let kind_width = 150.0;
+        let modified_width = 190.0;
+        let size_width = 90.0;
+        let kind_width = 190.0;
         let condensed = size.width < (name_width + modified_width + size_width);
         let is_search = matches!(self.location, Location::Search(..));
         let icon_size: u16 = 16;
-        let row_height: u16 = 28;
+        let row_height: u16 = 26;
 
-        let mut column = widget::column::with_capacity(3);
+        let mut column = widget::column::with_capacity(3).padding([0, 10]);
         let mut y: f32 = 0.0;
 
         //TODO: move to function
@@ -6001,30 +6011,38 @@ impl Tab {
                         .align_y(Alignment::Center)
                         .spacing(space_xxs)
                     } else {
+                        let cell = |content: String, width: f32, right: bool| -> Element<'_, Message> {
+                            let mut label = widget::text(content)
+                                .size(crate::glass::BODY_SIZE)
+                                .wrapping(text::Wrapping::None);
+                            if !item.selected {
+                                label = label.class(theme::Text::Custom(list_secondary_text));
+                            }
+                            widget::container(label)
+                                .padding([0, 10])
+                                .width(Length::Fixed(width))
+                                .align_x(if right {
+                                    Alignment::End
+                                } else {
+                                    Alignment::Start
+                                })
+                                .into()
+                        };
                         widget::row::with_children([
                             widget::icon::icon(item.icon_handle_list.clone())
                                 .content_fit(ContentFit::Contain)
                                 .size(icon_size)
                                 .into(),
+                            space::horizontal().width(Length::Fixed(8.0)).into(),
                             Item::list_display_name(item.display_name.clone())
                                 .width(Length::Fill)
                                 .into(),
-                            widget::container(widget::text::caption(modified_text.clone()))
-                                .padding([0, 12])
-                                .width(Length::Fixed(modified_width))
-                                .into(),
-                            widget::container(widget::text::caption(size_text.clone()))
-                                .padding([0, 12])
-                                .width(Length::Fixed(size_width))
-                                .into(),
-                            widget::container(widget::text::caption(kind_text))
-                                .padding([0, 12])
-                                .width(Length::Fixed(kind_width))
-                                .into(),
+                            cell(modified_text.clone(), modified_width + 1.0, false),
+                            cell(size_text.clone(), size_width + 1.0, true),
+                            cell(kind_text, kind_width + 1.0, false),
                         ])
                         .height(Length::Fixed(f32::from(row_height)))
                         .align_y(Alignment::Center)
-                        .spacing(space_xxs)
                     };
 
                     let button = |row| {
@@ -6032,7 +6050,7 @@ impl Tab {
                             widget::button::custom(row)
                                 .width(Length::Fill)
                                 .id(item.button_id.clone())
-                                .padding([0, 12])
+                                .padding([0, 10])
                                 .class(list_row_style(
                                     item.selected,
                                     item.highlighted,

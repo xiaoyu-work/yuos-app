@@ -2695,6 +2695,44 @@ impl App {
         icon::icon(icon::from_svg_bytes(YU_AGENT_SVG)).size(size)
     }
 
+    fn sidebar_section(label: &'static str) -> Element<'static, Message> {
+        widget::container(
+            widget::text(label)
+                .size(crate::glass::SMALL_SIZE)
+                .font(cosmic::font::semibold())
+                .class(theme::Text::Custom(|theme| {
+                    cosmic::iced::widget::text::Style {
+                        color: Some(crate::glass::text_tertiary(theme)),
+                    }
+                })),
+        )
+        .padding([12, 8, 5, 8])
+        .into()
+    }
+
+    fn window_lights() -> Element<'static, Message> {
+        let light = |color: cosmic::iced::Color, msg: Message| -> Element<'static, Message> {
+            widget::button::custom(widget::space::horizontal().width(Length::Fixed(0.0)))
+                .width(Length::Fixed(12.0))
+                .height(Length::Fixed(12.0))
+                .padding(0)
+                .class(crate::glass::window_light_button(color))
+                .on_press(msg)
+                .into()
+        };
+        widget::row::with_children([
+            light(cosmic::iced::Color::from_rgb8(0xff, 0x5f, 0x57), Message::WindowClose),
+            light(cosmic::iced::Color::from_rgb8(0xfe, 0xbc, 0x2e), Message::WindowMinimize),
+            light(
+                cosmic::iced::Color::from_rgb8(0x28, 0xc8, 0x40),
+                Message::WindowToggleMaximize,
+            ),
+        ])
+        .spacing(8)
+        .align_y(Alignment::Center)
+        .into()
+    }
+
     fn finder_sidebar(&self) -> Element<'_, Message> {
         let active_loc = self
             .tab_model
@@ -2703,49 +2741,45 @@ impl App {
         let active_path = active_loc.as_ref().and_then(|l| l.path_opt()).cloned();
 
         let toggle_btn = widget::button::custom(
-            icon::from_name("view-sidebar-symbolic").size(16).icon(),
+            icon::from_name("view-sidebar-symbolic").size(17).icon(),
         )
-        .padding([5, 7])
+        .padding([5, 5])
         .class(crate::glass::toolbar_icon_button(false))
         .on_press(Message::SidebarToggleMenu);
 
         let new_folder_btn = widget::button::custom(
-            icon::from_name("folder-new-symbolic").size(15).icon(),
+            icon::from_name("folder-new-symbolic").size(17).icon(),
         )
-        .padding([5, 6])
+        .padding([5, 5])
         .class(crate::glass::toolbar_icon_button(false))
         .on_press(Message::NewItem(None, true));
 
         let new_tab_btn = widget::button::custom(
-            icon::from_name("tab-new-symbolic").size(15).icon(),
+            icon::from_name("tab-new-symbolic").size(17).icon(),
         )
-        .padding([5, 6])
+        .padding([5, 5])
         .class(crate::glass::toolbar_icon_button(false))
         .on_press(Message::TabNew);
 
         let header = widget::container(
             widget::row::with_children([
-                toggle_btn.into(),
+                Self::window_lights(),
                 widget::space::horizontal().width(Length::Fill).into(),
+                toggle_btn.into(),
                 new_folder_btn.into(),
                 new_tab_btn.into(),
             ])
             .align_y(Alignment::Center)
-            .spacing(2),
+            .spacing(4),
         )
-        .height(Length::Fixed(44.0))
+        .height(Length::Fixed(52.0))
         .width(Length::Fill)
         .align_y(Alignment::Center)
-        .padding([0, 10]);
+        .padding([0, 0, 0, 8]);
 
-        let header_rule = cosmic::iced::widget::rule::horizontal(1).class(crate::glass::sidebar_rule());
+        let mut list = widget::column::with_capacity(24).padding([0, 0, 10, 0]);
 
-        let mut list = widget::column::with_capacity(24).spacing(2).padding([8, 8]);
-
-        list = list.push(
-            widget::container(widget::text::caption("▾ ★ Favourites"))
-                .padding([6, 8, 4, 8]),
-        );
+        list = list.push(Self::sidebar_section("Favourites"));
 
         let nav_row = |indent: u16,
                        chev: Option<(bool, PathBuf)>,
@@ -2757,24 +2791,29 @@ impl App {
          -> Element<'_, Message> {
             let mut row = widget::row::with_capacity(5)
                 .align_y(Alignment::Center)
-                .spacing(6);
+                .spacing(7);
             if indent > 0 {
                 row = row.push(widget::space::horizontal().width(Length::Fixed(f32::from(indent))));
             }
             if let Some((expanded, p)) = chev {
-                let chev_label = if expanded { "▾" } else { "›" };
+                let chev_icon = if expanded {
+                    "pan-down-symbolic"
+                } else {
+                    "pan-end-symbolic"
+                };
                 row = row.push(
-                    widget::button::custom(widget::text::caption(chev_label))
-                        .padding([0, 2])
+                    widget::button::custom(icon::from_name(chev_icon).size(10).icon())
+                        .padding(0)
                         .class(theme::Button::Text)
                         .on_press(Message::SidebarToggleExpand(p)),
                 );
             } else {
-                row = row.push(widget::space::horizontal().width(Length::Fixed(12.0)));
+                row = row.push(widget::space::horizontal().width(Length::Fixed(10.0)));
             }
-            row = row.push(icon::from_name(icon_name).size(15).icon());
+            row = row.push(icon::from_name(icon_name).size(16).icon());
             row = row.push(
-                widget::text::body(label)
+                widget::text(label)
+                    .size(crate::glass::BODY_SIZE)
                     .wrapping(cosmic::iced::core::text::Wrapping::None)
                     .width(Length::Fill),
             );
@@ -2795,7 +2834,7 @@ impl App {
             }
             widget::button::custom(row)
                 .width(Length::Fill)
-                .height(Length::Fixed(27.0))
+                .height(Length::Fixed(26.0))
                 .padding([0, 8])
                 .class(crate::glass::sidebar_item_button(active))
                 .on_press(Message::TabMessage(None, tab::Message::Location(target)))
@@ -2928,10 +2967,7 @@ impl App {
             }
         }
 
-        list = list.push(
-            widget::container(widget::text::caption("▾ Locations"))
-                .padding([12, 8, 4, 8]),
-        );
+        list = list.push(Self::sidebar_section("Locations"));
 
         let root_path = PathBuf::from("/");
         let root_active = active_path.as_ref() == Some(&root_path);
@@ -2969,15 +3005,15 @@ impl App {
 
         let sidebar_col = widget::column::with_children([
             header.into(),
-            header_rule.into(),
             widget::scrollable(list).height(Length::Fill).into(),
         ])
-        .width(Length::Fixed(218.0))
+        .width(Length::Fill)
         .height(Length::Fill);
 
         let sidebar_box = widget::container(sidebar_col)
-            .width(Length::Fixed(218.0))
+            .width(Length::Fixed(248.0))
             .height(Length::Fill)
+            .padding([0, 10])
             .class(theme::Container::custom(crate::glass::sidebar_surface));
 
         let v_rule = cosmic::iced::widget::rule::vertical(1).class(crate::glass::sidebar_rule());
@@ -3007,115 +3043,96 @@ impl App {
             None => (false, false, false, fl!("home")),
         };
 
+        let tool_btn = |name: &'static str| {
+            widget::button::custom(icon::from_name(name).size(18).icon())
+                .padding(5)
+                .class(crate::glass::toolbar_icon_button(false))
+        };
+
         let mut row = widget::row::with_capacity(14)
             .align_y(Alignment::Center)
-            .spacing(4);
+            .spacing(6);
 
-        if !self.core.nav_bar_active() {
-            row = row.push(
-                widget::button::custom(icon::from_name("view-sidebar-symbolic").size(16).icon())
-                    .padding([5, 7])
-                    .class(crate::glass::toolbar_icon_button(false))
-                    .on_press(Message::SidebarToggleMenu),
-            );
+        let sidebar_visible = self.core.nav_bar_active();
+        if !sidebar_visible {
+            row = row
+                .push(Self::window_lights())
+                .push(widget::space::horizontal().width(Length::Fixed(8.0)))
+                .push(tool_btn("view-sidebar-symbolic").on_press(Message::SidebarToggleMenu));
         }
 
-        let mut back = widget::button::custom(icon::from_name("go-previous-symbolic").size(16).icon())
-            .padding([5, 6])
-            .class(crate::glass::toolbar_icon_button(false));
+        let mut back = tool_btn("go-previous-symbolic");
         if can_back {
             back = back.on_press(Message::TabMessage(None, tab::Message::GoPrevious));
         }
 
-        let mut forward = widget::button::custom(icon::from_name("go-next-symbolic").size(16).icon())
-            .padding([5, 6])
-            .class(crate::glass::toolbar_icon_button(false));
+        let mut forward = tool_btn("go-next-symbolic");
         if can_forward {
             forward = forward.on_press(Message::TabMessage(None, tab::Message::GoNext));
         }
 
-        let mut up_btn = widget::button::custom(icon::from_name("go-up-symbolic").size(16).icon())
-            .padding([5, 6])
-            .class(crate::glass::toolbar_icon_button(false));
+        let mut up_btn = tool_btn("go-up-symbolic");
         if can_up {
             up_btn = up_btn.on_press(Message::TabMessage(None, tab::Message::LocationUp));
         }
 
         let title_drag = crate::mouse_area::MouseArea::new(
-            widget::container(widget::text::heading(folder_title))
-                .padding([0, 6])
-                .width(Length::Fill)
-                .height(Length::Fill)
-                .align_y(Alignment::Center),
+            widget::container(
+                widget::text(folder_title)
+                    .size(15.0)
+                    .font(cosmic::font::semibold())
+                    .wrapping(cosmic::iced::core::text::Wrapping::None),
+            )
+            .padding([0, 10, 0, 6])
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .align_y(Alignment::Center),
         )
         .on_drag(|_| Message::WindowDrag)
         .on_double_click(|_| Message::WindowToggleMaximize);
 
-        let new_folder = widget::button::custom(icon::from_name("folder-new-symbolic").size(16).icon())
-            .padding([5, 6])
-            .class(crate::glass::toolbar_icon_button(false))
-            .on_press(Message::NewItem(None, true));
+        let new_folder = tool_btn("folder-new-symbolic").on_press(Message::NewItem(None, true));
 
-        let list_btn = widget::button::custom(icon::from_name("view-list-symbolic").size(15).icon())
-            .padding([4, 6])
-            .class(crate::glass::toolbar_icon_button(matches!(view, tab::View::List)))
-            .on_press(Message::TabView(None, tab::View::List));
-        let grid_btn = widget::button::custom(icon::from_name("view-grid-symbolic").size(15).icon())
-            .padding([4, 6])
-            .class(crate::glass::toolbar_icon_button(matches!(view, tab::View::Grid)))
-            .on_press(Message::TabView(None, tab::View::Grid));
+        let seg_btn = |name: &'static str, active: bool, target: tab::View| {
+            widget::button::custom(icon::from_name(name).size(16).icon())
+                .width(Length::Fixed(30.0))
+                .height(Length::Fixed(24.0))
+                .padding([4, 7])
+                .class(crate::glass::toolbar_icon_button(active))
+                .on_press(Message::TabView(None, target))
+        };
         let view_group = widget::container(
-            widget::row::with_children([list_btn.into(), grid_btn.into()]).spacing(2),
+            widget::row::with_children([
+                seg_btn("view-list-symbolic", matches!(view, tab::View::List), tab::View::List)
+                    .into(),
+                seg_btn("view-grid-symbolic", matches!(view, tab::View::Grid), tab::View::Grid)
+                    .into(),
+            ]),
         )
         .padding(2)
         .class(theme::Container::custom(crate::glass::view_switcher_group));
 
-        let sort_btn = widget::button::custom(
-            icon::from_name("view-sort-ascending-symbolic").size(15).icon(),
-        )
-        .padding([5, 6])
-        .class(crate::glass::toolbar_icon_button(false))
-        .on_press(Message::TabMessage(
+        let sort_btn = tool_btn("view-sort-ascending-symbolic").on_press(Message::TabMessage(
             None,
             tab::Message::ToggleSort(HeadingOptions::Name),
         ));
+
+        let mut bookmark_btn = tool_btn("bookmark-new-symbolic");
+        if self.selected_paths(None).next().is_some() {
+            bookmark_btn = bookmark_btn.on_press(Message::AddToSidebar(None));
+        }
 
         let search_term = self.search_get();
         let search_input = widget::text_input::search_input(
             fl!("finder-toolbar-search"),
             search_term.unwrap_or(""),
         )
-        .width(Length::Fixed(196.0))
+        .width(Length::Fixed(240.0))
+        .size(crate::glass::BODY_SIZE)
+        .style(crate::glass::search_input())
         .id(self.search_id.clone())
         .on_clear(Message::SearchClear)
         .on_input(Message::SearchInput);
-
-        let sep = widget::container(
-            cosmic::iced::widget::rule::vertical(1).class(crate::glass::divider_rule()),
-        )
-        .height(Length::Fixed(18.0))
-        .padding([0, 4]);
-
-        let min_btn = widget::button::custom(
-            icon::from_name("window-minimize-symbolic").size(14).icon(),
-        )
-        .padding([5, 6])
-        .class(crate::glass::toolbar_icon_button(false))
-        .on_press(Message::WindowMinimize);
-
-        let max_btn = widget::button::custom(
-            icon::from_name("window-maximize-symbolic").size(14).icon(),
-        )
-        .padding([5, 6])
-        .class(crate::glass::toolbar_icon_button(false))
-        .on_press(Message::WindowToggleMaximize);
-
-        let close_btn = widget::button::custom(
-            icon::from_name("window-close-symbolic").size(14).icon(),
-        )
-        .padding([5, 6])
-        .class(crate::glass::toolbar_icon_button(false))
-        .on_press(Message::WindowClose);
 
         row = row
             .push(back)
@@ -3125,31 +3142,24 @@ impl App {
             .push(new_folder)
             .push(view_group)
             .push(sort_btn)
-            .push(search_input)
-            .push(sep)
-            .push(min_btn)
-            .push(max_btn)
-            .push(close_btn);
+            .push(bookmark_btn)
+            .push(search_input);
 
         let toolbar = widget::container(row)
-            .height(Length::Fixed(44.0))
+            .height(Length::Fixed(52.0))
             .align_y(Alignment::Center)
-            .padding([0, 10])
+            .padding([0, 12, 0, 10])
             .width(Length::Fill)
             .class(theme::Container::custom(crate::glass::top_toolbar_surface));
-        let hairline = cosmic::iced::widget::rule::horizontal(1).class(crate::glass::divider_rule());
-        widget::column::with_children([toolbar.into(), hairline.into()])
-            .width(Length::Fill)
-            .into()
+        toolbar.into()
     }
-
     fn finder_action_strip(&self) -> Element<'_, Message> {
         let has_selection = self.selected_paths(None).next().is_some();
         let can_paste = self.clipboard_has_content();
 
         let act_btn = |icon_name: &'static str, enabled: bool, msg: Message| -> Element<'_, Message> {
-            let mut b = widget::button::custom(icon::from_name(icon_name).size(15).icon())
-                .padding([4, 6])
+            let mut b = widget::button::custom(icon::from_name(icon_name).size(17).icon())
+                .padding(5)
                 .class(crate::glass::toolbar_icon_button(false));
             if enabled {
                 b = b.on_press(msg);
@@ -3161,13 +3171,13 @@ impl App {
             widget::container(
                 cosmic::iced::widget::rule::vertical(1).class(crate::glass::divider_rule()),
             )
-            .height(Length::Fixed(16.0))
-            .padding([0, 4])
+            .height(Length::Fixed(18.0))
+            .padding([0, 6])
             .into()
         };
 
-        let ai_btn = widget::button::custom(Self::yu_agent_icon(16))
-            .padding([4, 6])
+        let ai_btn = widget::button::custom(Self::yu_agent_icon(17))
+            .padding(5)
             .class(crate::glass::toolbar_icon_button(self.ai_drawer_open))
             .on_press(Message::ToggleAiDrawer);
 
@@ -3191,7 +3201,7 @@ impl App {
         .spacing(2);
 
         let bar = widget::container(row)
-            .height(Length::Fixed(34.0))
+            .height(Length::Fixed(38.0))
             .align_y(Alignment::Center)
             .padding([0, 10])
             .width(Length::Fill)
@@ -3412,6 +3422,12 @@ impl App {
             .into()
     }
 
+    fn finder_small_text<'a>(label: impl Into<std::borrow::Cow<'a, str>> + 'a) -> widget::Text<'a, cosmic::Theme, cosmic::Renderer> {
+        widget::text(label)
+            .size(crate::glass::SMALL_SIZE)
+            .wrapping(cosmic::iced::core::text::Wrapping::None)
+    }
+
     fn finder_bottom_bar(&self) -> Element<'_, Message> {
         let left_crumbs: Element<'_, Message> =
             self.finder_path_bar().unwrap_or_else(|| widget::space::horizontal().into());
@@ -3421,21 +3437,34 @@ impl App {
             && let Some(items) = tab.items_opt()
         {
             let total = items.len();
-            let selected = items.iter().filter(|i| i.selected).count();
-            let counts = if selected > 0 {
-                format!("{selected} of {total} selected")
-            } else {
+            let selected: Vec<_> = items.iter().filter(|i| i.selected).collect();
+            let counts = if selected.is_empty() {
                 format!("{total} items")
+            } else {
+                let bytes: u64 = selected
+                    .iter()
+                    .filter_map(|i| match &i.metadata {
+                        tab::ItemMetadata::Path { metadata, .. } if !metadata.is_dir() => {
+                            Some(metadata.len())
+                        }
+                        _ => None,
+                    })
+                    .sum();
+                format!(
+                    "{} of {total} selected, {}",
+                    selected.len(),
+                    tab::format_size(bytes)
+                )
             };
             let label = match tab
                 .location
                 .path_opt()
                 .and_then(|p| finder_free_space(p.as_path()))
             {
-                Some(bytes) => format!("{counts}, {} available", tab::format_size(bytes)),
+                Some(bytes) => format!("{counts} · {} available", tab::format_size(bytes)),
                 None => counts,
             };
-            widget::text::caption(label).into()
+            Self::finder_small_text(label).into()
         } else {
             widget::space::horizontal().into()
         };
@@ -3447,9 +3476,9 @@ impl App {
                 right_summary,
             ])
             .align_y(Alignment::Center)
-            .spacing(8),
+            .spacing(10),
         )
-        .height(Length::Fixed(26.0))
+        .height(Length::Fixed(28.0))
         .align_y(Alignment::Center)
         .padding([0, 12])
         .width(Length::Fill)
@@ -3491,7 +3520,6 @@ impl App {
             segments.push(path.clone());
         }
 
-        let cosmic_theme::Spacing { space_xxs, .. } = theme::spacing();
         let mut children: Vec<Element<'_, Message>> = Vec::new();
         let last_index = segments.len().saturating_sub(1);
         for (idx, segment) in segments.into_iter().enumerate() {
@@ -3509,29 +3537,47 @@ impl App {
                     .map(|n| n.to_string_lossy().into_owned())
                     .unwrap_or_else(|| segment.to_string_lossy().into_owned())
             };
-            children.push(icon::from_name(ico_name).size(13).icon().into());
+            let crumb = widget::row::with_children([
+                icon::from_name(ico_name)
+                    .size(13)
+                    .icon()
+                    .class(theme::Svg::Custom(std::rc::Rc::new(|_| {
+                        cosmic::iced::widget::svg::Style {
+                            color: Some(crate::glass::SIDEBAR_ICON),
+                        }
+                    })))
+                    .into(),
+                Self::finder_small_text(label).into(),
+            ])
+            .spacing(4)
+            .align_y(Alignment::Center);
             if idx == last_index {
-                children.push(widget::text::caption(label).into());
+                children.push(crumb.into());
             } else {
                 let target = location.with_path(segment);
                 children.push(
-                    widget::button::link(label)
-                        .on_press(Message::TabMessage(None, tab::Message::Location(target)))
+                    widget::button::custom(crumb)
                         .padding(0)
+                        .class(crate::glass::toolbar_icon_button(false))
+                        .on_press(Message::TabMessage(None, tab::Message::Location(target)))
                         .into(),
                 );
-                children.push(widget::text::caption("›").into());
+                children.push(
+                    icon::from_name("pan-end-symbolic")
+                        .size(8)
+                        .icon()
+                        .into(),
+                );
             }
         }
 
         Some(
             widget::row::with_children(children)
-                .spacing(space_xxs)
+                .spacing(4)
                 .align_y(Alignment::Center)
                 .into(),
         )
     }
-
     fn finder_status_bar(&self) -> Option<Element<'_, Message>> {
         if !self.config.show_status_bar {
             return None;
