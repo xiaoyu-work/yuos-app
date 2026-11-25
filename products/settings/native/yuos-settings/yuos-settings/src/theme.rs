@@ -38,33 +38,26 @@ pub fn icon_tile() -> cosmic::theme::Container<'static> {
 }
 
 #[must_use]
-pub fn sidebar_icon_tile(id: &str) -> cosmic::theme::Container<'static> {
+pub fn sidebar_icon(id: &str, selected: bool) -> cosmic::theme::Svg {
     let color = match id {
         "desktop" => Color::from_rgb8(94, 92, 230),
         "sound" => Color::from_rgb8(255, 55, 95),
         "power" => Color::from_rgb8(48, 185, 77),
-        "input-devices" | "system" => Color::from_rgb8(142, 142, 147),
+        "input-devices" | "system" => Color::from_rgb8(120, 120, 128),
         "agent" => Color::from_rgb8(138, 108, 247),
         "time" => Color::from_rgb8(255, 159, 10),
         _ => Color::from_rgb8(10, 132, 255),
     };
-    theme::Container::custom(move |theme| {
+    theme::Svg::custom(move |theme| {
         let cosmic = theme.cosmic();
-        let (background, foreground) = if cosmic.is_high_contrast {
-            (cosmic.accent.base.into(), cosmic.accent.on.into())
+        let color = if selected {
+            cosmic.accent.on.into()
+        } else if cosmic.is_high_contrast {
+            cosmic.on_bg_color().into()
         } else {
-            (color, Color::WHITE)
+            color
         };
-        cosmic::widget::container::Style {
-            icon_color: Some(foreground),
-            text_color: Some(foreground),
-            background: Some(Background::Color(background)),
-            border: Border {
-                radius: 5.0.into(),
-                ..Default::default()
-            },
-            ..Default::default()
-        }
+        cosmic::iced::widget::svg::Style { color: Some(color) }
     })
 }
 

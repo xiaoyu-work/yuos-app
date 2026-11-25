@@ -33,3 +33,11 @@ page-discovery/fixed-launch contract, plus four OS-backed permission tools.
 Their shared native client, durable policy consent and fixed user-service
 activation do not import OS authority into this product. Source relocation does not migrate
 credentials, user configuration, device state or provider consent.
+
+Sidebar category icons in
+`native/yuos-settings/yuos-settings/res/sidebar-icons/` are unmodified SVGs
+from [Lucide](https://github.com/lucide-icons/lucide) at revision
+`46b0ba68379558f380c445483f88abd8f7cf736a`. They are embedded in the binary,
+not installed into an icon theme. Lucide is ISC licensed; `monitor` is
+derived from Feather under MIT. Both notices are retained in that directory's
+`LICENSE`.

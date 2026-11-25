@@ -139,11 +139,16 @@ impl SettingsApp {
             .align_y(iced::Alignment::Center)
             .spacing(8);
         if !child {
-            content = content.push(
-                container(icon::from_name(info.icon_name.as_ref()).size(13))
-                    .padding(4)
-                    .class(crate::theme::sidebar_icon_tile(info.id.as_ref())),
-            );
+            let glyph: Element<'_, Message> = match sidebar_icon_svg(info.id.as_ref()) {
+                Some(svg) => icon::from_svg_bytes(svg)
+                    .symbolic(true)
+                    .icon()
+                    .size(17)
+                    .class(crate::theme::sidebar_icon(info.id.as_ref(), selected))
+                    .into(),
+                None => icon::from_name(info.icon_name.as_ref()).size(17).into(),
+            };
+            content = content.push(container(glyph).padding([2, 2]));
         }
         content = content.push(label);
         button::custom(content)
@@ -1532,4 +1537,22 @@ impl SettingsApp {
             .padding([0, padding, bottom_spacer, padding])
             .into()
     }
+}
+
+fn sidebar_icon_svg(id: &str) -> Option<&'static [u8]> {
+    Some(match id {
+        "network-and-wireless" => include_bytes!("../res/sidebar-icons/wifi.svg").as_slice(),
+        "bluetooth" => include_bytes!("../res/sidebar-icons/bluetooth.svg").as_slice(),
+        "accessibility" => include_bytes!("../res/sidebar-icons/accessibility.svg").as_slice(),
+        "desktop" => include_bytes!("../res/sidebar-icons/app-window.svg").as_slice(),
+        "display" => include_bytes!("../res/sidebar-icons/monitor.svg").as_slice(),
+        "sound" => include_bytes!("../res/sidebar-icons/volume-2.svg").as_slice(),
+        "power" => include_bytes!("../res/sidebar-icons/battery-charging.svg").as_slice(),
+        "input-devices" => include_bytes!("../res/sidebar-icons/keyboard.svg").as_slice(),
+        "applications" => include_bytes!("../res/sidebar-icons/layout-grid.svg").as_slice(),
+        "agent" => include_bytes!("../res/sidebar-icons/sparkles.svg").as_slice(),
+        "time" => include_bytes!("../res/sidebar-icons/languages.svg").as_slice(),
+        "system" => include_bytes!("../res/sidebar-icons/users.svg").as_slice(),
+        _ => return None,
+    })
 }
