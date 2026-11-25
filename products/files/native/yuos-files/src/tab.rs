@@ -5101,11 +5101,11 @@ impl Tab {
         w += f32::from(space_s);
 
         //TODO: allow resizing?
-        let name_width = 240.0;
-        let modified_width = 150.0;
-        let size_width = 92.0;
-        let kind_width = 150.0;
-        let condensed = size.width < (name_width + modified_width + size_width);
+        let modified_width = 136.0;
+        let size_width = 82.0;
+        let kind_width = 136.0;
+        let condensed = size.width < 340.0;
+        let show_kind = size.width >= 560.0;
 
         let (sort_name, sort_direction, _) = self.sort_options();
         let heading_item = |name: String, width: Length, msg: HeadingOptions| -> Element<'_, Message> {
@@ -5136,34 +5136,40 @@ impl Tab {
                 .into()
         };
 
-        let heading_row = widget::container(
-            widget::row::with_children([
-                heading_item(fl!("name"), Length::Fill, HeadingOptions::Name),
-                col_sep(),
-                if self.location.is_trash() {
-                    heading_item(
-                        fl!("trashed-on"),
-                        Length::Fixed(modified_width),
-                        HeadingOptions::TrashedOn,
-                    )
-                } else {
-                    heading_item(
-                        "Date Modified".to_string(),
-                        Length::Fixed(modified_width),
-                        HeadingOptions::Modified,
-                    )
-                },
-                col_sep(),
-                heading_item(fl!("size"), Length::Fixed(size_width), HeadingOptions::Size),
-                col_sep(),
+        let mut header_cells: Vec<Element<'_, Message>> = vec![
+            heading_item(fl!("name"), Length::Fill, HeadingOptions::Name),
+            col_sep(),
+            if self.location.is_trash() {
+                heading_item(
+                    fl!("trashed-on"),
+                    Length::Fixed(modified_width),
+                    HeadingOptions::TrashedOn,
+                )
+            } else {
+                heading_item(
+                    "Date Modified".to_string(),
+                    Length::Fixed(modified_width),
+                    HeadingOptions::Modified,
+                )
+            },
+            col_sep(),
+            heading_item(fl!("size"), Length::Fixed(size_width), HeadingOptions::Size),
+        ];
+        if show_kind {
+            header_cells.push(col_sep());
+            header_cells.push(
                 widget::container(widget::text::caption("Kind"))
                     .padding([0, 12])
                     .width(Length::Fixed(kind_width))
                     .align_y(Alignment::Center)
                     .into(),
-            ])
-            .align_y(Alignment::Center)
-            .height(Length::Fixed(26.0)),
+            );
+        }
+
+        let heading_row = widget::container(
+            widget::row::with_children(header_cells)
+                .align_y(Alignment::Center)
+                .height(Length::Fixed(26.0)),
         )
         .width(Length::Fill)
         .class(theme::Container::custom(crate::glass::table_header_surface));
@@ -5821,11 +5827,11 @@ impl Tab {
 
         let size = self.size_opt.get().unwrap_or_else(|| Size::new(0.0, 0.0));
         //TODO: allow resizing?
-        let name_width = 240.0;
-        let modified_width = 150.0;
-        let size_width = 92.0;
-        let kind_width = 150.0;
-        let condensed = size.width < (name_width + modified_width + size_width);
+        let modified_width = 136.0;
+        let size_width = 82.0;
+        let kind_width = 136.0;
+        let condensed = size.width < 340.0;
+        let show_kind = size.width >= 560.0;
         let is_search = matches!(self.location, Location::Search(..));
         let icon_size: u16 = 16;
         let row_height: u16 = 28;
@@ -5957,19 +5963,15 @@ impl Tab {
                                 .content_fit(ContentFit::Contain)
                                 .size(icon_size)
                                 .into(),
-                            widget::column::with_children([
-                                Item::list_display_name(item.display_name.clone()).into(),
-                                //TODO: translate?
-                                widget::text::caption(format!("{modified_text} - {size_text}"))
-                                    .into(),
-                            ])
-                            .into(),
+                            Item::list_display_name(item.display_name.clone())
+                                .width(Length::Fill)
+                                .into(),
                         ])
                         .height(Length::Fixed(f32::from(row_height)))
                         .align_y(Alignment::Center)
                         .spacing(space_xxs)
                     } else if is_search {
-                        widget::row::with_children([
+                        let mut cells: Vec<Element<'_, Message>> = vec![
                             widget::icon::icon(item.icon_handle_list_condensed.clone())
                                 .content_fit(ContentFit::Contain)
                                 .size(icon_size)
@@ -5992,16 +5994,21 @@ impl Tab {
                                 .padding([0, 12])
                                 .width(Length::Fixed(size_width))
                                 .into(),
-                            widget::container(widget::text::caption(kind_text))
-                                .padding([0, 12])
-                                .width(Length::Fixed(kind_width))
-                                .into(),
-                        ])
-                        .height(Length::Fixed(f32::from(row_height)))
-                        .align_y(Alignment::Center)
-                        .spacing(space_xxs)
+                        ];
+                        if show_kind {
+                            cells.push(
+                                widget::container(widget::text::caption(kind_text))
+                                    .padding([0, 12])
+                                    .width(Length::Fixed(kind_width))
+                                    .into(),
+                            );
+                        }
+                        widget::row::with_children(cells)
+                            .height(Length::Fixed(f32::from(row_height)))
+                            .align_y(Alignment::Center)
+                            .spacing(space_xxs)
                     } else {
-                        widget::row::with_children([
+                        let mut cells: Vec<Element<'_, Message>> = vec![
                             widget::icon::icon(item.icon_handle_list.clone())
                                 .content_fit(ContentFit::Contain)
                                 .size(icon_size)
@@ -6017,14 +6024,19 @@ impl Tab {
                                 .padding([0, 12])
                                 .width(Length::Fixed(size_width))
                                 .into(),
-                            widget::container(widget::text::caption(kind_text))
-                                .padding([0, 12])
-                                .width(Length::Fixed(kind_width))
-                                .into(),
-                        ])
-                        .height(Length::Fixed(f32::from(row_height)))
-                        .align_y(Alignment::Center)
-                        .spacing(space_xxs)
+                        ];
+                        if show_kind {
+                            cells.push(
+                                widget::container(widget::text::caption(kind_text))
+                                    .padding([0, 12])
+                                    .width(Length::Fixed(kind_width))
+                                    .into(),
+                            );
+                        }
+                        widget::row::with_children(cells)
+                            .height(Length::Fixed(f32::from(row_height)))
+                            .align_y(Alignment::Center)
+                            .spacing(space_xxs)
                     };
 
                     let button = |row| {

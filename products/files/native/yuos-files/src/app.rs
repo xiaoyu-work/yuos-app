@@ -3276,14 +3276,14 @@ impl App {
 
         let chips = widget::column::with_children([
             widget::row::with_children([
-                chip("整理当前目录", Message::AiAssistFindSimilar),
-                chip("总结文件信息", Message::AiSummarize(None)),
+                chip("Summarize", Message::AiSummarize(None)),
+                chip("Explain", Message::AiExplain(None)),
             ])
             .spacing(5)
             .into(),
             widget::row::with_children([
-                chip("解释选中文件", Message::AiExplain(None)),
-                chip("在 Yu Agent 中打开", Message::AskYu),
+                chip("Find Similar", Message::AiAssistFindSimilar),
+                chip("Open in Yu Agent", Message::AskYu),
             ])
             .spacing(5)
             .into(),
@@ -3293,7 +3293,7 @@ impl App {
         let user_prompt = self
             .ai_last_prompt
             .clone()
-            .unwrap_or_else(|| format!("分析当前目录「{folder_name}」的文件概览"));
+            .unwrap_or_else(|| format!("Analyze folder \"{folder_name}\""));
 
         let user_bubble = widget::row::with_children([
             widget::space::horizontal().width(Length::Fixed(24.0)).into(),
@@ -3312,26 +3312,30 @@ impl App {
                 .unwrap_or(0);
             let files = total.saturating_sub(dirs);
             let mut summary = format!(
-                "已扫描「{folder_name}」：共 {total} 项（{dirs} 个文件夹，{files} 个文件）。"
+                "Scanned \"{folder_name}\": {total} items ({dirs} folders, {files} files)."
             );
             if let Some(ref sel) = selected_file {
-                summary.push_str(&format!("\n\n当前选中：{sel}\n可点击上方快捷按钮总结、解释或检索相似文件。"));
+                summary.push_str(&format!(
+                    "\n\nSelected: {sel}\nUse the quick actions above to summarize, explain, or find related files."
+                ));
             } else {
-                summary.push_str("\n\n选中任意文件后可一键生成摘要、解释内容或查找相关文件。");
+                summary.push_str(
+                    "\n\nSelect any file to generate a summary, explain its contents, or find similar items.",
+                );
             }
             summary
         };
 
         let agent_text = match (&self.ai_last_response, &self.ai_assist_status) {
-            (_, AiAssistStatus::Loading) => "正在分析文件与索引，请稍候…".to_string(),
+            (_, AiAssistStatus::Loading) => "Analyzing files and index…".to_string(),
             (Some(Ok(text)), _) => text.clone(),
-            (Some(Err(err)), _) => format!("处理提示：{err}"),
-            (_, AiAssistStatus::Error(err)) => format!("检索提示：{err}"),
+            (Some(Err(err)), _) => format!("Note: {err}"),
+            (_, AiAssistStatus::Error(err)) => format!("Search note: {err}"),
             (_, AiAssistStatus::Ready(hits)) if hits.is_empty() => {
-                "未找到匹配的相关文件。".to_string()
+                "No matching files found.".to_string()
             }
             (_, AiAssistStatus::Ready(hits)) => {
-                let mut lines = vec![format!("找到 {} 个相关文件：", hits.len())];
+                let mut lines = vec![format!("Found {} matching files:", hits.len())];
                 for hit in hits.iter().take(6) {
                     let name = hit
                         .path
@@ -3360,7 +3364,7 @@ impl App {
         .width(Length::Fill);
 
         let composer_input = widget::text_input(
-            "针对当前目录或选中文件提问…",
+            "Ask about this folder or file…",
             &self.ai_assist_input,
         )
         .on_input(Message::AiAssistInput)
