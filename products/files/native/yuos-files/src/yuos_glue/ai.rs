@@ -93,6 +93,126 @@ pub async fn find_similar(path: PathBuf, max_results: usize) -> Result<Vec<Searc
     search(query, max_results).await
 }
 
+pub async fn ask_context(
+    folder: Option<PathBuf>,
+    selected: Option<PathBuf>,
+    instruction: String,
+) -> Result<String, String> {
+    if let Some(ref sel) = selected
+        && sel.is_file()
+        && let Ok(text) = transform(sel.clone(), "explain", Some(instruction.clone()), None).await
+    {
+        return Ok(text);
+    }
+
+    tokio::task::spawn_blocking(move || {
+        let target_dir = match (&selected, &folder) {
+            (Some(s), _) if s.is_dir() => s.clone(),
+            (_, Some(f)) => f.clone(),
+            (Some(s), None) => s.parent().map(Path::to_path_buf).unwrap_or_else(|| s.clone()),
+            (None, None) => PathBuf::from("/"),
+        };
+
+        let mut dirs = Vec::new();
+        let mut files: Vec<(String, u64)> = Vec::new();
+        if let Ok(rd) = std::fs::read_dir(&target_dir) {
+            for entry in rd.filter_map(Result::ok) {
+                let name = entry.file_name().to_string_lossy().into_owned();
+                if name.starts_with('.') {
+                    continue;
+                }
+                if let Ok(meta) = entry.metadata() {
+                    if meta.is_dir() {
+                        dirs.push(name);
+                    } else {
+                        files.push((name, meta.len()));
+                    }
+                }
+            }
+        }
+        dirs.sort();
+        files.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+
+        let prompt = json!({
+            "operation": "explain",
+            "instruction": instruction,
+            "folder": target_dir.to_string_lossy(),
+            "selected": selected.as_ref().map(|p| p.to_string_lossy()),
+            "subfolders": dirs.iter().take(30).collect::<Vec<_>>(),
+            "files": files.iter().take(40).map(|(n, sz)| json!({"name": n, "bytes": sz})).collect::<Vec<_>>(),
+        })
+        .to_string();
+
+        if let Ok(response) = ai::chat(
+            &prompt,
+            ai::ChatOpts::default()
+                .app("yuos-files")
+                .origin("external-content")
+                .system(SYSTEM)
+                .max_units(4000),
+        ) && response.output.tool_calls.is_empty()
+            && !response.output.text.trim().is_empty()
+        {
+            return Ok(response.output.text);
+        }
+
+        let folder_label = target_dir
+            .file_name()
+            .map(|n| n.to_string_lossy().into_owned())
+            .unwrap_or_else(|| target_dir.display().to_string());
+        let total_bytes: u64 = files.iter().map(|(_, s)| *s).sum();
+        let mut lines = Vec::new();
+        if let Some(sel) = selected.filter(|p| p.is_file()) {
+            let sel_name = sel
+                .file_name()
+                .map(|n| n.to_string_lossy().into_owned())
+                .unwrap_or_else(|| sel.display().to_string());
+            let sz = std::fs::metadata(&sel).map(|m| m.len()).unwrap_or(0);
+            lines.push(format!("File: {sel_name} ({sz} bytes)"));
+            if let Ok(content) = std::fs::read_to_string(&sel) {
+                let preview: String = content.lines().take(6).collect::<Vec<_>>().join("\n");
+                if !preview.trim().is_empty() {
+                    lines.push(format!("Preview:\n{preview}"));
+                }
+            }
+        } else {
+            lines.push(format!(
+                "Folder \"{folder_label}\": {} folders, {} files ({} bytes total).",
+                dirs.len(),
+                files.len(),
+                total_bytes
+            ));
+            if !dirs.is_empty() {
+                let sample = dirs.iter().take(6).cloned().collect::<Vec<_>>().join(", ");
+                lines.push(format!("Subfolders: {sample}"));
+            }
+            if !files.is_empty() {
+                let sample = files
+                    .iter()
+                    .take(5)
+                    .map(|(n, s)| format!("{n} ({s} B)"))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                lines.push(format!("Top files: {sample}"));
+            }
+        }
+        let q = instruction.to_lowercase();
+        let matched: Vec<String> = dirs
+            .iter()
+            .cloned()
+            .chain(files.iter().map(|(n, _)| n.clone()))
+            .filter(|name| !q.is_empty() && name.to_lowercase().contains(&q))
+            .take(6)
+            .collect();
+        if !matched.is_empty() {
+            lines.push(format!("Matches in folder: {}", matched.join(", ")));
+        }
+        Ok(lines.join("\n\n"))
+    })
+    .await
+    .map_err(|error| format!("Files AI worker: {error}"))?
+}
+
 fn parse_search_hits(value: &Value) -> Result<Vec<SearchHit>, String> {
     let results = value.get("results").and_then(Value::as_array)
         .ok_or("Recoll response missing 'results' array")?;

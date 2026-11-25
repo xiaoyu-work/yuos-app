@@ -6064,7 +6064,6 @@ impl Tab {
                         } else {
                             mouse_area
                                 .on_right_press_no_capture()
-                                .wayland_on_right_press_window_position()
                                 .on_right_press(move |point_opt| {
                                     Message::RightClick(point_opt, Some(i))
                                 })
@@ -6304,13 +6303,10 @@ impl Tab {
                     if self.context_menu.is_some() { None } else { p },
                     self.window_id,
                 )
-            })
-            .wayland_on_right_press_window_position();
+            });
 
         let mut popover = widget::popover(mouse_area);
-        if let Some(point) = self.context_menu
-            && (!cfg!(feature = "wayland") || !crate::is_wayland())
-        {
+        if let Some(point) = self.context_menu {
             let context_menu = menu::context_menu(
                 self,
                 key_binds,

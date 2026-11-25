@@ -4563,37 +4563,49 @@ impl Application for App {
                 return self.update_config();
             }
             Message::AiSummarize(entity_opt) => {
-                let path = match self.selected_paths(entity_opt).next() {
-                    Some(p) => p,
-                    None => return Task::none(),
+                let selected = self.selected_paths(entity_opt).next();
+                let folder = self
+                    .tab_model
+                    .active_data::<Tab>()
+                    .and_then(|t| t.location.path_opt().cloned());
+                let Some(target) = selected.clone().or_else(|| folder.clone()) else {
+                    return Task::none();
                 };
-                let name = path
+                let name = target
                     .file_name()
                     .map(|n| n.to_string_lossy().into_owned())
-                    .unwrap_or_else(|| path.display().to_string());
-                self.ai_last_prompt = Some(format!("总结文件「{name}」的核心内容"));
+                    .unwrap_or_else(|| target.display().to_string());
+                self.ai_drawer_open = true;
+                self.ai_last_prompt = Some(format!("Summarize \"{name}\""));
                 self.ai_last_response = None;
                 self.ai_assist_status = AiAssistStatus::Loading;
-                let dialog_task = if self.ai_drawer_open {
-                    Task::none()
-                } else {
-                    self.push_dialog(
-                        DialogPage::AiSummary {
-                            path: path.clone(),
-                            status: AiSummaryStatus::Loading,
-                        },
-                        None,
-                    )
-                };
-                let work_path = path.clone();
-                let work = cosmic::Task::future(async move {
-                    let outcome = run_ai_summarize(work_path.clone()).await;
+                let work_path = target.clone();
+                return cosmic::Task::future(async move {
+                    let outcome = if work_path.is_file() {
+                        match run_ai_summarize(work_path.clone()).await {
+                            Ok(text) => Ok(text),
+                            Err(_) => {
+                                crate::yuos_glue::ai::ask_context(
+                                    folder,
+                                    Some(work_path.clone()),
+                                    "Summarize this file".to_string(),
+                                )
+                                .await
+                            }
+                        }
+                    } else {
+                        crate::yuos_glue::ai::ask_context(
+                            Some(work_path.clone()),
+                            None,
+                            "Summarize the contents of this folder".to_string(),
+                        )
+                        .await
+                    };
                     cosmic::action::app(Message::AiSummaryResult {
                         path: work_path,
                         outcome,
                     })
                 });
-                return Task::batch([dialog_task, work]);
             }
             Message::HomeDashboardLoaded(data) => {
                 self.home_dashboard = Some(data);
@@ -4674,37 +4686,35 @@ impl Application for App {
                 }
             }
             Message::AiExplain(entity_opt) => {
-                let path = match self.selected_paths(entity_opt).next() {
-                    Some(p) => p,
-                    None => return Task::none(),
+                let selected = self.selected_paths(entity_opt).next();
+                let folder = self
+                    .tab_model
+                    .active_data::<Tab>()
+                    .and_then(|t| t.location.path_opt().cloned());
+                let Some(target) = selected.clone().or_else(|| folder.clone()) else {
+                    return Task::none();
                 };
-                let name = path
+                let name = target
                     .file_name()
                     .map(|n| n.to_string_lossy().into_owned())
-                    .unwrap_or_else(|| path.display().to_string());
-                self.ai_last_prompt = Some(format!("解释文件「{name}」的作用与结构"));
+                    .unwrap_or_else(|| target.display().to_string());
+                self.ai_drawer_open = true;
+                self.ai_last_prompt = Some(format!("Explain \"{name}\""));
                 self.ai_last_response = None;
                 self.ai_assist_status = AiAssistStatus::Loading;
-                let dialog_task = if self.ai_drawer_open {
-                    Task::none()
-                } else {
-                    self.push_dialog(
-                        DialogPage::AiExplain {
-                            path: path.clone(),
-                            status: AiSummaryStatus::Loading,
-                        },
-                        None,
+                let work_path = target.clone();
+                return cosmic::Task::future(async move {
+                    let outcome = crate::yuos_glue::ai::ask_context(
+                        folder,
+                        selected,
+                        "Explain the purpose and structure of this item".to_string(),
                     )
-                };
-                let work_path = path.clone();
-                let work = cosmic::Task::future(async move {
-                    let outcome = crate::yuos_glue::ai::explain(work_path.clone()).await;
+                    .await;
                     cosmic::action::app(Message::AiExplainResult {
                         path: work_path,
                         outcome,
                     })
                 });
-                return Task::batch([dialog_task, work]);
             }
             Message::AiExplainResult { path, outcome } => {
                 self.ai_assist_status = AiAssistStatus::Idle;
@@ -4730,30 +4740,61 @@ impl Application for App {
                 if query.is_empty() {
                     return Task::none();
                 }
+                let selected = self.selected_paths(None).next();
+                let folder = self
+                    .tab_model
+                    .active_data::<Tab>()
+                    .and_then(|t| t.location.path_opt().cloned());
+                let target = selected
+                    .clone()
+                    .or_else(|| folder.clone())
+                    .unwrap_or_else(|| PathBuf::from("/"));
+                self.ai_drawer_open = true;
                 self.ai_last_prompt = Some(query.clone());
                 self.ai_last_response = None;
                 self.ai_assist_input.clear();
                 self.ai_assist_status = AiAssistStatus::Loading;
                 return cosmic::Task::future(async move {
-                    let outcome = crate::yuos_glue::ai::search(query, 50).await;
-                    cosmic::action::app(Message::AiAssistSearchResult(outcome))
+                    let outcome =
+                        crate::yuos_glue::ai::ask_context(folder, selected, query).await;
+                    cosmic::action::app(Message::AiExplainResult {
+                        path: target,
+                        outcome,
+                    })
                 });
             }
             Message::AiAssistFindSimilar => {
-                let path = match self.selected_paths(None).next() {
-                    Some(p) => p,
-                    None => return Task::none(),
+                let selected = self.selected_paths(None).next();
+                let folder = self
+                    .tab_model
+                    .active_data::<Tab>()
+                    .and_then(|t| t.location.path_opt().cloned());
+                let Some(path) = selected.or(folder.clone()) else {
+                    return Task::none();
                 };
                 let name = path
                     .file_name()
                     .map(|n| n.to_string_lossy().into_owned())
                     .unwrap_or_else(|| path.display().to_string());
-                self.ai_last_prompt = Some(format!("查找与「{name}」相关的相似文件"));
+                self.ai_drawer_open = true;
+                self.ai_last_prompt = Some(format!("Find files related to \"{name}\""));
                 self.ai_last_response = None;
                 self.ai_assist_status = AiAssistStatus::Loading;
                 return cosmic::Task::future(async move {
-                    let outcome = crate::yuos_glue::ai::find_similar(path, 50).await;
-                    cosmic::action::app(Message::AiAssistSearchResult(outcome))
+                    match crate::yuos_glue::ai::find_similar(path.clone(), 50).await {
+                        Ok(hits) if !hits.is_empty() => {
+                            cosmic::action::app(Message::AiAssistSearchResult(Ok(hits)))
+                        }
+                        _ => {
+                            let outcome = crate::yuos_glue::ai::ask_context(
+                                folder,
+                                Some(path.clone()),
+                                format!("Find files related to {name}"),
+                            )
+                            .await;
+                            cosmic::action::app(Message::AiExplainResult { path, outcome })
+                        }
+                    }
                 });
             }
             Message::AiAssistSearchResult(outcome) => {
@@ -6108,10 +6149,10 @@ impl Application for App {
             Message::Preview(entity_opt) => {
                 match self.mode {
                     Mode::App => {
-                        let show_details = !self.config.show_details;
-                        self.context_page = ContextPage::Preview(None, PreviewKind::Selected);
-                        self.core.window.show_context = show_details;
-                        return cosmic::task::message(Message::SetShowDetails(show_details));
+                        return self.update(Message::TabMessage(
+                            entity_opt,
+                            tab::Message::GalleryToggle,
+                        ));
                     }
                     Mode::Desktop => {
                         let preview_kind = {
@@ -6469,76 +6510,9 @@ impl Application for App {
                             location_tasks.push(self.update_tab(entity, tab_path, selection_paths));
                             commands.push(Task::batch(location_tasks));
                         }
-                        tab::Command::ContextMenu(point_opt, parent_id) => {
-                            #[cfg(feature = "wayland")]
-                            if let Some(point) = point_opt {
-                                if crate::is_wayland() {
-                                    // Open context menu
-                                    use cctk::wayland_protocols::xdg::shell::client::xdg_positioner::{
-                                        Anchor, Gravity,
-                                    };
-                                    use cosmic::iced::runtime::platform_specific::wayland::popup::{
-                                        SctkPopupSettings, SctkPositioner,
-                                    };
-                                    let window_id = WindowId::unique();
-                                    self.windows.insert(
-                                        window_id,
-                                        Window::new(WindowKind::ContextMenu(
-                                            entity,
-                                            widget::Id::unique(),
-                                        )),
-                                    );
-                                    commands.push(self.update(Message::CheckClipboard));
-                                    commands.push(self.update(Message::Surface(
-                                        cosmic::surface::action::app_popup(
-                                            move |app: &mut Self| -> SctkPopupSettings {
-                                                let anchor_rect = Rectangle {
-                                                    x: point.x as i32,
-                                                    y: point.y as i32,
-                                                    width: 1,
-                                                    height: 1,
-                                                };
-                                                let positioner = SctkPositioner {
-                                                    size: None,
-                                                    anchor_rect,
-                                                    anchor: Anchor::None,
-                                                    gravity: Gravity::BottomRight,
-                                                    reactive: true,
-                                                    ..Default::default()
-                                                };
-                                                SctkPopupSettings {
-                                                    parent: parent_id.unwrap_or(
-                                                        app.core
-                                                            .main_window_id()
-                                                            .unwrap_or(WindowId::NONE),
-                                                    ),
-                                                    id: window_id,
-                                                    positioner,
-                                                    parent_size: None,
-                                                    grab: true,
-                                                    close_with_children: false,
-                                                    input_zone: None,
-                                                }
-                                            },
-                                            None,
-                                        ),
-                                    )));
-                                }
-                            } else {
-                                // Destroy previous popup
-                                let mut window_ids = Vec::new();
-                                for (window_id, window) in &self.windows {
-                                    if let WindowKind::ContextMenu(e, _) = &window.kind
-                                        && *e == entity
-                                    {
-                                        window_ids.push(*window_id);
-                                    }
-                                }
-                                for window_id in window_ids {
-                                    commands.push(self.update(Message::Surface(
-                                        cosmic::surface::action::destroy_popup(window_id),
-                                    )));
-                                }
+                        tab::Command::ContextMenu(point_opt, _parent_id) => {
+                            if point_opt.is_some() {
+                                commands.push(self.update(Message::CheckClipboard));
                             }
                         }
                         tab::Command::Delete(paths) => commands.push(self.delete(paths)),
