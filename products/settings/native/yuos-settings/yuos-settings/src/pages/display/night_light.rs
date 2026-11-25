@@ -4,8 +4,9 @@
 use super::{Message, NightLight};
 use crate::pages;
 use cosmic::iced::core::{Alignment, Length};
+use crate::widget::text;
 use cosmic::widget::{
-    button, column, container, icon, list_column, row, settings, text, toggler, vertical_space,
+    button, column, container, icon, list_column, row, settings, toggler, vertical_space,
 };
 use cosmic::{Apply, Element, Task};
 use std::sync::Arc;

@@ -16,8 +16,8 @@ The shared OS policy implementation is not copied and no other App is imported.
 All original visual and CopyQ behavior is retained; this relocation does not
 merge selection/history state or broaden grants.
 
-Native development uses only the immutable shared toolkit source specified in
-[`platform.lock.json`](../../platform.lock.json), with its existing licenses,
+Native development uses the repository's shared
+[`toolkit`](../../shared/rust/toolkit), with its existing licenses,
 through [`tools/native_build.py`](../../tools/native_build.py) and the original
 [toolkit patches](../../tools/native-patches.toml), carried by the standalone
 manifest. Installed identity, data and grants remain unchanged. The independent

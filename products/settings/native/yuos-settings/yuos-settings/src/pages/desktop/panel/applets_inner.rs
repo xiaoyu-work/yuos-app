@@ -8,7 +8,8 @@ use cosmic::iced::id::Internal;
 
 use cosmic::iced;
 use cosmic::iced::core::clipboard::IconSurface;
-use cosmic::widget::{Column, button, column, container, icon, list_column, row, text, text_input};
+use crate::widget::text;
+use cosmic::widget::{Column, button, column, container, icon, list_column, row, text_input};
 
 use crate::owner_config::Config;
 use cosmic::{

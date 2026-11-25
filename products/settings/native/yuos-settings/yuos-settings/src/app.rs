@@ -24,7 +24,7 @@ use crate::pages::power;
 use crate::pages::sound;
 use crate::pages::{self, system, time};
 use crate::subscription::desktop_files;
-use crate::widget::{page_title, search_header};
+use crate::widget::{page_title, search_header, text};
 #[cfg(feature = "wayland")]
 use cosmic::cctk::{sctk::output::OutputInfo, wayland_client::protocol::wl_output::WlOutput};
 use cosmic::{
@@ -77,6 +77,85 @@ pub struct SettingsApp {
 }
 
 impl SettingsApp {
+    fn sidebar(&self) -> Element<'_, Message> {
+        let mut active_root = self.active_page;
+        while let Some(parent) = self.pages.info[active_root].parent {
+            active_root = parent;
+        }
+        let active = &self.pages.info[self.active_page];
+        let child_visible = active.parent == Some(active_root)
+            && (self.pages.info[active_root].id == "desktop" || active.id == "wifi");
+        let mut entries = column::with_capacity(24).spacing(2);
+        for (id, info) in self.pages.info.iter().filter(|(_, info)| info.parent.is_none()) {
+            if matches!(info.id.as_ref(), "accessibility" | "input-devices" | "time") {
+                entries = entries.push(
+                    container(cosmic::widget::divider::horizontal::default()).padding([6, 4]),
+                );
+            }
+            entries = entries.push(self.sidebar_entry(
+                id,
+                false,
+                id == active_root && !child_visible,
+            ));
+            if let Some(children) = self.pages.sub_pages(id) {
+                for &child in children {
+                    if info.id == "desktop" || self.pages.info[child].id == "wifi" {
+                        entries = entries.push(self.sidebar_entry(
+                            child,
+                            true,
+                            child == self.active_page,
+                        ));
+                    }
+                }
+            }
+        }
+        let search = text_input::search_input(fl!("type-to-search"), &self.search_input)
+            .id(self.search_id.clone())
+            .size(12)
+            .on_input(Message::SearchChanged)
+            .on_clear(Message::SearchClear)
+            .on_submit(|_| Message::SearchSubmit);
+        container(
+            column::with_capacity(2)
+                .push(search)
+                .push(scrollable(entries).height(Length::Fill))
+                .spacing(8),
+        )
+        .padding(10)
+        .width(248)
+        .height(Length::Fill)
+        .class(crate::theme::sidebar())
+        .into()
+    }
+
+    fn sidebar_entry(&self, id: page::Entity, child: bool, selected: bool) -> Element<'_, Message> {
+        let info = &self.pages.info[id];
+        let label = if child {
+            text::body(info.title.as_str()).size(12.5)
+        } else {
+            text::body(info.title.as_str())
+        };
+        let mut content = row::with_capacity(2)
+            .align_y(iced::Alignment::Center)
+            .spacing(8);
+        if !child {
+            content = content.push(
+                container(icon::from_name(info.icon_name.as_ref()).size(13))
+                    .padding(4)
+                    .class(crate::theme::sidebar_icon_tile(info.id.as_ref())),
+            );
+        }
+        content = content.push(label);
+        button::custom(content)
+            .padding(if child { [0, 6, 0, 34] } else { [0, 6, 0, 6] })
+            .height(if child { 24 } else { 28 })
+            .width(Length::Fill)
+            .selected(selected)
+            .class(crate::theme::navigation_button(selected))
+            .on_press(Message::SidebarPage(id))
+            .into()
+    }
+
     fn subtask_to_page(&self, cmd: &PageCommands) -> Option<Entity> {
         match cmd {
             #[cfg(feature = "page-accessibility")]
@@ -172,6 +251,7 @@ pub enum Message {
     #[cfg(feature = "wayland")]
     OutputRemoved(WlOutput),
     Page(page::Entity),
+    SidebarPage(page::Entity),
     PageMessage(crate::pages::Message),
     #[cfg(feature = "wayland")]
     PanelConfig(Box<CosmicPanelConfig>),
@@ -264,6 +344,10 @@ impl cosmic::Application for SettingsApp {
         Some(&self.nav_model)
     }
 
+    fn nav_bar(&self) -> Option<Element<'_, cosmic::Action<Message>>> {
+        self.core.nav_bar_active().then(|| self.sidebar().map(cosmic::Action::App))
+    }
+
     fn header_start(&self) -> Vec<Element<'_, Self::Message>> {
         let mut widgets = Vec::new();
 
@@ -274,6 +358,10 @@ impl cosmic::Application for SettingsApp {
                 .on_press(Message::AskYu)
                 .into(),
         );
+
+        if self.core.nav_bar_active() {
+            return widgets;
+        }
 
         widgets.push(if self.search_active {
             text_input::search_input("", &self.search_input)
@@ -400,11 +488,19 @@ impl cosmic::Application for SettingsApp {
 
             Message::Page(page) => return self.activate_page(page),
 
+            Message::SidebarPage(page) => {
+                if self.core.is_condensed() {
+                    self.core.nav_bar_toggle_condensed();
+                }
+                return self.activate_page(page);
+            }
+
             Message::None => (),
 
             Message::SetWindowTitle => return self.set_title(),
 
             Message::SearchChanged(phrase) => {
+                self.search_active = true;
                 return self.search_changed(phrase);
             }
 
@@ -421,6 +517,9 @@ impl cosmic::Application for SettingsApp {
 
             Message::SearchSubmit => {
                 self.search_active = true;
+                if self.core.is_condensed() && self.core.nav_bar_active() {
+                    self.core.nav_bar_toggle_condensed();
+                }
             }
 
             Message::AskYuSearch => {
@@ -986,13 +1085,20 @@ impl cosmic::Application for SettingsApp {
         };
 
         if let Some(error) = crate::owner_config::failure() {
-            return cosmic::widget::column::with_capacity(2)
-                .spacing(cosmic::theme::spacing().space_s)
-                .push(cosmic::widget::text::body(fl!("owner-preferences-error", detail = error.as_str())))
-                .push(view)
+            return container(
+                column::with_capacity(2)
+                    .spacing(8)
+                    .push(
+                        container(text::caption(fl!("owner-preferences-error", detail = error.as_str())))
+                            .padding([8, 14])
+                            .class(crate::theme::section_card()),
+                    )
+                    .push(view),
+            )
+                .class(crate::theme::page())
                 .into();
         }
-        container(view).into()
+        container(view).class(crate::theme::page()).into()
     }
 
     #[allow(clippy::too_many_lines)]
@@ -1170,7 +1276,7 @@ impl SettingsApp {
 
             page_header_content.into()
         } else {
-            cosmic::widget::text::title3(&page_info.title).into()
+            text::title3(&page_info.title).into()
         };
 
         for id in content.iter().copied() {
@@ -1189,9 +1295,21 @@ impl SettingsApp {
             }
         }
 
+        if page_info.id == "applications" {
+            if let Some(sub_pages) = self.pages.sub_pages(self.active_page) {
+                sections_column.push(
+                    column::with_capacity(2)
+                        .push(container(text::heading(fl!("application-settings"))).padding([0, 4]))
+                        .push(self.sub_page_list(sub_pages))
+                        .spacing(8)
+                        .into(),
+                );
+            }
+        }
+
         let view = self
             .page_container(
-                settings::view_column(sections_column).spacing(cosmic::theme::spacing().space_l),
+                settings::view_column(sections_column).spacing(22),
             )
             .apply(scrollable)
             .height(Length::Fill)
@@ -1311,7 +1429,7 @@ impl SettingsApp {
         // the user has a clear escape hatch.
         if self.search_selections.is_empty() {
             let banner = container(
-                cosmic::widget::text::body(crate::fl!(
+                crate::widget::text::body(crate::fl!(
                     "ai-search-no-results",
                     query = self.search_input.clone()
                 ))
@@ -1330,14 +1448,14 @@ impl SettingsApp {
         // keyword scan above couldn't.
         if !self.search_input.trim().is_empty() {
             let spacing = cosmic::theme::active().cosmic().spacing;
-            let title = cosmic::widget::text::heading(crate::fl!("ai-search-ask-yu"));
+            let title = crate::widget::text::heading(crate::fl!("ai-search-ask-yu"));
             let query_line =
-                cosmic::widget::text::body(format!("\u{201C}{}\u{201D}", self.search_input)).class(
+                crate::widget::text::body(format!("\u{201C}{}\u{201D}", self.search_input)).class(
                     cosmic::theme::Text::Custom(|t| cosmic::iced::widget::text::Style {
                         color: Some(t.cosmic().on_bg_color().into()),
                     }),
                 );
-            let hint = cosmic::widget::text::caption(crate::fl!("ai-search-ask-yu-hint"));
+            let hint = crate::widget::text::caption(crate::fl!("ai-search-ask-yu-hint"));
             let card_col = cosmic::widget::column::with_children(vec![
                 title.into(),
                 query_line.into(),
@@ -1366,29 +1484,27 @@ impl SettingsApp {
             .into()
     }
 
-    /// Displays the sub-pages view of a page.
-    fn sub_page_view(&self, sub_pages: &[page::Entity]) -> cosmic::Element<'_, Message> {
-        let page_list = sub_pages
+    fn sub_page_list(&self, sub_pages: &[page::Entity]) -> Element<'_, Message> {
+        sub_pages
             .iter()
             .copied()
-            .fold(
-                column::with_capacity(sub_pages.len()),
-                |page_list, entity| {
-                    let sub_page = &self.pages.info[entity];
+            .fold(crate::widget::yuos_list_column(), |list, entity| {
+                let sub_page = &self.pages.info[entity];
+                list.add(crate::widget::page_list_item(
+                    sub_page.title.as_str(),
+                    sub_page.description.as_str(),
+                    "",
+                    &sub_page.icon_name,
+                    Message::Page(entity),
+                ))
+            })
+            .into()
+    }
 
-                    page_list.push(crate::widget::page_list_item(
-                        sub_page.title.as_str(),
-                        sub_page.description.as_str(),
-                        "",
-                        &sub_page.icon_name,
-                        entity,
-                    ))
-                },
-            )
-            .spacing(cosmic::theme::spacing().space_s)
-            .apply(|widget| scrollable(self.page_container(widget)).height(Length::Fill))
-            .apply(Element::from)
-            .map(Message::Page);
+    /// Displays the sub-pages view of a page.
+    fn sub_page_view(&self, sub_pages: &[page::Entity]) -> cosmic::Element<'_, Message> {
+        let page_list = scrollable(self.page_container(self.sub_page_list(sub_pages)))
+            .height(Length::Fill);
 
         column::with_capacity(2)
             .push(self.page_container(page_title(&self.pages.info[self.active_page])))
@@ -1404,16 +1520,12 @@ impl SettingsApp {
     ) -> cosmic::Element<'a, Message> {
         let theme = cosmic::theme::active();
 
-        let padding = if self.core.is_condensed() {
-            theme.cosmic().space_s()
-        } else {
-            theme.cosmic().space_l()
-        };
+        let padding = if self.core.is_condensed() { 14 } else { 28 };
         // prevents content from touching window edge on bottom of scroll
         let bottom_spacer = theme.cosmic().space_m();
 
         container(content.into())
-            .max_width(800)
+            .max_width(640)
             .width(Length::Fill)
             .apply(container)
             .center_x(Length::Fill)

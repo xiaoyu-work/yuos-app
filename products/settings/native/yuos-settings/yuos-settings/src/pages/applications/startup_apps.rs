@@ -1,6 +1,7 @@
 use cosmic::app::ContextDrawer;
 use cosmic::iced::{Alignment, Length};
-use cosmic::widget::{button, icon, settings, text};
+use crate::widget::text;
+use cosmic::widget::{button, icon, settings};
 use cosmic::{Apply, Element, Task, widget};
 use yuos_settings_page::section::Entity;
 use yuos_settings_page::{self as page, Content, Info, Section};

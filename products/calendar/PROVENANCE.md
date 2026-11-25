@@ -15,8 +15,8 @@ The original callback seam now uses the public SDK's fixed, versioned OS
 applet provider. Provider implementation and policy remain OS-owned.
 Calendar does not call another App.
 
-Development links the shared Yu OS toolkit (including its vendored iced
-tree) from the immutable [`platform.lock.json`](../../platform.lock.json).
+Development links the repository's shared Yu OS toolkit (including its vendored
+iced tree) from [`shared/rust/toolkit`](../../shared/rust/toolkit).
 Its source licenses and origin notices remain in that dependency. The
 [`../../tools/native-patches.toml`](../../tools/native-patches.toml) mapping preserves the original
 desktop workspace's toolkit patches, now carried by the standalone manifest.

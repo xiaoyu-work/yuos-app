@@ -12,10 +12,12 @@ use cosmic::widget::{
     self, ColorPickerModel, button, column, container, divider, icon, list, list_column, row,
     settings,
     space::{horizontal, vertical},
-    text,
 };
 use cosmic::{Apply, Element, theme};
 use yuos_settings_page as page;
+
+pub mod text;
+pub use text::text;
 
 pub fn color_picker_context_view<'a, Message: Clone + 'static>(
     description: Option<Cow<'static, str>>,
@@ -51,34 +53,81 @@ pub fn color_picker_context_view<'a, Message: Clone + 'static>(
         .apply(Element::from)
 }
 
-/// A settings section whose list card uses the Yu OS Glass elevated material.
-///
-/// `settings::section()` defaults to `Container::List`, which fills with
-/// `component.base` and carries no border or shadow. On the YuOS light
-/// palette that composites to `#DDE0E7` against the `#EEF1F8` page, so
-/// sections read as a flat wash. `ListColumn` does expose a style hook, so
-/// pages opt into the branded card by building the section from a pre-styled
-/// column instead.
 #[must_use]
-pub fn yuos_section<'a, Message: Clone + 'static>() -> settings::Section<'a, Message> {
-    settings::section::with_column(list_column().style(crate::theme::section_card()))
+pub fn yuos_section<'a, Message: Clone + 'static>() -> SettingsSection<'a, Message> {
+    yuos_section_with_capacity(4)
 }
 
-/// [`yuos_section`] with a pre-allocated list column.
 #[must_use]
 pub fn yuos_section_with_capacity<'a, Message: Clone + 'static>(
     capacity: usize,
-) -> settings::Section<'a, Message> {
-    settings::section::with_column(
-        list::list_column::with_capacity(capacity).style(crate::theme::section_card()),
-    )
+) -> SettingsSection<'a, Message> {
+    SettingsSection(settings::section::with_column(
+        list::list_column::with_capacity(capacity)
+            .list_item_padding([4, 14])
+            .divider_padding(14)
+            .style(crate::theme::section_card()),
+    ))
 }
 
-/// A bare list card for the places that build a section-like column by hand
-/// instead of going through [`yuos_section`].
+pub struct SettingsSection<'a, Message>(settings::Section<'a, Message>);
+
+impl<'a, Message: Clone + 'static> SettingsSection<'a, Message> {
+    pub fn title(self, title: impl Into<Cow<'a, str>> + 'a) -> Self {
+        Self(
+            self.0
+                .header(container(text::heading(title)).padding([0, 4])),
+        )
+    }
+
+    pub fn add(self, item: impl list::list_column::IntoListItem<'a, Message>) -> Self {
+        Self(self.0.add(item))
+    }
+
+    pub fn add_maybe(
+        self,
+        item: Option<impl list::list_column::IntoListItem<'a, Message>>,
+    ) -> Self {
+        Self(self.0.add_maybe(item))
+    }
+
+    pub fn extend(
+        self,
+        items: impl IntoIterator<Item = impl list::list_column::IntoListItem<'a, Message>>,
+    ) -> Self {
+        Self(self.0.extend(items))
+    }
+}
+
+impl<'a, Message: Clone + 'static> From<SettingsSection<'a, Message>> for Element<'a, Message> {
+    fn from(section: SettingsSection<'a, Message>) -> Self {
+        section.0.into()
+    }
+}
+
 #[must_use]
 pub fn yuos_list_column<'a, Message: Clone + 'static>() -> widget::ListColumn<'a, Message> {
-    list_column().style(crate::theme::section_card())
+    list_column()
+        .list_item_padding([4, 14])
+        .divider_padding(14)
+        .style(crate::theme::section_card())
+}
+
+pub fn segmented_control<'a, Message: Clone + 'static>(
+    choices: impl IntoIterator<Item = (&'a str, bool, Message)>,
+) -> Element<'a, Message> {
+    let buttons = choices.into_iter().map(|(label, selected, message)| {
+        button::custom(text::caption(label))
+            .padding([3, 10])
+            .selected(selected)
+            .class(crate::theme::segment_button(selected))
+            .on_press(message)
+            .into()
+    });
+    container(row::with_children(buttons).spacing(2))
+        .padding(2)
+        .class(crate::theme::section_card())
+        .into()
 }
 
 #[must_use]
@@ -151,24 +200,21 @@ pub fn page_list_item<'a, Message: 'static + Clone>(
     info: impl Into<Cow<'a, str>> + 'a,
     icon: &'a str,
     message: Message,
-) -> Element<'a, Message> {
+) -> list::list_column::ListButton<'a, Message> {
     let Spacing {
         space_xxs,
         space_xs,
         space_s,
-        space_m,
         ..
     } = cosmic::theme::spacing();
 
     let description = description.into();
     let info = info.into();
 
-    // Leading brand-blue glass "icon tile" (iOS/macOS settings row pattern).
-    let icon_tile = container(icon::from_name(icon).size(20))
-        .padding(space_xs)
+    let icon_tile = container(icon::from_name(icon).size(16))
+        .padding(6)
         .class(crate::theme::icon_tile());
 
-    // Title + optional description stacked with a clear weight/size hierarchy.
     let mut text_column = column::with_capacity(2).push(text::body(title));
 
     if !description.is_empty() {
@@ -177,7 +223,6 @@ pub fn page_list_item<'a, Message: 'static + Clone>(
 
     let text_column = text_column.spacing(space_xxs).width(Length::Fill);
 
-    // Trailing value text (if any) + chevron affordance.
     let mut trailing = row::with_capacity(2)
         .align_y(Alignment::Center)
         .spacing(space_xs);
@@ -188,23 +233,15 @@ pub fn page_list_item<'a, Message: 'static + Clone>(
 
     trailing = trailing.push(icon::from_name("go-next-symbolic").size(16).icon());
 
-    row::with_capacity(3)
-        .push(icon_tile)
-        .push(text_column)
-        .push(trailing)
-        .align_y(Alignment::Center)
-        .spacing(space_m)
-        .apply(container)
-        .padding([space_s, space_m])
-        .align_y(Alignment::Center)
-        .class(crate::theme::frosted_card())
-        .width(Length::Fill)
-        .apply(button::custom)
-        .padding(0)
-        .class(theme::Button::Transparent)
-        .on_press(message)
-        .width(Length::Fill)
-        .into()
+    list::list_column::button(
+        row::with_capacity(3)
+            .push(icon_tile)
+            .push(text_column)
+            .push(trailing)
+            .align_y(Alignment::Center)
+            .spacing(space_s),
+    )
+    .on_press(message)
 }
 
 #[must_use]
@@ -221,13 +258,11 @@ pub fn sub_page_header<'a, Message: 'static + Clone>(
         .class(button::ButtonClass::Link)
         .on_press(on_press);
 
-    let sub_page_header = row::with_capacity(2).push(text::title3(sub_page));
-
-    column::with_capacity(2)
+    row::with_capacity(2)
+        .push(text::title3(sub_page))
         .push(previous_button)
-        .push(sub_page_header)
-        .spacing(6)
-        .width(Length::Shrink)
+        .spacing(10)
+        .align_y(Alignment::Center)
         .into()
 }
 

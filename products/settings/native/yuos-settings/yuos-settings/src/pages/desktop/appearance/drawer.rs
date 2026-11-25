@@ -2,8 +2,9 @@ use cosmic::app::{ContextDrawer, context_drawer};
 use crate::owner_config::{self as cosmic_config, Config, ConfigSet};
 use cosmic::cosmic_theme::Spacing;
 use cosmic::iced::core::{Color, Length};
+use crate::widget::text;
 use cosmic::widget::{
-    ColorPickerModel, color_picker::ColorPickerUpdate, container, flex_row, settings, text,
+    ColorPickerModel, color_picker::ColorPickerUpdate, container, flex_row, settings,
 };
 use cosmic::{Apply, Task};
 use cosmic::{Element, widget};

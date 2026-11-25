@@ -1,4 +1,4 @@
-"""Run declared App tests with verified platform artifact and local library exports."""
+"""Run declared App tests with the repository SDK and local library exports."""
 
 import argparse
 import json

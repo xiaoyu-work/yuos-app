@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use cosmic::iced::{Alignment, Length};
-use cosmic::widget::{self, row, settings, text};
+use crate::widget::text;
+use cosmic::widget::{self, row, settings};
 use cosmic::{Apply, Element};
 use cosmic_comp_config::input::AccelProfile;
 use yuos_settings_page::Section;

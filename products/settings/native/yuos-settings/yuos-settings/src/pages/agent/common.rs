@@ -23,7 +23,8 @@ use std::borrow::Cow;
 use std::process::Stdio;
 
 use cosmic::iced::{Alignment, Length};
-use cosmic::widget::{self, button, column, container, dropdown, row, settings, text};
+use crate::widget::text;
+use cosmic::widget::{self, button, column, container, dropdown, row, settings};
 use cosmic::{Apply, Element, Task};
 use yuos_settings_page::Section;
 use serde::Deserialize;

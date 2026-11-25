@@ -1,18 +1,10 @@
 # App Build Tools
 
-By default, `platform_dependency.py` fetches only the versioned public platform
-artifact selected by `platform.lock.json`. `platform_archive.py` verifies its public
-`yuos.app-platform/v1` inventory and extracts it with `tarfile`'s data filter.
-No Git fetching, OS source checkout, sibling lookup or unverified cache fallback
-remains. Its Python paths include the named SDK/runtime exports and local
-App-owned `shared/python`, never OS `apps/`.
-`manifest_schema_path()` resolves the public SDK manifest contract, not private
-core source. `test.py` runs declared Python/Node contracts with these imports.
-The lock selects the separately approved published platform `0.2.1`, including
-account-scoped Mail, independent GUI declarations and bounded selected-file
-clients. Historical `1.0.0`/`1.1.0`
-releases remain withdrawn; see
-[publication status](../docs/releases.md#platform-publication-status).
+Source builds use the checked-in `yuos-sdk/rust`, `yuos-sdk/python/src` and
+`shared/rust/toolkit`, never a sibling OS checkout or private OS implementation.
+`test.py` runs declared product/capability contracts with the repository Python
+SDK, local App-owned `shared/python` and declared library exports.
+SDK publication or a platform archive download is not a source-build prerequisite.
 `stage.py` assembles declared App assets without installing them on the host.
 `package_assets.py` stages `installed_assets` declared by a product's
 `package.json`: each entry names a source file/directory, a root-relative
@@ -28,46 +20,14 @@ while source executable modes are preserved. Browser uses this for its complete
 WebExtension and fixed canonical-host launcher; release and fixture assembly
 use the same contract rather than copying another native host implementation.
 
-The lock has exactly `version` (release SemVer), `url` (HTTPS),
-`sha256` (64 hexadecimal characters), and `runtime_abi` (currently integer `1`).
-It may additionally declare `schema: "yuos.app-platform/v1"`. Old repository,
-revision and source-selection fields are errors. Publication must supply the
-real release URL and digest; a probe fixture or placeholder is not a release pin.
-`validate_lock(lock)` exposes that same pure validation to release callers;
-`read_lock()` applies it to the bounded repository lock file.
+`native_build.py` prepares each product under `build/<product>-native`, resolves
+its declared local SDK/shared Rust paths and keeps Cargo outputs in a separate
+target directory. Cargo runs with `--locked`; checked-in product locks and
+upstream Git dependencies remain authoritative. `test.py` disables bytecode
+when importing the repository SDK.
 
-Downloads and every redirect must remain HTTPS. Private project-local temporary
-files are bounded to 128 MiB compressed, 512 MiB expanded, 64 MiB per file,
-8 MiB metadata and 50,000 inventory nodes. SHA-256 verification precedes tar
-inspection; inventory checks precede standard filtered extraction. The complete
-candidate is validated before atomic cache publication.
-
-Caches live under `build/platform-artifacts/<sha256>/`, containing only a retained
-`archive.tar.gz` and `payload/`. Every use re-verifies the archive into a private
-snapshot and derives expectations from its `platform.json`, not mutable
-extracted metadata. Missing/extra files, bytes, modes, unsupported nodes and
-changed symlinks fail without repair or redownload. Exactly required implicit
-ancestor directories are allowed, including `desktop/`; unrelated entries are
-not. The raw archive layout preserves relative Cargo dependencies.
-
-`prepare_exports()` returns named verified paths; `download=False` is cache-only,
-not a verification bypass. `prepare()` retains the SDK Python root, runtime
-Python root and local App support root in that order. `prepare_native()` returns
-the `ui-toolkit` export: its parent is the artifact's `desktop/` and its
-grandparent is the payload root. Native builds use a mutable prepared App
-workspace/lock and an external Cargo target directory. Direct SDK tests must
-likewise stage their workspace/lock from the verified artifact into a separate
-test-owned build area, not run Cargo on the verified library manifest. Test
-scratch belongs beneath the external test executable/target, not the artifact's
-`CARGO_MANIFEST_DIR`. `test.py` disables bytecode so imports do not mutate verified SDK
-sources. Staged Python/native test fixtures select named exports cache-only;
-Mail's source-checkout native host also verifies the cache without downloading.
-
-These are versioned App interface exports, not an OS-private entitlement for
-bundled clients. `prepare_exports()` needs no App source tree, identity or origin
-classification. `prepare()` additionally composes this repository's local App
-helpers; that build convenience does not grant authority. `prepare_native()` is
-a toolkit-selection convenience, not a privileged integration category.
+These are App interface libraries, not an OS-private entitlement for bundled
+clients. Local build helpers do not grant runtime authority.
 Every App still requires the same authenticated manifest/Host/session,
 capability and sandbox contract. A signed archive or Debian package is not a
 permission grant or authorization to run an App-supplied root hook.
@@ -88,8 +48,8 @@ installed App. Test staging through `tests/test_stage.py`.
 installer for a GUI binary without fabricating a Cargo workspace or MCP.
 Its build tree is out-of-source; `--app-root` and `--install-root` use the same
 ELF/resource/license producer and signer entry inventory as Cargo products.
-These products do not consume the Rust toolkit. Their runtime SDK dependency
-still follows the validated public platform lock. GUI-only native Apps have
+These products do not consume the Rust toolkit. Their installed runtime still
+uses the OS-provided SDK interfaces. GUI-only native Apps have
 no mandatory Python test module, and a missing CMake test target is an explicit
 error rather than a successful empty test run.
 The native dependency scan creates a temporary release-owned package root
@@ -117,8 +77,8 @@ their upstream workspaces. `stage_native.py` copies declared native assets
 from the same product (including Launcher's compiled-in shared Python backend).
 Binary preparation also resolves the App-owned `shared/rust/gui-argv` Cargo
 dependency, including Settings' nested manifest. This std-only parser helper
-comes from this repository, not the immutable SDK artifact; SDK 1.0.0 and the
-Python runtime support ABI remain unchanged. Native payload preparation detects
+comes from this repository and does not change the SDK or Python runtime
+support ABI. Native payload preparation detects
 its actual Cargo consumers and preserves the root Apache-2.0 license alongside
 their original licenses. Flat/nested mapping and missing-license refusal are
 covered in `tests/release/test_native_payload.py`.
@@ -140,26 +100,12 @@ public MCP fixtures explicitly compose common and product payloads.
 installed IDs. `python_dependencies` references that export by kind, source
 name, library name and consuming IDs, never by an arbitrary path or App call.
 Tests add only declared library import roots alongside common App support and
-the pinned OS libraries.
+the repository SDK.
 Staging installs those same exports even without their owner's Apps. Co-staging
 checks an existing library's complete payload/modes/symlinks and refuses a
 conflicting tree instead of merging or overwriting it.
-`tests/test_platform_dependency.py` covers synthetic HTTPS downloads, exact
-pins, bounded/filtered tar extraction, malicious inventories and links, atomic
-publication, cache tampering and isolated native-host bootstrap. An explicit
-local OS-built probe can test real SDK imports without a production override:
-
-```bash
-PYTHONPATH=tests:shared/python python3 -m pytest -q --import-mode=importlib \
-  tests/test_platform_dependency.py \
-  --platform-artifact-fixture=/path/to/yuos-app-platform-1.0.0.tar.gz
-```
-
-The optional test fixture path is test-only; production always uses the lock's
-HTTPS URL and digest. These checks do not establish a native UI build or release
-acceptance before the final platform artifact is published.
-They also do not establish runtime resource/authority acceptance. The generic
-Host now binds signed package-relative entries without the former launch table
+Source tests do not establish native UI or runtime resource/authority acceptance.
+The generic Host now binds signed package-relative entries without the former launch table
 or native-host exemption; provider identity and resource integration remain
 separate from source/artifact verification.
 Earlier Notifications config/util candidates were not generic runtime services.
@@ -175,7 +121,7 @@ installed resource checks, isolated MCP and a private MPRIS fixture built from
 the actual native backend. Fixtures never connect to the user's desktop bus.
 Notifications retains its standalone graph and private daemon/config/util
 packages, but no longer exports config/util libraries. OS consumers use
-`yuos-sdk/rust/notification-presentation` from the normal SDK artifact.
+`yuos-sdk/rust/notification-presentation` from the repository SDK.
 Other declared data-only library fixtures retain path/identity checks; retired
 Notifications exports cannot re-enter release or development artifacts.
 Notifications process fixtures cover installed isolated MCP and actual private-FD
@@ -268,53 +214,22 @@ re-runs all `review` checks, signs the App directory with the publisher key
 (`yuos.provenance/v1`), refreshes `DEBIAN/md5sums`, and repacks a deterministic
 `.deb` verified again with `validate_deb`.
 
-## Local platform development
+## Local SDK development
 
-Source development need not publish an SDK first. `platform_dependency.py`,
-`test.py` and `native_build.py` accept one explicit local archive together with
-its expected version and SHA-256. Obtain the digest from the trusted producer's
-checksum output. All three options are required on each command; preparation
-does not install a persistent default or change `platform.lock.json`.
-
-From the App repository root, with the archive and `EXPECTED_SHA256` supplied:
+Run native commands from the repository root on Linux/WSL's Linux filesystem:
 
 ```bash
-python3 tools/test.py mail \
-  --development-platform build/local-platform/yuos-app-platform-0.1.0.tar.gz \
-  --development-platform-version 0.1.0 \
-  --development-platform-sha256 "$EXPECTED_SHA256"
-
-python3 tools/native_build.py launcher check \
-  --development-platform build/local-platform/yuos-app-platform-0.1.0.tar.gz \
-  --development-platform-version 0.1.0 \
-  --development-platform-sha256 "$EXPECTED_SHA256"
+python3 tools/test.py mail
+python3 tools/native_build.py settings test
+python3 tools/native_build.py settings build
 ```
 
-The same options on `tools/platform_dependency.py` prepare the archive and
-print its verified Python import roots. The producer uses the OS's existing
-public artifact builder; consumers never import a sibling OS checkout.
-
-Local inputs use `build/platform-development/<sha256>/`, separate from the
-published-pin cache. They retain all regular-file, digest, ABI, inventory,
-extraction and cache-tampering checks. The selected source archive is rechecked
-even when its cache exists. A changed source or cache fails without redownload,
-repair or substitution. Missing production artifacts never select this mode.
-
-The Python runner forwards selection through explicit pytest options, and only
-test helpers bind those inputs. Runtime source bootstrap and release tools do
-not inherit a development override. Native builds keep `--locked` and never
-rewrite checked-in Cargo locks; an incompatible SDK graph must be handled
-explicitly. `--app-root` and `--install-root` refuse local development input.
-This is not App installation, publication authorization or a runtime grant.
-
-The independent `platform-tools` CI job exercises synthetic archives and a
-real minimal locked native consumer without downloading a released SDK:
-
-```bash
-PYTHONPATH=tests:tools python3 -m pytest -q --import-mode=importlib \
-  tests/test_platform_dependency.py tests/test_platform_native.py
-```
-
-The native smoke case is separate so ordinary Python product tests do not gain
-a Cargo dependency. Default product/native CI still needs an available
-published artifact; local development does not silently clear that blocker.
+`--target-dir` selects a separate Cargo output directory. `--release` selects
+the release profile; `--app-root` and `--install-root` additionally require
+`build --release` and use the original product installer. SDK bindings come
+from `yuos-sdk/rust`, shared toolkit paths from `shared/rust/toolkit`, and the
+argv adapter from `shared/rust/gui-argv`. Products that retain an upstream Git
+toolkit continue to use their checked-in dependency graph.
+No sibling OS checkout or platform archive override is used. Source builds
+are not App installation, publication authorization or runtime grants; release,
+version and pin changes still require explicit owner approval.

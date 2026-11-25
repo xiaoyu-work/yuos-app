@@ -46,11 +46,10 @@ client adapters. These carry versioned App requests; OS implementation ownership
 does not make their interface an entitlement reserved for bundled clients.
 Every App requires the same authenticated Host, capability and sandbox contract,
 with identity used for ownership/session/audit binding, not business-name
-privilege. Development resolves
-them through the versioned HTTPS/SHA-256 artifact in `platform.lock.json`, never
-a sibling OS checkout or copied SDK/provider implementation. Staged MCP tests
-select its verified named exports cache-only. Installed execution uses OS
-libraries. Development artifact preparation is explicit, not a runtime download.
+privilege. Development and staged MCP tests use `yuos-sdk/python/src` and
+local `shared/python`, never a sibling OS checkout or copied provider
+implementation. Installed execution uses OS libraries, without runtime
+source downloads.
 
 The OS retains the Agent, AI and memory authority, App identity/capabilities,
 credentials, consent/budgets, safety/audit, sandbox and signing/install/update/

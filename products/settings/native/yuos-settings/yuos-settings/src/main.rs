@@ -228,13 +228,11 @@ pub fn main() -> color_eyre::Result<()> {
     }
 
     let settings = cosmic::app::Settings::default()
+        .default_text_size(13.0)
+        .default_font(cosmic::iced::Font::with_name("Noto Sans SC"))
+        .size(cosmic::iced::Size::new(1180.0, 720.0))
         .size_limits(Limits::NONE.min_width(360.0).min_height(300.0))
-        // Frosted shell. The YuOS theme is `is_frosted`, so the toolkit's
-        // surface colours carry alpha; without asking the compositor to blur
-        // behind the window that alpha would expose raw wallpaper under the
-        // page text. Files uses the same pairing.
-        .transparent(true)
-        .blur(true);
+        .transparent(false);
 
     #[cfg(feature = "single-instance")]
     {

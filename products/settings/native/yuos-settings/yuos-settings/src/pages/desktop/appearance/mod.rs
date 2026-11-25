@@ -19,8 +19,9 @@ use cosmic::cosmic_theme::{CornerRadii, Density, ThemeBuilder, ThemeMode};
 #[cfg(feature = "xdg-portal")]
 use cosmic::iced::Subscription;
 use cosmic::iced::core::{Alignment, Length};
+use crate::widget::text;
 use cosmic::widget::{
-    button, color_picker::ColorPickerUpdate, container, row, settings, space::horizontal, text,
+    button, color_picker::ColorPickerUpdate, container, row, settings, space::horizontal,
 };
 use cosmic::{Apply, Element, Task, widget};
 #[cfg(feature = "wayland")]
@@ -733,7 +734,6 @@ impl page::Page<crate::pages::Message> for Page {
         Some(vec![
             sections.insert(mode_and_colors::section()),
             sections.insert(style::section()),
-            sections.insert(interface_density()),
             sections.insert(window_management()),
             sections.insert(experimental()),
             sections.insert(reset_button()),
@@ -804,41 +804,6 @@ impl page::Page<crate::pages::Message> for Page {
     fn context_drawer(&self) -> Option<ContextDrawer<'_, crate::pages::Message>> {
         self.drawer.context_drawer(self.context_view)
     }
-}
-
-pub fn interface_density() -> Section<crate::pages::Message> {
-    crate::slab!(descriptions {
-        comfortable = fl!("interface-density", "comfortable");
-        compact = fl!("interface-density", "compact");
-        spacious = fl!("interface-density", "spacious");
-    });
-
-    Section::default()
-        .title(fl!("interface-density"))
-        .descriptions(descriptions)
-        .view::<Page>(move |_binder, page, section| {
-            let descriptions = &section.descriptions;
-
-            crate::widget::yuos_section()
-                .title(&section.title)
-                .add(settings::item::builder(&descriptions[compact]).radio(
-                    Density::Compact,
-                    Some(page.density),
-                    Message::Density,
-                ))
-                .add(settings::item::builder(&descriptions[comfortable]).radio(
-                    Density::Standard,
-                    Some(page.density),
-                    Message::Density,
-                ))
-                .add(settings::item::builder(&descriptions[spacious]).radio(
-                    Density::Spacious,
-                    Some(page.density),
-                    Message::Density,
-                ))
-                .apply(Element::from)
-                .map(crate::pages::Message::Appearance)
-        })
 }
 
 #[allow(clippy::too_many_lines)]

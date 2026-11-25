@@ -173,7 +173,7 @@ fn popover_menu_row(
     message: impl Fn(DefaultKey) -> SourceContext + 'static,
 ) -> cosmic::Element<'static, Message> {
     let spacing = theme::spacing();
-    widget::text::body(label)
+    crate::widget::text::body(label)
         .align_y(Alignment::Center)
         .apply(button::custom)
         .padding([spacing.space_xxxs, spacing.space_xs])
@@ -680,7 +680,7 @@ impl Page {
 
         widget::column::with_capacity(2)
             .spacing(theme::spacing().space_m)
-            .push_maybe(description.map(widget::text::body))
+            .push_maybe(description.map(crate::widget::text::body))
             .push(list)
             .into()
     }
@@ -759,7 +759,7 @@ fn input_sources() -> Section<crate::pages::Message> {
                     .description(fl!("keyboard-system-defaults-description"))
                     .control(widget::button::standard(fl!("keyboard-system-defaults-apply"))
                         .on_press_maybe((!page.system_pending.busy()).then_some(Message::ApplySystemKeyboard))))
-                .push_maybe(page.system_notice.as_ref().map(widget::text::body))
+                .push_maybe(page.system_notice.as_ref().map(crate::widget::text::body))
                 .push(
                     widget::container(add_input_source)
                         .width(Length::Fill)
@@ -864,9 +864,9 @@ fn keyboard_typing_assist() -> Section<crate::pages::Message> {
                             row::with_capacity(3)
                                 .align_y(Alignment::Center)
                                 .spacing(theme::spacing().space_s)
-                                .push(widget::text::body(&descriptions[short]))
+                                .push(crate::widget::text::body(&descriptions[short]))
                                 .push(delay_slider)
-                                .push(widget::text::body(&descriptions[long]))
+                                .push(crate::widget::text::body(&descriptions[long]))
                         })
                         .align_items(Alignment::Center),
                 )
@@ -888,9 +888,9 @@ fn keyboard_typing_assist() -> Section<crate::pages::Message> {
                             row::with_capacity(3)
                                 .align_y(Alignment::Center)
                                 .spacing(theme::spacing().space_s)
-                                .push(widget::text::body(&descriptions[slow]))
+                                .push(crate::widget::text::body(&descriptions[slow]))
                                 .push(rate_slider)
-                                .push(widget::text::body(&descriptions[fast]))
+                                .push(crate::widget::text::body(&descriptions[fast]))
                         })
                         .align_items(Alignment::Center),
                 )

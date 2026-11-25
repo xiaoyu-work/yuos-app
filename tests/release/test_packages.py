@@ -164,7 +164,7 @@ def test_native_packages_refuse_a_placeholder_or_wrong_architecture(tmp_path, mo
     binary.parent.mkdir(parents=True)
     binary.write_bytes(b"not an executable")
     binary.chmod(0o755)
-    monkeypatch.setattr(release, "require_platform_artifact", lambda: None)
+    monkeypatch.setattr(release, "require_repository_sdk", lambda: None)
     monkeypatch.setattr(release.subprocess, "run", lambda *args, **kwargs: None)
     # Keep the Debian host architecture query real without invoking a product build.
     monkeypatch.setattr(release, "run", lambda args, **kwargs: type(
@@ -194,7 +194,7 @@ def test_native_libraries_are_never_published_as_runnable_apps(tmp_path, monkeyp
 
 def test_support_release_runs_shared_contracts_and_native_release_does_not_build_examples(monkeypatch):
     calls = []
-    monkeypatch.setattr(release, "require_platform_artifact", lambda: None)
+    monkeypatch.setattr(release, "require_repository_sdk", lambda: None)
     monkeypatch.setattr(release.subprocess, "run", lambda command, **kwargs: calls.append(command))
     plan = {"selections": ["support"], "packages": []}
     release.test_selected(plan, "all")
@@ -202,22 +202,6 @@ def test_support_release_runs_shared_contracts_and_native_release_does_not_build
     source = (ROOT / "tools/native_build.py").read_text()
     assert 'options.command == "build" and not options.release' in source
     assert '"--release"' in source and '"--install-root"' in source
-
-
-def test_release_commands_refuse_the_legacy_os_source_transport():
-    with pytest.raises(ValueError, match="legacy OS Git/source"):
-        release.require_platform_artifact({"repository": "https://github.com/example/os.git", "revision": "a" * 40})
-    pin = {"version": "1.0.0", "url": "https://example.invalid/platform-1.0.0.tar.gz",
-           "sha256": "a" * 64, "runtime_abi": 1}
-    release.require_platform_artifact(pin)
-    for invalid in (
-        {"artifact": {"sha256": "a" * 64}},
-        {**pin, "repository": "https://github.com/example/os.git", "revision": "a" * 40},
-        {**pin, "url": "http://example.invalid/platform-1.0.0.tar.gz"},
-        {**pin, "runtime_abi": 2},
-    ):
-        with pytest.raises(ValueError):
-            release.require_platform_artifact(invalid)
 
 
 def test_native_installer_rejects_non_release_or_host_roots_before_fetching_inputs(tmp_path):

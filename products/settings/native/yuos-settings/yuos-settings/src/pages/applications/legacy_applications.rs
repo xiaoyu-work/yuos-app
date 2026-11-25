@@ -7,11 +7,12 @@ use std::sync::{
 };
 
 use crate::owner_config::{self as cosmic_config, ConfigGet, ConfigSet};
+use crate::widget::text;
 use cosmic::{
     Apply, Element, Task,
     iced::stream,
     surface,
-    widget::{self, dropdown, settings, text},
+    widget::{self, dropdown, settings},
 };
 use cosmic_comp_config::{EavesdroppingKeyboardMode, XwaylandDescaling, XwaylandEavesdropping};
 use cosmic_randr_shell::List;

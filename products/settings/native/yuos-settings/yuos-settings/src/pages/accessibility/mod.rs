@@ -1,3 +1,4 @@
+use crate::widget::text;
 use cosmic::{
     Apply, Element, Task,
     cosmic_theme::{CosmicPalette, ThemeBuilder},
@@ -5,7 +6,7 @@ use cosmic::{
     iced::stream,
     surface,
     theme::CosmicTheme,
-    widget::{dropdown, settings, text},
+    widget::{dropdown, settings},
 };
 pub use cosmic_comp_config::ZoomMovement;
 use crate::owner_config::{self as cosmic_config, Config, CosmicConfigEntry};

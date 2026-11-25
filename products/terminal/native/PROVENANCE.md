@@ -11,7 +11,7 @@ icons, Debian/Nix/build inputs, password integration and unit tests remain.
 The original native Cargo.lock, upstream libcosmic/file-chooser libraries,
 alacritty terminal and cosmic-text renderer graph are retained. This does not
 substitute the OS's applet toolkit patches or remove the default renderer.
-SDK/runtime remain pinned development libraries from `platform.lock.json`.
+SDK bindings come from the checked-in `yuos-sdk/rust`.
 Native MCP compiles the existing Terminal command implementation into the
 binary through a private library adapter. No OS provider, capability authority,
 snapshot implementation or user state is copied into this product.

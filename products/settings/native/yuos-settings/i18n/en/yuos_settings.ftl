@@ -405,6 +405,7 @@ icon-theme = Icon theme
 text-tint = Interface text tint
     .desc = Used to derive interface text colors that have sufficient contrast on various surfaces
 
+settings-corners = Corners
 style = Style
     .round = Round
     .slightly-round = Slightly round
@@ -978,6 +979,7 @@ region = Region
 ## Applications
 
 applications = Applications
+application-settings = Application Settings
 app-permissions = App permissions
 app-permissions-description = Choose what an app may access. Your choices stay saved until you change them here.
 app-permissions-no-choices = This app has no permissions you can change here.

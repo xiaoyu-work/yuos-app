@@ -20,6 +20,7 @@ use cosmic::{
     widget::{ColorPickerModel, color_picker::ColorPickerUpdate, icon},
 };
 use cosmic::{app::ContextDrawer, iced::runtime::core::image::Handle as ImageHandle};
+use crate::widget::text;
 use cosmic::{
     iced::Subscription,
     widget::{
@@ -27,7 +28,7 @@ use cosmic::{
         segmented_button::{self, SingleSelectModel},
         settings,
         space::horizontal as horizontal_space,
-        tab_bar, text,
+        tab_bar,
     },
 };
 use cosmic::{

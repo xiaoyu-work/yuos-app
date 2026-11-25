@@ -288,7 +288,7 @@ fn app_item(meta: &AppMeta, label: String, category: Category) -> widget::FlexRo
     settings::flex_item(
         label,
         if meta.apps.is_empty() {
-            widget::text(fl!("default-apps", "not-installed")).apply(Element::from)
+            crate::widget::text(fl!("default-apps", "not-installed")).apply(Element::from)
         } else {
             dropdown::popup_dropdown(
                 &meta.apps,

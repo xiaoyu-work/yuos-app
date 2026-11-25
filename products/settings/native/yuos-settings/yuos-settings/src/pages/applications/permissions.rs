@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
-use cosmic::widget::{button, column, dropdown, row, text};
+use crate::widget::text;
+use cosmic::widget::{button, column, dropdown, row};
 use cosmic::{Element, Task};
 use serde::Deserialize;
 use serde_json::{Value, json};

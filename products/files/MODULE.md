@@ -91,10 +91,9 @@ evidence.
 This source requires the public SDK `yuos_sdk.objects` reference helpers,
 the file-plan wire shape and manifest `objects`/MCP `effects` metadata, plus
 the session-aware runtime signature
-`replace_file(path, expected, content, *, session_id=...)`. The withdrawn
-platform pin is not a compatible release. Validate with an explicitly
-versioned, SHA-256-verified development archive through
-[the normal platform tooling](../../tools/MODULE.md#local-platform-development);
+`replace_file(path, expected, content, *, session_id=...)`. Validate with the
+checked-in SDK through
+[the normal build tooling](../../tools/MODULE.md#local-sdk-development);
 publication and pin adoption remain coordinated owner decisions. No sibling
 OS import or ambient write fallback is supported.
 

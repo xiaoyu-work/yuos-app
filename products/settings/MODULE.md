@@ -10,6 +10,11 @@ discovery/queue/printing tools, and `user-manager`'s twelve identity tools.
 All eleven management App sources assigned to Settings have moved.
 The complete native `yuos-settings` workspace, UI, MCP and resources also live
 here, retaining its separate twelfth identity and original default pages.
+Native presentation uses App-local Noto Sans SC text presets, compact category
+navigation and flat grouped cards. The Appearance page keeps its existing
+theme, roundness and density messages behind the compact controls. These
+presentation choices do not write owner preferences or add device authority;
+all settings still use their existing authenticated clients and error states.
 Native owner preferences now consume the generic bounded OS
 `system.desktop-preferences.control` service through the published SDK's
 fixed-binary transport. The private App HOME contains presentation caches,
@@ -312,9 +317,9 @@ separate gates; a source build or an OS response is not a new grant.
 
 Focused Rust tests are `regional_settings`, `pages::time::region` and
 `pages::system::about`, plus `users_service` in the independent
-`yuos-settings` binary package,
-prepared through `tools/native_build.prepare` and the digest-verified published
-platform loader. Do not combine upstream native packages or import an OS tree.
+`yuos-settings` binary package. Run `python3 tools/native_build.py settings test`;
+preparation uses the checked-in `yuos-sdk/rust` and `shared/rust/toolkit`.
+Do not combine upstream native packages or import an OS tree.
 
 Former filesystem/exec App
 bridges now use controlled OS text writes, registered process spawning and

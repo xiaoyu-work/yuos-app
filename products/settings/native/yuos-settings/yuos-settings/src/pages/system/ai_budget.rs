@@ -2,7 +2,8 @@
 
 use std::borrow::Cow;
 
-use cosmic::widget::{self, button, settings, text};
+use crate::widget::text;
+use cosmic::widget::{self, button, settings};
 use cosmic::{Apply, Task, iced::Length};
 use serde::{Deserialize, Serialize};
 use slotmap::SlotMap;

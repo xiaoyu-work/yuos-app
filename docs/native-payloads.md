@@ -64,7 +64,7 @@ Run from the repository root on Linux/WSL:
 ```sh
 python3 tools/native_payload.py notifications --plan
 
-# Uses the real published platform.lock.json and the original product installer.
+# Uses the repository SDK/toolkit and the original product installer.
 python3 tools/native_build.py notifications build --release \
   --target-dir build/native-package-target \
   --app-root build/prepared/yuos-notifications

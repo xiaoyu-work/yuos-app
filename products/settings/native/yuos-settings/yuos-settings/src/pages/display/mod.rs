@@ -9,8 +9,9 @@ use arrangement::Arrangement;
 use cosmic::iced::core::text::{Ellipsize, EllipsizeHeightLimit};
 use cosmic::iced::widget::scrollable::RelativeOffset;
 use cosmic::iced::{Alignment, Length, stream, time};
+use crate::widget::text;
 use cosmic::widget::{
-    self, column, container, dropdown, list_column, segmented_button, tab_bar, text,
+    self, column, container, dropdown, list_column, segmented_button, tab_bar,
 };
 use cosmic::{Apply, Element, Task, surface};
 use cosmic_randr_shell::{

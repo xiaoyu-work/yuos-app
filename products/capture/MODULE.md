@@ -15,7 +15,7 @@
 The original standalone ashpd/zbus/Tokio graph, release profile and lock remain
 independent of the shell toolkit. This crate has no libcosmic renderer,
 file-chooser dependency, bundled font or optional Cargo feature to substitute.
-Only the allowlisted immutable SDK/runtime inputs come from `platform.lock.json`.
+SDK bindings come from the checked-in `yuos-sdk/rust`.
 Generated inputs belong under `build/capture-native`, not another checkout.
 
 The OS owns capture permission, authenticated session selection, its portal

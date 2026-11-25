@@ -437,12 +437,12 @@ impl Page {
 
         let name_control = widget::column::with_capacity(2)
             .spacing(4)
-            .push(widget::text::body(fl!("shortcut-name")))
+            .push(crate::widget::text::body(fl!("shortcut-name")))
             .push(name_input);
 
         let command_control = widget::column::with_capacity(2)
             .spacing(4)
-            .push(widget::text::body(fl!("command")))
+            .push(crate::widget::text::body(fl!("command")))
             .push(task_input);
 
         let input_fields = widget::column::with_capacity(2)
@@ -714,7 +714,7 @@ fn shortcuts() -> Section<crate::pages::Message> {
             let content = if page.model.shortcut_models.is_empty() {
                 crate::widget::yuos_section()
                     .add(widget::settings::item_row(vec![
-                        widget::text::body(fl!("custom-shortcuts", "none")).into(),
+                        crate::widget::text::body(fl!("custom-shortcuts", "none")).into(),
                     ]))
                     .into()
             } else {

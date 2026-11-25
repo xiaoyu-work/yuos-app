@@ -94,9 +94,8 @@ do not replace the OS's capability-denial and signed-worker checks.
 
 A compatible client implementation change needs no OS core rewrite, and an OS
 internal refactor preserving these exports/protocols needs no client rewrite.
-This is not complete source-build or release independence: development still
-selects SDK/runtime source directories at the exact `platform.lock.json`
-revision; composition consumes `package.json` and `tools/stage.py`; installed
+Development uses the checked-in `yuos-sdk/python/src`; composition consumes
+`package.json` and `tools/stage.py`; installed
 delivery still requires an OS App-pin/package update. Independent runtime
 artifacts and a broader compatibility matrix remain outside this migration.
 Paired source-cutover commits are migration choreography, not a requirement
@@ -124,7 +123,7 @@ python3 tools/stage.py storage-sdk --kind capability --root build/storage-sdk-st
 python3 tools/stage.py storage-sdk --kind capability --apps kv --root build/kv-stage
 ```
 
-Tests resolve only `platform.lock.json` libraries, never a sibling OS checkout.
+Tests use the repository SDK, never a sibling OS checkout.
 `package.json` explicitly selects KV's `test_server.py`; neither a production
 `main.py` nor a placeholder `test_main.py` is required or created.
 This source move does not establish full boot/upgrade, native visual/hardware

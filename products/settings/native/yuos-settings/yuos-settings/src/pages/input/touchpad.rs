@@ -3,7 +3,8 @@
 
 use crate::owner_config::{self as cosmic_config, ConfigGet};
 use cosmic::iced::{Alignment, Length};
-use cosmic::widget::{self, row, settings, text};
+use crate::widget::text;
+use cosmic::widget::{self, row, settings};
 use cosmic::{Apply, Element};
 use cosmic_comp_config::CosmicCompConfig;
 use cosmic_comp_config::input::{AccelProfile, ClickMethod, ScrollMethod};

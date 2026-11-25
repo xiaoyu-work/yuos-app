@@ -64,8 +64,8 @@ python3 products/mail/build.py build -j 8
 python3 products/mail/build.py package
 ```
 
-Product contracts fetch only the immutable SDK/runtime dependency recorded in
-`platform.lock.json`, never a sibling OS checkout. Native source and objects
+Product contracts use the checked-in `yuos-sdk/python/src`, never a sibling OS
+checkout. Native source and objects
 must be on the Linux filesystem. The upstream desktop toolchain choice is
 called `browser`; `mozconfig` explicitly selects `comm/mail`, not Firefox
 artifact mode. Linux `zip` and `unzip` are required.

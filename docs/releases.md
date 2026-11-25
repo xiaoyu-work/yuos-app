@@ -24,20 +24,18 @@ arm64, `yuos-app-office-desktop` owns the `yu-office` App and is not part of
 The initial Yu OS App Platform and SDK version is **`0.1.0`**, with runtime
 ABI 1. The OS publishes development exports under `yuos-app-platform-v0.1.0`
 and language bindings and provenance tools under `yuos-sdk-v0.1.0`.
-`platform.lock.json` pins the verified public Platform archive. App
-publication also requires the verified public CLI digests in
+Source builds now use the repository's `yuos-sdk/` and `shared/rust/toolkit`.
+App publication still requires the verified public CLI digests in
 `packaging/provenance-tools.lock.json`. These releases alone neither install
 Apps nor update an OS image.
 
-Source development can instead explicitly supply a local archive with its
-expected version and SHA-256; see
-[local platform development](../tools/MODULE.md#local-platform-development).
-This verifies the same public artifact format in a separate cache. A local
-archive can build a private acceptance fixture, but cannot stage a release
-or install payload or select another source at runtime.
+Run `python3 tools/native_build.py <product> test` and
+`python3 tools/native_build.py <product> build` on Linux/WSL's Linux filesystem;
+see [local SDK development](../tools/MODULE.md#local-sdk-development).
+No SDK publication or platform archive download is needed for source builds.
 
 The owner AI Budget and private Mail dispatch are coordinated source changes.
-The pinned 0.1.0 schema still requires `ai.budget`, which the new manifests
+The published 0.1.0 schema still requires `ai.budget`, which the new manifests
 omit. Before publication, validate the matching OS schema, the provenance
 signer and the verified Mail Host (including CLI and same-App Web calls).
 
@@ -545,11 +543,10 @@ Release builds exclude `native_examples` test executables, strip the installed
 ELFs, check their architecture, and fail if a product is still a library or
 its real binary/resources are missing.
 
-The development dependency must be the published, digest-pinned SDK/runtime/
-toolkit artifact resolved by
-[`platform_dependency.py`](../tools/platform_dependency.py). Release tests and
-native builds explicitly refuse the old OS-source pin. They neither build the
-OS nor import private OS implementations. A new compatible App version does
+Development and native builds use the checked-in `yuos-sdk/rust`,
+`yuos-sdk/python/src` and declared `shared/rust/toolkit` paths. They neither
+build the OS nor import a sibling OS checkout or private OS implementations.
+A new compatible App version does
 not require a matching OS release; only a new public platform interface does.
 
 Focused tests build real `.deb` archives and use generated fixture signing keys.
@@ -561,8 +558,8 @@ version collisions/regressions, retained products and by-hash indexes. They
 never install fixture packages on the developer's real root or call live AI.
 Native unit/build/resource coverage is not interactive desktop or hardware
 acceptance.
-The packaged Doc/KV fixture selects the verified `python-sdk` and
-`python-runtime` exports explicitly; common support comes from the actual App
+The packaged Doc/KV fixture stages the checked-in Python SDK explicitly;
+common support comes from the actual App
 package, not the SDK fixture. A test-only prepared artifact repository can be
 selected inside `pytest.MonkeyPatch`, using cache-only `prepare_exports` with
 downloads refused and restoring the module root afterward. This leaves the
@@ -804,7 +801,8 @@ source/test archives.
 
 Before dispatching the first release:
 
-1. Publish the platform-development artifact and commit its validated App lock.
+1. Validate the checked-in SDK against the target runtime and verify the
+   approved provenance CLI pin in `packaging/provenance-tools.lock.json`.
 2. Coordinate the `1:0.2.1` file-ownership boundary and versioned virtual
    runtime/service `Provides` in the OS packages.
 3. Enable **immutable releases** in the App repository. The workflow verifies

@@ -251,10 +251,10 @@ impl page::Page<crate::pages::Message> for Page {
         let qr_section = if let Some(ref qr_data) = self.qr_code_data {
             widget::container(widget::qr_code(qr_data).cell_size(5)).center_x(Length::Fill)
         } else {
-            widget::container(widget::text::body(fl!("qr-code-unavailable")))
+            widget::container(crate::widget::text::body(fl!("qr-code-unavailable")))
         };
 
-        let description = widget::text::body(fl!("scan-to-connect-description"))
+        let description = crate::widget::text::body(fl!("scan-to-connect-description"))
             .apply(widget::container)
             .center_x(Length::Fill);
 
@@ -785,7 +785,7 @@ fn devices_view() -> Section<crate::pages::Message> {
                 .push_maybe(state.airplane_mode.then(|| {
                     widget::row::with_capacity(2)
                         .push(icon::from_name("airplane-mode-symbolic"))
-                        .push(widget::text::body(&section.descriptions[airplane_mode_txt]))
+                        .push(crate::widget::text::body(&section.descriptions[airplane_mode_txt]))
                         .spacing(8)
                         .align_y(Alignment::Center)
                         .apply(widget::container)
@@ -797,7 +797,7 @@ fn devices_view() -> Section<crate::pages::Message> {
                 && state.wireless_access_points.is_empty()
             {
                 let no_networks_found =
-                    widget::container(widget::text::body(&section.descriptions[no_networks_txt]))
+                    widget::container(crate::widget::text::body(&section.descriptions[no_networks_txt]))
                         .center_x(Length::Fill);
 
                 view = view.push(no_networks_found);
@@ -847,14 +847,14 @@ fn devices_view() -> Section<crate::pages::Message> {
                                     .then(|| widget::icon::from_name("connection-secure-symbolic")),
                             )
                             .push(
-                                widget::text::body(network.ssid.as_ref()).wrapping(Wrapping::Glyph),
+                                crate::widget::text::body(network.ssid.as_ref()).wrapping(Wrapping::Glyph),
                             )
                             .spacing(spacing.space_xxs);
 
                         let connect: Element<'_, Message> = if let Some(msg) = connect_msg {
                             widget::button::text(connect_label).on_press(msg).into()
                         } else {
-                            widget::text::body(connect_label)
+                            crate::widget::text::body(connect_label)
                                 .align_y(Alignment::Center)
                                 .into()
                         };
@@ -952,14 +952,14 @@ fn devices_view() -> Section<crate::pages::Message> {
                                     .then(|| widget::icon::from_name("connection-secure-symbolic")),
                             )
                             .push(
-                                widget::text::body(network.ssid.as_ref()).wrapping(Wrapping::Glyph),
+                                crate::widget::text::body(network.ssid.as_ref()).wrapping(Wrapping::Glyph),
                             )
                             .spacing(spacing.space_xxs);
 
                         let connect: Element<'_, Message> = if let Some(msg) = connect_msg {
                             widget::button::text(connect_label).on_press(msg).into()
                         } else {
-                            widget::text::body(connect_label)
+                            crate::widget::text::body(connect_label)
                                 .align_y(Alignment::Center)
                                 .into()
                         };
@@ -1065,7 +1065,7 @@ fn devices_view() -> Section<crate::pages::Message> {
                     let mut visible_section = widget::column::with_capacity(3);
 
                     // Section title
-                    visible_section = visible_section.push(widget::text::title4(
+                    visible_section = visible_section.push(crate::widget::text::title4(
                         &section.descriptions[visible_networks_txt],
                     ));
 
@@ -1082,7 +1082,7 @@ fn devices_view() -> Section<crate::pages::Message> {
                     {
                         // Show "no search results" message only when search is active and returns no results
                         visible_section = visible_section.push(
-                            widget::container(widget::text::body(
+                            widget::container(crate::widget::text::body(
                                 &section.descriptions[no_search_results_txt],
                             ))
                             .center_x(Length::Fill),
@@ -1113,7 +1113,7 @@ fn devices_view() -> Section<crate::pages::Message> {
                                         widget::icon::from_name("connection-secure-symbolic")
                                     }))
                                     .push(
-                                        widget::text::body(network.ssid.as_ref())
+                                        crate::widget::text::body(network.ssid.as_ref())
                                             .wrapping(Wrapping::Glyph),
                                     )
                                     .spacing(spacing.space_xxs);
@@ -1121,7 +1121,7 @@ fn devices_view() -> Section<crate::pages::Message> {
                             let connect: Element<'_, Message> = if let Some(msg) = connect_msg {
                                 widget::button::text(connect_label).on_press(msg).into()
                             } else {
-                                widget::text::body(connect_label)
+                                crate::widget::text::body(connect_label)
                                     .align_y(Alignment::Center)
                                     .into()
                             };
@@ -1159,7 +1159,7 @@ fn is_connected(state: &NetworkManagerState, network: &AccessPoint) -> bool {
 
 fn popup_button(message: Message, text: &str) -> Element<'_, Message> {
     let spacing = cosmic::theme::spacing();
-    widget::text::body(text)
+    crate::widget::text::body(text)
         .align_y(Alignment::Center)
         .apply(widget::button::custom)
         .padding([spacing.space_xxxs, spacing.space_xs])
