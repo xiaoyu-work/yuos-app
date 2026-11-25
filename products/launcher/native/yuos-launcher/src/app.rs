@@ -197,14 +197,13 @@ fn palette_appearance(theme: &cosmic::Theme) -> container::Style {
 
 fn section_appearance(theme: &cosmic::Theme) -> container::Style {
     let cosmic = theme.cosmic();
-    let is_dark = theme.theme_type.is_dark();
     container::Style {
         text_color: Some(cosmic.on_bg_color().into()),
-        background: Some(hairline(cosmic, if is_dark { 0.06 } else { 0.035 }).into()),
+        background: None,
         border: Border {
-            radius: cosmic.corner_radii.radius_l.into(),
-            width: 1.0,
-            color: hairline(cosmic, if is_dark { 0.10 } else { 0.07 }),
+            radius: 0.0.into(),
+            width: 0.0,
+            color: Color::TRANSPARENT,
         },
         shadow: Shadow::default(),
         icon_color: Some(cosmic.on_bg_color().into()),
@@ -445,31 +444,17 @@ impl YuOsLauncher {
             get_layer_surface(SctkLayerSurfaceSettings {
                 id: self.window_id,
                 keyboard_interactivity: KeyboardInteractivity::Exclusive,
-                anchor: Anchor::TOP,
+                // Layer-shell surfaces without edge anchors are placed in the
+                // center of the output, like the Spotlight palette.
+                anchor: Anchor::empty(),
                 namespace: "launcher".into(),
                 size: None,
-                // Match the palette exactly. At 880 against a 840 px palette
-                // the surface stood 20 px proud on each side, and since the
-                // compositor blurs the whole layer bbox that margin showed up
-                // as a second, wallpaper-coloured backdrop around the palette.
                 size_limits: Limits::NONE
                     .min_width(1.0)
                     .min_height(1.0)
                     .max_width(PALETTE_WIDTH),
-                // Let the compositor place us clear of the panel's exclusive
-                // zone, and keep the gap above the palette in the surface's
-                // margin. Previously the surface anchored over the panel
-                // (`exclusive_zone: -1`) and a `vertical_space` inside it
-                // pushed the palette down instead. That spacer was still part
-                // of the surface, and `is_shell_glass_namespace` blurs the
-                // whole layer bbox, so the empty strip rendered as a band of
-                // blurred wallpaper above the palette. Margin lives outside
-                // the surface, so there is nothing there to blur.
                 exclusive_zone: 0,
-                margin: IcedMargin {
-                    top: 12,
-                    ..Default::default()
-                },
+                margin: IcedMargin::default(),
                 ..Default::default()
             }),
             overlap_notify(self.window_id, true),
@@ -767,6 +752,24 @@ impl YuOsLauncher {
 
     fn result_button(&self, source_index: usize, visible_index: usize) -> Element<'_, Message> {
         let item = &self.launcher_items[source_index];
+        let is_focused = visible_index == self.focused;
+        let active_theme = cosmic::theme::active();
+        let cosmic_theme = active_theme.cosmic();
+        let name_color: Color = if is_focused {
+            cosmic_theme.on_accent_color().into()
+        } else {
+            cosmic_theme.on_bg_color().into()
+        };
+        let desc_color: Color = if is_focused {
+            cosmic_theme.on_accent_color().with_alpha(0.82).into()
+        } else {
+            cosmic_theme.on_bg_color().with_alpha(0.66).into()
+        };
+        let shortcut_color: Color = if is_focused {
+            cosmic_theme.on_accent_color().with_alpha(0.82).into()
+        } else {
+            cosmic_theme.on_bg_color().with_alpha(0.55).into()
+        };
         let (name, desc) = if item.window.is_some() {
             (&item.description, &item.name)
         } else {
@@ -778,6 +781,7 @@ impl YuOsLauncher {
                 .ellipsize(Ellipsize::End(EllipsizeHeightLimit::Lines(1)))
                 .align_x(Horizontal::Left)
                 .align_y(Vertical::Center)
+                .class(theme::Text::Color(name_color))
                 .into()
         }));
         let desc = Column::with_children(desc.lines().map(|line| {
@@ -785,11 +789,7 @@ impl YuOsLauncher {
                 .ellipsize(Ellipsize::End(EllipsizeHeightLimit::Lines(1)))
                 .align_x(Horizontal::Left)
                 .align_y(Vertical::Center)
-                .class(theme::Text::Custom(|theme| {
-                    cosmic::iced::widget::text::Style {
-                        color: Some(theme.cosmic().on_bg_color().with_alpha(0.66).into()),
-                    }
-                }))
+                .class(theme::Text::Color(desc_color))
                 .into()
         }));
 
@@ -808,9 +808,13 @@ impl YuOsLauncher {
                 icon(icon_handle)
                     .width(Length::Fixed(16.0))
                     .height(Length::Fixed(16.0))
-                    .class(cosmic::theme::Svg::Custom(Rc::new(|theme| {
+                    .class(cosmic::theme::Svg::Custom(Rc::new(move |theme| {
                         cosmic::iced::widget::svg::Style {
-                            color: Some(theme.cosmic().on_bg_color().with_alpha(0.70).into()),
+                            color: Some(if is_focused {
+                                theme.cosmic().on_accent_color().into()
+                            } else {
+                                theme.cosmic().on_bg_color().with_alpha(0.70).into()
+                            }),
                         }
                     })))
                     .into(),
@@ -829,16 +833,11 @@ impl YuOsLauncher {
             content.push(
                 text::caption(format!("Ctrl + {}", (visible_index + 1) % 10))
                     .align_x(Horizontal::Right)
-                    .class(theme::Text::Custom(|theme| {
-                        cosmic::iced::widget::text::Style {
-                            color: Some(theme.cosmic().on_bg_color().with_alpha(0.55).into()),
-                        }
-                    }))
+                    .class(theme::Text::Color(shortcut_color))
                     .into(),
             );
         }
 
-        let is_focused = visible_index == self.focused;
         mouse_area(
             button::custom(row(content).spacing(8).align_y(Alignment::Center))
                 .id(self.result_ids[visible_index].clone())
@@ -852,7 +851,8 @@ impl YuOsLauncher {
                         let mut style =
                             button::Catalog::active(theme, focused, focused, &Button::Text);
                         if focused {
-                            style.background = Some(cosmic.accent_color().with_alpha(0.20).into());
+                            style.background = Some(cosmic.accent_color().into());
+                            style.text_color = Some(cosmic.on_accent_color().into());
                         }
                         style.border_radius = cosmic.corner_radii.radius_m.into();
                         style.outline_width = 0.0;
@@ -863,12 +863,14 @@ impl YuOsLauncher {
                         let cosmic = theme.cosmic();
                         let mut style =
                             button::Catalog::hovered(theme, focused, focused, &Button::Text);
-                        style.background = Some(
-                            cosmic
-                                .accent_color()
-                                .with_alpha(if focused { 0.24 } else { 0.12 })
-                                .into(),
-                        );
+                        style.background = Some(if focused {
+                            cosmic.accent_color().into()
+                        } else {
+                            cosmic.accent_color().with_alpha(0.12).into()
+                        });
+                        if focused {
+                            style.text_color = Some(cosmic.on_accent_color().into());
+                        }
                         style.border_radius = cosmic.corner_radii.radius_m.into();
                         style.outline_width = 0.0;
                         style
@@ -878,6 +880,10 @@ impl YuOsLauncher {
                         let cosmic = theme.cosmic();
                         let mut style =
                             button::Catalog::pressed(theme, focused, focused, &Button::Text);
+                        if focused {
+                            style.background = Some(cosmic.accent_color().into());
+                            style.text_color = Some(cosmic.on_accent_color().into());
+                        }
                         style.border_radius = cosmic.corner_radii.radius_m.into();
                         style.outline_width = 0.0;
                         style
