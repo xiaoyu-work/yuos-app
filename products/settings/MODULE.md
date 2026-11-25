@@ -10,6 +10,11 @@ discovery/queue/printing tools, and `user-manager`'s twelve identity tools.
 All eleven management App sources assigned to Settings have moved.
 The complete native `yuos-settings` workspace, UI, MCP and resources also live
 here, retaining its separate twelfth identity and original default pages.
+Native presentation uses App-local Noto Sans SC text presets, compact category
+navigation and hairline-grouped sections on the normal page background. The Appearance page keeps its existing
+theme, roundness and density messages behind the compact controls. These
+presentation choices do not write owner preferences or add device authority;
+all settings still use their existing authenticated clients and error states.
 Native owner preferences now consume the generic bounded OS
 `system.desktop-preferences.control` service through the published SDK's
 fixed-binary transport. The private App HOME contains presentation caches,

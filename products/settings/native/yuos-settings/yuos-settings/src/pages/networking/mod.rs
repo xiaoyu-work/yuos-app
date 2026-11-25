@@ -9,7 +9,7 @@ pub mod wired;
 use std::{path::Path, sync::Arc};
 
 use anyhow::Context;
-use cosmic::{Apply, Element, Task, widget};
+use cosmic::{Apply, Element, Task};
 use cosmic_dbus_networkmanager::interface::enums::{DeviceState, DeviceType};
 use yuos_settings_network_manager_subscription as network_manager;
 use yuos_settings_page::{self as page, Section, section};
@@ -202,8 +202,8 @@ impl page::Page<crate::pages::Message> for Page {
 
                 let device_list = wifi_devices
                     .chain(wired_devices)
-                    .fold(widget::column([]), |column, device| column.push(device))
-                    .push(crate::widget::page_list_item(
+                    .fold(crate::widget::yuos_list_column(), |column, device| column.add(device))
+                    .add(crate::widget::page_list_item(
                         fl!("vpn"),
                         &descs[vpn_desc],
                         "",
@@ -212,8 +212,7 @@ impl page::Page<crate::pages::Message> for Page {
                             page: page.vpn,
                             device: None,
                         },
-                    ))
-                    .spacing(cosmic::theme::active().cosmic().spacing.space_s);
+                    ));
 
                 Element::from(device_list).map(crate::pages::Message::Networking)
             },

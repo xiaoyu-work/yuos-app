@@ -1,12 +1,13 @@
 use std::collections::HashSet;
 use std::fmt::Write;
 
+use crate::widget::text;
 use cosmic::{
     Apply,
     iced::core::text::Wrapping,
     iced::{Element, Length, stream},
     surface,
-    widget::{self, icon, settings, svg, text},
+    widget::{self, icon, settings, svg},
 };
 use cosmic_comp_config::{ZoomConfig, ZoomMovement};
 use crate::owner_config::{self as cosmic_config, ConfigGet, ConfigSet};

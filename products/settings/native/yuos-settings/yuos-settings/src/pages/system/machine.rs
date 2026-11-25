@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-use cosmic::widget::{button, settings, text};
+use crate::widget::text;
+use cosmic::widget::{button, settings};
 use cosmic::{Apply, Task};
 use yuos_settings_page::{self as page, Section, section};
 use serde::{Deserialize, Serialize};

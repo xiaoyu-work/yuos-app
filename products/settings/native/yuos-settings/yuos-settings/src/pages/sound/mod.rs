@@ -291,7 +291,7 @@ fn input() -> Section<crate::pages::Message> {
                     .on_press(Message::ToggleSourceMute.into()),
                 )
                 .push(
-                    widget::text::body(&page.model.source_volume_text)
+                    crate::widget::text::body(&page.model.source_volume_text)
                         .width(Length::Fixed(22.0))
                         .align_x(Alignment::Center),
                 )
@@ -370,7 +370,7 @@ fn output() -> Section<crate::pages::Message> {
                     .on_press(Message::ToggleSinkMute.into()),
                 )
                 .push(
-                    widget::text::body(&page.model.sink_volume_text)
+                    crate::widget::text::body(&page.model.sink_volume_text)
                         .width(Length::Fixed(22.0))
                         .align_x(Alignment::Center),
                 )
@@ -404,7 +404,7 @@ fn output() -> Section<crate::pages::Message> {
                             widget::column::with_capacity(2)
                                 .align_x(Alignment::Center)
                                 .push(
-                                    widget::text::body(&*section.descriptions[left])
+                                    crate::widget::text::body(&*section.descriptions[left])
                                         .align_x(Alignment::Center),
                                 )
                                 .push(horizontal_space().width(22.)),
@@ -424,7 +424,7 @@ fn output() -> Section<crate::pages::Message> {
                             widget::column::with_capacity(2)
                                 .align_x(Alignment::Center)
                                 .push(
-                                    widget::text::body(&*section.descriptions[right])
+                                    crate::widget::text::body(&*section.descriptions[right])
                                         .align_x(Alignment::Center),
                                 )
                                 .push(horizontal_space().width(22.0)),

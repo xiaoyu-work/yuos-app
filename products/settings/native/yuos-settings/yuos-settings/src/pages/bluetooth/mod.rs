@@ -3,7 +3,8 @@
 
 use cosmic::iced::core::text::Wrapping;
 use cosmic::iced::{Alignment, Length, color};
-use cosmic::widget::{self, settings, space::horizontal as horizontal_space, text};
+use crate::widget::text;
+use cosmic::widget::{self, settings, space::horizontal as horizontal_space};
 use cosmic::{Apply, Element, Task, theme};
 use yuos_settings_bluetooth_subscription::*;
 use yuos_settings_page::{self as page, Section, section};
@@ -222,14 +223,14 @@ impl page::Page<crate::pages::Message> for Page {
             Dialog::RequestConfirmation {
                 device, passkey, ..
             } => {
-                let description = widget::text::body(fl!(
+                let description = crate::widget::text::body(fl!(
                     "bluetooth-confirm-pin",
                     "description",
                     device = device
                 ))
                 .wrapping(Wrapping::Word);
 
-                let pin = widget::text::title1(itoa::Buffer::new().format(*passkey).to_owned())
+                let pin = crate::widget::text::title1(itoa::Buffer::new().format(*passkey).to_owned())
                     .width(Length::Fill)
                     .align_x(Alignment::Center)
                     .wrapping(Wrapping::None);
@@ -744,7 +745,7 @@ fn status() -> Section<crate::pages::Message> {
             }
 
             if page.bluez_service_unknown {
-                let control = widget::text::body(fl!("bluetooth", "unknown"));
+                let control = crate::widget::text::body(fl!("bluetooth", "unknown"));
 
                 return Element::from(crate::widget::yuos_section().add(control));
             } else if !page.service_is_enabled {
@@ -782,7 +783,7 @@ fn status() -> Section<crate::pages::Message> {
 
 fn popup_button(message: Option<Message>, text: &str) -> Element<'_, Message> {
     let spacing = theme::spacing();
-    widget::text::body(text)
+    crate::widget::text::body(text)
         .align_y(Alignment::Center)
         .apply(widget::button::custom)
         .padding([spacing.space_xxxs, spacing.space_xs])
@@ -874,17 +875,17 @@ fn connected_devices() -> Section<crate::pages::Message> {
                                 )))
                                 .into()
                         } else {
-                            widget::text(device.alias_or_addr())
+                            crate::widget::text(device.alias_or_addr())
                                 .wrapping(Wrapping::Word)
                                 .into()
                         },
                         horizontal_space().into(),
                         match device.enabled {
-                            Active::Enabled => widget::text(&descriptions[device_connected]).into(),
-                            Active::Enabling => widget::text(&descriptions[device_connecting])
+                            Active::Enabled => crate::widget::text(&descriptions[device_connected]).into(),
+                            Active::Enabling => crate::widget::text(&descriptions[device_connecting])
                                 .class(theme::Text::Color(color!(128, 128, 128)))
                                 .into(),
-                            Active::Disabling => widget::text(&descriptions[device_disconnecting])
+                            Active::Disabling => crate::widget::text(&descriptions[device_disconnecting])
                                 .class(theme::Text::Color(color!(128, 128, 128)))
                                 .into(),
                             Active::Disabled => widget::button::text(&descriptions[device_connect])
@@ -895,7 +896,7 @@ fn connected_devices() -> Section<crate::pages::Message> {
                         device_menu,
                     ]))
                 })
-                .fold(section, settings::Section::add)
+                .fold(section, crate::widget::SettingsSection::add)
                 .apply(Element::from)
                 .map(crate::pages::Message::Bluetooth)
         })
@@ -957,7 +958,7 @@ fn available_devices() -> Section<crate::pages::Message> {
 
                     Some(widget::mouse_area(settings::item_row(items)).into())
                 })
-                .fold(section, settings::Section::add)
+                .fold(section, crate::widget::SettingsSection::add)
                 .apply(Element::from)
                 .map(crate::pages::Message::Bluetooth)
         })
@@ -1002,7 +1003,7 @@ fn multiple_adapter() -> Section<crate::pages::Message> {
                     widget::mouse_area(settings::item_row(items))
                         .on_press(Message::SelectAdapter(Some(path.clone())))
                 })
-                .fold(section, settings::Section::add)
+                .fold(section, crate::widget::SettingsSection::add)
                 .apply(Element::from)
                 .map(crate::pages::Message::Bluetooth)
         })

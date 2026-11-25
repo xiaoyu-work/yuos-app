@@ -4,8 +4,9 @@
 use super::{Message, NightLight};
 use crate::pages;
 use cosmic::iced::core::{Alignment, Length};
+use crate::widget::text;
 use cosmic::widget::{
-    button, column, container, icon, list_column, row, settings, text, toggler, vertical_space,
+    button, column, container, icon, list_column, row, settings, toggler, vertical_space,
 };
 use cosmic::{Apply, Element, Task};
 use std::sync::Arc;
@@ -39,13 +40,13 @@ pub fn view(
             .push(icon::from_name("object-select-symbolic").size(24))
             .apply(Element::from)
             .apply(container)
-            .class(cosmic::theme::Container::List)
+            .class(crate::theme::section_card())
             .padding(8)
             .width(Length::Fill)
             .into()
     } else {
         container(content)
-            .class(cosmic::theme::Container::List)
+            .class(crate::theme::section_card())
             .padding(8)
             .width(Length::Fill)
             .into()

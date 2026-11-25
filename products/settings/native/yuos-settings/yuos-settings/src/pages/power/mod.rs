@@ -7,7 +7,8 @@ use cosmic::Task;
 use cosmic::iced::core::text::{Ellipsize, EllipsizeHeightLimit};
 use cosmic::iced::widget::{column, row};
 use cosmic::iced::{self, Alignment, Length, stream};
-use cosmic::widget::{self, settings, space, text};
+use crate::widget::text;
+use cosmic::widget::{self, settings, space};
 use cosmic::{Apply, surface};
 use cosmic_idle_config::CosmicIdleConfig;
 use yuos_settings_page::{self as page, Section, section};
@@ -298,7 +299,7 @@ fn provider_status() -> Section<crate::pages::Message> {
     Section::default()
         .show_while::<Page>(|page| page.notice.is_some())
         .view::<Page>(|_, page, _| {
-            widget::text::body(page.notice.as_deref().unwrap_or_default()).into()
+            crate::widget::text::body(page.notice.as_deref().unwrap_or_default()).into()
         })
 }
 
@@ -344,7 +345,7 @@ fn connected_devices() -> Section<crate::pages::Message> {
                     let battery_icon =
                         widget::icon::from_name(connected_device.battery.icon_name.clone());
 
-                    let battery_percent_and_time = widget::text(
+                    let battery_percent_and_time = crate::widget::text(
                         if connected_device.battery.remaining_duration.is_positive() {
                             format!(
                                 "{}% - {}",
@@ -429,7 +430,7 @@ fn profiles() -> Section<crate::pages::Message> {
                                 .description(profile.description())
                                 .radio(profile, Some(current_profile), Message::PowerProfileChange)
                         })
-                        .fold(section, settings::Section::add);
+                        .fold(section, crate::widget::SettingsSection::add);
                 }
             } else {
                 let item = text::body(fl!("power-mode", "no-backend"));

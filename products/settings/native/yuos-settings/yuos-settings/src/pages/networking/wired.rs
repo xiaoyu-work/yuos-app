@@ -480,12 +480,12 @@ impl Page {
                         )
                     };
 
-                    let identifier = widget::text::body(&connection.id).wrapping(Wrapping::Glyph);
+                    let identifier = crate::widget::text::body(&connection.id).wrapping(Wrapping::Glyph);
 
                     let connect: Element<'_, Message> = if let Some(msg) = connect_msg {
                         widget::button::text(connect_txt).on_press(msg).into()
                     } else {
-                        widget::text::body(connect_txt)
+                        crate::widget::text::body(connect_txt)
                             .align_y(Alignment::Center)
                             .into()
                     };
@@ -603,7 +603,7 @@ fn devices_view() -> Section<crate::pages::Message> {
 
 fn popup_button(message: Message, text: &str) -> Element<'_, Message> {
     let spacing = cosmic::theme::spacing();
-    widget::text::body(text)
+    crate::widget::text::body(text)
         .align_y(Alignment::Center)
         .apply(widget::button::custom)
         .padding([spacing.space_xxxs, spacing.space_xs])

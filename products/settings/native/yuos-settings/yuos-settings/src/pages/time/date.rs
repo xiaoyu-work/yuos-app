@@ -366,10 +366,10 @@ fn date() -> Section<crate::pages::Message> {
                 .add(
                     settings::item::builder(&*section.descriptions[title])
                         .description(fl!("time-date", "auto-ntp"))
-                        .control(widget::text::body(&page.formatted_date)),
+                        .control(crate::widget::text::body(&page.formatted_date)),
                 );
             if let Some(notice) = &page.notice {
-                section = section.add(widget::text::body(notice));
+                section = section.add(crate::widget::text::body(notice));
             }
             section.apply(cosmic::Element::from)
                 .map(crate::pages::Message::DateAndTime)
@@ -453,7 +453,7 @@ fn timezone() -> Section<crate::pages::Message> {
                 // Time zone select
                 .add(crate::widget::go_next_with_item(
                     &section.descriptions[time_zone],
-                    widget::text::body(
+                    crate::widget::text::body(
                         page.timezone
                             .map(|id| &*page.timezone_list[id])
                             .unwrap_or_default(),

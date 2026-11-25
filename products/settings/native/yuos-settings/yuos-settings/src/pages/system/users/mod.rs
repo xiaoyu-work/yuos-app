@@ -6,10 +6,11 @@ use crate::{
     regional_settings::{Failure, Pending},
     user_settings::{self, Change, Password, Target, DEFAULT_ICON_FILE},
 };
+use crate::widget::text;
 use cosmic::{
     Apply, Element,
     iced::{Alignment, Length},
-    widget::{self, column, icon, list, row, settings, space::horizontal, text},
+    widget::{self, column, icon, list, row, settings, space::horizontal},
 };
 use yuos_settings_page::{self as page, Section, section};
 use slotmap::SlotMap;
@@ -246,7 +247,7 @@ impl page::Page<crate::pages::Message> for Page {
                     )
                     .primary_action(add_user_button)
                     .secondary_action(cancel_button)
-                    .tertiary_action(widget::text::body(validation_msg))
+                    .tertiary_action(crate::widget::text::body(validation_msg))
                     .apply(Element::from)
             }
 
@@ -304,7 +305,7 @@ impl page::Page<crate::pages::Message> for Page {
                     )
                     .primary_action(save_button)
                     .secondary_action(cancel_button)
-                    .tertiary_action(widget::text::body(validation_msg))
+                    .tertiary_action(crate::widget::text::body(validation_msg))
                     .apply(Element::from)
             }
         };

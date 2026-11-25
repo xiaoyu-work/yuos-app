@@ -4,10 +4,11 @@
 use std::{collections::BTreeMap, path::PathBuf};
 
 use super::Message;
+use crate::widget::text;
 use cosmic::{
     Element,
     iced::{Background, Length},
-    widget::{button, icon, text},
+    widget::{button, icon},
 };
 use tokio::io::AsyncBufReadExt;
 

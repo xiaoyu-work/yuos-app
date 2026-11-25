@@ -1,14 +1,12 @@
-use crate::pages::desktop::wallpaper::widgets::color_image;
-use cosmic::cosmic_theme::Spacing;
+use crate::widget::text;
 use cosmic::cosmic_theme::palette::Srgba;
 use cosmic::iced::ContentFit;
 use cosmic::iced::core::{Alignment, Length};
 use cosmic::widget::icon::{from_name, icon};
-use cosmic::widget::{self, button, container, list, settings, text};
+use cosmic::widget::{self, button, container, list, settings};
 use cosmic::{Apply, Element};
-use yuos_settings_page::Section;
-use yuos_settings_wallpaper as wallpaper;
 use std::collections::HashMap;
+use yuos_settings_page::Section;
 
 use super::{ContextView, Message, Page};
 
@@ -198,7 +196,6 @@ fn accent_color_palette<'a>(
     section: &'a Section<crate::pages::Message>,
     labels: &HashMap<String, usize>,
 ) -> impl Into<Element<'a, Message>> {
-    let Spacing { space_xxs, .. } = cosmic::theme::spacing();
     let descriptions = &section.descriptions;
     let accent = page.theme_manager.accent_palette().as_ref().unwrap();
     let cur_accent = page.theme_manager.builder().accent.map_or_else(
@@ -212,8 +209,8 @@ fn accent_color_palette<'a>(
             Some(Message::PaletteAccent(color.into())),
             color.into(),
             cur_accent == color,
-            48,
-            48,
+            16,
+            16,
         ));
     }
 
@@ -223,26 +220,25 @@ fn accent_color_palette<'a>(
                 Some(Message::DrawerOpen(ContextView::CustomAccent)),
                 c,
                 cosmic::iced::Color::from(cur_accent) == c,
-                48,
-                48,
+                16,
+                16,
             ))
         } else {
             container(
                 page.drawer
                     .custom_accent
-                    .picker_button(|_| Message::DrawerOpen(ContextView::CustomAccent), Some(24))
-                    .width(Length::Fixed(48.0))
-                    .height(Length::Fixed(48.0)),
+                    .picker_button(|_| Message::DrawerOpen(ContextView::CustomAccent), Some(16))
+                    .width(Length::Fixed(20.0))
+                    .height(Length::Fixed(20.0)),
             )
         }
         .into(),
     );
 
-    cosmic::iced::widget::column![
-        text::body(&descriptions[labels["accent_color"]]),
-        widget::flex_row(accent_palette_row).spacing(16)
-    ]
-    .spacing(space_xxs)
+    settings::item(
+        &descriptions[labels["accent_color"]],
+        widget::flex_row(accent_palette_row).spacing(9),
+    )
 }
 
 fn theme_mode<'a>(
@@ -251,17 +247,30 @@ fn theme_mode<'a>(
     labels: &HashMap<String, usize>,
 ) -> impl Into<Element<'a, Message>> {
     let descriptions = &section.descriptions;
-    let dark_mode_illustration = from_name("illustration-appearance-mode-dark").handle();
-    let light_mode_illustration = from_name("illustration-appearance-mode-light").handle();
+    let dark_mode_illustration = widget::icon::from_svg_bytes(
+        include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../resources/icons/scalable/status/illustration-appearance-mode-dark.svg"
+        ))
+        .as_slice(),
+    );
+    let light_mode_illustration = widget::icon::from_svg_bytes(
+        include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../resources/icons/scalable/status/illustration-appearance-mode-light.svg"
+        ))
+        .as_slice(),
+    );
 
-    container(
+    settings::item(
+        fl!("appearance"),
         cosmic::iced::widget::row![
             cosmic::iced::widget::column![
                 button::custom_image_button(
                     icon(dark_mode_illustration)
                         .content_fit(ContentFit::Contain)
                         .width(Length::Fill)
-                        .height(Length::Fixed(100.0)),
+                        .height(Length::Fixed(44.0)),
                     None
                 )
                 .class(button::ButtonClass::Image)
@@ -269,18 +278,18 @@ fn theme_mode<'a>(
                 .on_press(super::Message::DarkMode(true))
                 .padding(1)
                 .apply(widget::container)
-                .max_width(191),
-                text::body(&descriptions[labels["dark"]])
+                .max_width(68),
+                text::caption(&descriptions[labels["dark"]])
             ]
             .spacing(8)
-            .width(Length::FillPortion(1))
+            .width(Length::Fixed(68.0))
             .align_x(Alignment::Center),
             cosmic::iced::widget::column![
                 button::custom_image_button(
                     icon(light_mode_illustration)
                         .content_fit(ContentFit::Contain)
                         .width(Length::Fill)
-                        .height(Length::Fixed(100.0)),
+                        .height(Length::Fixed(44.0)),
                     None
                 )
                 .class(button::ButtonClass::Image)
@@ -288,21 +297,18 @@ fn theme_mode<'a>(
                 .on_press(super::Message::DarkMode(false))
                 .padding(1)
                 .apply(widget::container)
-                .max_width(191),
-                text::body(&descriptions[labels["light"]])
+                .max_width(68),
+                text::caption(&descriptions[labels["light"]])
             ]
             .spacing(8)
-            .width(Length::FillPortion(1))
+            .width(Length::Fixed(68.0))
             .align_x(Alignment::Center)
         ]
-        .spacing(8)
-        .width(Length::Fixed(478.0))
+        .spacing(18)
         .align_y(Alignment::Center),
     )
-    .center_x(Length::Fill)
 }
 
-/// A button for selecting a color or gradient.
 pub fn color_button<'a, Message: 'a + Clone>(
     on_press: Option<Message>,
     color: cosmic::iced::Color,
@@ -310,22 +316,14 @@ pub fn color_button<'a, Message: 'a + Clone>(
     width: u16,
     height: u16,
 ) -> Element<'a, Message> {
-    button::custom_image_button(
-        color_image(
-            wallpaper::Color::Single([color.r, color.g, color.b]),
-            width,
-            height,
-            None,
-        ),
-        None,
-    )
-    .padding(0)
-    .selected(selected)
-    .class(button::ButtonClass::Image)
-    .on_press_maybe(on_press)
-    .width(Length::Fixed(f32::from(width)))
-    .height(Length::Fixed(f32::from(height)))
-    .into()
+    button::custom(widget::space().width(width).height(height))
+        .padding(0)
+        .selected(selected)
+        .class(crate::theme::color_swatch(color, selected))
+        .on_press_maybe(on_press)
+        .width(Length::Fixed(f32::from(width)))
+        .height(Length::Fixed(f32::from(height)))
+        .into()
 }
 
 #[inline]

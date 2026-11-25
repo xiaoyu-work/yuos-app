@@ -16,7 +16,8 @@ pub mod tiling;
 use crate::owner_config::{self as cosmic_config, ConfigGet};
 use cosmic::app::ContextDrawer;
 use cosmic::iced::Length;
-use cosmic::widget::{self, list::ListButton, settings, text};
+use crate::widget::text;
+use cosmic::widget::{self, list::ListButton};
 use cosmic::{Apply, Element, Task};
 use cosmic_settings_config::Binding;
 use cosmic_settings_config::shortcuts::action::{

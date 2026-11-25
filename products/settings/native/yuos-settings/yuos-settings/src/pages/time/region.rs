@@ -602,7 +602,7 @@ impl Page {
     fn region_view(&self) -> cosmic::Element<'_, crate::pages::Message> {
         let mut list = widget::list_column::with_capacity(self.available_languages.len());
         if let Some(notice) = &self.notice {
-            list = list.add(widget::text::body(notice));
+            list = list.add(crate::widget::text::body(notice));
         }
 
         let search_input = &self.add_language_search.trim().to_lowercase();
@@ -654,9 +654,9 @@ mod preferred_languages {
             .title(fl!("preferred-languages"))
             .descriptions(descriptions)
             .view::<super::Page>(move |_binder, page, section| {
-                let title = widget::text::body(&section.title).font(cosmic::font::bold());
+                let title = crate::widget::text::body(&section.title).font(cosmic::font::bold());
 
-                let description = widget::text::body(&section.descriptions[pref_lang_desc]);
+                let description = crate::widget::text::body(&section.descriptions[pref_lang_desc]);
 
                 let mut content = crate::widget::yuos_section();
 
@@ -692,7 +692,7 @@ mod preferred_languages {
                     .push(content)
                     .push(add_language_button);
                 if let Some(notice) = &page.notice {
-                    view = view.push(widget::text::body(notice));
+                    view = view.push(crate::widget::text::body(notice));
                 }
                 view.spacing(cosmic::theme::spacing().space_xxs)
                     .apply(cosmic::Element::from)
@@ -723,38 +723,38 @@ mod formatting {
                 let desc = &section.descriptions;
 
                 let dates = widget::row::with_capacity(2)
-                    .push(widget::text::body(&desc[dates_txt]))
-                    .push(widget::text::body(page.formatted_date()).font(cosmic::font::bold()))
+                    .push(crate::widget::text::body(&desc[dates_txt]))
+                    .push(crate::widget::text::body(page.formatted_date()).font(cosmic::font::bold()))
                     .spacing(4);
 
                 let time = widget::row::with_capacity(2)
-                    .push(widget::text::body(&desc[time_txt]))
-                    .push(widget::text::body(page.formatted_time()).font(cosmic::font::bold()))
+                    .push(crate::widget::text::body(&desc[time_txt]))
+                    .push(crate::widget::text::body(page.formatted_time()).font(cosmic::font::bold()))
                     .spacing(4);
 
                 let dates_and_times = widget::row::with_capacity(2)
-                    .push(widget::text::body(&desc[date_and_time_txt]))
+                    .push(crate::widget::text::body(&desc[date_and_time_txt]))
                     .push(
-                        widget::text::body(page.formatted_dates_and_times())
+                        crate::widget::text::body(page.formatted_dates_and_times())
                             .font(cosmic::font::bold()),
                     )
                     .spacing(4);
 
                 let numbers = widget::row::with_capacity(2)
-                    .push(widget::text::body(&desc[numbers_txt]))
-                    .push(widget::text::body(page.formatted_numbers()).font(cosmic::font::bold()))
+                    .push(crate::widget::text::body(&desc[numbers_txt]))
+                    .push(crate::widget::text::body(page.formatted_numbers()).font(cosmic::font::bold()))
                     .spacing(4);
 
                 // TODO: Display measurement and paper demos
 
                 // let measurement = widget::row::with_capacity(2)
-                //     .push(widget::text::body(measurement_label.clone()))
-                //     .push(widget::text::body("").font(cosmic::font::bold()))
+                //     .push(crate::widget::text::body(measurement_label.clone()))
+                //     .push(crate::widget::text::body("").font(cosmic::font::bold()))
                 //     .spacing(4);
 
                 // let paper = widget::row::with_capacity(2)
-                //     .push(widget::text::body(paper_label.clone()))
-                //     .push(widget::text::body("").font(cosmic::font::bold()))
+                //     .push(crate::widget::text::body(paper_label.clone()))
+                //     .push(crate::widget::text::body("").font(cosmic::font::bold()))
                 //     .spacing(4);
 
                 let formatted_demo = widget::column::with_capacity(6)
@@ -776,7 +776,7 @@ mod formatting {
 
                 let select_region = crate::widget::go_next_with_item(
                     &desc[region_txt],
-                    widget::text::body(region),
+                    crate::widget::text::body(region),
                     Message::RegionContext,
                 );
 
@@ -962,7 +962,7 @@ fn popover_menu_row(
     message: impl Fn(usize) -> SourceContext + 'static,
 ) -> cosmic::Element<'static, Message> {
     let spacing = cosmic::theme::spacing();
-    widget::text::body(label)
+    crate::widget::text::body(label)
         .align_y(Alignment::Center)
         .apply(button::custom)
         .padding([spacing.space_xxxs, spacing.space_xs])

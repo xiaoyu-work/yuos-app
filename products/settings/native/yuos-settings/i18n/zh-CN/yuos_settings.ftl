@@ -294,6 +294,7 @@ icon-theme = 图标主题
     .desc = 为应用程序应用另一套图标集
 text-tint = 界面文字色调
     .desc = 用于派生在各种界面背景上都具有足够对比度的文字颜色
+settings-corners = 圆角
 style = 样式
     .round = 圆角
     .slightly-round = 微圆角
@@ -770,6 +771,7 @@ region = 区域
 ## Applications
 
 applications = 应用程序
+application-settings = 应用设置
 
 ## Applications: Default Applications
 

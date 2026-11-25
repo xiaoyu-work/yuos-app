@@ -6,7 +6,8 @@ use yuos_settings_page::{self as page, Section, section};
 
 use super::info::Info;
 use crate::regional_settings::{self, Change, Failure, Pending};
-use cosmic::widget::{editable_input, list_column, settings, text};
+use crate::widget::text;
+use cosmic::widget::{editable_input, settings};
 use cosmic::{Apply, Task};
 use slotmap::SlotMap;
 

@@ -2,8 +2,9 @@
 
 use std::borrow::Cow;
 
-use cosmic::widget::{self, button, settings, text};
-use cosmic::{Apply, Task, iced::Length};
+use crate::widget::text;
+use cosmic::widget::{self, button, settings};
+use cosmic::{Task, iced::Length};
 use serde::{Deserialize, Serialize};
 use slotmap::SlotMap;
 use yuos_settings_page::{self as page, Section, section};

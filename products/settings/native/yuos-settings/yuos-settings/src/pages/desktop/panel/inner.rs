@@ -1,11 +1,12 @@
 use crate::owner_config::{self as cosmic_config, CosmicConfigEntry};
+use crate::widget::text;
 use cosmic::{
     Element, Task,
     cctk::sctk::reexports::client::{Proxy, backend::ObjectId, protocol::wl_output::WlOutput},
     cosmic_theme::Density,
     iced::{Alignment, Length},
     surface,
-    widget::{button, container, dropdown, row, settings, slider, space, text},
+    widget::{button, container, dropdown, row, settings, slider, space},
 };
 
 use cosmic::Apply;

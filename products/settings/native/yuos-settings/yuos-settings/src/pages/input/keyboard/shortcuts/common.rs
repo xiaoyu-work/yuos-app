@@ -8,7 +8,8 @@ use cosmic::iced::keyboard::{Key, Location, Modifiers};
 use cosmic::iced::platform_specific::shell::wayland::commands::keyboard_shortcuts_inhibit;
 use cosmic::iced::platform_specific::shell::wayland::keymap;
 use cosmic::iced::{self, Alignment, Length};
-use cosmic::widget::{self, button, icon, list, settings, text};
+use crate::widget::text;
+use cosmic::widget::{self, button, icon, list, settings};
 use cosmic::{Apply, Element, Task, theme};
 use crate::owner_config::{self as cosmic_config, ConfigGet, ConfigSet};
 use cosmic_settings_config::shortcuts::{self, Action, Binding, Shortcuts};
@@ -856,7 +857,7 @@ fn context_drawer<'a>(
         .align_x(Alignment::End);
 
     widget::column::with_capacity(if show_action { 4 } else { 3 })
-        .push(widget::text::heading(title))
+        .push(crate::widget::text::heading(title))
         .spacing(space_l)
         .push_maybe(action)
         .push(bindings)

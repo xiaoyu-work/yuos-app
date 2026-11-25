@@ -220,7 +220,7 @@ impl page::Page<crate::pages::Message> for Page {
     fn dialog(&'_ self) -> Option<Element<'_, crate::pages::Message>> {
         self.dialog.as_ref().map(|dialog| match dialog {
             VpnDialog::Error(error_kind, message) => {
-                let reason = widget::text::body(message.as_str()).wrapping(Wrapping::Word);
+                let reason = crate::widget::text::body(message.as_str()).wrapping(Wrapping::Word);
 
                 let primary_action =
                     widget::button::standard(fl!("ok")).on_press(Message::CancelDialog);
@@ -266,7 +266,7 @@ impl page::Page<crate::pages::Message> for Page {
                 let (err_kind, error_text) = if let Some(err) = error.as_ref() {
                     (
                         Some(err.0),
-                        Some(widget::text::body(err.1.as_str()).wrapping(Wrapping::Word)),
+                        Some(crate::widget::text::body(err.1.as_str()).wrapping(Wrapping::Word)),
                     )
                 } else {
                     (None, None)
@@ -769,7 +769,7 @@ fn devices_view() -> Section<crate::pages::Message> {
 
             if page.known_connections.is_empty() {
                 view = view.push(vpn_connections.add(widget::settings::item_row(vec![
-                    widget::text::body(fl!("no-vpn")).into(),
+                    crate::widget::text::body(fl!("no-vpn")).into(),
                 ])));
             } else {
                 let known_networks = page.known_connections.iter().fold(
@@ -795,12 +795,12 @@ fn devices_view() -> Section<crate::pages::Message> {
                             )
                         };
 
-                        let identifier = widget::text::body(id).wrapping(Wrapping::Glyph);
+                        let identifier = crate::widget::text::body(id).wrapping(Wrapping::Glyph);
 
                         let connect: Element<'_, Message> = if let Some(msg) = connect_msg {
                             widget::button::text(connect_txt).on_press(msg).into()
                         } else {
-                            widget::text::body(connect_txt)
+                            crate::widget::text::body(connect_txt)
                                 .align_y(Alignment::Center)
                                 .into()
                         };
@@ -871,7 +871,7 @@ fn devices_view() -> Section<crate::pages::Message> {
 
 fn popup_button(message: Message, text: &str) -> Element<'_, Message> {
     let spacing = cosmic::theme::spacing();
-    widget::text::body(text)
+    crate::widget::text::body(text)
         .align_y(Alignment::Center)
         .apply(widget::button::custom)
         .padding([spacing.space_xxxs, spacing.space_xs])

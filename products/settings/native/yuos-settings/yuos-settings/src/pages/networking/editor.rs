@@ -155,7 +155,7 @@ impl Editor {
             column = column.push(field(fl!("identity"), &self.username, "username"));
         }
         if let Some(error) = &self.error {
-            column = column.push(widget::text(error));
+            column = column.push(crate::widget::text(error));
         }
         widget::dialog()
             .title(fl!("os-network-profile"))
