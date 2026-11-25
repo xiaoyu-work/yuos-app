@@ -60,8 +60,8 @@ overwrite lease, and its status reference is discarded after successful native
 completion. Non-UTF8 inverse writes, project watch and installed UI acceptance
 remain separate gates.
 
-Build inputs are materialized under `build/editor-native`; SDK/runtime are
-resolved only from `platform.lock.json`. The upstream toolkit and rendering
+Build inputs are materialized under `build/editor-native`; SDK bindings come
+from the checked-in `yuos-sdk/rust`. The upstream toolkit and rendering
 dependency graph in the checked-in native lock is preserved, not replaced by
 another product's toolkit patches.
 

@@ -10,6 +10,6 @@ upstream development files are retained.
 
 The OS-owned `pop-launcher` library/service (`desktop/launcher-backend`,
 MPL-2.0, upstream `pop-os/launcher` revision `5b8685107166`) is not copied
-into this product. Development uses the immutable platform lock, as it does
-for the restyled toolkit and SDK/runtime. System composition supplies these
+into this product. Development uses the repository's `shared/rust/launcher-backend`,
+as it does `shared/rust/toolkit` and `yuos-sdk/rust`. System composition supplies these
 same dependency boundaries from its own source tree.

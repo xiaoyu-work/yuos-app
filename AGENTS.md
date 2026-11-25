@@ -22,20 +22,14 @@ source group's `MODULE.md` before changing its boundary.
   Their lifecycle belongs to the OS service `yuosd`, not the AI runtime.
   Root is not a standalone lifecycle bypass. Keep the OS cutover status
   explicit; this contract does not itself complete runtime integration.
-- `platform.lock.json` pins a published SDK/runtime/toolkit artifact by version,
-  HTTPS URL, SHA-256 and runtime ABI. Fetch it through
-  `tools/platform_dependency.py`; never import from a sibling OS checkout.
-  Common App Python libraries belong to local `shared/python`, not the OS artifact.
+- Build against the checked-in `yuos-sdk/rust`, `yuos-sdk/python/src` and
+  `shared/rust/toolkit`; never import from a sibling OS checkout.
+  Common App Python libraries belong to local `shared/python`.
   The compile-time native argv adapter belongs to `shared/rust/gui-argv`; it
   selects parsing behavior only and is not an SDK or runtime authority interface.
-  Native products use `prepare_native()` for allowlisted shared toolkit,
-  launcher backend and SDK/runtime libraries only; run
-  `python3 tools/native_build.py <product> test` for actual native coverage.
-- Developer commands may explicitly select a local platform archive with its
-  expected version and SHA-256. The same bounded verifier applies in a separate
-  development cache; no environment/download fallback or production pin change
-  is allowed. Local input cannot stage release/install payloads. See
-  [local platform development](tools/MODULE.md#local-platform-development).
+  Native preparation resolves only declared shared libraries and product-owned
+  inputs; run `python3 tools/native_build.py <product> test` and
+  `python3 tools/native_build.py <product> build` for native validation.
 - Preserve upstream licenses, source pins, executable modes and symlinks.
   Build native products on Linux/WSL's Linux filesystem.
 - Keep installed identities and permissions unchanged during repository moves.

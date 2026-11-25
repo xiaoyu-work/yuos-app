@@ -11,7 +11,7 @@ Debian packaging, development files and executable modes are retained.
 The existing upstream libcosmic, cosmic-files file-chooser library,
 cosmic-syntax-theme and cosmic-text dependencies remain pinned by the native
 Cargo.lock. This migration does not substitute a toolkit or move the Files App.
-OS SDK/runtime are development dependencies from the immutable platform lock;
+OS SDK bindings are development dependencies from the checked-in `yuos-sdk/rust`;
 OS composition resolves the same library boundaries from its source tree.
 No OS filesystem, snapshot, model-provider or authorization implementation
 is copied into this product.

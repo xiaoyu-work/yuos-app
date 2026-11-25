@@ -104,10 +104,8 @@ no separate executable App copy at `/usr/lib/yuos/mail-ai`.
 The launcher starts `/usr/lib/yuos/apps/mail-ai/native_host.py` with isolated
 Python. The host explicitly adds its own canonical directory and
 `/usr/lib/yuos/python` for the packaged SDK and runtime; it does not depend on
-`PYTHONPATH` or search legacy install roots. Source-checkout execution uses only
-the immutable SDK/runtime dependency prepared by `tools/platform_dependency.py`
-from this repository's `platform.lock.json`. It never searches a sibling OS
-checkout.
+`PYTHONPATH` or search legacy install roots. Source-checkout execution uses
+this repository's `yuos-sdk/python/src`, never a sibling OS checkout.
 
 All model calls require exact `ai.chat.untrusted` authority and use
 `yuos_sdk.ai.chat(origin="external-content")`. Core retains provider

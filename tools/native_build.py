@@ -1,4 +1,4 @@
-"""Build/test native products with their locked library and toolkit boundaries."""
+"""Build/test native products with the repository SDK and declared toolkit paths."""
 
 import argparse
 import importlib.util

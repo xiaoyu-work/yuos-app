@@ -312,9 +312,9 @@ separate gates; a source build or an OS response is not a new grant.
 
 Focused Rust tests are `regional_settings`, `pages::time::region` and
 `pages::system::about`, plus `users_service` in the independent
-`yuos-settings` binary package,
-prepared through `tools/native_build.prepare` and the digest-verified published
-platform loader. Do not combine upstream native packages or import an OS tree.
+`yuos-settings` binary package. Run `python3 tools/native_build.py settings test`;
+preparation uses the checked-in `yuos-sdk/rust` and `shared/rust/toolkit`.
+Do not combine upstream native packages or import an OS tree.
 
 Former filesystem/exec App
 bridges now use controlled OS text writes, registered process spawning and
@@ -338,7 +338,7 @@ xkbregistry, libclang and gettext development inputs. Native process tests use
 `just` and Bubblewrap for scratch installation and an isolated synthetic broker.
 The process fixture accepts `--build-root` and `--target-dir` for an explicitly
 prepared native candidate and its matching isolated Cargo output under `build/`.
-These are fixture inputs only: they neither change the platform lock nor
+These are fixture inputs only: they neither change the repository SDK nor
 authorize an unpublished SDK for production release. Candidate process checks
 do not approve the existing polkit payload or establish live Wayland acceptance.
 

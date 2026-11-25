@@ -141,7 +141,7 @@ def load_local_module(path, name, *, clear_modules=()):
 
 
 def stage_platform_python(python):
-    """Compose verified SDK exports without fetching during a test."""
+    """Stage the repository SDK without fetching during a test."""
     root = Path(__file__).resolve().parents[1]
     stage = load_local_module(root / "tools/stage.py", "_fixture_stage")
     shutil.copytree(

@@ -22,8 +22,8 @@ Stop pauses playback and resets seekable tracks without fabricating position
 after a failed seek. Empty and ended tracks report Stopped rather than Playing.
 
 The standalone original renderer/toolkit/video dependency graph and lock are
-preserved. Only allowlisted immutable SDK/runtime dependencies come from
-`platform.lock.json`. Installed identity, resources, user files and
+preserved. SDK bindings come from the checked-in `yuos-sdk/rust`.
+Installed identity, resources, user files and
 configuration paths are unchanged. See [MODULE.md](MODULE.md) for commands
 and [PROVENANCE.md](PROVENANCE.md) for corresponding-source provenance.
 

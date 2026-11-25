@@ -30,8 +30,7 @@ privileged egress enforcement, credentials, audit, signing and installation
 remain in `yuos`. No provider implementation, other App handler, local
 database or user state is copied into this group.
 
-Development resolves SDK/runtime through `platform.lock.json` and
-`tools/platform_dependency.py`, and `_shared` from local `shared/python`.
+Development uses `yuos-sdk/python/src` and `_shared` from local `shared/python`.
 Installed execution uses `/usr/lib/yuos/python`: the common App runtime owns
 the helper, separately from OS SDK/runtime. The client has no parent-directory
 import shim. There are no runtime source downloads or alternate App

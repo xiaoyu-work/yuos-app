@@ -94,10 +94,10 @@ already been published or that every physical device has been exercised.
 | `tools/native_payload.py` | Original-installer output to package-local ELF/resource/license preparation, explicit signer entries and common-Host compatibility launchers; no resource activation or authority |
 | `products/home-integration/` | Home Assistant REST adapter source; external server, accounts, devices and automation state are not imported; OS credentials and egress authority remain separate |
 | `products/messaging-channels/` | Selected Discord, Telegram, Slack and WhatsApp outbound/presentation clients; versioned SDK delegates authenticated owner/sender admission, lifecycle and replay to the OS and ordinary Activity triggers |
-| `platform.lock.json`, `tools/platform_dependency.py` | Published, digest-pinned SDK/runtime/toolkit artifact, not an OS source checkout |
+| `yuos-sdk/`, `shared/rust/toolkit/` | Checked-in SDK bindings and shared native toolkit, not an OS source checkout |
 | `shared/python/`, `shared/MODULE.md` | App-owned common client libraries, staged once through the common support package |
 | `shared/rust/gui-argv/` | App-owned compile-time selector adaptation for native parsers; no provider, permission, transport or runtime package |
-| `tools/test.py` | Product/capability-scoped tests using the locked runtime and declared library exports |
+| `tools/test.py` | Product/capability-scoped tests using the repository SDK and declared library exports |
 | `tools/release.py`, `tools/release_apt.py`, `tools/release_publish.py` | Independent product/capability Debian versions, real native payloads, immutable Release assets and separately signed retained App APT metadata |
 | `yuos` | Native authority launcher, package signing, installation, core services and system integration |
 
@@ -152,26 +152,19 @@ without deleting credentials or installed user data. These source moves do not m
 legacy identities or account state; completing that product cutover requires
 explicit account, consent and installation changes.
 
-Development dependencies come from the public App platform release selected by
-`platform.lock.json`: explicit version, HTTPS URL, SHA-256 and runtime ABI.
-The consumer verifies the archive before extraction and rechecks its complete
-inventory on every cache use. It selects named SDK/runtime/toolkit exports;
-there is no Git, sibling-checkout or unverified-cache fallback. The SDK artifact
-contains OS libraries, not App helpers or private OS providers.
-Historical platform `1.0.0`/`1.1.0` releases remain withdrawn. The explicitly
-approved `app-platform-v0.2.1` release now supplies the verified development pin,
-including account-scoped Mail permissions, public event/channel/object/effect
-contracts and independent GUI/selected-file clients; see
+Development uses the checked-in `yuos-sdk/rust`, `yuos-sdk/python/src` and
+`shared/rust/toolkit`, never a sibling OS checkout or private OS providers.
+Run `python3 tools/native_build.py <product> test` and
+`python3 tools/native_build.py <product> build` on Linux/WSL's Linux filesystem.
+Native preparation preserves each product's Cargo lock and upstream dependency
+graph while resolving its declared local libraries. No platform archive download
+or SDK publication is needed for source builds. Release tools and dependency
+pins still require their separately approved publication inputs; see
 [publication status](docs/releases.md#platform-publication-status).
-Developer commands can explicitly supply a local archive, expected version
-and SHA-256 through the same public artifact verifier. This uses a separate
-development cache, not an OS source checkout or a replacement production pin.
-Runtime bootstrap and release consumers still use the published-pin contract;
-see [local platform development](tools/MODULE.md#local-platform-development).
 
 Email, delivery and other products use the App-owned common libraries in
 `shared/python`: `_shared`, `gateway._shared` and `canonical_argv`. Development
-composes that local import root with the verified SDK/runtime roots; installed
+composes that local import root with `yuos-sdk/python/src`; installed
 clients use `/usr/lib/yuos/python`. `stage_shared` supplies a separate common
 payload, and individual product staging does not duplicate it. The installed
 file-ownership transition remains a coordinated package rollout, not a

@@ -59,30 +59,11 @@ def library_interface(name):
     return f"yuos-app-python-{name.replace('_', '-')}-v{config()['python_library_abi']}"
 
 
-def require_platform_artifact(lock=None):
-    if lock is None:
-        if not (ROOT / "yuos-sdk/rust/Cargo.toml").is_file() or not (
-            ROOT / "yuos-sdk/python/src/yuos_sdk/__init__.py"
-        ).is_file():
-            raise ValueError("Missing checked-in Yu OS SDK")
-        return None
-    required = {"version", "url", "sha256", "runtime_abi"}
-    if not isinstance(lock, dict) or set(lock) not in (required, required | {"schema"}):
-        raise ValueError(
-            "platform.lock.json must pin a published artifact with version, url, sha256 and "
-            "runtime_abi; legacy OS Git/source fields are not supported"
-        )
-    if lock.get("schema", "yuos.app-platform/v1") != "yuos.app-platform/v1":
-        raise ValueError("Unsupported App platform lock schema")
-    if not isinstance(lock["version"], str) or not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", lock["version"]):
-        raise ValueError("Invalid App platform version")
-    if not isinstance(lock["sha256"], str) or not re.fullmatch(r"[0-9A-Fa-f]{64}", lock["sha256"]):
-        raise ValueError("Invalid App platform SHA-256")
-    if type(lock["runtime_abi"]) is not int or lock["runtime_abi"] != 1:
-        raise ValueError("Unsupported App platform runtime ABI")
-    if not isinstance(lock["url"], str) or not lock["url"].startswith("https://"):
-        raise ValueError("App platform URL must be HTTPS")
-    return None
+def require_repository_sdk():
+    if not (ROOT / "yuos-sdk/rust/Cargo.toml").is_file() or not (
+        ROOT / "yuos-sdk/python/src/yuos_sdk/__init__.py"
+    ).is_file():
+        raise ValueError("Missing checked-in Yu OS SDK")
 
 
 def packages_for(selection):
@@ -292,7 +273,7 @@ def native_payload(root, entry):
     host = run(["dpkg", "--print-architecture"]).stdout.decode().strip()
     if host != entry["architecture"]:
         raise ValueError("Native packages must be built on their declared Linux architecture")
-    require_platform_artifact()
+    require_repository_sdk()
     subprocess.run([
         sys.executable, str(ROOT / "tools/native_build.py"), name, "build", "--release",
         "--target-dir", str(ROOT / "build/release-native-target"), "--install-root", str(root),
@@ -428,16 +409,16 @@ def test_selected(plan, architecture):
         products = [item for item in selected if not item.startswith("capability:")]
         capabilities = [item.removeprefix("capability:") for item in selected if item.startswith("capability:")]
         if selected:
-            require_platform_artifact()
+            require_repository_sdk()
             arguments = [sys.executable, "tools/test.py", *products]
             if capabilities:
                 arguments.extend(["--capability", *capabilities])
             subprocess.run(arguments, check=True, cwd=ROOT)
         elif "support" in plan["selections"]:
-            require_platform_artifact()
+            require_repository_sdk()
             subprocess.run([sys.executable, "tools/test.py", "--shared"], check=True, cwd=ROOT)
     else:
-        require_platform_artifact()
+        require_repository_sdk()
         for selection in sorted({
             entry["selection"] for entry in plan["packages"] if entry["architecture"] == architecture
         }):

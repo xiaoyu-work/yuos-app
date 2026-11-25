@@ -35,8 +35,6 @@ def test_content_addressed_fixture_is_deterministic_and_stages_the_complete_decl
     projection = json.loads((root / "products/files/package.json").read_text())
     assert "native" not in projection and "native_assets" not in projection
     assert not (root / "products/files/native").exists()
-    assert not (root / "platform.lock.json").exists()
-    assert not (root / "tools/platform_dependency.py").exists()
     staged = tmp_path / "staged"
     result = run([sys.executable, root / "tools/stage.py", "document-engine", "--kind", "capability",
                   "--root", staged], cwd=root, env={"PYTHONDONTWRITEBYTECODE": "1"})

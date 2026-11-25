@@ -10,7 +10,7 @@ Translations, icons, screenshots, Debian/Nix/build inputs, hidden files and the
 
 The original standalone Cargo.lock, upstream libcosmic graph and default
 Flatpak/PackageKit, logind, notification, Wayland and wgpu features are retained.
-SDK/runtime are the immutable libraries selected by `platform.lock.json`;
+SDK bindings come from the checked-in `yuos-sdk/rust`;
 no OS provider, authority implementation or installed state is copied here.
 The native catalog embeds existing product functions, not a mutable helper or
 App entrypoint. Human UI policies and OS package transaction identity remain

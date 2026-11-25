@@ -109,11 +109,10 @@ requests. AI App stdout can return only correlated AI responses, never mailbox
 commands. The `mail-ai` host's standing AI/memory ceiling stays unchanged.
 Email's `_shared` dependency is an App-owned common library under
 [`shared/python`](../../shared/MODULE.md), not another App or an OS export.
-Source-checkout Native Messaging resolves named SDK/runtime exports from the
-verified platform artifact cache, never a Git directory or sibling OS checkout.
-Prepare the pinned artifact explicitly with `tools/platform_dependency.py`;
-the isolated native host never downloads build dependencies at runtime and
-disables bytecode when importing from that cache. Installed execution retains
+Source-checkout Native Messaging uses the checked-in `yuos-sdk/python/src`,
+never a sibling OS checkout. The isolated native host never downloads build
+dependencies at runtime and disables bytecode when importing repository sources.
+Installed execution retains
 the fixed `/usr/lib/yuos/python` root and existing OS authority launcher.
 Protocol tests stage their own source/bootstrap fixture and a fully verified
 platform archive selected by the developer test command. The fixture's synthetic
