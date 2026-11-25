@@ -360,6 +360,12 @@ pub enum Message {
     AiAssistSearchResult(Result<Vec<crate::yuos_glue::ai::SearchHit>, String>),
     AiAssistFindSimilar,
     AskYu,
+    ToggleAiDrawer,
+    SidebarToggleMenu,
+    SidebarToggleExpand(PathBuf),
+    WindowDrag,
+    WindowMinimize,
+    WindowToggleMaximize,
     AiRewrite(Option<Entity>),
     AiRewriteInput(String),
     AiRewriteSubmit,
@@ -885,6 +891,10 @@ pub struct App {
     network_drive_input: String,
     ai_assist_input: String,
     ai_assist_status: AiAssistStatus,
+    ai_drawer_open: bool,
+    ai_last_prompt: Option<String>,
+    ai_last_response: Option<Result<String, String>>,
+    sidebar_expanded: FxHashSet<PathBuf>,
     #[cfg(feature = "notify")]
     notification_opt: Option<Arc<Mutex<notify_rust::NotificationHandle>>>,
     #[cfg(all(feature = "wayland", feature = "desktop-applet"))]
@@ -1361,9 +1371,7 @@ impl App {
         } else {
             entity.id()
         };
-        if show_home_dashboard {
-            self.home_dashboard_tabs.insert(entity);
-        }
+        let _ = show_home_dashboard;
 
         let mut tasks = Vec::with_capacity(4);
         if activate {
@@ -2682,91 +2690,773 @@ impl App {
         false
     }
 
-    fn finder_toolbar(&self) -> Element<'_, Message> {
-        let cosmic_theme::Spacing {
-            space_xxs,
-            space_xs,
-            space_s,
-            ..
-        } = theme::spacing();
-        let tab_opt = self.tab_model.active_data::<Tab>();
-        let view = tab_opt.map(|t| t.config.view).unwrap_or(tab::View::List);
-        let (can_back, can_forward) = match tab_opt {
-            Some(tab) => (
-                tab.history_i > 0 && !tab.history.is_empty(),
-                tab.history_i + 1 < tab.history.len(),
-            ),
-            None => (false, false),
+    fn yu_agent_icon(size: u16) -> widget::Icon {
+        const YU_AGENT_SVG: &[u8] = br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M11.5 3.8L3.2 19.8M15 9.6L9.5 19.8M18.8 13.5L15.4 19.8" stroke="#19202b" stroke-width="2.5" stroke-linecap="round"/><circle cx="19.8" cy="19.1" r="2.5" fill="#005cfe"/></svg>"##;
+        icon::icon(icon::from_svg_bytes(YU_AGENT_SVG)).size(size)
+    }
+
+    fn finder_sidebar(&self) -> Element<'_, Message> {
+        let active_loc = self
+            .tab_model
+            .active_data::<Tab>()
+            .map(|tab| tab.location.clone());
+        let active_path = active_loc.as_ref().and_then(|l| l.path_opt()).cloned();
+
+        let toggle_btn = widget::button::custom(
+            icon::from_name("view-sidebar-symbolic").size(16).icon(),
+        )
+        .padding([5, 7])
+        .class(crate::glass::toolbar_icon_button(false))
+        .on_press(Message::SidebarToggleMenu);
+
+        let new_folder_btn = widget::button::custom(
+            icon::from_name("folder-new-symbolic").size(15).icon(),
+        )
+        .padding([5, 6])
+        .class(crate::glass::toolbar_icon_button(false))
+        .on_press(Message::NewItem(None, true));
+
+        let new_tab_btn = widget::button::custom(
+            icon::from_name("tab-new-symbolic").size(15).icon(),
+        )
+        .padding([5, 6])
+        .class(crate::glass::toolbar_icon_button(false))
+        .on_press(Message::TabNew);
+
+        let header = widget::container(
+            widget::row::with_children([
+                toggle_btn.into(),
+                widget::space::horizontal().width(Length::Fill).into(),
+                new_folder_btn.into(),
+                new_tab_btn.into(),
+            ])
+            .align_y(Alignment::Center)
+            .spacing(2),
+        )
+        .height(Length::Fixed(44.0))
+        .width(Length::Fill)
+        .align_y(Alignment::Center)
+        .padding([0, 10]);
+
+        let header_rule = cosmic::iced::widget::rule::horizontal(1).class(crate::glass::sidebar_rule());
+
+        let mut list = widget::column::with_capacity(24).spacing(2).padding([8, 8]);
+
+        list = list.push(
+            widget::container(widget::text::caption("▾ ★ Favourites"))
+                .padding([6, 8, 4, 8]),
+        );
+
+        let nav_row = |indent: u16,
+                       chev: Option<(bool, PathBuf)>,
+                       icon_name: &'static str,
+                       label: String,
+                       target: Location,
+                       active: bool,
+                       tag_color: Option<cosmic::iced::Color>|
+         -> Element<'_, Message> {
+            let mut row = widget::row::with_capacity(5)
+                .align_y(Alignment::Center)
+                .spacing(6);
+            if indent > 0 {
+                row = row.push(widget::space::horizontal().width(Length::Fixed(f32::from(indent))));
+            }
+            if let Some((expanded, p)) = chev {
+                let chev_label = if expanded { "▾" } else { "›" };
+                row = row.push(
+                    widget::button::custom(widget::text::caption(chev_label))
+                        .padding([0, 2])
+                        .class(theme::Button::Text)
+                        .on_press(Message::SidebarToggleExpand(p)),
+                );
+            } else {
+                row = row.push(widget::space::horizontal().width(Length::Fixed(12.0)));
+            }
+            row = row.push(icon::from_name(icon_name).size(15).icon());
+            row = row.push(
+                widget::text::body(label)
+                    .wrapping(cosmic::iced::core::text::Wrapping::None)
+                    .width(Length::Fill),
+            );
+            if let Some(dot_color) = tag_color {
+                let dot = widget::container(widget::space::horizontal().width(Length::Fixed(8.0)))
+                    .width(Length::Fixed(8.0))
+                    .height(Length::Fixed(8.0))
+                    .style(move |_| widget::container::Style {
+                        background: Some(cosmic::iced::Background::Color(dot_color)),
+                        border: cosmic::iced::Border {
+                            color: cosmic::iced::Color::TRANSPARENT,
+                            width: 0.0,
+                            radius: 4.0.into(),
+                        },
+                        ..Default::default()
+                    });
+                row = row.push(dot);
+            }
+            widget::button::custom(row)
+                .width(Length::Fill)
+                .height(Length::Fixed(27.0))
+                .padding([0, 8])
+                .class(crate::glass::sidebar_item_button(active))
+                .on_press(Message::TabMessage(None, tab::Message::Location(target)))
+                .into()
         };
 
-        let mut back = widget::button::icon(icon::from_name("go-previous-symbolic").size(16))
-            .padding(space_xxs);
+        // Recents
+        let recents_active = matches!(active_loc, Some(Location::Recents));
+        list = list.push(nav_row(
+            0,
+            None,
+            "document-open-recent-symbolic",
+            fl!("recents"),
+            Location::Recents,
+            recents_active,
+            None,
+        ));
+
+        // Home + tree children
+        let home = home_dir();
+        let home_expanded = self.sidebar_expanded.contains(&home);
+        let home_active = active_path.as_ref() == Some(&home);
+        list = list.push(nav_row(
+            0,
+            Some((home_expanded, home.clone())),
+            "user-home-symbolic",
+            fl!("home"),
+            Location::Path(home.clone()),
+            home_active,
+            None,
+        ));
+
+        if home_expanded {
+            let mut subdirs: Vec<PathBuf> = Vec::new();
+            for std_name in ["Desktop", "Documents", "Downloads", "Music", "Pictures", "Videos"] {
+                let candidate = home.join(std_name);
+                if candidate.is_dir() && !subdirs.contains(&candidate) {
+                    subdirs.push(candidate);
+                }
+            }
+            if let Ok(entries) = fs::read_dir(&home) {
+                let mut extra: Vec<PathBuf> = entries
+                    .filter_map(Result::ok)
+                    .map(|e| e.path())
+                    .filter(|p| {
+                        p.is_dir()
+                            && p.file_name()
+                                .and_then(|n| n.to_str())
+                                .is_some_and(|n| !n.starts_with('.'))
+                            && !subdirs.contains(p)
+                    })
+                    .collect();
+                extra.sort();
+                for e in extra.into_iter().take(6) {
+                    subdirs.push(e);
+                }
+            }
+            for child in subdirs {
+                let child_name = child
+                    .file_name()
+                    .map(|n| n.to_string_lossy().into_owned())
+                    .unwrap_or_default();
+                let has_grandchildren = fs::read_dir(&child)
+                    .map(|mut it| {
+                        it.any(|e| {
+                            e.ok().is_some_and(|e| {
+                                e.path().is_dir()
+                                    && e.file_name()
+                                        .to_str()
+                                        .is_some_and(|s| !s.starts_with('.'))
+                            })
+                        })
+                    })
+                    .unwrap_or(false);
+                let child_expanded = self.sidebar_expanded.contains(&child);
+                let child_active = active_path.as_ref() == Some(&child);
+                let child_ico = match child_name.as_str() {
+                    "Desktop" => "user-desktop-symbolic",
+                    "Downloads" => "folder-download-symbolic",
+                    "Music" => "folder-music-symbolic",
+                    "Pictures" => "folder-pictures-symbolic",
+                    "Videos" | "Movies" => "folder-videos-symbolic",
+                    _ => "folder-symbolic",
+                };
+                let tag = match child_name.as_str() {
+                    "Documents" => Some(cosmic::iced::Color::from_rgb8(0xff, 0x5f, 0x57)),
+                    "Developer" | "Downloads" => {
+                        Some(cosmic::iced::Color::from_rgb8(0x00, 0x7a, 0xff))
+                    }
+                    _ => None,
+                };
+                list = list.push(nav_row(
+                    14,
+                    has_grandchildren.then(|| (child_expanded, child.clone())),
+                    child_ico,
+                    child_name,
+                    Location::Path(child.clone()),
+                    child_active,
+                    tag,
+                ));
+                if child_expanded && let Ok(g_entries) = fs::read_dir(&child) {
+                    let mut grandchildren: Vec<PathBuf> = g_entries
+                        .filter_map(Result::ok)
+                        .map(|e| e.path())
+                        .filter(|p| {
+                            p.is_dir()
+                                && p.file_name()
+                                    .and_then(|n| n.to_str())
+                                    .is_some_and(|n| !n.starts_with('.'))
+                        })
+                        .collect();
+                    grandchildren.sort();
+                    for gchild in grandchildren.into_iter().take(8) {
+                        let gname = gchild
+                            .file_name()
+                            .map(|n| n.to_string_lossy().into_owned())
+                            .unwrap_or_default();
+                        let gactive = active_path.as_ref() == Some(&gchild);
+                        list = list.push(nav_row(
+                            28,
+                            None,
+                            "folder-symbolic",
+                            gname,
+                            Location::Path(gchild),
+                            gactive,
+                            None,
+                        ));
+                    }
+                }
+            }
+        }
+
+        list = list.push(
+            widget::container(widget::text::caption("▾ Locations"))
+                .padding([12, 8, 4, 8]),
+        );
+
+        let root_path = PathBuf::from("/");
+        let root_active = active_path.as_ref() == Some(&root_path);
+        list = list.push(nav_row(
+            0,
+            None,
+            "drive-harddisk-symbolic",
+            "Yu OS Disk".to_string(),
+            Location::Path(root_path),
+            root_active,
+            None,
+        ));
+
+        let net_active = matches!(active_loc, Some(Location::Network(..)));
+        list = list.push(nav_row(
+            0,
+            None,
+            "network-workgroup-symbolic",
+            fl!("networks"),
+            Location::Network("network:///".to_string(), fl!("networks"), None),
+            net_active,
+            None,
+        ));
+
+        let trash_active = matches!(active_loc, Some(Location::Trash));
+        list = list.push(nav_row(
+            0,
+            None,
+            "user-trash-symbolic",
+            fl!("trash"),
+            Location::Trash,
+            trash_active,
+            None,
+        ));
+
+        let sidebar_col = widget::column::with_children([
+            header.into(),
+            header_rule.into(),
+            widget::scrollable(list).height(Length::Fill).into(),
+        ])
+        .width(Length::Fixed(218.0))
+        .height(Length::Fill);
+
+        let sidebar_box = widget::container(sidebar_col)
+            .width(Length::Fixed(218.0))
+            .height(Length::Fill)
+            .class(theme::Container::custom(crate::glass::sidebar_surface));
+
+        let v_rule = cosmic::iced::widget::rule::vertical(1).class(crate::glass::sidebar_rule());
+
+        widget::row::with_children([sidebar_box.into(), v_rule.into()])
+            .height(Length::Fill)
+            .into()
+    }
+
+    fn finder_toolbar(&self) -> Element<'_, Message> {
+        let tab_opt = self.tab_model.active_data::<Tab>();
+        let view = tab_opt.map(|t| t.config.view).unwrap_or(tab::View::List);
+        let (can_back, can_forward, can_up, folder_title) = match tab_opt {
+            Some(tab) => {
+                let can_up = tab
+                    .location
+                    .path_opt()
+                    .and_then(|p| p.parent())
+                    .is_some();
+                (
+                    tab.history_i > 0 && !tab.history.is_empty(),
+                    tab.history_i + 1 < tab.history.len(),
+                    can_up,
+                    tab.title(),
+                )
+            }
+            None => (false, false, false, fl!("home")),
+        };
+
+        let mut row = widget::row::with_capacity(14)
+            .align_y(Alignment::Center)
+            .spacing(4);
+
+        if !self.core.nav_bar_active() {
+            row = row.push(
+                widget::button::custom(icon::from_name("view-sidebar-symbolic").size(16).icon())
+                    .padding([5, 7])
+                    .class(crate::glass::toolbar_icon_button(false))
+                    .on_press(Message::SidebarToggleMenu),
+            );
+        }
+
+        let mut back = widget::button::custom(icon::from_name("go-previous-symbolic").size(16).icon())
+            .padding([5, 6])
+            .class(crate::glass::toolbar_icon_button(false));
         if can_back {
             back = back.on_press(Message::TabMessage(None, tab::Message::GoPrevious));
         }
-        let mut forward =
-            widget::button::icon(icon::from_name("go-next-symbolic").size(16)).padding(space_xxs);
+
+        let mut forward = widget::button::custom(icon::from_name("go-next-symbolic").size(16).icon())
+            .padding([5, 6])
+            .class(crate::glass::toolbar_icon_button(false));
         if can_forward {
             forward = forward.on_press(Message::TabMessage(None, tab::Message::GoNext));
         }
 
-        let grid = widget::button::icon(icon::from_name("view-grid-symbolic").size(16))
-            .padding(space_xxs)
-            .selected(matches!(view, tab::View::Grid))
-            .on_press(Message::TabView(None, tab::View::Grid));
-        let list = widget::button::icon(icon::from_name("view-list-symbolic").size(16))
-            .padding(space_xxs)
-            .selected(matches!(view, tab::View::List))
-            .on_press(Message::TabView(None, tab::View::List));
-        let ask_yu = widget::tooltip(
-            widget::button::icon(icon::from_name("face-smile-symbolic").size(16))
-                .padding(space_xxs)
-                .class(crate::glass::ask_yu_button())
-                .on_press(Message::AskYu),
-            widget::text::body(fl!("ask-yu")),
-            widget::tooltip::Position::Bottom,
-        );
+        let mut up_btn = widget::button::custom(icon::from_name("go-up-symbolic").size(16).icon())
+            .padding([5, 6])
+            .class(crate::glass::toolbar_icon_button(false));
+        if can_up {
+            up_btn = up_btn.on_press(Message::TabMessage(None, tab::Message::LocationUp));
+        }
 
-        let mut row = widget::row::with_capacity(10)
-            .align_y(Alignment::Center)
-            .spacing(space_xxs)
-            .push(back)
-            .push(forward)
-            .push(widget::space::horizontal().width(Length::Fixed(space_s.into())))
-            .push(grid)
-            .push(list)
-            .push(widget::space::horizontal().width(Length::Fill))
-            .push(ask_yu);
+        let title_drag = crate::mouse_area::MouseArea::new(
+            widget::container(widget::text::heading(folder_title))
+                .padding([0, 6])
+                .width(Length::Fill)
+                .height(Length::Fill)
+                .align_y(Alignment::Center),
+        )
+        .on_drag(|_| Message::WindowDrag)
+        .on_double_click(|_| Message::WindowToggleMaximize);
+
+        let new_folder = widget::button::custom(icon::from_name("folder-new-symbolic").size(16).icon())
+            .padding([5, 6])
+            .class(crate::glass::toolbar_icon_button(false))
+            .on_press(Message::NewItem(None, true));
+
+        let list_btn = widget::button::custom(icon::from_name("view-list-symbolic").size(15).icon())
+            .padding([4, 6])
+            .class(crate::glass::toolbar_icon_button(matches!(view, tab::View::List)))
+            .on_press(Message::TabView(None, tab::View::List));
+        let grid_btn = widget::button::custom(icon::from_name("view-grid-symbolic").size(15).icon())
+            .padding([4, 6])
+            .class(crate::glass::toolbar_icon_button(matches!(view, tab::View::Grid)))
+            .on_press(Message::TabView(None, tab::View::Grid));
+        let view_group = widget::container(
+            widget::row::with_children([list_btn.into(), grid_btn.into()]).spacing(2),
+        )
+        .padding(2)
+        .class(theme::Container::custom(crate::glass::view_switcher_group));
+
+        let sort_btn = widget::button::custom(
+            icon::from_name("view-sort-ascending-symbolic").size(15).icon(),
+        )
+        .padding([5, 6])
+        .class(crate::glass::toolbar_icon_button(false))
+        .on_press(Message::TabMessage(
+            None,
+            tab::Message::ToggleSort(HeadingOptions::Name),
+        ));
 
         let search_term = self.search_get();
         let search_input = widget::text_input::search_input(
             fl!("finder-toolbar-search"),
             search_term.unwrap_or(""),
         )
-        .width(Length::Fixed(220.0))
+        .width(Length::Fixed(196.0))
         .id(self.search_id.clone())
         .on_clear(Message::SearchClear)
         .on_input(Message::SearchInput);
-        row = row.push(search_input);
+
+        let sep = widget::container(
+            cosmic::iced::widget::rule::vertical(1).class(crate::glass::divider_rule()),
+        )
+        .height(Length::Fixed(18.0))
+        .padding([0, 4]);
+
+        let min_btn = widget::button::custom(
+            icon::from_name("window-minimize-symbolic").size(14).icon(),
+        )
+        .padding([5, 6])
+        .class(crate::glass::toolbar_icon_button(false))
+        .on_press(Message::WindowMinimize);
+
+        let max_btn = widget::button::custom(
+            icon::from_name("window-maximize-symbolic").size(14).icon(),
+        )
+        .padding([5, 6])
+        .class(crate::glass::toolbar_icon_button(false))
+        .on_press(Message::WindowToggleMaximize);
+
+        let close_btn = widget::button::custom(
+            icon::from_name("window-close-symbolic").size(14).icon(),
+        )
+        .padding([5, 6])
+        .class(crate::glass::toolbar_icon_button(false))
+        .on_press(Message::WindowClose);
+
+        row = row
+            .push(back)
+            .push(forward)
+            .push(up_btn)
+            .push(title_drag)
+            .push(new_folder)
+            .push(view_group)
+            .push(sort_btn)
+            .push(search_input)
+            .push(sep)
+            .push(min_btn)
+            .push(max_btn)
+            .push(close_btn);
 
         let toolbar = widget::container(row)
-            .padding([space_xxs, space_xs])
+            .height(Length::Fixed(44.0))
+            .align_y(Alignment::Center)
+            .padding([0, 10])
             .width(Length::Fill)
-            .class(theme::Container::custom(crate::glass::toolbar));
-        // Yu OS Glass: brand-blue translucent hairline separating chrome from content.
-        let hairline = cosmic::iced::widget::rule::horizontal(1).class(theme::Rule::Custom(
-            Box::new(|theme| cosmic::iced::widget::rule::Style {
-                color: {
-                    let mut c = theme.cosmic().accent_color();
-                    c.alpha = 0.20;
-                    c.into()
-                },
-                radius: 0.0.into(),
-                fill_mode: cosmic::iced::widget::rule::FillMode::Full,
-                snap: true,
-            }),
-        ));
+            .class(theme::Container::custom(crate::glass::top_toolbar_surface));
+        let hairline = cosmic::iced::widget::rule::horizontal(1).class(crate::glass::divider_rule());
         widget::column::with_children([toolbar.into(), hairline.into()])
+            .width(Length::Fill)
+            .into()
+    }
+
+    fn finder_action_strip(&self) -> Element<'_, Message> {
+        let has_selection = self.selected_paths(None).next().is_some();
+        let can_paste = self.clipboard_has_content();
+
+        let act_btn = |icon_name: &'static str, enabled: bool, msg: Message| -> Element<'_, Message> {
+            let mut b = widget::button::custom(icon::from_name(icon_name).size(15).icon())
+                .padding([4, 6])
+                .class(crate::glass::toolbar_icon_button(false));
+            if enabled {
+                b = b.on_press(msg);
+            }
+            b.into()
+        };
+
+        let sep = || -> Element<'_, Message> {
+            widget::container(
+                cosmic::iced::widget::rule::vertical(1).class(crate::glass::divider_rule()),
+            )
+            .height(Length::Fixed(16.0))
+            .padding([0, 4])
+            .into()
+        };
+
+        let ai_btn = widget::button::custom(Self::yu_agent_icon(16))
+            .padding([4, 6])
+            .class(crate::glass::toolbar_icon_button(self.ai_drawer_open))
+            .on_press(Message::ToggleAiDrawer);
+
+        let row = widget::row::with_children([
+            act_btn("folder-new-symbolic", true, Message::NewItem(None, true)),
+            act_btn("edit-paste-symbolic", can_paste, Message::Paste(None)),
+            sep(),
+            act_btn("user-trash-symbolic", has_selection, Message::Delete(None)),
+            act_btn("edit-symbolic", has_selection, Message::Rename(None)),
+            act_btn("package-x-generic-symbolic", has_selection, Message::Compress(None)),
+            act_btn("view-reveal-symbolic", has_selection, Message::Preview(None)),
+            sep(),
+            act_btn("edit-cut-symbolic", has_selection, Message::Cut(None)),
+            act_btn("edit-copy-symbolic", has_selection, Message::Copy(None)),
+            widget::space::horizontal().width(Length::Fill).into(),
+            act_btn("utilities-terminal-symbolic", true, Message::OpenTerminal(None)),
+            sep(),
+            ai_btn.into(),
+        ])
+        .align_y(Alignment::Center)
+        .spacing(2);
+
+        let bar = widget::container(row)
+            .height(Length::Fixed(34.0))
+            .align_y(Alignment::Center)
+            .padding([0, 10])
+            .width(Length::Fill)
+            .class(theme::Container::custom(crate::glass::action_strip_surface));
+        let hairline = cosmic::iced::widget::rule::horizontal(1).class(crate::glass::divider_rule());
+        widget::column::with_children([bar.into(), hairline.into()])
+            .width(Length::Fill)
+            .into()
+    }
+
+    fn finder_ai_drawer(&self) -> Element<'_, Message> {
+        let tab_opt = self.tab_model.active_data::<Tab>();
+        let folder_name = tab_opt.map(|t| t.title()).unwrap_or_else(|| fl!("home"));
+        let selected_file = self
+            .selected_paths(None)
+            .next()
+            .and_then(|p| p.file_name().map(|n| n.to_string_lossy().into_owned()));
+
+        let header = widget::container(
+            widget::row::with_children([
+                Self::yu_agent_icon(16).into(),
+                widget::text::heading("Yu Agent").width(Length::Fill).into(),
+                widget::button::custom(icon::from_name("window-close-symbolic").size(14).icon())
+                    .padding([4, 5])
+                    .class(crate::glass::toolbar_icon_button(false))
+                    .on_press(Message::ToggleAiDrawer)
+                    .into(),
+            ])
+            .align_y(Alignment::Center)
+            .spacing(7),
+        )
+        .height(Length::Fixed(36.0))
+        .align_y(Alignment::Center)
+        .padding([0, 10])
+        .width(Length::Fill)
+        .class(theme::Container::custom(crate::glass::ai_header_surface));
+
+        let mut pills = widget::row::with_capacity(2)
+            .spacing(6)
+            .align_y(Alignment::Center);
+        pills = pills.push(
+            widget::container(
+                widget::row::with_children([
+                    icon::from_name("folder-symbolic").size(12).icon().into(),
+                    widget::text::caption(folder_name.clone()).into(),
+                ])
+                .spacing(4)
+                .align_y(Alignment::Center),
+            )
+            .padding([2, 8])
+            .class(theme::Container::custom(crate::glass::ai_pill_surface)),
+        );
+        if let Some(ref sel) = selected_file {
+            pills = pills.push(
+                widget::container(
+                    widget::row::with_children([
+                        icon::from_name("text-x-generic-symbolic")
+                            .size(12)
+                            .icon()
+                            .into(),
+                        widget::text::caption(sel.clone()).into(),
+                    ])
+                    .spacing(4)
+                    .align_y(Alignment::Center),
+                )
+                .padding([2, 8])
+                .class(theme::Container::custom(crate::glass::ai_pill_surface)),
+            );
+        }
+        let ctx_bar = widget::container(pills)
+            .padding([8, 10])
+            .width(Length::Fill)
+            .class(theme::Container::custom(crate::glass::ai_context_bar_surface));
+
+        let chip = |label: &'static str, msg: Message| -> Element<'_, Message> {
+            widget::button::custom(widget::text::caption(label))
+                .padding([4, 8])
+                .class(crate::glass::ai_chip_button())
+                .on_press(msg)
+                .into()
+        };
+
+        let chips = widget::column::with_children([
+            widget::row::with_children([
+                chip("整理当前目录", Message::AiAssistFindSimilar),
+                chip("总结文件信息", Message::AiSummarize(None)),
+            ])
+            .spacing(5)
+            .into(),
+            widget::row::with_children([
+                chip("解释选中文件", Message::AiExplain(None)),
+                chip("在 Yu Agent 中打开", Message::AskYu),
+            ])
+            .spacing(5)
+            .into(),
+        ])
+        .spacing(5);
+
+        let user_prompt = self
+            .ai_last_prompt
+            .clone()
+            .unwrap_or_else(|| format!("分析当前目录「{folder_name}」的文件概览"));
+
+        let user_bubble = widget::row::with_children([
+            widget::space::horizontal().width(Length::Fixed(24.0)).into(),
+            widget::container(widget::text::caption(user_prompt))
+                .padding([7, 10])
+                .width(Length::Fill)
+                .class(theme::Container::custom(crate::glass::ai_user_bubble))
+                .into(),
+        ]);
+
+        let folder_summary = {
+            let items_opt = tab_opt.and_then(|t| t.items_opt());
+            let total = items_opt.map(|i| i.len()).unwrap_or(0);
+            let dirs = items_opt
+                .map(|i| i.iter().filter(|x| x.metadata.is_dir()).count())
+                .unwrap_or(0);
+            let files = total.saturating_sub(dirs);
+            let mut summary = format!(
+                "已扫描「{folder_name}」：共 {total} 项（{dirs} 个文件夹，{files} 个文件）。"
+            );
+            if let Some(ref sel) = selected_file {
+                summary.push_str(&format!("\n\n当前选中：{sel}\n可点击上方快捷按钮总结、解释或检索相似文件。"));
+            } else {
+                summary.push_str("\n\n选中任意文件后可一键生成摘要、解释内容或查找相关文件。");
+            }
+            summary
+        };
+
+        let agent_text = match (&self.ai_last_response, &self.ai_assist_status) {
+            (_, AiAssistStatus::Loading) => "正在分析文件与索引，请稍候…".to_string(),
+            (Some(Ok(text)), _) => text.clone(),
+            (Some(Err(err)), _) => format!("处理提示：{err}"),
+            (_, AiAssistStatus::Error(err)) => format!("检索提示：{err}"),
+            (_, AiAssistStatus::Ready(hits)) if hits.is_empty() => {
+                "未找到匹配的相关文件。".to_string()
+            }
+            (_, AiAssistStatus::Ready(hits)) => {
+                let mut lines = vec![format!("找到 {} 个相关文件：", hits.len())];
+                for hit in hits.iter().take(6) {
+                    let name = hit
+                        .path
+                        .file_name()
+                        .map(|n| n.to_string_lossy().into_owned())
+                        .unwrap_or_else(|| hit.path.display().to_string());
+                    lines.push(format!("• {name}"));
+                }
+                lines.join("\n")
+            }
+            _ => folder_summary,
+        };
+
+        let agent_card = widget::container(widget::text::caption(agent_text))
+            .padding([9, 11])
+            .width(Length::Fill)
+            .class(theme::Container::custom(crate::glass::ai_agent_card));
+
+        let messages_col = widget::column::with_children([
+            chips.into(),
+            user_bubble.into(),
+            agent_card.into(),
+        ])
+        .spacing(10)
+        .padding(12)
+        .width(Length::Fill);
+
+        let composer_input = widget::text_input(
+            "针对当前目录或选中文件提问…",
+            &self.ai_assist_input,
+        )
+        .on_input(Message::AiAssistInput)
+        .on_submit(|_| Message::AiAssistSubmit)
+        .width(Length::Fill);
+
+        let send_btn = widget::button::custom(icon::from_name("go-up-symbolic").size(14).icon())
+            .width(Length::Fixed(28.0))
+            .height(Length::Fixed(28.0))
+            .padding(6)
+            .class(crate::glass::ai_send_button())
+            .on_press(Message::AiAssistSubmit);
+
+        let composer = widget::container(
+            widget::row::with_children([composer_input.into(), send_btn.into()])
+                .spacing(6)
+                .align_y(Alignment::Center),
+        )
+        .padding([8, 10])
+        .width(Length::Fill)
+        .class(theme::Container::custom(crate::glass::ai_context_bar_surface));
+
+        let drawer_col = widget::column::with_children([
+            header.into(),
+            cosmic::iced::widget::rule::horizontal(1)
+                .class(crate::glass::divider_rule())
+                .into(),
+            ctx_bar.into(),
+            cosmic::iced::widget::rule::horizontal(1)
+                .class(crate::glass::divider_rule())
+                .into(),
+            widget::scrollable(messages_col).height(Length::Fill).into(),
+            cosmic::iced::widget::rule::horizontal(1)
+                .class(crate::glass::divider_rule())
+                .into(),
+            composer.into(),
+        ])
+        .width(Length::Fixed(300.0))
+        .height(Length::Fill);
+
+        let drawer_box = widget::container(drawer_col)
+            .width(Length::Fixed(300.0))
+            .height(Length::Fill)
+            .class(theme::Container::custom(crate::glass::ai_drawer_surface));
+
+        let v_rule = cosmic::iced::widget::rule::vertical(1).class(crate::glass::sidebar_rule());
+        widget::row::with_children([v_rule.into(), drawer_box.into()])
+            .height(Length::Fill)
+            .into()
+    }
+
+    fn finder_bottom_bar(&self) -> Element<'_, Message> {
+        let left_crumbs: Element<'_, Message> =
+            self.finder_path_bar().unwrap_or_else(|| widget::space::horizontal().into());
+
+        let right_summary: Element<'_, Message> = if let Some(tab) =
+            self.tab_model.active_data::<Tab>()
+            && let Some(items) = tab.items_opt()
+        {
+            let total = items.len();
+            let selected = items.iter().filter(|i| i.selected).count();
+            let counts = if selected > 0 {
+                format!("{selected} of {total} selected")
+            } else {
+                format!("{total} items")
+            };
+            let label = match tab
+                .location
+                .path_opt()
+                .and_then(|p| finder_free_space(p.as_path()))
+            {
+                Some(bytes) => format!("{counts}, {} available", tab::format_size(bytes)),
+                None => counts,
+            };
+            widget::text::caption(label).into()
+        } else {
+            widget::space::horizontal().into()
+        };
+
+        let bar = widget::container(
+            widget::row::with_children([
+                left_crumbs,
+                widget::space::horizontal().width(Length::Fill).into(),
+                right_summary,
+            ])
+            .align_y(Alignment::Center)
+            .spacing(8),
+        )
+        .height(Length::Fixed(26.0))
+        .align_y(Alignment::Center)
+        .padding([0, 12])
+        .width(Length::Fill)
+        .class(theme::Container::custom(crate::glass::bottom_bar_surface));
+
+        let hairline = cosmic::iced::widget::rule::horizontal(1).class(crate::glass::divider_rule());
+        widget::column::with_children([hairline.into(), bar.into()])
             .width(Length::Fill)
             .into()
     }
@@ -2779,17 +3469,38 @@ impl App {
         let path = tab.location.path_opt()?.clone();
         let location = tab.location.clone();
 
-        let mut segments: Vec<PathBuf> = path
-            .ancestors()
-            .filter(|p| !p.as_os_str().is_empty())
-            .map(|p| p.to_path_buf())
-            .collect();
-        segments.reverse();
+        let home = home_dir();
+        let mut segments: Vec<PathBuf> = if let Ok(rel) = path.strip_prefix(&home) {
+            let mut v = vec![home.clone()];
+            let mut cur = home.clone();
+            for comp in rel.components() {
+                cur.push(comp);
+                v.push(cur.clone());
+            }
+            v
+        } else {
+            let mut v: Vec<PathBuf> = path
+                .ancestors()
+                .filter(|p| !p.as_os_str().is_empty())
+                .map(|p| p.to_path_buf())
+                .collect();
+            v.reverse();
+            v
+        };
+        if segments.is_empty() {
+            segments.push(path.clone());
+        }
 
         let cosmic_theme::Spacing { space_xxs, .. } = theme::spacing();
         let mut children: Vec<Element<'_, Message>> = Vec::new();
         let last_index = segments.len().saturating_sub(1);
         for (idx, segment) in segments.into_iter().enumerate() {
+            let is_home_seg = segment == home;
+            let ico_name = if is_home_seg {
+                "user-home-symbolic"
+            } else {
+                "folder-symbolic"
+            };
             let label = if segment.parent().is_none() {
                 "/".to_string()
             } else {
@@ -2798,8 +3509,9 @@ impl App {
                     .map(|n| n.to_string_lossy().into_owned())
                     .unwrap_or_else(|| segment.to_string_lossy().into_owned())
             };
+            children.push(icon::from_name(ico_name).size(13).icon().into());
             if idx == last_index {
-                children.push(widget::text::body(label).into());
+                children.push(widget::text::caption(label).into());
             } else {
                 let target = location.with_path(segment);
                 children.push(
@@ -2808,7 +3520,7 @@ impl App {
                         .padding(0)
                         .into(),
                 );
-                children.push(widget::text::body("›").into());
+                children.push(widget::text::caption("›").into());
             }
         }
 
@@ -3270,9 +3982,11 @@ impl Application for App {
         core.window.context_is_overlay = false;
         match flags.mode {
             Mode::App => {
-                // Let the blurred transparent window show through chrome and the
-                // navigation rail; the file canvas paints its own denser surface.
                 core.window.content_container = false;
+                core.window.show_window_menu = false;
+                core.window.show_headerbar = false;
+                core.window.show_maximize = false;
+                core.window.show_minimize = false;
                 core.window.show_context = flags.config.show_details;
             }
             Mode::Desktop => {
@@ -3354,6 +4068,16 @@ impl Application for App {
             network_drive_input: String::new(),
             ai_assist_input: String::new(),
             ai_assist_status: AiAssistStatus::Idle,
+            ai_drawer_open: false,
+            ai_last_prompt: None,
+            ai_last_response: None,
+            sidebar_expanded: {
+                let mut set = FxHashSet::default();
+                let h = home_dir();
+                set.insert(h.clone());
+                set.insert(h.join("Documents"));
+                set
+            },
             #[cfg(feature = "notify")]
             notification_opt: None,
             #[cfg(all(feature = "wayland", feature = "desktop-applet"))]
@@ -3421,17 +4145,21 @@ impl Application for App {
         }
 
         if app.tab_model.entity_at(0).is_none() {
-            if let Ok(current_dir) = env::current_dir() {
-                commands.push(app.open_tab(Location::Path(current_dir), true, None));
+            let initial_dir = if yuos_sdk::gui::is_gui_launch() {
+                home_dir()
             } else {
-                commands.push(app.open_tab(Location::Path(home_dir()), true, None));
-            }
+                env::current_dir().unwrap_or_else(|_| home_dir())
+            };
+            commands.push(app.open_tab(Location::Path(initial_dir), true, None));
         }
 
         (app, Task::batch(commands))
     }
 
     fn nav_bar(&self) -> Option<Element<'_, cosmic::Action<Self::Message>>> {
+        if matches!(self.mode, Mode::App) {
+            return None;
+        }
         if !self.core.nav_bar_active() {
             return None;
         }
@@ -3835,13 +4563,24 @@ impl Application for App {
                     Some(p) => p,
                     None => return Task::none(),
                 };
-                let dialog_task = self.push_dialog(
-                    DialogPage::AiSummary {
-                        path: path.clone(),
-                        status: AiSummaryStatus::Loading,
-                    },
-                    None,
-                );
+                let name = path
+                    .file_name()
+                    .map(|n| n.to_string_lossy().into_owned())
+                    .unwrap_or_else(|| path.display().to_string());
+                self.ai_last_prompt = Some(format!("总结文件「{name}」的核心内容"));
+                self.ai_last_response = None;
+                self.ai_assist_status = AiAssistStatus::Loading;
+                let dialog_task = if self.ai_drawer_open {
+                    Task::none()
+                } else {
+                    self.push_dialog(
+                        DialogPage::AiSummary {
+                            path: path.clone(),
+                            status: AiSummaryStatus::Loading,
+                        },
+                        None,
+                    )
+                };
                 let work_path = path.clone();
                 let work = cosmic::Task::future(async move {
                     let outcome = run_ai_summarize(work_path.clone()).await;
@@ -3887,7 +4626,35 @@ impl Application for App {
                     log::error!("failed to open Ask Yu OS overlay: {err}");
                 }
             }
+            Message::ToggleAiDrawer => {
+                self.ai_drawer_open = !self.ai_drawer_open;
+            }
+            Message::SidebarToggleMenu => {
+                self.core.nav_bar_toggle();
+            }
+            Message::SidebarToggleExpand(path) => {
+                if !self.sidebar_expanded.remove(&path) {
+                    self.sidebar_expanded.insert(path);
+                }
+            }
+            Message::WindowDrag => {
+                if let Some(window_id) = self.core.main_window_id() {
+                    return window::drag(window_id);
+                }
+            }
+            Message::WindowMinimize => {
+                if let Some(window_id) = self.core.main_window_id() {
+                    return window::minimize(window_id, true);
+                }
+            }
+            Message::WindowToggleMaximize => {
+                if let Some(window_id) = self.core.main_window_id() {
+                    return window::toggle_maximize(window_id);
+                }
+            }
             Message::AiSummaryResult { path, outcome } => {
+                self.ai_assist_status = AiAssistStatus::Idle;
+                self.ai_last_response = Some(outcome.clone());
                 // Only mutate the dialog if it's still the one we kicked off
                 // (the user may have already closed it).
                 if let Some(DialogPage::AiSummary { path: cur_path, .. }) =
@@ -3907,13 +4674,24 @@ impl Application for App {
                     Some(p) => p,
                     None => return Task::none(),
                 };
-                let dialog_task = self.push_dialog(
-                    DialogPage::AiExplain {
-                        path: path.clone(),
-                        status: AiSummaryStatus::Loading,
-                    },
-                    None,
-                );
+                let name = path
+                    .file_name()
+                    .map(|n| n.to_string_lossy().into_owned())
+                    .unwrap_or_else(|| path.display().to_string());
+                self.ai_last_prompt = Some(format!("解释文件「{name}」的作用与结构"));
+                self.ai_last_response = None;
+                self.ai_assist_status = AiAssistStatus::Loading;
+                let dialog_task = if self.ai_drawer_open {
+                    Task::none()
+                } else {
+                    self.push_dialog(
+                        DialogPage::AiExplain {
+                            path: path.clone(),
+                            status: AiSummaryStatus::Loading,
+                        },
+                        None,
+                    )
+                };
                 let work_path = path.clone();
                 let work = cosmic::Task::future(async move {
                     let outcome = crate::yuos_glue::ai::explain(work_path.clone()).await;
@@ -3925,6 +4703,8 @@ impl Application for App {
                 return Task::batch([dialog_task, work]);
             }
             Message::AiExplainResult { path, outcome } => {
+                self.ai_assist_status = AiAssistStatus::Idle;
+                self.ai_last_response = Some(outcome.clone());
                 // Same "is this still our dialog?" guard as AiSummaryResult.
                 if let Some(DialogPage::AiExplain { path: cur_path, .. }) =
                     self.dialog_pages.front()
@@ -3946,6 +4726,9 @@ impl Application for App {
                 if query.is_empty() {
                     return Task::none();
                 }
+                self.ai_last_prompt = Some(query.clone());
+                self.ai_last_response = None;
+                self.ai_assist_input.clear();
                 self.ai_assist_status = AiAssistStatus::Loading;
                 return cosmic::Task::future(async move {
                     let outcome = crate::yuos_glue::ai::search(query, 50).await;
@@ -3957,6 +4740,12 @@ impl Application for App {
                     Some(p) => p,
                     None => return Task::none(),
                 };
+                let name = path
+                    .file_name()
+                    .map(|n| n.to_string_lossy().into_owned())
+                    .unwrap_or_else(|| path.display().to_string());
+                self.ai_last_prompt = Some(format!("查找与「{name}」相关的相似文件"));
+                self.ai_last_response = None;
                 self.ai_assist_status = AiAssistStatus::Loading;
                 return cosmic::Task::future(async move {
                     let outcome = crate::yuos_glue::ai::find_similar(path, 50).await;
@@ -5660,13 +6449,9 @@ impl Application for App {
                             }
                         }
                         tab::Command::ChangeLocation(tab_title, tab_path, selection_paths) => {
-                            let show_home_dashboard = is_home_location(&tab_path)
-                                && !has_direct_selection(&tab_path, selection_paths.as_deref());
-                            if show_home_dashboard {
-                                self.home_dashboard_tabs.insert(entity);
-                            } else {
-                                self.home_dashboard_tabs.remove(&entity);
-                            }
+                            let show_home_dashboard = false;
+                            let _ = has_direct_selection(&tab_path, selection_paths.as_deref());
+                            self.home_dashboard_tabs.remove(&entity);
                             self.activate_nav_model_location(&tab_path);
 
                             self.tab_model.text_set(entity, tab_title);
@@ -7663,19 +8448,11 @@ impl Application for App {
 
     fn footer(&self) -> Option<Element<'_, Message>> {
         let has_ops = !self.progress_operations.is_empty();
-        let path_bar = if has_ops {
-            None
-        } else {
-            self.finder_path_bar()
-        };
-        let status_bar = if has_ops {
-            None
-        } else {
-            self.finder_status_bar()
-        };
-        if !has_ops && path_bar.is_none() && status_bar.is_none() {
+        if !has_ops {
             return None;
         }
+        let path_bar: Option<Element<'_, Message>> = None;
+        let status_bar: Option<Element<'_, Message>> = None;
 
         let cosmic_theme::Spacing {
             space_xs, space_s, ..
@@ -7821,20 +8598,10 @@ impl Application for App {
     }
 
     fn header_start(&self) -> Vec<Element<'_, Self::Message>> {
-        vec![menu::menu_bar(
-            &self.core,
-            self.tab_model.active_data::<Tab>(),
-            &self.config,
-            &self.modifiers,
-            &self.key_binds,
-            self.clipboard_has_content(),
-        )]
+        Vec::new()
     }
 
     fn header_end(&self) -> Vec<Element<'_, Self::Message>> {
-        // Search lives in the Finder-style toolbar inside `view()` now,
-        // so the title bar's right side stays clean — just like macOS
-        // Finder, which has no controls in its title bar.
         Vec::new()
     }
 
@@ -7844,16 +8611,18 @@ impl Application for App {
             space_xxs, space_s, ..
         } = theme::spacing();
 
-        let mut tab_column = widget::column::with_capacity(5);
+        let mut main_pane = widget::column::with_capacity(6)
+            .width(Length::Fill)
+            .height(Length::Fill);
 
-        // Finder-style toolbar: back/forward + view switcher + search.
-        tab_column = tab_column.push(self.finder_toolbar());
+        // 1. Unified Top Toolbar
+        main_pane = main_pane.push(self.finder_toolbar());
 
         if self.tab_model.len() > 1 {
-            tab_column = tab_column.push(
+            main_pane = main_pane.push(
                 widget::container(
                     widget::tab_bar::horizontal(&self.tab_model)
-                        .button_height(32)
+                        .button_height(28)
                         .button_spacing(space_xxs)
                         .enable_tab_drag(String::from("x-yuos-files/tab-dnd"))
                         .on_reorder(Message::ReorderTab)
@@ -7873,48 +8642,45 @@ impl Application for App {
             );
         }
 
+        // 2. Secondary Compact Action Strip
+        main_pane = main_pane.push(self.finder_action_strip());
+
+        // 3. Edge-to-Edge Content Area + Optional Right-Side AI Drawer
         let entity = self.tab_model.active();
         if let Some(tab) = self.tab_model.data::<Tab>(entity) {
-            let is_home = is_home_location(&tab.location);
-            let tab_view = if is_home && self.home_dashboard_tabs.contains(&entity) {
-                self.home_dashboard(entity, tab)
-            } else {
-                let files = tab
-                    .view(
-                        &self.key_binds,
-                        &self.modifiers,
-                        self.clipboard_has_content(),
-                        &self.config.context_actions,
-                    )
-                    .map(move |message| Message::TabMessage(Some(entity), message));
-                if is_home {
-                    widget::column::with_children(vec![
-                        widget::container(
-                            widget::button::link(fl!("home-dashboard-show-overview"))
-                                .on_press(Message::HomeDashboardShow(true)),
-                        )
-                        .padding([theme::spacing().space_xxs, theme::spacing().space_m])
-                        .into(),
-                        files,
-                    ])
-                    .into()
-                } else {
-                    files
-                }
-            };
-            tab_column = tab_column.push(tab_view);
-        } else {
-            //TODO
+            let files: Element<'_, Self::Message> = tab
+                .view(
+                    &self.key_binds,
+                    &self.modifiers,
+                    self.clipboard_has_content(),
+                    &self.config.context_actions,
+                )
+                .map(move |message| Message::TabMessage(Some(entity), message));
+
+            let mut split_row = widget::row::with_capacity(2)
+                .width(Length::Fill)
+                .height(Length::Fill)
+                .push(files);
+            if self.ai_drawer_open {
+                split_row = split_row.push(self.finder_ai_drawer());
+            }
+            main_pane = main_pane.push(split_row);
         }
 
+        // 4. Single Compact Bottom Status & Breadcrumb Bar
+        main_pane = main_pane.push(self.finder_bottom_bar());
+
         // The toaster is added on top of an empty element to ensure that it does not override context menus
-        tab_column = tab_column.push(widget::toaster(&self.toasts, widget::space::horizontal()));
+        main_pane = main_pane.push(widget::toaster(&self.toasts, widget::space::horizontal()));
 
-        let content: Element<_> = tab_column.into();
-
-        // Uncomment to debug layout:
-        //content.explain(cosmic::iced::Color::WHITE)
-        content
+        if matches!(self.mode, Mode::App) && self.core.nav_bar_active() {
+            widget::row::with_children([self.finder_sidebar(), main_pane.into()])
+                .width(Length::Fill)
+                .height(Length::Fill)
+                .into()
+        } else {
+            main_pane.into()
+        }
     }
 
     fn view_window(&self, id: WindowId) -> Element<'_, Self::Message> {

@@ -219,6 +219,113 @@ fn button_appearance(
     appearance
 }
 
+fn list_row_style(
+    selected: bool,
+    highlighted: bool,
+    cut: bool,
+    even: bool,
+) -> theme::Button {
+    theme::Button::Custom {
+        active: Box::new(move |_focused, theme| {
+            list_row_appearance(theme, selected, highlighted, cut, even)
+        }),
+        disabled: Box::new(move |theme| {
+            list_row_appearance(theme, selected, false, cut, even)
+        }),
+        hovered: Box::new(move |_focused, theme| {
+            list_row_appearance(theme, selected, true, cut, even)
+        }),
+        pressed: Box::new(move |_focused, theme| {
+            list_row_appearance(theme, true, true, cut, even)
+        }),
+    }
+}
+
+fn list_row_appearance(
+    theme: &theme::Theme,
+    selected: bool,
+    highlighted: bool,
+    cut: bool,
+    even: bool,
+) -> widget::button::Style {
+    let is_dark = theme.cosmic().is_dark;
+    let mut style = widget::button::Style::new();
+    style.border_radius = 0.0.into();
+    if selected {
+        style.background = Some(Color::from_rgb8(0x0a, 0x84, 0xff).into());
+        style.icon_color = Some(Color::WHITE);
+        style.text_color = Some(if cut {
+            Color::from_rgba(1.0, 1.0, 1.0, 0.75)
+        } else {
+            Color::WHITE
+        });
+    } else if highlighted {
+        style.background = Some(
+            if is_dark {
+                Color::from_rgb8(0x1e, 0x29, 0x3b)
+            } else {
+                Color::from_rgb8(0xea, 0xf1, 0xfb)
+            }
+            .into(),
+        );
+        style.text_color = Some(if is_dark {
+            Color::from_rgb8(0xee, 0xf2, 0xf7)
+        } else {
+            Color::from_rgb8(0x1f, 0x29, 0x37)
+        });
+    } else {
+        let bg = match (is_dark, even) {
+            (false, true) => Color::WHITE,
+            (false, false) => Color::from_rgb8(0xf5, 0xf7, 0xfb),
+            (true, true) => Color::from_rgb8(0x12, 0x16, 0x1f),
+            (true, false) => Color::from_rgb8(0x16, 0x1b, 0x25),
+        };
+        style.background = Some(bg.into());
+        style.text_color = Some(if is_dark {
+            Color::from_rgb8(0xee, 0xf2, 0xf7)
+        } else {
+            Color::from_rgb8(0x1f, 0x29, 0x37)
+        });
+    }
+    style
+}
+
+fn item_kind_label(item: &Item) -> String {
+    if item.metadata.is_dir() {
+        return "Folder".to_string();
+    }
+    let essence = item.mime.essence_str();
+    match essence {
+        "audio/mpeg" | "audio/mp3" => "MP3 audio".to_string(),
+        "audio/x-aiff" | "audio/aiff" => "AIFF audio".to_string(),
+        "audio/x-wav" | "audio/wav" => "WAV audio".to_string(),
+        "audio/flac" => "FLAC audio".to_string(),
+        "audio/x-caf" => "Core Audio file".to_string(),
+        "image/png" => "PNG image".to_string(),
+        "image/jpeg" => "JPEG image".to_string(),
+        "image/svg+xml" => "SVG image".to_string(),
+        "image/webp" => "WebP image".to_string(),
+        "application/pdf" => "PDF document".to_string(),
+        "application/zip" => "ZIP archive".to_string(),
+        "application/json" => "JSON document".to_string(),
+        "text/markdown" => "Markdown document".to_string(),
+        "text/x-rust" => "Rust source".to_string(),
+        "text/x-python" => "Python script".to_string(),
+        "text/plain" => "Plain text".to_string(),
+        _ => {
+            let sub = item.mime.subtype().as_str().trim_start_matches("x-");
+            let ty = item.mime.type_().as_str();
+            if sub.is_empty() || sub == "octet-stream" {
+                "Document".to_string()
+            } else if ty == "audio" || ty == "video" || ty == "image" {
+                format!("{} {}", sub.to_uppercase(), ty)
+            } else {
+                format!("{} file", sub.to_uppercase())
+            }
+        }
+    }
+}
+
 fn button_style(
     selected: bool,
     highlighted: bool,
@@ -4994,74 +5101,86 @@ impl Tab {
         w += f32::from(space_s);
 
         //TODO: allow resizing?
-        let name_width = 300.0;
-        let modified_width = 200.0;
-        let size_width = 100.0;
+        let name_width = 240.0;
+        let modified_width = 150.0;
+        let size_width = 92.0;
+        let kind_width = 150.0;
         let condensed = size.width < (name_width + modified_width + size_width);
 
         let (sort_name, sort_direction, _) = self.sort_options();
-        let heading_item = |name, width, msg| {
-            let mut row = widget::row::with_capacity(2)
+        let heading_item = |name: String, width: Length, msg: HeadingOptions| -> Element<'_, Message> {
+            let mut row = widget::row::with_capacity(3)
                 .align_y(Alignment::Center)
                 .spacing(space_xxxs)
+                .padding([0, 12])
                 .width(width);
-            row = row.push(widget::text::heading(name));
+            row = row.push(widget::text::caption(name));
+            row = row.push(widget::space::horizontal());
             match (sort_name == msg, sort_direction) {
                 (true, true) => {
-                    row = row.push(widget::icon::from_name("pan-down-symbolic").size(16));
+                    row = row.push(widget::icon::from_name("pan-up-symbolic").size(12));
                 }
                 (true, false) => {
-                    row = row.push(widget::icon::from_name("pan-up-symbolic").size(16));
+                    row = row.push(widget::icon::from_name("pan-down-symbolic").size(12));
                 }
                 _ => {}
             }
-            //TODO: make it possible to resize with the mouse
             mouse_area::MouseArea::new(row)
                 .on_press(move |_point_opt| Message::ToggleSort(msg))
                 .into()
         };
 
-        let heading_row = widget::row::with_children([
-            heading_item(fl!("name"), Length::Fill, HeadingOptions::Name),
-            if self.location.is_trash() {
-                heading_item(
-                    fl!("trashed-on"),
-                    Length::Fixed(modified_width),
-                    HeadingOptions::TrashedOn,
-                )
-            } else {
-                heading_item(
-                    fl!("modified"),
-                    Length::Fixed(modified_width),
-                    HeadingOptions::Modified,
-                )
-            },
-            heading_item(fl!("size"), Length::Fixed(size_width), HeadingOptions::Size),
-        ])
-        .align_y(Alignment::Center)
-        .height(Length::Fixed((space_m + 4).into()))
-        .padding([0, space_xxs]);
+        let col_sep = || -> Element<'_, Message> {
+            rule::vertical(1)
+                .class(crate::glass::divider_rule())
+                .into()
+        };
+
+        let heading_row = widget::container(
+            widget::row::with_children([
+                heading_item(fl!("name"), Length::Fill, HeadingOptions::Name),
+                col_sep(),
+                if self.location.is_trash() {
+                    heading_item(
+                        fl!("trashed-on"),
+                        Length::Fixed(modified_width),
+                        HeadingOptions::TrashedOn,
+                    )
+                } else {
+                    heading_item(
+                        "Date Modified".to_string(),
+                        Length::Fixed(modified_width),
+                        HeadingOptions::Modified,
+                    )
+                },
+                col_sep(),
+                heading_item(fl!("size"), Length::Fixed(size_width), HeadingOptions::Size),
+                col_sep(),
+                widget::container(widget::text::caption("Kind"))
+                    .padding([0, 12])
+                    .width(Length::Fixed(kind_width))
+                    .align_y(Alignment::Center)
+                    .into(),
+            ])
+            .align_y(Alignment::Center)
+            .height(Length::Fixed(26.0)),
+        )
+        .width(Length::Fill)
+        .class(theme::Container::custom(crate::glass::table_header_surface));
 
         let accent_rule =
-            rule::horizontal(1).class(theme::Rule::Custom(Box::new(|theme| rule::Style {
-                color: theme.cosmic().accent_color().into(),
-                radius: 0.0.into(),
-                fill_mode: rule::FillMode::Full,
-                snap: true,
-            })));
-        let heading_rule = widget::container(rule::horizontal(1).class(theme::Rule::Custom(
-            Box::new(|theme| rule::Style {
-                color: {
-                    let mut c = theme.cosmic().accent_color();
-                    c.alpha = 0.20;
-                    c.into()
-                },
-                radius: 0.0.into(),
-                fill_mode: rule::FillMode::Full,
-                snap: true,
-            }),
-        )))
-        .padding([0, theme::active().cosmic().corner_radii.radius_xs[0] as u16]);
+            rule::horizontal(1).class(crate::glass::divider_rule());
+        let heading_rule =
+            rule::horizontal(1).class(crate::glass::divider_rule());
+
+        if matches!(self.mode, Mode::App) && self.edit_location.is_none() {
+            if self.config.view == View::List && !condensed {
+                return widget::column::with_children([heading_row.into(), heading_rule.into()])
+                    .width(Length::Fill)
+                    .into();
+            }
+            return widget::space::horizontal().width(Length::Shrink).into();
+        }
 
         if let Some(edit_location) = &self.edit_location {
             let mut text_input = None;
@@ -5702,22 +5821,17 @@ impl Tab {
 
         let size = self.size_opt.get().unwrap_or_else(|| Size::new(0.0, 0.0));
         //TODO: allow resizing?
-        let name_width = 300.0;
-        let modified_width = 200.0;
-        let size_width = 100.0;
+        let name_width = 240.0;
+        let modified_width = 150.0;
+        let size_width = 92.0;
+        let kind_width = 150.0;
         let condensed = size.width < (name_width + modified_width + size_width);
         let is_search = matches!(self.location, Location::Search(..));
-        let icon_size = if condensed || is_search {
-            icon_sizes.list_condensed()
-        } else {
-            icon_sizes.list()
-        };
-        let row_height = icon_size + 2 * space_xxs;
+        let icon_size: u16 = 16;
+        let row_height: u16 = 28;
 
         let mut column = widget::column::with_capacity(3);
         let mut y: f32 = 0.0;
-
-        let rule_padding = theme::active().cosmic().corner_radii.radius_xs[0] as u16;
 
         //TODO: move to function
         let visible_rect = {
@@ -5748,16 +5862,10 @@ impl Tab {
                     continue;
                 }
 
-                if count > 0 {
-                    column = column
-                        .push(widget::container(rule::horizontal(1)).padding([0, rule_padding]));
-                    y += 1.0;
-                }
-
                 item.pos_opt.set(Some((count, 0)));
                 let item_rect = Rectangle::new(
-                    Point::new(f32::from(space_s), y),
-                    Size::new(size.width - f32::from(2 * space_s), f32::from(row_height)),
+                    Point::new(0.0, y),
+                    Size::new(size.width, f32::from(row_height)),
                 );
                 item.rect_opt.set(Some(item_rect));
 
@@ -5840,6 +5948,9 @@ impl Tab {
                         },
                     };
 
+                    let kind_text = item_kind_label(item);
+                    let even = count % 2 == 0;
+
                     let row = if condensed {
                         widget::row::with_children([
                             widget::icon::icon(item.icon_handle_list_condensed.clone())
@@ -5873,11 +5984,17 @@ impl Tab {
                             ])
                             .width(Length::Fill)
                             .into(),
-                            widget::text::body(modified_text.clone())
+                            widget::container(widget::text::caption(modified_text.clone()))
+                                .padding([0, 12])
                                 .width(Length::Fixed(modified_width))
                                 .into(),
-                            widget::text::body(size_text.clone())
+                            widget::container(widget::text::caption(size_text.clone()))
+                                .padding([0, 12])
                                 .width(Length::Fixed(size_width))
+                                .into(),
+                            widget::container(widget::text::caption(kind_text))
+                                .padding([0, 12])
+                                .width(Length::Fixed(kind_width))
                                 .into(),
                         ])
                         .height(Length::Fixed(f32::from(row_height)))
@@ -5892,11 +6009,17 @@ impl Tab {
                             Item::list_display_name(item.display_name.clone())
                                 .width(Length::Fill)
                                 .into(),
-                            widget::text::body(modified_text.clone())
+                            widget::container(widget::text::caption(modified_text.clone()))
+                                .padding([0, 12])
                                 .width(Length::Fixed(modified_width))
                                 .into(),
-                            widget::text::body(size_text.clone())
+                            widget::container(widget::text::caption(size_text.clone()))
+                                .padding([0, 12])
                                 .width(Length::Fixed(size_width))
+                                .into(),
+                            widget::container(widget::text::caption(kind_text))
+                                .padding([0, 12])
+                                .width(Length::Fixed(kind_width))
                                 .into(),
                         ])
                         .height(Length::Fixed(f32::from(row_height)))
@@ -5909,14 +6032,12 @@ impl Tab {
                             widget::button::custom(row)
                                 .width(Length::Fill)
                                 .id(item.button_id.clone())
-                                .padding([0, space_xxs])
-                                .class(button_style(
+                                .padding([0, 12])
+                                .class(list_row_style(
                                     item.selected,
                                     item.highlighted,
                                     item.cut,
-                                    true,
-                                    true,
-                                    false,
+                                    even,
                                 )),
                         )
                         .on_press(move |_| Message::Click(Some(i)))
@@ -6064,7 +6185,7 @@ impl Tab {
         let drag_col = (!drag_items.is_empty())
             .then(|| Element::from(widget::column::with_children(drag_items)));
 
-        let mut mouse_area = mouse_area::MouseArea::new(column.padding([0, space_s]))
+        let mut mouse_area = mouse_area::MouseArea::new(column)
             .with_id(Id::new("list-view"))
             .on_press(|_| Message::Click(None))
             .on_auto_scroll(Message::AutoScroll)
@@ -6096,10 +6217,16 @@ impl Tab {
             ..
         } = theme::spacing();
 
-        let location_view_opt = if matches!(self.mode, Mode::Desktop) {
-            None
-        } else {
-            Some(self.location_view())
+        let location_view_opt = match self.mode {
+            Mode::Desktop => None,
+            Mode::App => {
+                if self.config.view == View::List || self.edit_location.is_some() {
+                    Some(self.location_view())
+                } else {
+                    None
+                }
+            }
+            Mode::Dialog(_) => Some(self.location_view()),
         };
         let (drag_list, mut item_view, can_scroll) = match self.config.view {
             View::Grid => self.grid_view(),
@@ -6186,10 +6313,15 @@ impl Tab {
 
         let mut tab_column = widget::column::with_capacity(3);
         if let Some(location_view) = location_view_opt {
-            let location_view = widget::container(location_view)
-                .padding([space_xxxs, space_xs])
-                .width(Length::Fill)
-                .class(theme::Container::custom(crate::glass::path_bar));
+            let location_view: Element<'_, Message> = if matches!(self.mode, Mode::App) && self.edit_location.is_none() {
+                location_view
+            } else {
+                widget::container(location_view)
+                    .padding([space_xxxs, space_xs])
+                    .width(Length::Fill)
+                    .class(theme::Container::custom(crate::glass::path_bar))
+                    .into()
+            };
             tab_column = tab_column.push(location_view);
         }
         let file_content: Element<'_, Message> = if can_scroll {
