@@ -1,21 +1,105 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mail</title><link rel="stylesheet" href="shared/ui.css"></head><body>
-<header><div><h1>Mail</h1><p data-app-label>Mailboxes, drafts and account-scoped delivery</p></div></header>
-<main class="stack"><div class="toolbar" id="mail-toolbar"><select id="accounts" aria-label="Mail account" style="width:220px"></select>
-<select id="folders" aria-label="Mailbox folder" style="width:180px"></select>
-<input id="query" placeholder="Search messages"><button id="search">Search</button><button id="refresh">Refresh</button>
-<button id="compose" class="primary">Compose</button></div><p id="notice" class="notice" role="status"></p>
-<div class="split" id="mailbox"><section class="card stack"><div class="toolbar">
-<label class="row"><input id="unread" type="checkbox">Unread only</label>
-<label>Messages per page<select id="limit"><option>25</option><option>50</option><option>100</option></select></label></div>
-<p id="message-count" class="small muted"></p><div id="messages" class="list"></div></section>
-<section class="card stack"><h2 id="subject">Message</h2><p id="sender" class="muted small"></p>
-<div id="message" class="prose muted">Select a message to read it.</div><div id="attachments" class="stack"></div>
-<div id="message-actions" class="toolbar"></div></section></div>
-<section id="draft" class="card stack" hidden><h2>Saved draft</h2><div id="draft-content" class="stack"></div>
-<div id="draft-actions" class="toolbar"></div></section>
-<section class="card stack" id="ai"><h2>Mail AI</h2><p class="muted small">Explicit text assistance uses this App's own AI consent and budget.</p>
-<label>Message or writing context<textarea id="ai-input" rows="6" placeholder="Paste the message or describe what you want to write."></textarea></label>
-<div id="ai-actions" class="toolbar"></div><div id="ai-result"></div></section><div id="more"></div></main>
-<script src="shared/client.js"></script><script src="shared/ui.js"></script><script src="app.js"></script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mail</title>
+  <link rel="stylesheet" href="shared/ui.css">
+  <link rel="stylesheet" href="mail.css">
+</head>
+<body>
+  <svg class="mail-symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="icon-mail" viewBox="0 0 20 20"><rect x="2.5" y="4.5" width="15" height="11" rx="2"/><path d="m3 6 7 5 7-5"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5"/><path d="m12 12 4 4"/></symbol>
+    <symbol id="icon-compose" viewBox="0 0 20 20"><path d="M9 4H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-4M7 12.5l.5-3 6.8-6.8a1.8 1.8 0 0 1 2.5 2.5L10 12z"/></symbol>
+    <symbol id="icon-refresh" viewBox="0 0 20 20"><path d="M16.5 10a6.5 6.5 0 1 1-2-4.7l2 2m0-4v4h-4"/></symbol>
+    <symbol id="icon-inbox" viewBox="0 0 20 20"><path d="M2.5 11 5 4h10l2.5 7v4.5a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1zm0 0H7l1.5 2h3l1.5-2h4.5"/></symbol>
+    <symbol id="icon-folder" viewBox="0 0 20 20"><path d="M2.5 6a2 2 0 0 1 2-2h3l2 2h6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="icon-drafts" viewBox="0 0 20 20"><path d="M5 3.5h7l3 3v10H5zM11.5 3.5V7H15M8 10h4m-4 3h4"/></symbol>
+    <symbol id="icon-sent" viewBox="0 0 20 20"><path d="M17 3 3 8l5.5 3.5L12 17zm0 0-8.5 8.5"/></symbol>
+    <symbol id="icon-archive" viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="4" rx="1"/><path d="M4.5 8v7.5h11V8M8 11h4"/></symbol>
+    <symbol id="icon-trash" viewBox="0 0 20 20"><path d="M3.5 6h13M7.5 6V3.5h5V6M5 6l1 10.5h8L15 6M8.5 9v4.5m3-4.5v4.5"/></symbol>
+    <symbol id="icon-junk" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5"/><path d="M10 6.5v4m0 2.5v.1"/></symbol>
+    <symbol id="icon-reply" viewBox="0 0 20 20"><path d="m7.5 5-5 5 5 5m-5-5h7a6 6 0 0 1 6 6"/></symbol>
+    <symbol id="icon-clip" viewBox="0 0 20 20"><path d="m16 9-6.5 6.5A3.5 3.5 0 0 1 4.5 10.5l7-7A2.5 2.5 0 0 1 15 7l-6.5 6.5A1.4 1.4 0 0 1 6.5 11.5l6-6"/></symbol>
+  </svg>
+  <header class="mail-header">
+    <h1 class="mail-brand"><svg class="mail-icon" aria-hidden="true"><use href="#icon-mail"/></svg> Mail</h1>
+    <div class="mail-search" id="mail-search" role="search">
+      <svg class="mail-icon" aria-hidden="true"><use href="#icon-search"/></svg>
+      <input id="query" type="search" aria-label="Search current folder" placeholder="Search current folder" disabled>
+      <button id="search" type="button" disabled>Search</button>
+    </div>
+  </header>
+  <main class="mail-main">
+    <div id="mail-toolbar" class="mail-toolbar" role="group" aria-label="Mail commands">
+      <div class="mail-ribbon-label">Home</div>
+      <button id="compose" class="primary mail-button" type="button" disabled>
+        <svg class="mail-icon" aria-hidden="true"><use href="#icon-compose"/></svg> New mail
+      </button>
+      <button id="refresh" class="mail-button" type="button" disabled>
+        <svg class="mail-icon" aria-hidden="true"><use href="#icon-refresh"/></svg> Refresh
+      </button>
+    </div>
+    <p id="notice" class="notice mail-notice" role="status"></p>
+    <div class="mailbox" id="mailbox">
+      <nav class="mail-folders" aria-label="Mailbox folders">
+        <label for="accounts">Account</label>
+        <select id="accounts" disabled></select>
+        <h2>Folders</h2>
+        <div id="folders" class="folder-list"></div>
+      </nav>
+      <section class="mail-list-pane" aria-labelledby="folder-title">
+        <div class="mail-list-header">
+          <div class="mail-list-title">
+            <h2 id="folder-title">Messages</h2>
+            <span id="message-count" class="small muted" role="status"></span>
+          </div>
+          <div class="mail-list-filters">
+            <label class="mail-unread"><input id="unread" type="checkbox" disabled> Unread only</label>
+            <label class="mail-limit">Show up to
+              <select id="limit" disabled><option>25</option><option>50</option><option>100</option></select>
+            </label>
+          </div>
+        </div>
+        <div id="messages" class="mail-messages"></div>
+      </section>
+      <section class="mail-reader" aria-labelledby="subject">
+        <div class="mail-reader-heading">
+          <h2 id="subject">Message</h2>
+          <div id="message-actions"></div>
+        </div>
+        <div class="mail-reader-content">
+          <div id="message-meta" class="mail-meta" hidden>
+            <span class="mail-avatar" aria-hidden="true"></span>
+            <div><p id="sender"></p><p id="message-date" class="muted small"></p></div>
+          </div>
+          <div id="message" class="prose muted">Select a message to read it.</div>
+          <div id="attachments" class="mail-attachments"></div>
+          <section id="draft" class="mail-draft" hidden>
+            <h3>Saved draft</h3>
+            <div id="draft-content" class="stack"></div>
+            <div id="draft-actions" class="stack"></div>
+          </section>
+        </div>
+      </section>
+    </div>
+    <details class="mail-extra" id="ai" hidden>
+      <summary>Mail AI</summary>
+      <div class="mail-extra-body stack">
+        <p class="muted small">Explicit text assistance uses this App's own AI consent and budget.</p>
+        <label>Message or writing context
+          <textarea id="ai-input" rows="6" placeholder="Paste the message or describe what you want to write."></textarea>
+        </label>
+        <div id="ai-actions" class="toolbar"></div>
+        <div id="ai-result"></div>
+      </div>
+    </details>
+    <div id="more"></div>
+    <div id="tool-result" aria-live="polite"></div>
+  </main>
+  <script src="shared/client.js"></script>
+  <script src="shared/ui.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

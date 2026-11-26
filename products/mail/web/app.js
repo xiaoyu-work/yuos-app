@@ -1,18 +1,24 @@
 YuOsApp.ready.then((app) => {
   "use strict";
   const ui = YuOsUi;
-  ui.showApp(app);
-  const accounts = document.querySelector("#accounts");
-  const folders = document.querySelector("#folders");
-  const notice = document.querySelector("#notice");
+  const $ = (selector) => document.querySelector(selector);
+  const accounts = $("#accounts");
+  const folders = $("#folders");
+  const messages = $("#messages");
+  const notice = $("#notice");
   const accountItems = new Map();
+  const has = (name) => YuOsApp.tool(app, name);
+  const dateLabel = new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" });
   let selected = null;
+  let folder = null;
+  let folderItems = [];
+  let foldersReady = false;
+  let activeQuery = "";
   let generation = 0;
   let readGeneration = 0;
-  let folderItems = [];
   const addresses = (value) => Array.isArray(value) ? value.join(", ") : value || "";
-  const defaults = () => ({ account: selected && selected.account || accounts.value,
-    folder: folders.value, id: selected && selected.id });
+  const defaults = () => ({ account: selected?.account || accounts.value,
+    folder: folder?.id, id: selected?.id });
   const fields = {
     account: { label: "Account", hidden: true },
     "source-account": { label: "Draft mailbox account", hidden: true },
@@ -26,14 +32,47 @@ YuOsApp.ready.then((app) => {
     body: { label: "Message", type: "textarea", rows: 10 },
     confirm: { label: "I have reviewed this draft and confirm it may be sent." },
   };
-  function resetMessage() {
+  function icon(name) {
+    const namespace = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(namespace, "svg");
+    const use = document.createElementNS(namespace, "use");
+    svg.setAttribute("class", "mail-icon");
+    svg.setAttribute("aria-hidden", "true");
+    use.setAttribute("href", `#icon-${name}`);
+    svg.append(use);
+    return svg;
+  }
+  function action(label, symbol) {
+    const button = ui.node("button", null, { type: "button", class: "mail-button" });
+    button.append(icon(symbol), label);
+    return button;
+  }
+  function setNotice(text, error = false) {
+    notice.textContent = text;
+    notice.classList.toggle("error", error);
+  }
+  async function mailboxRequest(command, args, current, onResult) {
+    try {
+      const result = await YuOsApp.call(command, args);
+      if (!current()) return false;
+      onResult(result);
+      return true;
+    } catch (error) {
+      if (current()) setNotice(error.message, true);
+      return false;
+    }
+  }
+  function resetMessage(hint = "Select a message to read it.") {
     selected = null;
     ++readGeneration;
-    document.querySelector("#subject").textContent = "Message";
-    document.querySelector("#sender").textContent = "";
-    document.querySelector("#message").textContent = "Select a message to read it.";
-    document.querySelector("#message-actions").replaceChildren();
-    document.querySelector("#attachments").replaceChildren();
+    $("#subject").textContent = "Message";
+    $("#message-meta").hidden = true;
+    $("#message").textContent = hint;
+    $("#message").classList.add("muted");
+    $("#message-actions").replaceChildren();
+    $("#attachments").replaceChildren();
+    $("#draft").hidden = true;
+    messages.querySelector('[aria-pressed="true"]')?.setAttribute("aria-pressed", "false");
   }
   function aiResult(result) {
     const target = document.querySelector("#ai-result");
@@ -59,12 +98,15 @@ YuOsApp.ready.then((app) => {
     ui.replace(target, items);
   }
   function compose(values, replacing) {
-    const command = YuOsApp.tool(app, "draft_save") ? "draft_save" : "send";
+    const command = has("draft_save") ? "draft_save" : "send";
     const context = { account: accounts.value, "request-id": crypto.randomUUID(), ...values };
+    const request = readGeneration;
     ui.command(app, command, context, async (result) => {
-      if (result.draft) await reviewDraft(result.draft);
-      else notice.textContent = result.sent ?
-        "Submitted to Thunderbird. Delivery is not confirmed." : "Mail operation returned.";
+      if (result.draft && request === readGeneration) {
+        resetMessage("Review the draft before sending it.");
+        await reviewDraft(result.draft);
+      } else if (!result.draft) setNotice(result.sent ?
+        "Submitted to Thunderbird. Delivery is not confirmed." : "Mail operation returned.");
     }, {
       title: replacing ? "Edit saved draft" : "Compose email",
       submitLabel: command === "draft_save" ? "Save draft" : "Send email",
@@ -129,32 +171,44 @@ YuOsApp.ready.then((app) => {
     document.querySelector("#draft").hidden = false;
   }
   function reviewDraft(draft) {
-    if (!YuOsApp.tool(app, "native_draft")) return;
-    const request = generation;
-    return ui.run(null, () => YuOsApp.call("native_draft", { id: draft.id }), (result) => {
-      if (request === generation) showDraft(result.draft);
-    }, notice);
+    if (!has("native_draft")) return;
+    const request = readGeneration;
+    setNotice("Loading saved draft...");
+    return mailboxRequest("native_draft", { id: draft.id }, () => request === readGeneration, (result) => {
+      setNotice("");
+      showDraft(result.draft);
+      revealReader(true);
+    });
+  }
+  function revealReader(draft = false) {
+    if (draft || window.matchMedia("(max-width: 690px)").matches) {
+      $(draft ? "#draft" : ".mail-reader").scrollIntoView({ block: "nearest" });
+    }
   }
   function displayMessage(value, item) {
     selected = value;
-    document.querySelector("#subject").textContent = value.subject || item.subject || "(No subject)";
-    document.querySelector("#sender").textContent = `${value.from || ""}${value.date ? ` - ${new Date(value.date).toLocaleString()}` : ""}`;
-    document.querySelector("#message").textContent = value.body || "(No plain-text body)";
-    document.querySelector("#ai-input").value = value.body || "";
-    const attachments = document.querySelector("#attachments");
-    attachments.replaceChildren();
+    $("#subject").textContent = value.subject || item.subject || "(No subject)";
+    $("#sender").textContent = value.from || "Unknown sender";
+    const senderName = (value.from || "").split("<")[0].trim();
+    $(".mail-avatar").textContent = senderName.match(/[\p{L}\p{N}]/u)?.[0].toLocaleUpperCase() || "?";
+    $("#message-date").textContent = value.date ? new Date(value.date).toLocaleString() : "";
+    $("#message-meta").hidden = false;
+    $("#message").textContent = value.body || "(No plain-text body)";
+    $("#message").classList.toggle("muted", !value.body);
+    $("#ai-input").value = value.body || "";
+    const attachments = $("#attachments");
     if (value.truncated) attachments.append(ui.node("p", "The displayed message is truncated.", { class: "notice" }));
-    for (const item of value.attachments || []) {
-      const row = ui.node("div", null, { class: "row" });
-      row.append(ui.node("span", `${item.name} - ${item.size} bytes`, { class: "small" }));
-      if (YuOsApp.tool(app, "attachment_download")) {
+    for (const attachment of value.attachments || []) {
+      const row = ui.node("div", null, { class: "mail-attachment" });
+      row.append(icon("clip"), ui.node("span", `${attachment.name} - ${attachment.size} bytes`, { class: "small" }));
+      if (has("attachment_download")) {
         const download = ui.node("button", "Save attachment");
         download.onclick = () => ui.command(app, "attachment_download", {
-          ...defaults(), attachment: item.id,
+          account: value.account || accounts.value, id: value.id, attachment: attachment.id,
         }, (result) => {
           row.append(ui.node("span", `Saved ${result.bytes} bytes to ${result.path}`, { class: "small muted" }));
           download.disabled = true;
-        }, { title: `Save ${item.name}`, submitLabel: "Save attachment", fields: {
+        }, { title: `Save ${attachment.name}`, submitLabel: "Save attachment", fields: {
           ...fields, attachment: { label: "Attachment", hidden: true },
           output: { label: "Absolute destination path", type: "text", placeholder: "/home/user/Downloads/attachment.pdf" },
         }, description: "Choose an existing destination directory. An existing file is never overwritten." });
@@ -162,81 +216,156 @@ YuOsApp.ready.then((app) => {
       }
       attachments.append(row);
     }
-    const actions = document.querySelector("#message-actions");
-    actions.replaceChildren();
-    if (YuOsApp.tool(app, "draft_save") || YuOsApp.tool(app, "send")) {
-      const reply = ui.node("button", "Reply");
+    const actions = $("#message-actions");
+    if (!$("#compose").disabled) {
+      const reply = action("Reply", "reply");
       reply.onclick = () => compose({ to: value.from, subject: /^re:/i.test(value.subject || "") ?
         value.subject : `Re: ${value.subject || ""}`, body: `\n\n${value.body || ""}` });
       actions.append(reply);
     }
-    const folder = folderItems.find((entry) => entry.id === value.folder);
-    if (folder && folder.special_use && folder.special_use.includes("drafts") && YuOsApp.tool(app, "native_draft")) {
-      const review = ui.node("button", "Review saved draft");
+    const source = folderItems.find((entry) => entry.id === value.folder);
+    if (source?.special_use?.includes("drafts") && has("native_draft")) {
+      const review = action("Review saved draft", "drafts");
       review.onclick = () => { void reviewDraft(value); };
       actions.append(review);
     }
+    revealReader();
   }
   function list(result) {
-    const messages = ui.rows(result);
-    const limit = Number(document.querySelector("#limit").value);
-    document.querySelector("#message-count").textContent = `${messages.length} messages${messages.length === limit ?
-      " shown; narrow the search to find more." : "."}`;
-    ui.replace(document.querySelector("#messages"), messages.length ? messages.map((item) => {
-      const button = ui.node("button");
-      button.append(ui.node("strong", `${item.unread ? "Unread: " : ""}${item.subject || "(No subject)"}`),
-        ui.node("p", item.from || "", { class: "small muted" }),
-        ui.node("p", item.date ? new Date(item.date).toLocaleString() : "", { class: "small muted" }));
+    const items = ui.rows(result);
+    const limit = Number($("#limit").value);
+    $("#message-count").textContent = `${items.length} shown${items.length === limit ? ` (limit ${limit})` : ""}`;
+    ui.replace(messages, items.length ? items.map((item) => {
+      const subject = item.subject || "(No subject)";
+      const sender = item.from || "Unknown sender";
+      const button = ui.node("button", null, {
+        type: "button", class: item.unread ? "mail-message unread" : "mail-message",
+        "aria-pressed": "false", "aria-label": `${item.unread ? "Unread: " : ""}${sender}, ${subject}`,
+      });
+      const heading = ui.node("span", null, { class: "mail-row-heading" });
+      heading.append(ui.node("span", sender, { class: "mail-from", title: sender }));
+      if (item.date) {
+        const date = new Date(item.date);
+        if (!Number.isNaN(date.getTime())) heading.append(ui.node("time", dateLabel.format(date),
+          { datetime: date.toISOString(), title: date.toLocaleString() }));
+      }
+      button.append(heading, ui.node("span", subject, { class: "mail-subject-line", title: subject }));
+      button.disabled = !has("read");
       button.onclick = () => {
-        const request = ++readGeneration;
-        void ui.run(button, () => YuOsApp.call("read", { account: item.account || accounts.value, id: item.id }), (value) => {
-          if (request === readGeneration) displayMessage(value, item);
-        }, notice);
+        resetMessage("Loading message...");
+        const request = readGeneration;
+        button.setAttribute("aria-pressed", "true");
+        setNotice("");
+        const read = mailboxRequest("read", { account: item.account || accounts.value, id: item.id },
+          () => request === readGeneration, (value) => displayMessage(value, item));
+        void read.then((shown) => {
+          if (request === readGeneration && !shown) resetMessage("Could not open this message.");
+        });
       };
       return button;
-    }) : [ui.node("p", "No messages returned.", { class: "empty" })]);
+    }) : [ui.node("p", activeQuery ? "No messages match this search." : "No messages to show.", { class: "mail-empty" })]);
   }
-  function load(searching) {
-    if (!YuOsApp.tool(app, "list") || !accounts.value) return;
+  function listHint(text) {
+    $("#message-count").textContent = "";
+    ui.replace(messages, text ? [ui.node("p", text, { class: "mail-empty" })] : []);
+  }
+  function syncControls() {
+    const canList = foldersReady && !!folder && has("list");
+    const canSearch = foldersReady && has("search");
+    $("#query").disabled = $("#search").disabled = !canSearch;
+    $("#refresh").disabled = !(activeQuery ? canSearch : canList);
+    $("#unread").disabled = !canList || !!activeQuery;
+    $("#limit").disabled = !(canList || canSearch);
+  }
+  function load() {
+    const command = activeQuery ? "search" : "list";
+    if (!foldersReady || !has(command) || (!activeQuery && !folder)) return;
     const request = ++generation;
     resetMessage();
-    const arguments_ = { account: accounts.value, "max-results": Number(document.querySelector("#limit").value) };
-    if (folders.value) arguments_.folder = folders.value;
-    if (searching === true) arguments_.query = document.querySelector("#query").value;
-    else arguments_.unread = document.querySelector("#unread").checked;
-    return ui.run(document.querySelector(searching === true ? "#search" : "#refresh"),
-      () => YuOsApp.call(searching === true ? "search" : "list", arguments_),
-      (result) => { if (request === generation) list(result); }, notice);
+    $("#folder-title").textContent = activeQuery ? "Search results" : folder.name || folder.id;
+    listHint("Loading messages...");
+    setNotice("");
+    const args = { account: accounts.value, "max-results": Number($("#limit").value) };
+    if (folder) args.folder = folder.id;
+    if (activeQuery) args.query = activeQuery;
+    else args.unread = $("#unread").checked;
+    const loading = mailboxRequest(command, args, () => request === generation, list);
+    return loading.then((shown) => {
+      if (request === generation && !shown) listHint("Could not load messages.");
+    });
   }
-  accounts.onchange = () => {
+  function selectFolder(entry, button) {
+    folder = entry;
+    folders.querySelector('[aria-pressed="true"]')?.setAttribute("aria-pressed", "false");
+    button?.setAttribute("aria-pressed", "true");
+    $("#query").value = activeQuery = "";
+    $("#query").placeholder = $("#query").ariaLabel = folder ? "Search current folder" : "Search mailbox";
+    $("#folder-title").textContent = folder ? folder.name || folder.id : "Messages";
+    syncControls();
+    if (folder && has("list")) void load();
+    else {
+      ++generation;
+      setNotice("");
+      resetMessage();
+      listHint(folder ? "" : "This account has no folders.");
+    }
+  }
+  async function selectAccount() {
     const request = ++generation;
     resetMessage();
+    setNotice("");
+    foldersReady = false;
+    folder = null;
+    folderItems = [];
     folders.replaceChildren();
-    document.querySelector("#messages").replaceChildren();
-    document.querySelector("#draft").hidden = true;
+    $("#query").value = activeQuery = "";
+    $("#folder-title").textContent = "Messages";
+    syncControls();
+    listHint("Loading folders...");
     const item = accountItems.get(accounts.value);
-    document.querySelector("#compose").disabled = !item || !item.can_send ||
-      !(YuOsApp.tool(app, "draft_save") || YuOsApp.tool(app, "send"));
-    if (YuOsApp.tool(app, "folders") && item) void ui.run(null, () => YuOsApp.call("folders", { account: item.id }), (result) => {
-      if (request !== generation) return;
+    $("#compose").disabled = !item?.can_send || !(has("draft_save") || has("send"));
+    if (!item || !has("folders")) {
+      listHint("No mailbox folders are available.");
+      return;
+    }
+    await mailboxRequest("folders", { account: item.id }, () => request === generation, (result) => {
+      foldersReady = true;
       folderItems = ui.rows(result, ["folders"]);
-      ui.replace(folders, folderItems.map((entry) => ui.node("option", entry.name || entry.id, { value: entry.id })));
-      const inbox = folderItems.find((entry) => entry.special_use && entry.special_use.includes("inbox"));
-      if (inbox) folders.value = inbox.id;
-      void load();
-    }, notice);
+      const folderIcons = { inbox: "inbox", drafts: "drafts", sent: "sent", archives: "archive", trash: "trash", junk: "junk" };
+      const buttons = folderItems.map((entry) => {
+        const symbol = Object.keys(folderIcons).find((key) => entry.special_use?.includes(key));
+        const button = ui.node("button", null, { type: "button", class: "folder-button", "aria-pressed": "false" });
+        button.append(icon(folderIcons[symbol] || "folder"), ui.node("span", entry.name || entry.id));
+        button.onclick = () => selectFolder(entry, button);
+        return button;
+      });
+      folders.replaceChildren(...buttons);
+      const inbox = folderItems.findIndex((entry) => entry.special_use?.includes("inbox"));
+      const index = Math.max(inbox, 0);
+      selectFolder(folderItems[index], buttons[index]);
+    });
+    if (request === generation && !foldersReady) listHint("Could not load folders.");
+  }
+  accounts.onchange = () => { void selectAccount(); };
+  $("#refresh").onclick = () => { void load(); };
+  $("#unread").onchange = () => { void load(); };
+  $("#limit").onchange = () => { void load(); };
+  $("#search").onclick = () => {
+    activeQuery = $("#query").value.trim();
+    if (!activeQuery) {
+      selectFolder(folder, folders.querySelector('[aria-pressed="true"]'));
+      return;
+    }
+    syncControls();
+    void load();
   };
-  folders.onchange = () => { void load(); };
-  document.querySelector("#refresh").onclick = () => { void load(); };
-  document.querySelector("#unread").onchange = () => { void load(); };
-  document.querySelector("#limit").onchange = () => { void load(); };
-  document.querySelector("#search").disabled = !YuOsApp.tool(app, "search");
-  document.querySelector("#search").onclick = () => { void load(true); };
-  document.querySelector("#query").onkeydown = (event) => {
-    if (event.key === "Enter" && YuOsApp.tool(app, "search")) { event.preventDefault(); void load(true); }
+  $("#query").oninput = () => {
+    if (activeQuery && !$("#query").value.trim()) $("#search").click();
   };
-  document.querySelector("#compose").disabled = true;
-  document.querySelector("#compose").onclick = () => compose();
+  $("#query").onkeydown = (event) => {
+    if (event.key === "Enter") { event.preventDefault(); $("#search").click(); }
+  };
+  $("#compose").onclick = () => compose();
   const aiCommands = { summarize: "Summarize message", smart_reply: "Suggest replies",
     smart_compose: "Help compose", translate: "Translate", triage: "Triage", chat: "Ask about mail", draft: "Draft from context" };
   for (const [command, label] of Object.entries(aiCommands)) {
@@ -253,17 +382,20 @@ YuOsApp.ready.then((app) => {
     document.querySelector("#ai-actions").append(button);
   }
   document.querySelector("#ai").hidden = !document.querySelector("#ai-actions").children.length;
-  ui.allTools(document.querySelector("#more"), app, (value) => ui.output(document.querySelector("#ai-result"), value), defaults);
-  if (YuOsApp.tool(app, "accounts")) void ui.run(null, () => YuOsApp.call("accounts"), (result) => {
-    const values = ui.rows(result, ["accounts", "items"]);
-    for (const item of values) accountItems.set(item.id, item);
-    ui.replace(accounts, values.map((item) => ui.node("option", item.name || item.label || item.id, { value: item.id || item.account })));
-    if (values.length) accounts.onchange();
-    else notice.textContent = "No Thunderbird accounts are configured. Add an account in Thunderbird before opening a mailbox.";
-  }, notice);
-  else {
-    document.querySelector("#mail-toolbar").hidden = true;
-    document.querySelector("#mailbox").hidden = true;
-    notice.textContent = "Mail AI processes only the content you supply. It does not read another App's mailbox.";
+  ui.allTools($("#more"), app, (value) => ui.output($("#tool-result"), value), defaults);
+  if (has("accounts")) {
+    void ui.run(null, () => YuOsApp.call("accounts"), (result) => {
+      const values = ui.rows(result, ["accounts", "items"]);
+      for (const item of values) accountItems.set(item.id, item);
+      ui.replace(accounts, values.map((item) => ui.node("option", item.name || item.id, { value: item.id })));
+      accounts.disabled = !values.length;
+      if (values.length) void selectAccount();
+      else listHint("No accounts yet. Add an account in Thunderbird to open a mailbox.");
+    }, notice);
+  } else {
+    $("#mail-search").hidden = true;
+    $("#mail-toolbar").hidden = true;
+    $("#mailbox").hidden = true;
+    setNotice("Mail AI processes only the content you supply. It does not read another App's mailbox.");
   }
 });

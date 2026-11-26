@@ -52,6 +52,12 @@ Thunderbird. The XPI owns the Assistant, options, and AI popups in
 Thunderbird still owns the inbox, native compose window, and window controls.
 The checked-in `comm/` source build is not the desktop package's runtime.
 
+The signed Email Web entry in `web/` presents Thunderbird's existing accounts
+and folders in a three-pane mailbox with its own search, command bar, list
+and reading area. New mail and replies use the same draft review tools.
+This presentation does not replace the distribution Thunderbird window,
+change the active Thunderbird profile, or add account providers.
+
 `sync` reads the extension's bounded native inbox-arrival journal without a
 model request. The first pass records a non-replaying baseline; subsequent
 passes publish `message.received` references before advancing the App-private
