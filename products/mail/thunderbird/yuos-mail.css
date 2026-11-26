@@ -1,3 +1,21 @@
+@-moz-document url("chrome://messenger/content/messenger.xhtml"),
+               url("about:3pane"), url("chrome://messenger/content/messenger/about3Pane.xhtml"),
+               url("about:message"), url("chrome://messenger/content/messenger/aboutMessage.xhtml"),
+               url("chrome://messenger/content/messengercompose/messengercompose.xhtml") {
+  :root {
+    --yu-mail-font: "Noto Sans", system-ui, sans-serif;
+    --yu-mail-font-small: calc(12rem / 13);
+    --yu-mail-hover: light-dark(#ebf2fa, #313b4b);
+    --yu-mail-rule: light-dark(#dce3ed, #343e4c);
+    --yu-mail-secondary: var(--color-text-secondary, GrayText);
+    font-family: var(--yu-mail-font) !important;
+  }
+
+  :root:lang(zh-CN) {
+    --yu-mail-font: "Noto Sans CJK SC", system-ui, sans-serif;
+  }
+}
+
 @-moz-document url("chrome://messenger/content/messenger.xhtml") {
   unified-toolbar li[item-id="search-bar"] {
     min-width: 16em;
@@ -6,7 +24,15 @@
   @media (prefers-contrast: no-preference) and (forced-colors: none) {
     :root:not([lwtheme], [customizingUnifiedToolbar]) unified-toolbar {
       background-color: light-dark(#e7eef9, #202630) !important;
-      border-block-end-color: light-dark(#dce3ed, #343e4c) !important;
+      border-block-end-color: var(--yu-mail-rule) !important;
+    }
+
+    :root:not([lwtheme], [customizingUnifiedToolbar]) unified-toolbar .unified-toolbar-button {
+      border-radius: 4px !important;
+    }
+
+    :root:not([lwtheme], [customizingUnifiedToolbar]) unified-toolbar .unified-toolbar-button:not([popup]) {
+      padding-inline: 6px !important;
     }
 
     :root:not([lwtheme]) unified-toolbar li[item-id="write-message"] button:not(:disabled) {
@@ -30,7 +56,7 @@
 
 @-moz-document url("about:3pane"), url("chrome://messenger/content/messenger/about3Pane.xhtml") {
   #paneLayout.layout-vertical:not([style*="--folderPaneSplitter-width"]) {
-    --folderPaneSplitter-width: clamp(10em, 17vw, 14em) !important;
+    --folderPaneSplitter-width: clamp(10em, 17vw, 16em) !important;
   }
 
   #paneLayout.layout-vertical:not([style*="--messagePaneSplitter-width"]) {
@@ -42,6 +68,29 @@
   }
 
   #threadPaneHeaderBar .list-header-title {
+    font-size: calc(15rem / 13) !important;
+    font-weight: 600 !important;
+  }
+
+  #folderTree .container > .name,
+  #folderTree .folder-count-badge,
+  #threadTree[rows="thread-card"] .card-layout {
+    font-weight: 400 !important;
+  }
+
+  #folderTree .folder-count-badge,
+  #threadPaneHeaderBar .thread-pane-count-info,
+  #threadTree[rows="thread-card"] .card-container :is(.date, .yu-mail-preview) {
+    font-size: var(--yu-mail-font-small) !important;
+  }
+
+  #threadTree[rows="thread-card"] .card-container :is(.sender, .subject) {
+    font-size: 1rem !important;
+    font-weight: 400 !important;
+  }
+
+  #threadTree[rows="thread-card"] .card-layout[data-properties~="unread"]
+    .card-container :is(.sender, .subject) {
     font-weight: 600 !important;
   }
 
@@ -58,16 +107,11 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    font-size: 0.92em;
-    color: var(--color-text-secondary, GrayText);
+    color: var(--yu-mail-secondary);
   }
 
   #threadTree[rows="thread-card"] .yu-mail-preview:empty {
     display: none;
-  }
-
-  #threadTree[rows="thread-card"] .card-layout[data-properties~="unread"] .sender {
-    font-weight: 700;
   }
 
   @container threadPane (max-width: 380px) {
@@ -82,8 +126,6 @@
 
   @media (prefers-contrast: no-preference) and (forced-colors: none) {
     :root:not([lwt-tree]) {
-      --yu-mail-rule: light-dark(#dce3ed, #343e4c);
-      --yu-mail-hover: light-dark(#ebf2fa, #313b4b);
       --yu-mail-selected: light-dark(#dcecff, #293e59);
       --yu-mail-text-accent: light-dark(#084f91, #a5d4ff);
       --yu-mail-mark: light-dark(#0f60ab, #82bfff);
@@ -102,8 +144,25 @@
       --list-indicator-border-selected: var(--yu-mail-mark);
     }
 
+    :root:not([lwt-tree]) #folderTree
+      li:not([data-tag-key], [data-has-error="true"], [data-is-busy="true"])
+      > .container > .icon:not([style*="--icon-color"]) {
+      --icon-color: var(--yu-mail-secondary) !important;
+      fill: transparent !important;
+    }
+
+    :root:not([lwt-tree]) #folderTree
+      li.selected:not([data-tag-key], [data-has-error="true"], [data-is-busy="true"])
+      > .container > .icon:not([style*="--icon-color"]) {
+      --icon-color: var(--yu-mail-text-accent) !important;
+    }
+
     :root:not([lwt-tree]) #folderTree li.selected > .container > .name {
       color: var(--yu-mail-text-accent);
+    }
+
+    :root:not([lwt-tree]) #threadPaneHeaderBar .thread-pane-count-info {
+      color: var(--yu-mail-secondary);
     }
 
     :root:not([lwt-tree]) #folderPaneWriteMessage:not(:disabled) {
@@ -121,7 +180,9 @@
     }
 
     :root:not([lwt-tree]) #threadTree[rows="thread-card"] {
-      --card-container-padding-block: 0px;
+      --tree-pane-background: var(--layout-background-0);
+      --tree-card-inline: 6px;
+      --tree-card-block: 0px;
       --tree-card-background-current: var(--yu-mail-hover);
       --tree-card-background-current-unfocused: var(--yu-mail-hover);
       --tree-card-background-selected: var(--yu-mail-selected);
@@ -134,8 +195,18 @@
     :root:not([lwt-tree]) #threadTree[rows="thread-card"]
       .card-layout:not([data-properties~="dummy"], [data-properties~="junk"])
       > td > .card-container {
+      border-color: transparent !important;
+      border-inline-start-width: 3px !important;
       border-radius: 0 !important;
       border-block-end-color: var(--yu-mail-rule) !important;
+      box-shadow: none !important;
+    }
+
+    :root:not([lwt-tree]) #threadTree[rows="thread-card"]:focus-within
+      .card-layout.current:not([data-properties~="dummy"], [data-properties~="junk"])
+      > td > .card-container {
+      outline: 1px solid var(--yu-mail-mark);
+      outline-offset: -1px;
     }
 
     :root:not([lwt-tree]) #threadTree[rows="thread-card"]
@@ -154,12 +225,35 @@
 
 @-moz-document url("about:message"), url("chrome://messenger/content/messenger/aboutMessage.xhtml") {
   #messagepanebox .message-header-container {
-    padding: 10px 12px !important;
+    padding: 12px 16px !important;
     border-block-end: 1px solid var(--sidebar-border);
   }
 
   #messagepanebox .message-header-large-subject #expandedsubjectBox {
+    font-size: calc(18rem / 13) !important;
     font-weight: 600 !important;
+    line-height: 1.4 !important;
+  }
+
+  @media (prefers-contrast: no-preference) and (forced-colors: none) {
+    :root:not([lwtheme]) #header-view-toolbar :is(
+      .message-header-view-button:not([is="toolbarbutton-menu-button"]),
+      .message-header-view-button > .toolbarbutton-menubutton-button,
+      .message-header-view-button > .toolbarbutton-menubutton-dropmarker
+    ) {
+      background-color: transparent !important;
+      border-color: transparent !important;
+      border-radius: 4px !important;
+      padding-inline: 6px !important;
+    }
+
+    :root:not([lwtheme]) #header-view-toolbar :is(
+      .message-header-view-button:not([is="toolbarbutton-menu-button"], [disabled]):is(:hover, [open], [checked]),
+      .message-header-view-button:not([disabled]):is(:hover, [open]) > .toolbarbutton-menubutton-button,
+      .message-header-view-button:not([disabled]):is(:hover, [open]) > .toolbarbutton-menubutton-dropmarker
+    ) {
+      background-color: var(--yu-mail-hover) !important;
+    }
   }
 }
 
@@ -179,7 +273,7 @@
   #msgSubject {
     border-width: 0 0 1px !important;
     border-radius: 0 !important;
-    border-color: var(--yu-mail-rule, light-dark(#dce3ed, #343e4c)) !important;
+    border-color: var(--yu-mail-rule) !important;
     background-color: transparent !important;
     box-shadow: none !important;
   }
@@ -190,20 +284,12 @@
     outline: none !important;
   }
 
-  #msgSubject {
-    font-weight: 600;
-  }
-
   #FormatToolbar {
     background-color: var(--layout-background-0, Field) !important;
-    border-block-end: 1px solid var(--yu-mail-rule, light-dark(#dce3ed, #343e4c));
+    border-block-end: 1px solid var(--yu-mail-rule);
   }
 
   @media (prefers-contrast: no-preference) and (forced-colors: none) {
-    :root:not([lwtheme]) {
-      --yu-mail-rule: light-dark(#dce3ed, #343e4c);
-    }
-
     :root:not([lwtheme]) #compose-toolbox {
       background-color: light-dark(#e7eef9, #202630) !important;
       border-block-end: 1px solid var(--yu-mail-rule);
