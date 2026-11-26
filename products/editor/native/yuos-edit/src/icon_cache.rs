@@ -31,6 +31,9 @@ impl IconCache {
         }
 
         bundle!("edit-clear-symbolic", 16);
+        bundle!("edit-clear-symbolic", 14);
+        bundle!("editor-branch-symbolic", 16);
+        bundle!("editor-sparkle-symbolic", 16);
         bundle!("folder-open-symbolic", 16);
         bundle!("go-down-symbolic", 16);
         bundle!("go-next-symbolic", 16);
@@ -40,6 +43,7 @@ impl IconCache {
         bundle!("replace-symbolic", 16);
         bundle!("replace-all-symbolic", 16);
         bundle!("window-close-symbolic", 16);
+        bundle!("window-close-symbolic", 12);
 
         Self { cache }
     }

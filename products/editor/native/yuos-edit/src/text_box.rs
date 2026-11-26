@@ -48,6 +48,7 @@ pub struct TextBox<'a, Message> {
     padding: Padding,
     on_auto_scroll: Option<Box<dyn Fn(Option<f32>) -> Message + 'a>>,
     on_changed: Option<Message>,
+    on_cursor_moved: Option<Message>,
     on_focus: Option<Message>,
     click_timing: Duration,
     has_context_menu: bool,
@@ -68,6 +69,7 @@ where
             padding: Padding::new(0.0),
             on_auto_scroll: None,
             on_changed: None,
+            on_cursor_moved: None,
             on_focus: None,
             click_timing: Duration::from_millis(500),
             has_context_menu: false,
@@ -94,6 +96,11 @@ where
 
     pub fn on_changed(mut self, on_changed: Message) -> Self {
         self.on_changed = Some(on_changed);
+        self
+    }
+
+    pub fn on_cursor_moved(mut self, message: Message) -> Self {
+        self.on_cursor_moved = Some(message);
         self
     }
 
@@ -978,6 +985,7 @@ where
         let (buffer_size, buffer_scroll) =
             editor.with_buffer(|buffer| (buffer.size(), buffer.scroll()));
         let last_changed = editor.changed();
+        let last_cursor = editor.cursor();
         //TODO: better handling of status line update
         let (last_parser_mode, last_parser_cmd) = {
             let parser = editor.parser();
@@ -1410,6 +1418,11 @@ where
                 || (&parser.mode, &parser.cmd) != (&last_parser_mode, &last_parser_cmd)
             {
                 shell.publish(on_changed.clone());
+            }
+            if editor.cursor() != last_cursor
+                && let Some(message) = &self.on_cursor_moved
+            {
+                shell.publish(message.clone());
             }
         }
     }

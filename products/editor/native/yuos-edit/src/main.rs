@@ -5,13 +5,13 @@ use cosmic::widget::menu::action::MenuAction;
 use cosmic::widget::menu::key_bind::KeyBind;
 use cosmic::widget::segmented_button::{Entity, ReorderEvent};
 use cosmic::{
-    Application, ApplicationExt, Apply, Element, action,
+    Application, ApplicationExt, Element, action,
     app::{Core, Settings, Task, context_drawer},
     cosmic_config::{self, CosmicConfigEntry},
     cosmic_theme, executor,
     font::Font,
     iced::{
-        self, Alignment, Background, Color, Length, Limits, Point, Subscription,
+        self, Alignment, Background, Length, Limits, Point, Subscription,
         advanced::graphics::text::font_system,
         clipboard, event,
         futures::{self, SinkExt},
@@ -19,7 +19,7 @@ use cosmic::{
         stream, window,
     },
     style, theme,
-    widget::{self, about::About, button, icon, nav_bar, segmented_button},
+    widget::{self, button, icon, nav_bar, segmented_button},
 };
 use cosmic_files::{
     dialog::{Dialog, DialogKind, DialogMessage, DialogResult, DialogSettings},
@@ -74,6 +74,7 @@ use self::tab::{EditorTab, GitDiffTab, Tab};
 mod tab;
 
 use self::text_box::text_box;
+mod chrome;
 mod text_box;
 
 static ICON_CACHE: OnceLock<Mutex<IconCache>> = OnceLock::new();
@@ -81,6 +82,37 @@ static LINE_NUMBER_CACHE: OnceLock<Mutex<LineNumberCache>> = OnceLock::new();
 static SWASH_CACHE: OnceLock<Mutex<SwashCache>> = OnceLock::new();
 static SYNTAX_SYSTEM: OnceLock<SyntaxSystem> = OnceLock::new();
 static FILE_ACCESS_JOBS: tokio::sync::Semaphore = tokio::sync::Semaphore::const_new(4);
+const INITIAL_WIDTH: f32 = 1280.0;
+const SIDEBAR_WIDTH: f32 = 236.0;
+
+fn sidebar_item<'a>(
+    icon: &'static str,
+    label: String,
+    message: action::Action<Message>,
+) -> Element<'a, action::Action<Message>> {
+    button::custom(
+        widget::row::with_children(vec![
+            icon_cache_get(icon, 14).into(),
+            chrome::label(label)
+                .wrapping(iced::widget::text::Wrapping::None)
+                .into(),
+        ])
+        .spacing(7)
+        .align_y(Alignment::Center),
+    )
+    .class(theme::Button::AppletMenu)
+    .padding([4, 8])
+    .width(Length::Fill)
+    .on_press(message)
+    .into()
+}
+
+fn clear_field(message: Message) -> Element<'static, Message> {
+    button::custom(icon_cache_get("edit-clear-symbolic", 14))
+        .on_press(message)
+        .class(style::Button::Icon)
+        .into()
+}
 
 pub fn icon_cache_get(name: &'static str, size: u16) -> icon::Icon {
     let mut icon_cache = ICON_CACHE.get().unwrap().lock().unwrap();
@@ -91,78 +123,6 @@ pub fn icon_cache_get(name: &'static str, size: u16) -> icon::Icon {
 /// This centralizes the creation of monospace font attributes to avoid duplication.
 pub fn monospace_attrs() -> cosmic_text::Attrs<'static> {
     cosmic_text::Attrs::new().family(Family::Monospace)
-}
-
-//
-// Yu OS Glass chrome styling (app-level).
-//
-// These small helpers translate the Yu OS Glass design language to the editor's
-// app chrome. Surface colors are pulled from the inherited theme tokens (never
-// hardcoded hex) so light/dark + compositor blur are inherited automatically;
-// we only apply translucency, brand-blue accents, hairlines, and the documented
-// radii here.
-
-/// A faint blue-tinted translucent hairline color from the active theme.
-fn glass_hairline(cosmic: &cosmic_theme::Theme) -> Color {
-    let mut color = cosmic.background.component.divider;
-    color.alpha *= 0.5;
-    color.into()
-}
-
-/// Frosted strip that hosts the tab bar + new-file button. Reads as glass with a
-/// single hairline beneath it, leaning on the compositor blur for depth instead
-/// of a heavy box.
-fn tab_bar_glass_style(theme: &cosmic::Theme) -> widget::container::Style {
-    let cosmic = theme.cosmic();
-    let mut bg = cosmic.background.base;
-    bg.alpha *= 0.55;
-    widget::container::Style {
-        background: Some(Background::Color(bg.into())),
-        border: cosmic::iced::Border {
-            // Hairline only on the bottom edge: separation via blur + a single line.
-            radius: cosmic.radius_l().into(),
-            width: 1.0,
-            color: glass_hairline(&cosmic),
-        },
-        ..Default::default()
-    }
-}
-
-/// Floating frosted card used by the find / replace bar. Large radius, hairline,
-/// soft glass fill — a quiet surface that floats over the editor.
-fn find_bar_glass_style(theme: &cosmic::Theme) -> widget::container::Style {
-    let cosmic = theme.cosmic();
-    let mut bg = cosmic.primary.base;
-    bg.alpha *= 0.80;
-    widget::container::Style {
-        background: Some(Background::Color(bg.into())),
-        border: cosmic::iced::Border {
-            radius: cosmic.radius_l().into(),
-            width: 1.0,
-            color: glass_hairline(&cosmic),
-        },
-        ..Default::default()
-    }
-}
-
-/// Brand-blue glass pill for the Vim mode status line.
-fn vim_status_glass_style(theme: &cosmic::Theme) -> widget::container::Style {
-    let cosmic = theme.cosmic();
-    let mut bg = cosmic.accent_color();
-    bg.alpha *= 0.16;
-    let mut border = cosmic.accent_color();
-    border.alpha *= 0.40;
-    widget::container::Style {
-        background: Some(Background::Color(bg.into())),
-        text_color: Some(cosmic.accent_color().into()),
-        border: cosmic::iced::Border {
-            // Pill per spec for chips/status.
-            radius: cosmic.radius_xl().into(),
-            width: 1.0,
-            color: border.into(),
-        },
-        ..Default::default()
-    }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -262,6 +222,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut settings = Settings::default();
     settings = settings.theme(config.app_theme.theme());
+    settings = settings
+        .default_text_size(13.0)
+        .size(iced::Size::new(INITIAL_WIDTH, 780.0));
     settings = settings.size_limits(Limits::NONE.min_width(360.0).min_height(180.0));
     settings = settings.exit_on_close(false);
 
@@ -474,6 +437,8 @@ enum NewTab {
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub enum Message {
+    CursorMoved,
+    WindowResized(window::Id, f32),
     AiAskYu,
     AiCustomChanged(String),
     AiCustomOpen,
@@ -588,6 +553,30 @@ pub enum ContextPage {
     Settings,
 }
 
+impl ContextPage {
+    fn label(self) -> String {
+        match self {
+            Self::About => fl!("text-editor-name"),
+            Self::Ai => fl!("ai-panel-title"),
+            Self::DocumentStatistics => fl!("document-statistics"),
+            Self::GitManagement => fl!("git-management"),
+            Self::ProjectSearch => fl!("project-search"),
+            Self::Settings => fl!("settings"),
+        }
+    }
+
+    fn icon(self) -> &'static str {
+        match self {
+            Self::About => "dialog-information-symbolic",
+            Self::Ai => "editor-sparkle-symbolic",
+            Self::DocumentStatistics => "view-list-symbolic",
+            Self::GitManagement => "editor-branch-symbolic",
+            Self::ProjectSearch => "folder-saved-search-symbolic",
+            Self::Settings => "preferences-system-symbolic",
+        }
+    }
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 enum DialogPage {
     PromptSaveClose(segmented_button::Entity),
@@ -635,7 +624,7 @@ impl Default for AiState {
 
 pub struct App {
     core: Core,
-    about: About,
+    window_width: f32,
     nav_model: segmented_button::SingleSelectModel,
     tab_model: segmented_button::SingleSelectModel,
     config_handler: Option<cosmic_config::Config>,
@@ -1111,6 +1100,211 @@ impl App {
         ])
     }
 
+    fn panel_content(&self) -> Element<'_, Message> {
+        match self.context_page {
+            ContextPage::About => self.about_panel(),
+            ContextPage::Ai => self.ai_panel(),
+            ContextPage::DocumentStatistics => self.document_statistics(),
+            ContextPage::GitManagement => self.git_management(),
+            ContextPage::ProjectSearch => self.project_search(),
+            ContextPage::Settings => self.settings(),
+        }
+    }
+
+    fn content_width(&self) -> f32 {
+        self.window_width
+            - if self.core.nav_bar_active() {
+                SIDEBAR_WIDTH + 16.0
+            } else {
+                16.0
+            }
+    }
+
+    fn inline_inspector(&self) -> bool {
+        !self.core.is_condensed() && self.content_width() >= 660.0
+    }
+
+    fn dismiss_compact_sidebar(&mut self) {
+        if self.core.is_condensed() && self.core.nav_bar_active() {
+            self.core.nav_bar_toggle_condensed();
+        }
+    }
+
+    fn about_panel(&self) -> Element<'_, Message> {
+        let links = widget::row::with_children(vec![
+            chrome::field_action(
+                fl!("repository"),
+                Message::LaunchUrl("https://github.com/pop-os/cosmic-edit".into()),
+            ),
+            chrome::field_action(
+                fl!("support"),
+                Message::LaunchUrl("https://github.com/pop-os/cosmic-edit/issues".into()),
+            ),
+        ])
+        .spacing(6);
+        let about = widget::column::with_children(vec![
+            icon::from_svg_bytes(include_bytes!(
+                "../res/icons/hicolor/scalable/apps/com.yuos.Edit.svg"
+            ))
+            .icon()
+            .size(38)
+            .into(),
+            chrome::title(fl!("text-editor-name"), 15.0).into(),
+            chrome::caption(env!("CARGO_PKG_VERSION")).into(),
+            chrome::label(fl!("comment")).into(),
+            links.into(),
+        ])
+        .spacing(6)
+        .align_x(Alignment::Center)
+        .width(Length::Fill)
+        .padding([8, 0]);
+        widget::column::with_children(vec![
+            about.into(),
+            chrome::rule(),
+            chrome::caption("System76 · GPL-3.0-only").into(),
+            button::link("Jeremy Soller")
+                .on_press(Message::LaunchUrl("mailto:jeremy@system76.com".into()))
+                .into(),
+        ])
+        .spacing(8)
+        .align_x(Alignment::Center)
+        .width(Length::Fill)
+        .into()
+    }
+
+    fn find_bar(&self, replace: bool) -> Element<'_, Message> {
+        let search = widget::text_input(fl!("find-placeholder"), &self.find_search_value)
+            .id(self.find_search_id.clone())
+            .on_input(Message::FindSearchValueChanged)
+            .on_submit(|_| {
+                if self.modifiers.contains(Modifiers::SHIFT) {
+                    Message::FindPrevious
+                } else {
+                    Message::FindNext
+                }
+            })
+            .on_focus(Message::FindFocused(true))
+            .size(13)
+            .padding([4, 8])
+            .width(Length::Fill)
+            .trailing_icon(clear_field(Message::FindSearchValueChanged(String::new())));
+        let close = chrome::tool(
+            "window-close-symbolic",
+            fl!("close-panel"),
+            Message::Find(None),
+            false,
+        );
+        let mut search_row = widget::row::with_children(vec![
+            search.into(),
+            chrome::tool(
+                "go-up-symbolic",
+                fl!("find-previous"),
+                Message::FindPrevious,
+                false,
+            ),
+            chrome::tool(
+                "go-down-symbolic",
+                fl!("find-next"),
+                Message::FindNext,
+                false,
+            ),
+        ])
+        .spacing(4)
+        .align_y(Alignment::Center);
+        let options = widget::row::with_children(vec![
+            widget::checkbox(self.config.find_case_sensitive)
+                .label(fl!("case-sensitive"))
+                .on_toggle(Message::FindCaseSensitive)
+                .into(),
+            widget::checkbox(self.config.find_use_regex)
+                .label(fl!("use-regex"))
+                .on_toggle(Message::FindUseRegex)
+                .into(),
+            widget::checkbox(self.config.find_wrap_around)
+                .label(fl!("wrap-around"))
+                .on_toggle(Message::FindWrapAround)
+                .into(),
+        ])
+        .align_y(Alignment::Center)
+        .spacing(8);
+        let mut column = widget::column::with_capacity(3).padding([6, 12]).spacing(5);
+        if self.content_width() < 560.0 {
+            column = column.push(search_row.push(close)).push(options);
+        } else {
+            search_row = search_row.push(options).push(close);
+            column = column.push(search_row);
+        }
+        if replace {
+            let input = widget::text_input(fl!("replace-placeholder"), &self.find_replace_value)
+                .id(self.find_replace_id.clone())
+                .on_input(Message::FindReplaceValueChanged)
+                .on_submit(|_| Message::FindReplace)
+                .size(13)
+                .padding([4, 8])
+                .width(Length::Fill)
+                .trailing_icon(clear_field(Message::FindReplaceValueChanged(String::new())));
+            column = column.push(
+                widget::row::with_children(vec![
+                    input.into(),
+                    chrome::field_action(fl!("replace"), Message::FindReplace),
+                    chrome::field_action(fl!("replace-all"), Message::FindReplaceAll),
+                ])
+                .align_y(Alignment::Center)
+                .spacing(5),
+            );
+        }
+        column.into()
+    }
+
+    fn document_status(&self) -> Element<'_, Message> {
+        let Some(Tab::Editor(tab)) = self.active_tab() else {
+            return widget::space::vertical().height(0).into();
+        };
+        let (cursor, column, lines) = {
+            let editor = tab.editor.lock().unwrap();
+            let cursor = editor.cursor();
+            let (column, lines) = editor.with_buffer(|buffer| {
+                let column = buffer
+                    .lines
+                    .get(cursor.line)
+                    .and_then(|line| line.text().get(..cursor.index))
+                    .map_or(0, |text| text.graphemes(true).count());
+                (column, buffer.lines.len())
+            });
+            (cursor, column, lines)
+        };
+        let zoom = (100.0 * self.config.font_size_adjusted(tab.zoom_adj())
+            / f32::from(self.config.font_size).max(1.0))
+        .round() as i64;
+        let mut status = widget::row::with_children(vec![
+            chrome::caption(fl!(
+                "status-position",
+                line = (cursor.line as i64 + 1),
+                column = (column as i64 + 1)
+            ))
+            .into(),
+            chrome::caption(fl!("status-lines", count = (lines as i64))).into(),
+        ]);
+        if self.content_width() >= 460.0 {
+            status = status
+                .push(widget::space::horizontal())
+                .push(chrome::caption(fl!(
+                    "tab-width",
+                    tab_width = self.config.tab_width
+                )))
+                .push(chrome::caption(fl!("status-zoom", zoom = zoom)));
+        }
+        widget::column::with_children(vec![
+            chrome::rule(),
+            status
+                .spacing(10)
+                .padding([5, 12])
+                .align_y(Alignment::Center)
+                .into(),
+        ])
+        .into()
+    }
+
     fn update_watcher(&mut self) {
         if let Some((mut watcher, old_paths)) = self.watcher_opt.take() {
             let mut new_paths = HashSet::new();
@@ -1198,32 +1392,31 @@ impl App {
             });
         }
 
-        widget::settings::view_column(vec![
-            widget::settings::section()
-                .add(
-                    widget::settings::item::builder(fl!("word-count"))
-                        .control(widget::text(word_count.to_string())),
+        let mut stats = widget::column::with_capacity(8).spacing(6);
+        for (name, count) in [
+            (fl!("line-count"), line_count),
+            (fl!("word-count"), word_count),
+            (fl!("character-count"), character_count),
+            (fl!("character-count-no-spaces"), character_count_no_spaces),
+        ] {
+            stats = stats
+                .push(
+                    widget::row::with_children(vec![
+                        chrome::label(name).into(),
+                        widget::space::horizontal().into(),
+                        chrome::title(count.to_string(), 13.0).into(),
+                    ])
+                    .align_y(Alignment::Center)
+                    .spacing(6)
+                    .padding([5, 2]),
                 )
-                .add(
-                    widget::settings::item::builder(fl!("character-count"))
-                        .control(widget::text(character_count.to_string())),
-                )
-                .add(
-                    widget::settings::item::builder(fl!("character-count-no-spaces"))
-                        .control(widget::text(character_count_no_spaces.to_string())),
-                )
-                .add(
-                    widget::settings::item::builder(fl!("line-count"))
-                        .control(widget::text(line_count.to_string())),
-                )
-                .into(),
-        ])
-        .into()
+                .push(chrome::rule());
+        }
+        stats.into()
     }
 
     fn ai_panel(&self) -> Element<'_, Message> {
-        let spacing = self.core().system_theme().cosmic().spacing;
-        let mut col = widget::column::with_capacity(8).spacing(spacing.space_s);
+        let mut col = widget::column::with_capacity(6).spacing(8);
 
         let mode_label = match self.ai_state.verb {
             Some(AiVerb::Summarize) => fl!("ai-mode-summarize"),
@@ -1232,16 +1425,17 @@ impl App {
             Some(AiVerb::Custom) => fl!("ai-mode-custom"),
             None => fl!("ai-mode-idle"),
         };
-        col = col.push(widget::text::heading(mode_label));
-
         // Custom command palette — a single text_input + Run button.
         // Always shown so users can drop into Cmd+K-style ad-hoc
         // rewrites without leaving the AI panel. Enter submits.
-        let prompt_input = widget::text_input(fl!("ai-custom-placeholder"), &self.ai_state.custom_prompt)
-            .id(self.ai_custom_input_id.clone())
-            .on_input(Message::AiCustomChanged)
-            .on_submit(|_| Message::AiCustomRun)
-            .width(Length::Fill);
+        let prompt_input =
+            widget::text_input(fl!("ai-custom-placeholder"), &self.ai_state.custom_prompt)
+                .id(self.ai_custom_input_id.clone())
+                .on_input(Message::AiCustomChanged)
+                .on_submit(|_| Message::AiCustomRun)
+                .size(13)
+                .padding([4, 8])
+                .width(Length::Fill);
         let run_button = {
             let mut b = widget::button::suggested(fl!("ai-run"));
             if !self.ai_state.custom_prompt.trim().is_empty()
@@ -1251,26 +1445,25 @@ impl App {
             }
             b
         };
-        col = col.push(prompt_input);
         col = col.push(
-            widget::row::with_children(vec![
-                widget::text::caption(fl!("ai-custom-hint")).into(),
-                widget::space::horizontal().into(),
-                run_button.into(),
-            ])
-            .align_y(Alignment::Center)
-            .spacing(spacing.space_xs),
+            widget::row::with_children(vec![prompt_input.into(), run_button.into()])
+                .align_y(Alignment::Center)
+                .spacing(6),
         );
+        col = col.push(chrome::caption(fl!("ai-custom-hint")));
+        col = col
+            .push(chrome::rule())
+            .push(chrome::title(mode_label, 13.0));
 
         match &self.ai_state.status {
             AiStatus::Idle => {
-                col = col.push(widget::text::body(fl!("ai-idle-hint")));
+                col = col.push(chrome::label(fl!("ai-idle-hint")));
             }
             AiStatus::Loading => {
-                col = col.push(widget::text::body(fl!("ai-loading")));
+                col = col.push(chrome::label(fl!("ai-loading")));
             }
             AiStatus::Ready(text) => {
-                col = col.push(widget::text::body(text.clone()));
+                col = col.push(chrome::label(text.clone()));
                 let label = if self.ai_state.text_was_selection {
                     fl!("ai-replace-selection")
                 } else {
@@ -1281,8 +1474,8 @@ impl App {
                 );
             }
             AiStatus::Error(err) => {
-                col = col.push(widget::text::heading(fl!("ai-error")));
-                col = col.push(widget::text::body(err.clone()));
+                col = col.push(chrome::title(fl!("ai-error"), 13.0));
+                col = col.push(chrome::label(err.clone()));
             }
         }
 
@@ -1290,6 +1483,7 @@ impl App {
     }
 
     fn ai_start(&mut self, verb: AiVerb) -> Task<Message> {
+        self.dismiss_compact_sidebar();
         let Some(Tab::Editor(tab)) = self.active_tab() else {
             self.ai_state = AiState {
                 verb: Some(verb),
@@ -1374,14 +1568,15 @@ impl App {
                     cosmic_theme.warning_color(),
                 )
             };
-            let added = || widget::text("[+]").class(theme::Text::Color(success_color.into()));
+            let added = || chrome::title("A", 12.0).class(theme::Text::Color(success_color.into()));
             let deleted =
-                || widget::text("[-]").class(theme::Text::Color(destructive_color.into()));
-            let modified = || widget::text("[*]").class(theme::Text::Color(warning_color.into()));
+                || chrome::title("D", 12.0).class(theme::Text::Color(destructive_color.into()));
+            let modified =
+                || chrome::title("M", 12.0).class(theme::Text::Color(warning_color.into()));
 
             let mut items =
                 Vec::with_capacity(project_status.len().saturating_mul(3).saturating_add(1));
-            items.push(widget::text(fl!("git-management-description")).into());
+            items.push(chrome::caption(fl!("git-management-description")).into());
 
             for (project_name, project_path, status) in project_status.iter() {
                 let mut unstaged_items = Vec::with_capacity(status.len());
@@ -1441,14 +1636,11 @@ impl App {
                             widget::button::custom(
                                 widget::row::with_children(vec![
                                     icon.into(),
-                                    widget::text(text.clone()).into(),
-                                    widget::space::horizontal().into(),
-                                    widget::button::standard(fl!("stage"))
-                                        .on_press(Message::GitStage(
-                                            project_path.clone(),
-                                            item.path.clone(),
-                                        ))
-                                        .into(),
+                                    chrome::label(text.clone()).width(Length::Fill).into(),
+                                    chrome::field_action(
+                                        fl!("stage"),
+                                        Message::GitStage(project_path.clone(), item.path.clone()),
+                                    ),
                                 ])
                                 .align_y(Alignment::Center)
                                 .spacing(spacing.space_xs),
@@ -1458,6 +1650,7 @@ impl App {
                                 item.path.clone(),
                                 false,
                             ))
+                            .padding([3, 4])
                             .class(theme::Button::AppletMenu)
                             .width(Length::Fill)
                             .into(),
@@ -1482,14 +1675,14 @@ impl App {
                             widget::button::custom(
                                 widget::row::with_children(vec![
                                     icon.into(),
-                                    widget::text(text.clone()).into(),
-                                    widget::space::horizontal().into(),
-                                    widget::button::standard(fl!("unstage"))
-                                        .on_press(Message::GitUnstage(
+                                    chrome::label(text.clone()).width(Length::Fill).into(),
+                                    chrome::field_action(
+                                        fl!("unstage"),
+                                        Message::GitUnstage(
                                             project_path.clone(),
                                             item.path.clone(),
-                                        ))
-                                        .into(),
+                                        ),
+                                    ),
                                 ])
                                 .align_y(Alignment::Center)
                                 .spacing(spacing.space_xs),
@@ -1499,6 +1692,7 @@ impl App {
                                 item.path.clone(),
                                 true,
                             ))
+                            .padding([3, 4])
                             .class(theme::Button::AppletMenu)
                             .width(Length::Fill)
                             .into(),
@@ -1506,24 +1700,20 @@ impl App {
                     }
                 }
 
-                items.push(widget::text::heading(project_name.clone()).into());
+                items.push(chrome::title(project_name.clone(), 15.0).into());
 
                 if !unstaged_items.is_empty() {
-                    items.push(
-                        widget::settings::section()
-                            .title(fl!("unstaged-changes"))
-                            .add(widget::column::with_children(unstaged_items))
-                            .into(),
-                    );
+                    items.push(chrome::section(
+                        fl!("unstaged-changes"),
+                        widget::column::with_children(unstaged_items),
+                    ));
                 }
 
                 if !staged_items.is_empty() {
-                    items.push(
-                        widget::settings::section()
-                            .title(fl!("staged-changes"))
-                            .add(widget::column::with_children(staged_items))
-                            .into(),
-                    );
+                    items.push(chrome::section(
+                        fl!("staged-changes"),
+                        widget::column::with_children(staged_items),
+                    ));
                 }
             }
 
@@ -1533,8 +1723,8 @@ impl App {
                 .into()
         } else {
             widget::column::with_children(vec![
-                widget::text(fl!("git-management-description")).into(),
-                widget::text(fl!("git-management-loading")).into(),
+                chrome::caption(fl!("git-management-description")).into(),
+                chrome::label(fl!("git-management-loading")).into(),
             ])
             .spacing(spacing.space_s)
             .padding([spacing.space_xxs, spacing.space_none])
@@ -1549,7 +1739,10 @@ impl App {
             fl!("project-search"),
             self.project_search_value.clone(),
         )
-        .id(self.project_search_id.clone());
+        .id(self.project_search_id.clone())
+        .size(13)
+        .padding([4, 8])
+        .width(Length::Fill);
 
         let items = match &self.project_search_result {
             Some(project_search_result) => {
@@ -1564,6 +1757,19 @@ impl App {
                             .on_input(Message::ProjectSearchValue)
                             .on_submit(|_| Message::ProjectSearchSubmit)
                             .into(),
+                    );
+                    let matches: usize = project_search_result
+                        .files
+                        .iter()
+                        .map(|file| file.lines.len())
+                        .sum();
+                    items.push(
+                        chrome::caption(fl!(
+                            "project-search-results",
+                            files = (project_search_result.files.len() as i64),
+                            matches = (matches as i64)
+                        ))
+                        .into(),
                     );
                 }
 
@@ -1582,31 +1788,33 @@ impl App {
                         column = column.push(
                             widget::button::custom(
                                 widget::row::with_children(vec![
-                                    widget::text(format!(
+                                    chrome::caption(format!(
                                         "{:width$}",
                                         line_search_result.number,
                                         width = line_number_width,
                                     ))
                                     .font(Font::MONOSPACE)
                                     .into(),
-                                    widget::text(line_search_result.text.to_string())
+                                    chrome::label(line_search_result.text.as_str())
+                                        .size(12)
                                         .font(Font::MONOSPACE)
                                         .into(),
                                 ])
                                 .spacing(spacing.space_xs),
                             )
                             .on_press(Message::OpenSearchResult(file_i, line_i))
+                            .padding([3, 4])
                             .width(Length::Fill)
                             .class(theme::Button::AppletMenu),
                         );
                     }
 
-                    items.push(
-                        widget::settings::section()
-                            .title(format!("{}", file_search_result.path.display(),))
-                            .add(column)
-                            .into(),
-                    );
+                    let path = self
+                        .projects
+                        .iter()
+                        .find_map(|(_, root)| file_search_result.path.strip_prefix(root).ok())
+                        .unwrap_or(&file_search_result.path);
+                    items.push(chrome::section(path.display().to_string(), column));
                 }
 
                 items
@@ -1656,66 +1864,62 @@ impl App {
             .zoom_steps
             .iter()
             .position(|zoom_step| zoom_step == &self.config.font_size_zoom_step_mul_100);
-        widget::settings::view_column(vec![
-            widget::settings::section()
-                .title(fl!("appearance"))
-                .add(
-                    widget::settings::item::builder(fl!("theme")).control(widget::dropdown(
-                        &self.app_themes,
-                        Some(app_theme_selected),
-                        move |index| {
-                            Message::AppTheme(match index {
-                                1 => AppTheme::Dark,
-                                2 => AppTheme::Light,
-                                _ => AppTheme::System,
-                            })
-                        },
-                    )),
-                )
-                .add(
-                    widget::settings::item::builder(fl!("syntax-dark")).control(widget::dropdown(
-                        &self.theme_names,
-                        dark_selected,
-                        move |index| Message::SyntaxTheme(index, true),
-                    )),
-                )
-                .add(
-                    widget::settings::item::builder(fl!("syntax-light")).control(widget::dropdown(
-                        &self.theme_names,
-                        light_selected,
-                        move |index| Message::SyntaxTheme(index, false),
-                    )),
-                )
-                .add(
-                    widget::settings::item::builder(fl!("default-font")).control(widget::dropdown(
-                        &self.font_names,
-                        font_selected,
-                        Message::DefaultFont,
-                    )),
-                )
-                .add(
-                    widget::settings::item::builder(fl!("default-font-size")).control(
-                        widget::dropdown(&self.font_size_names, font_size_selected, |index| {
-                            Message::DefaultFontSize(index)
-                        }),
-                    ),
-                )
-                .add(
-                    widget::settings::item::builder(fl!("default-zoom-step")).control(
-                        widget::dropdown(&self.zoom_step_names, zoom_step_selected, |index| {
-                            Message::DefaultZoomStep(index)
-                        }),
-                    ),
-                )
-                .into(),
-            widget::settings::section()
-                .title(fl!("keyboard-shortcuts"))
-                .add(
-                    widget::settings::item::builder(fl!("enable-vim-bindings"))
-                        .toggler(self.config.vim_bindings, Message::VimBindings),
-                )
-                .into(),
+        let appearance = widget::column::with_children(vec![
+            chrome::setting(
+                fl!("theme"),
+                widget::dropdown(&self.app_themes, Some(app_theme_selected), |index| {
+                    Message::AppTheme(match index {
+                        1 => AppTheme::Dark,
+                        2 => AppTheme::Light,
+                        _ => AppTheme::System,
+                    })
+                }),
+            ),
+            chrome::setting(
+                fl!("syntax-dark"),
+                widget::dropdown(&self.theme_names, dark_selected, |index| {
+                    Message::SyntaxTheme(index, true)
+                }),
+            ),
+            chrome::setting(
+                fl!("syntax-light"),
+                widget::dropdown(&self.theme_names, light_selected, |index| {
+                    Message::SyntaxTheme(index, false)
+                }),
+            ),
+            chrome::setting(
+                fl!("default-font"),
+                widget::dropdown(&self.font_names, font_selected, Message::DefaultFont),
+            ),
+            chrome::setting(
+                fl!("default-font-size"),
+                widget::dropdown(
+                    &self.font_size_names,
+                    font_size_selected,
+                    Message::DefaultFontSize,
+                ),
+            ),
+            chrome::setting(
+                fl!("default-zoom-step"),
+                widget::dropdown(
+                    &self.zoom_step_names,
+                    zoom_step_selected,
+                    Message::DefaultZoomStep,
+                ),
+            ),
         ])
+        .spacing(10);
+        widget::column::with_children(vec![
+            chrome::section(fl!("appearance"), appearance),
+            chrome::section(
+                fl!("keyboard-shortcuts"),
+                widget::toggler(self.config.vim_bindings)
+                    .label(fl!("enable-vim-bindings"))
+                    .text_size(13)
+                    .on_toggle(Message::VimBindings),
+            ),
+        ])
+        .spacing(16)
         .into()
     }
 }
@@ -1744,7 +1948,7 @@ impl Application for App {
 
     /// Creates the application, and optionally emits command on initialize.
     fn init(mut core: Core, flags: Self::Flags) -> (Self, Task<Self::Message>) {
-        core.window.context_is_overlay = false;
+        core.window.context_is_overlay = true;
 
         // Update font name from config
         {
@@ -1796,25 +2000,9 @@ impl Application for App {
             zoom_steps.push(zoom_step);
         }
 
-        let about = About::default()
-            .name(fl!("text-editor-name"))
-            .icon(icon::from_name(Self::APP_ID))
-            .version(env!("CARGO_PKG_VERSION"))
-            .author("System76")
-            .comments(fl!("comment"))
-            .license("GPL-3.0-only")
-            .developers([("Jeremy Soller", "jeremy@system76.com")])
-            .links([
-                (fl!("repository"), "https://github.com/pop-os/cosmic-edit"),
-                (
-                    fl!("support"),
-                    "https://github.com/pop-os/cosmic-edit/issues",
-                ),
-            ]);
-
         let mut app = App {
             core,
-            about,
+            window_width: INITIAL_WIDTH,
             nav_model: nav_bar::Model::builder().build(),
             tab_model: segmented_button::Model::builder().build(),
             config_handler: flags.config_handler,
@@ -1884,34 +2072,100 @@ impl Application for App {
 
         let nav_model = self.nav_model()?;
 
-        let cosmic_theme::Spacing {
-            space_none,
-            space_s,
-            space_xxxs,
-            ..
-        } = self.core().system_theme().cosmic().spacing;
-
-        let mut nav = segmented_button::vertical(nav_model)
-            .button_height(space_xxxs + 20 /* line height */ + space_xxxs)
-            .button_padding([space_s, space_xxxs, space_s, space_xxxs])
-            .button_spacing(space_xxxs)
+        let nav = segmented_button::vertical(nav_model)
+            .button_height(26)
+            .button_padding([8, 4, 8, 4])
+            .button_spacing(2)
             .on_activate(|entity| action::cosmic(cosmic::app::Action::NavBar(entity)))
-            .spacing(space_none)
-            .style(theme::SegmentedButton::FileNav)
-            .apply(widget::container)
-            .padding(space_s)
-            .width(Length::Shrink);
+            .spacing(0)
+            .style(theme::SegmentedButton::Custom(Box::new(
+                chrome::project_tree,
+            )));
 
-        if !self.core().is_condensed() {
-            nav = nav.max_width(280);
+        let actions = widget::row::with_children(vec![
+            widget::space::horizontal().into(),
+            chrome::tool(
+                "document-new-symbolic",
+                fl!("new-file"),
+                action::Action::App(Message::NewFile),
+                false,
+            ),
+            chrome::tool(
+                "document-open-symbolic",
+                fl!("open-file"),
+                action::Action::App(Message::OpenFileDialog),
+                false,
+            ),
+        ])
+        .align_y(Alignment::Center);
+        let mut sections = widget::column::with_children(vec![
+            widget::container(
+                chrome::caption(fl!("sidebar-projects")).font(cosmic::font::semibold()),
+            )
+            .padding([4, 8])
+            .into(),
+            nav.into(),
+        ]);
+        let mut files = widget::column::with_capacity(self.tab_model.iter().count()).spacing(2);
+        for entity in self.tab_model.iter() {
+            if let Some(label) = self.tab_model.text(entity) {
+                files = files.push(sidebar_item(
+                    "text-x-generic-symbolic",
+                    label.to_string(),
+                    action::Action::App(Message::TabActivate(entity)),
+                ));
+            }
+        }
+        sections = sections
+            .push(
+                widget::container(
+                    chrome::caption(fl!("sidebar-open-files")).font(cosmic::font::semibold()),
+                )
+                .padding([8, 8, 4, 8]),
+            )
+            .push(files);
+
+        if !self.config_state.recent_projects.is_empty() {
+            sections = sections.push(
+                widget::container(
+                    chrome::caption(fl!("sidebar-recent-projects")).font(cosmic::font::semibold()),
+                )
+                .padding([8, 8, 4, 8]),
+            );
+            for (index, path) in self.config_state.recent_projects.iter().enumerate() {
+                sections = sections.push(sidebar_item(
+                    "folder-symbolic",
+                    path.file_name()
+                        .unwrap_or(path.as_os_str())
+                        .to_string_lossy()
+                        .into_owned(),
+                    action::Action::App(Message::OpenRecentProject(index)),
+                ));
+            }
         }
 
         Some(
-            nav.apply(widget::scrollable)
-                .apply(widget::container)
+            widget::row::with_children(vec![
+                widget::container(
+                    widget::column::with_children(vec![
+                        actions.into(),
+                        widget::scrollable(sections).height(Length::Fill).into(),
+                    ])
+                    .spacing(4),
+                )
+                .width(if self.core.is_condensed() {
+                    Length::Fill
+                } else {
+                    Length::Fixed(SIDEBAR_WIDTH - 1.0)
+                })
                 .height(Length::Fill)
-                .class(theme::Container::custom(nav_bar::nav_bar_style))
+                .padding([4, 8])
+                .class(theme::Container::custom(chrome::sidebar))
                 .into(),
+                chrome::seam(),
+            ])
+            .height(Length::Fill)
+            .into(),
         )
     }
 
@@ -2129,6 +2383,7 @@ impl Application for App {
                 self.ai_state.custom_prompt = value;
             }
             Message::AiCustomOpen => {
+                self.dismiss_compact_sidebar();
                 self.context_page = ContextPage::Ai;
                 self.core.window.show_context = true;
                 return widget::text_input::focus(self.ai_custom_input_id.clone());
@@ -2538,6 +2793,7 @@ impl Application for App {
                 self.modifiers = modifiers;
             }
             Message::NewFile => {
+                self.dismiss_compact_sidebar();
                 self.open_tab(None);
                 return self.update_tab();
             }
@@ -2738,6 +2994,7 @@ impl Application for App {
                 return self.update_dialogs();
             }
             Message::OpenFileDialog => {
+                self.dismiss_compact_sidebar();
                 if self.dialog_opt.is_none() {
                     let (dialog, command) = Dialog::new(
                         dialog_settings(DialogKind::OpenMultipleFiles),
@@ -3152,6 +3409,7 @@ impl Application for App {
                 }
             },
             Message::TabActivate(entity) => {
+                self.dismiss_compact_sidebar();
                 // Close save changes dialog if switching to a different tab for consistency
                 if self.dialog_page_opt != Some(DialogPage::PromptSaveClose(entity)) {
                     self.dialog_page_opt = None;
@@ -3306,6 +3564,9 @@ impl Application for App {
                     self.context_page = context_page;
                     self.core.window.show_context = true;
                 }
+                if self.core.window.show_context {
+                    self.dismiss_compact_sidebar();
+                }
 
                 self.project_search_has_focus = self.core.window.show_context
                     && self.context_page == ContextPage::ProjectSearch;
@@ -3412,74 +3673,105 @@ impl Application for App {
                     }
                 }
             }
+            Message::CursorMoved => {}
+            Message::WindowResized(window_id, width) => {
+                if self.core.main_window_is(window_id) {
+                    self.window_width = width;
+                }
+            }
         }
 
         Task::none()
     }
 
     fn context_drawer(&self) -> Option<context_drawer::ContextDrawer<'_, Message>> {
-        if !self.core.window.show_context {
+        if !self.core.window.show_context || self.inline_inspector() {
             return None;
         }
-
-        Some(match self.context_page {
-            ContextPage::About => context_drawer::about(
-                &self.about,
-                |s| Message::LaunchUrl(s.to_string()),
-                Message::ToggleContextPage(ContextPage::About),
-            ),
-            ContextPage::Ai => context_drawer::context_drawer(
-                self.ai_panel(),
-                Message::ToggleContextPage(ContextPage::Ai),
-            )
-            .title(fl!("ai-panel-title")),
-            ContextPage::DocumentStatistics => context_drawer::context_drawer(
-                self.document_statistics(),
-                Message::ToggleContextPage(ContextPage::DocumentStatistics),
-            )
-            .title(fl!("document-statistics")),
-            ContextPage::GitManagement => context_drawer::context_drawer(
-                self.git_management(),
-                Message::ToggleContextPage(ContextPage::GitManagement),
-            )
-            .title(fl!("git-management")),
-            ContextPage::ProjectSearch => context_drawer::context_drawer(
-                self.project_search(),
-                Message::ToggleContextPage(ContextPage::ProjectSearch),
-            )
-            .title(fl!("project-search")),
-            ContextPage::Settings => context_drawer::context_drawer(
-                self.settings(),
-                Message::ToggleContextPage(ContextPage::Settings),
-            )
-            .title(fl!("settings")),
-        })
+        let page = self.context_page;
+        Some(
+            context_drawer::context_drawer(self.panel_content(), Message::ToggleContextPage(page))
+                .title(page.label()),
+        )
     }
 
     fn header_start(&self) -> Vec<Element<'_, Message>> {
-        vec![menu_bar(
+        let mut items = Vec::with_capacity(2);
+        if self.window_width >= 880.0 {
+            let (title, edited) = match self.active_tab() {
+                Some(Tab::Editor(tab)) => (tab.title(), tab.changed()),
+                Some(tab) => (tab.title(), false),
+                None => (fl!("text-editor-name"), false),
+            };
+            let mut heading = widget::row::with_capacity(2)
+                .align_y(Alignment::Center)
+                .spacing(6)
+                .push(
+                    widget::container(
+                        chrome::title(title, 15.0).wrapping(iced::widget::text::Wrapping::None),
+                    )
+                    .max_width(205)
+                    .clip(true),
+                );
+            if edited {
+                heading = heading.push(chrome::caption(fl!("edited-indicator")));
+            }
+            items.push(heading.into());
+        }
+        items.push(menu_bar(
             &self.core,
             &self.config,
             &self.config_state,
             &self.key_binds,
             &self.projects,
-        )]
+        ));
+        items
+    }
+
+    fn header_end(&self) -> Vec<Element<'_, Message>> {
+        if self.window_width < 760.0 {
+            return Vec::new();
+        }
+
+        let pages = [
+            ContextPage::ProjectSearch,
+            ContextPage::Ai,
+            ContextPage::DocumentStatistics,
+            ContextPage::GitManagement,
+            ContextPage::Settings,
+        ];
+        let mut tools = widget::row::with_capacity(6)
+            .align_y(Alignment::Center)
+            .spacing(2);
+        tools = tools.push(chrome::tool(
+            "edit-find-symbolic",
+            fl!("find"),
+            Message::Find(self.find_opt.is_none().then_some(false)),
+            self.find_opt.is_some(),
+        ));
+        for page in pages {
+            tools = tools.push(chrome::tool(
+                page.icon(),
+                page.label(),
+                Message::ToggleContextPage(page),
+                self.core.window.show_context && self.context_page == page,
+            ));
+        }
+        vec![tools.into()]
     }
 
     fn view(&self) -> Element<'_, Message> {
         let cosmic_theme::Spacing {
-            space_none,
             space_xxxs,
             space_xxs,
             space_xs,
             ..
         } = self.core().system_theme().cosmic().spacing;
 
-        let mut tab_column = widget::column::with_capacity(3).padding([space_none, space_xxs]);
+        let mut tab_column = widget::column::with_capacity(5)
+            .width(Length::Fill)
+            .height(Length::Fill);
 
-        // Yu OS Glass tab strip: tab bar (brand-blue active tab, inherited from the
-        // shared toolkit style) + a glass new-file button, hosted on a frosted
-        // strip with a single hairline for quiet structure.
         let tab_strip = widget::row::with_capacity(2)
             .align_y(Alignment::Center)
             .spacing(space_xxs)
@@ -3489,8 +3781,9 @@ impl Application for App {
                     .enable_tab_drag(String::from("x-yuos-edit/tab"))
                     .on_reorder(Message::ReorderTab)
                     .tab_drag_threshold(25.)
-                    .button_spacing(space_xxs)
-                    .close_icon(icon_cache_get("window-close-symbolic", 16))
+                    .button_spacing(2)
+                    .style(theme::SegmentedButton::Custom(Box::new(chrome::tabs)))
+                    .close_icon(icon_cache_get("window-close-symbolic", 12))
                     //TODO: this causes issues with small window sizes .minimum_button_width(240)
                     .on_activate(Message::TabActivate)
                     .on_close(Message::TabClose)
@@ -3503,28 +3796,42 @@ impl Application for App {
                     .class(style::Button::Icon),
             );
 
-        tab_column = tab_column.push(
-            widget::container(tab_strip)
-                .padding([space_xxxs, space_xxs])
-                .width(Length::Fill)
-                .class(theme::Container::custom(tab_bar_glass_style)),
-        );
+        tab_column = tab_column
+            .push(
+                widget::container(tab_strip)
+                    .padding([0, 8])
+                    .width(Length::Fill),
+            )
+            .push(chrome::rule());
 
         let pending_file_count = self.pending_file_opens.len() + self.pending_file_saves.len();
         let file_access_message = if pending_file_count == 0 {
             self.file_access_error.clone()
         } else {
-            Some(fl!("file-access-pending", count = (pending_file_count as i64)))
+            Some(fl!(
+                "file-access-pending",
+                count = (pending_file_count as i64)
+            ))
         };
         if let Some(message) = file_access_message {
-            tab_column = tab_column.push(
-                widget::container(widget::text(message))
-                    .padding([space_xxs, space_xs])
-                    .width(Length::Fill)
-                    .class(theme::Container::custom(find_bar_glass_style)),
-            );
+            tab_column = tab_column
+                .push(
+                    widget::container(chrome::label(message))
+                        .padding([space_xxs, space_xs])
+                        .width(Length::Fill),
+                )
+                .push(chrome::rule());
         }
 
+        if let Some(find) = &self.find_opt {
+            tab_column = tab_column
+                .push(self.find_bar(find.replace))
+                .push(chrome::rule());
+        }
+
+        let mut document = widget::column::with_capacity(3)
+            .width(Length::Fill)
+            .height(Length::Fill);
         let tab_id = self.tab_model.active();
         match self.tab_model.data::<Tab>(tab_id) {
             Some(Tab::Editor(tab)) => {
@@ -3532,6 +3839,7 @@ impl Application for App {
                     .id(self.text_box_id.clone())
                     .on_focus(Message::FindFocused(false))
                     .on_auto_scroll(Message::AutoScroll)
+                    .on_cursor_moved(Message::CursorMoved)
                     .on_changed(Message::TabChanged(tab_id))
                     .has_context_menu(tab.context_menu.is_some())
                     .on_context_menu(move |position_opt| {
@@ -3549,7 +3857,7 @@ impl Application for App {
                         .popup(menu::context_menu(&self.key_binds, tab_id))
                         .position(widget::popover::Position::Point(point));
                 }
-                tab_column = tab_column.push(popover);
+                document = document.push(popover);
                 if self.config.vim_bindings {
                     let status = {
                         let editor = tab.editor.lock().unwrap();
@@ -3581,10 +3889,9 @@ impl Application for App {
                             }
                         }
                     };
-                    tab_column = tab_column.push(
-                        widget::container(widget::text(status).font(Font::MONOSPACE))
-                            .padding([space_xxxs, space_xs])
-                            .class(theme::Container::custom(vim_status_glass_style)),
+                    document = document.push(
+                        widget::container(chrome::caption(status).font(Font::MONOSPACE))
+                            .padding([space_xxxs, space_xs]),
                     );
                 }
             }
@@ -3640,144 +3947,39 @@ impl Application for App {
                     }
                     diff_widget = diff_widget.push(hunk_widget);
                 }
-                tab_column = tab_column.push(widget::scrollable(
-                    widget::layer_container(diff_widget).layer(cosmic_theme::Layer::Primary),
-                ));
+                document = document.push(
+                    widget::scrollable(
+                        widget::layer_container(diff_widget).layer(cosmic_theme::Layer::Primary),
+                    )
+                    .height(Length::Fill),
+                );
             }
             None => {}
         }
 
-        if let Some(FindField {
-            replace,
-            has_focus: _,
-        }) = &self.find_opt
-        {
-            let find_input =
-                widget::text_input::text_input(fl!("find-placeholder"), &self.find_search_value)
-                    .id(self.find_search_id.clone())
-                    .on_input(Message::FindSearchValueChanged)
-                    .on_submit(|_| {
-                        if self.modifiers.contains(Modifiers::SHIFT) {
-                            Message::FindPrevious
-                        } else {
-                            Message::FindNext
-                        }
-                    })
-                    .on_focus(Message::FindFocused(true))
-                    .width(Length::Fixed(320.0))
-                    .trailing_icon(
-                        button::custom(icon_cache_get("edit-clear-symbolic", 16))
-                            .on_press(Message::FindSearchValueChanged(String::new()))
-                            .class(style::Button::Icon)
-                            .into(),
-                    );
-            let find_widget = widget::row::with_children(vec![
-                find_input.into(),
-                widget::tooltip(
-                    button::custom(icon_cache_get("go-up-symbolic", 16))
-                        .on_press(Message::FindPrevious)
-                        .padding(space_xxs)
-                        .class(style::Button::Icon),
-                    widget::text::body(fl!("find-previous")),
-                    widget::tooltip::Position::Top,
-                )
-                .into(),
-                widget::tooltip(
-                    button::custom(icon_cache_get("go-down-symbolic", 16))
-                        .on_press(Message::FindNext)
-                        .padding(space_xxs)
-                        .class(style::Button::Icon),
-                    widget::text::body(fl!("find-next")),
-                    widget::tooltip::Position::Top,
-                )
-                .into(),
-                widget::space::horizontal().into(),
-                button::custom(icon_cache_get("window-close-symbolic", 16))
-                    .on_press(Message::Find(None))
-                    .padding(space_xxs)
-                    .class(style::Button::Icon)
-                    .into(),
-            ])
-            .align_y(Alignment::Center)
-            .padding(space_xxs)
-            .spacing(space_xxs);
-
-            let mut column = widget::column::with_capacity(3).push(find_widget);
-            if *replace {
-                let replace_input = widget::text_input::text_input(
-                    fl!("replace-placeholder"),
-                    &self.find_replace_value,
-                )
-                .id(self.find_replace_id.clone())
-                .on_input(Message::FindReplaceValueChanged)
-                .on_submit(|_| Message::FindReplace)
-                .width(Length::Fixed(320.0))
-                .trailing_icon(
-                    button::custom(icon_cache_get("edit-clear-symbolic", 16))
-                        .on_press(Message::FindReplaceValueChanged(String::new()))
-                        .class(style::Button::Icon)
-                        .into(),
-                );
-                let replace_widget = widget::row::with_children(vec![
-                    replace_input.into(),
-                    widget::tooltip(
-                        button::custom(icon_cache_get("replace-symbolic", 16))
-                            .on_press(Message::FindReplace)
-                            .padding(space_xxs)
-                            .class(style::Button::Icon),
-                        widget::text::body(fl!("replace")),
-                        widget::tooltip::Position::Top,
-                    )
-                    .into(),
-                    widget::tooltip(
-                        button::custom(icon_cache_get("replace-all-symbolic", 16))
-                            .on_press(Message::FindReplaceAll)
-                            .padding(space_xxs)
-                            .class(style::Button::Icon),
-                        widget::text::body(fl!("replace-all")),
-                        widget::tooltip::Position::Top,
-                    )
-                    .into(),
-                ])
-                .align_y(Alignment::Center)
-                .padding(space_xxs)
-                .spacing(space_xxs);
-
-                column = column.push(replace_widget);
-            }
-
-            column = column.push(
-                widget::row::with_children(vec![
-                    widget::checkbox(self.config.find_case_sensitive)
-                        .label(fl!("case-sensitive"))
-                        .on_toggle(Message::FindCaseSensitive)
-                        .into(),
-                    widget::checkbox(self.config.find_use_regex)
-                        .label(fl!("use-regex"))
-                        .on_toggle(Message::FindUseRegex)
-                        .into(),
-                    widget::checkbox(self.config.find_wrap_around)
-                        .label(fl!("wrap-around"))
-                        .on_toggle(Message::FindWrapAround)
-                        .into(),
-                ])
-                .align_y(Alignment::Center)
-                .padding(space_xxs)
-                .spacing(space_xxs),
-            );
-
-            tab_column = tab_column.push(
-                widget::container(column)
-                    .padding(space_xxs)
-                    .class(theme::Container::custom(find_bar_glass_style)),
-            );
+        let mut body = widget::row::with_capacity(2)
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .push(document);
+        if self.core.window.show_context && self.inline_inspector() {
+            let page = self.context_page;
+            body = body.push(chrome::inspector(
+                page.icon(),
+                page.label(),
+                self.panel_content(),
+                Message::ToggleContextPage(page),
+            ));
         }
 
-        let content: Element<_> = tab_column.into();
-
-        // Uncomment to debug layout:
-        //content.explain(cosmic::iced::Color::WHITE)
-        content
+        tab_column
+            .push(
+                widget::container(body)
+                    .width(Length::Fill)
+                    .height(Length::Fill)
+                    .class(theme::Container::custom(chrome::content)),
+            )
+            .push(self.document_status())
+            .into()
     }
 
     fn view_window(&self, window_id: window::Id) -> Element<'_, Message> {
@@ -3805,6 +4007,9 @@ impl Application for App {
                     Some(Message::Modifiers(modifiers))
                 }
                 event::Event::Window(window::Event::Focused) => Some(Message::Focus(window_id)),
+                event::Event::Window(window::Event::Resized(size)) => {
+                    Some(Message::WindowResized(window_id, size.width))
+                }
                 event::Event::Window(window::Event::CloseRequested) => {
                     Some(Message::CloseWindow(window_id))
                 }

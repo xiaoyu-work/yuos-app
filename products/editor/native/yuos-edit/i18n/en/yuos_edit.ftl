@@ -3,6 +3,14 @@ comment = Text editor for the Yu OS desktop
 new-document = New document
 open-project = Open project
 todo = TODO
+sidebar-projects = Projects
+sidebar-open-files = Open files
+sidebar-recent-projects = Recent projects
+edited-indicator = Edited
+close-panel = Close panel
+status-position = Ln {$line}, Col {$column}
+status-lines = Lines: {$count}
+status-zoom = {$zoom}%
 
 # Context Pages
 
@@ -28,6 +36,7 @@ unstaged-changes = Unstaged changes
 
 ## Project search
 project-search = Project search
+project-search-results = Matching lines: {$matches} · Files: {$files}
 
 ## Prompt save changes
 prompt-save-changes-title = Save changes before closing?

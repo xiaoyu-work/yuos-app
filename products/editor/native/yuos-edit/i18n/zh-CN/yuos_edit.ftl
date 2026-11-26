@@ -2,6 +2,14 @@ text-editor-name = 文本编辑器
 new-document = 新建文件
 open-project = 打开项目
 todo = 待办事项
+sidebar-projects = 项目
+sidebar-open-files = 打开的文件
+sidebar-recent-projects = 最近项目
+edited-indicator = 已编辑
+close-panel = 关闭面板
+status-position = 第 {$line} 行，第 {$column} 列
+status-lines = 行数：{$count}
+status-zoom = {$zoom}%
 
 # Context Pages
 
@@ -30,6 +38,7 @@ unstaged-changes = 未暂存的更改
 ## Project search
 
 project-search = 项目搜索
+project-search-results = {$files} 个文件中 {$matches} 行匹配
 
 ## Prompt save changes
 

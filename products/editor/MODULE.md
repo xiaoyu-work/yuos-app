@@ -77,6 +77,11 @@ python3 products/editor/native/test_process.py
 Rust environment-mutating tests run serially. These fixture checks do not
 replace interactive Wayland acceptance.
 
+The native editor keeps its window controls and menus on the pinned toolkit.
+The Editor-owned chrome contains the project/open-files sidebar, tabs, find bar,
+document status and inspectors. At narrower widths the inspector uses the
+toolkit overlay; file dialogs and commands still use their existing routes.
+
 Native startup uses the shared `yuos-app-gui-argv` client helper and the
 published SDK's GUI-launch signal to remove only one leading Host `--gui`.
 Every remaining argument is a filename, including `--gui` on direct launches

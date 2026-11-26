@@ -17,7 +17,7 @@ use cosmic::{
 };
 use std::{collections::HashMap, path::PathBuf, sync::LazyLock};
 
-use crate::{Action, Config, ConfigState, Message, fl};
+use crate::{Action, Config, ConfigState, Message, chrome, fl};
 
 static MENU_ID: LazyLock<cosmic::widget::Id> =
     LazyLock::new(|| cosmic::widget::Id::new("responsive-menu"));
@@ -137,12 +137,15 @@ pub fn context_menu<'a>(
             }
         }
         menu_button(vec![
-            widget::text(menu_label).into(),
+            chrome::label(menu_label).into(),
             space::horizontal().into(),
             widget::text(key)
+                .size(11)
                 .class(theme::Text::Custom(key_style))
                 .into(),
         ])
+        .padding([3, 8])
+        .class(theme::Button::AppletMenu)
         .on_press(Message::TabContextAction(entity, menu_action))
     };
 
@@ -155,23 +158,17 @@ pub fn context_menu<'a>(
         menu_item(fl!("paste"), Action::Paste),
         menu_item(fl!("select-all"), Action::SelectAll),
     ))
-    .padding(1)
-    // Yu OS Glass popover: frosted surface, large radius, blue-tinted hairline.
+    .padding(4)
     .style(|theme| {
         let cosmic = theme.cosmic();
-        let component = &cosmic.background.component;
-        let mut base = component.base;
-        base.alpha *= 0.92;
-        let mut divider = component.divider;
-        divider.alpha *= 0.5;
         widget::container::Style {
-            icon_color: Some(component.on.into()),
-            text_color: Some(component.on.into()),
-            background: Some(Background::Color(base.into())),
+            icon_color: Some(cosmic.primary.on.into()),
+            text_color: Some(cosmic.primary.on.into()),
+            background: Some(Background::Color(cosmic.primary.base.into())),
             border: Border {
-                radius: cosmic.radius_l().into(),
+                radius: 7.0.into(),
                 width: 1.0,
-                color: divider.into(),
+                color: cosmic.background.divider.into(),
             },
             ..Default::default()
         }
@@ -227,9 +224,9 @@ pub fn menu_bar<'a>(
     }
 
     responsive_menu_bar()
-        .item_height(ItemHeight::Dynamic(40))
-        .item_width(ItemWidth::Uniform(320))
-        .spacing(4.0)
+        .item_height(ItemHeight::Dynamic(29))
+        .item_width(ItemWidth::Uniform(300))
+        .spacing(2.0)
         .into_element(
             core,
             key_binds,
