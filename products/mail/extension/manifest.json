@@ -36,30 +36,30 @@
     "scripts": ["lib/native.js", "lib/mailbox.js", "background.js"]
   },
 
-  "action": {
-    "default_title": "__MSG_action_title__",
-    "default_icon": {
-      "16": "icons/icon.svg",
-      "32": "icons/icon.svg"
-    }
-  },
-
   "message_display_action": {
     "default_title": "__MSG_summarize_title__",
     "default_popup": "ui/summarize/summarize.html",
     "default_icon": {
-      "16": "icons/icon.svg",
-      "32": "icons/icon.svg"
-    }
+      "16": "icons/agent.png",
+      "32": "icons/agent.png"
+    },
+    "theme_icons": [
+      { "light": "icons/agent-dark.png", "dark": "icons/agent.png", "size": 16 },
+      { "light": "icons/agent-dark.png", "dark": "icons/agent.png", "size": 32 }
+    ]
   },
 
   "compose_action": {
     "default_title": "__MSG_compose_title__",
     "default_popup": "ui/compose/composeAction.html",
     "default_icon": {
-      "16": "icons/icon.svg",
-      "32": "icons/icon.svg"
-    }
+      "16": "icons/agent.png",
+      "32": "icons/agent.png"
+    },
+    "theme_icons": [
+      { "light": "icons/agent-dark.png", "dark": "icons/agent.png", "size": 16 },
+      { "light": "icons/agent-dark.png", "dark": "icons/agent.png", "size": 32 }
+    ]
   },
 
   "compose_scripts": [
@@ -74,9 +74,9 @@
   },
 
   "icons": {
-    "16": "icons/icon.svg",
-    "32": "icons/icon.svg",
-    "48": "icons/icon.svg",
-    "96": "icons/icon.svg"
+    "16": "icons/agent.png",
+    "32": "icons/agent.png",
+    "48": "icons/agent.png",
+    "96": "icons/agent.png"
   }
 }

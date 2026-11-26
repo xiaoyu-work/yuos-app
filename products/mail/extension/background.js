@@ -12,7 +12,6 @@
 //   { id: "<uuid>", ok: false, error: "...", detail?: {...} }
 //
 // Surfaces this background script wires up:
-//   - browser.action                (main toolbar): opens the Assistant space
 //   - browser.messageDisplayAction  (read window):  Summarize popup
 //   - browser.composeAction         (compose):      Smart Reply / Smart Compose
 //   - browser.spaces                (left rail):    Yu AI Assistant
@@ -105,7 +104,7 @@ async function ensureAssistantSpace() {
     if (list && list.length) return list[0];
     return await browser.spaces.create(ASSISTANT_SPACE_NAME, ASSISTANT_PAGE, {
       title: browser.i18n.getMessage("assistant_title") || "Yu AI",
-      defaultIcons: { 16: browser.runtime.getURL("icons/icon.svg") },
+      defaultIcons: { 16: browser.runtime.getURL("icons/agent.png") },
       badgeBackgroundColor: "#10b981",
     });
   } catch (e) {
@@ -115,25 +114,6 @@ async function ensureAssistantSpace() {
 }
 
 ensureAssistantSpace();
-
-// ---------------------------------------------------------------------------
-// Toolbar action — opens the assistant tab.
-// ---------------------------------------------------------------------------
-
-browser.action.onClicked.addListener(async () => {
-  const settings = await getSettings();
-  if (!settings.features.assistant) {
-    notify(browser.i18n.getMessage("assistant_disabled") || "Assistant disabled in options");
-    return;
-  }
-  const space = await ensureAssistantSpace();
-  if (space) {
-    try { await browser.spaces.open(space.id); } catch (e) { console.warn(e); }
-  } else {
-    // Fallback: open a regular tab.
-    browser.tabs.create({ url: ASSISTANT_PAGE });
-  }
-});
 
 // ---------------------------------------------------------------------------
 // Context menus — summarise / translate / smart reply
@@ -360,7 +340,7 @@ function notify(message, title) {
   try {
     browser.notifications.create({
       type: "basic",
-      iconUrl: browser.runtime.getURL("icons/icon.svg"),
+      iconUrl: browser.runtime.getURL("icons/agent.png"),
       title: title || "Yu Mail AI",
       message,
     });

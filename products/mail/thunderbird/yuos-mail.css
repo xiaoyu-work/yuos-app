@@ -3,272 +3,978 @@
                url("about:message"), url("chrome://messenger/content/messenger/aboutMessage.xhtml"),
                url("chrome://messenger/content/messengercompose/messengercompose.xhtml") {
   :root {
-    --yu-mail-font: "Noto Sans", system-ui, sans-serif;
-    --yu-mail-font-small: calc(12rem / 13);
-    --yu-mail-hover: light-dark(#ebf2fa, #313b4b);
-    --yu-mail-rule: light-dark(#dce3ed, #343e4c);
-    --yu-mail-secondary: var(--color-text-secondary, GrayText);
-    font-family: var(--yu-mail-font) !important;
+    --yu-font: "Noto Sans", "Noto Sans CJK SC", sans-serif;
+    --yu-text: #1f2328;
+    --yu-muted: #8b949e;
+    --yu-icon: #57606a;
+    --yu-blue: #0b63c4;
+    --yu-blue-hover: #0a57ad;
+    --yu-sel: #dce9f9;
+    --yu-sel-soft: #eef4fc;
+    --yu-rule: #e6e8eb;
+    --yu-rule-soft: #f0f1f3;
+    --yu-hover: #f2f4f7;
+    --yu-side: #f7f8fa;
+    --yu-mail-rule: var(--yu-rule);
+    font-family: var(--yu-font) !important;
   }
 
   :root:lang(zh-CN) {
-    --yu-mail-font: "Noto Sans CJK SC", system-ui, sans-serif;
+    --yu-font: "Noto Sans CJK SC", "Noto Sans", sans-serif;
   }
 }
 
 @-moz-document url("chrome://messenger/content/messenger.xhtml") {
-  unified-toolbar li[item-id="search-bar"] {
-    min-width: 16em;
+  :root {
+    --yu-pen-w: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23ffffff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 2.5 13.5 5 6 12.5H3.5V10z'/%3E%3C/svg%3E");
+    --yu-search-m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%238b949e' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='7' cy='7' r='4.5'/%3E%3Cpath d='M10.5 10.5 14 14'/%3E%3C/svg%3E");
+    --yu-menu-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2357606a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 4h11M2.5 8h11M2.5 12h11'/%3E%3C/svg%3E");
+    --yu-min-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2357606a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8h8'/%3E%3C/svg%3E");
+    --yu-max-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2357606a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='8' height='8'/%3E%3C/svg%3E");
+    --yu-x-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2357606a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4l8 8M12 4l-8 8'/%3E%3C/svg%3E");
   }
 
-  /* Without an account the window is the account setup page. */
-  :root[yu-no-account] :is(#tabs-toolbar, #status-bar) {
+  #spacesToolbar, #spacesPinnedButton, #spacesToolbarReveal, #status-bar,
+  :root[yu-no-account] #tabs-toolbar {
     display: none !important;
   }
 
-  @media (prefers-contrast: no-preference) and (forced-colors: none) {
-    :root:not([lwtheme], [customizingUnifiedToolbar]) unified-toolbar {
-      background-color: light-dark(#e7eef9, #202630) !important;
-      border-block-end-color: var(--yu-mail-rule) !important;
-    }
-
-    :root:not([lwtheme], [customizingUnifiedToolbar]) unified-toolbar .unified-toolbar-button {
-      border-radius: 4px !important;
-    }
-
-    :root:not([lwtheme], [customizingUnifiedToolbar]) unified-toolbar .unified-toolbar-button:not([popup]) {
-      padding-inline: 6px !important;
-    }
-
-    :root:not([lwtheme]) unified-toolbar li[item-id="write-message"] button:not(:disabled) {
-      color: white !important;
-      background-color: #0f60ab !important;
-      border-color: transparent !important;
-      margin-inline-end: 8px;
-    }
-
-    :root:not([lwtheme]) unified-toolbar li[item-id="write-message"] button:not(:disabled):hover {
-      background-color: #0b518f !important;
-    }
-
-    :root:not([lwtheme]) unified-toolbar li:is([item-id="archive"], [item-id="move-to"],
-      [item-id="forward-inline"], [item-id="tag-message"]) {
-      border-inline-end: 1px solid light-dark(#c9d4e3, #3d4858);
-      padding-inline-end: 4px;
-    }
+  #titlebar {
+    margin-inline-start: 0 !important;
   }
+
+  unified-toolbar {
+    background: #fff !important;
+    border-block-end: 1px solid var(--yu-rule) !important;
+    color: var(--yu-text) !important;
+  }
+
+  #unifiedToolbarContainer {
+    box-sizing: border-box !important;
+    inline-size: 100% !important;
+    block-size: 51px;
+    padding-inline: 16px 12px;
+    align-items: center;
+  }
+
+  #unifiedToolbar {
+    padding: 0 !important;
+    align-items: center;
+    gap: 16px;
+  }
+
+  #unifiedToolbarContent {
+    flex: 1 1 auto !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    align-items: center;
+  }
+
+  #unifiedToolbarContent > li[item-id="spacer"] {
+    display: block !important;
+    flex: 1 1 0 !important;
+    min-inline-size: 0;
+  }
+
+  #unifiedToolbarContent > li[item-id="spacer"]:first-of-type {
+    flex-basis: 16px !important;
+  }
+
+  #unifiedToolbarContent global-search-bar > [slot="search-button"] {
+    display: none !important;
+  }
+
+  #unifiedToolbarContent > li[item-id="write-message"] button {
+    block-size: 32px !important;
+    min-block-size: 32px !important;
+    padding: 0 14px !important;
+    gap: 6px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: var(--yu-blue) !important;
+    color: #fff !important;
+    font: 600 13px var(--yu-font) !important;
+    --webextension-toolbar-image: var(--yu-pen-w);
+    --toolbar-button-icon: var(--yu-pen-w);
+  }
+
+  #unifiedToolbarContent > li[item-id="write-message"] button:hover {
+    background: var(--yu-blue-hover) !important;
+  }
+
+  #unifiedToolbarContent > li[item-id="write-message"] .button-icon {
+    content: var(--yu-pen-w) !important;
+    inline-size: 16px !important;
+    block-size: 16px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #unifiedToolbarContent > li[item-id="write-message"] .button-label {
+    margin: 0 !important;
+    padding: 0 !important;
+    font: inherit !important;
+    line-height: normal !important;
+  }
+
+  #unifiedToolbarContent > li[item-id="search-bar"] {
+    flex: 0 1 520px !important;
+    margin-inline: 16px 0 !important;
+    max-inline-size: 520px;
+    min-inline-size: 160px;
+  }
+
+  #unifiedToolbarContent > li[item-id="search-bar"] .live-content {
+    inline-size: 100%;
+  }
+
+  #unifiedToolbarContent global-search-bar {
+    display: block;
+    inline-size: 100% !important;
+    max-inline-size: none !important;
+    block-size: 32px !important;
+    border-radius: 8px;
+    background: var(--yu-hover) var(--yu-search-m) no-repeat 12px center / 16px 16px;
+    font: 13px var(--yu-font);
+    --search-bar-background: transparent;
+    --search-bar-focus-background: transparent;
+    --search-bar-border-color: transparent;
+    --search-bar-color: var(--yu-text);
+    --search-field-placeholder: var(--yu-muted);
+    --search-padding: 36px;
+    --search-buttons-padding: 12px;
+    --search-button-show: none;
+    --button-border-radius: 8px;
+  }
+
+  #unifiedToolbarContent global-search-bar > [slot="placeholder"] {
+    padding-inline-start: 29px;
+    font: 13px var(--yu-font);
+  }
+
+  #unifiedToolbar > #notification-popup-box {
+    margin-inline-start: -16px !important;
+  }
+
+  #button-appmenu {
+    inline-size: 32px !important;
+    block-size: 32px !important;
+    min-inline-size: 32px !important;
+    padding: 8px !important;
+    margin: 0 19px 0 0 !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    list-style-image: var(--yu-menu-b) !important;
+  }
+
+  #button-appmenu .toolbarbutton-icon {
+    content: var(--yu-menu-b) !important;
+    inline-size: 16px !important;
+    block-size: 16px !important;
+  }
+
+  #button-appmenu:hover, #button-appmenu[open] {
+    background: var(--yu-hover) !important;
+  }
+
+  #unifiedToolbarContainer .titlebar-buttonbox-container {
+    margin: 0 0 0 5px !important;
+    align-self: center !important;
+    align-items: center !important;
+    block-size: 32px !important;
+  }
+
+  #unifiedToolbarContainer .titlebar-buttonbox {
+    gap: 2px;
+    margin: 0 !important;
+  }
+
+  #unifiedToolbarContainer .titlebar-button:is(.titlebar-min, .titlebar-close),
+  :root:not([sizemode="maximized"]) #unifiedToolbarContainer .titlebar-max,
+  :root[sizemode="maximized"] #unifiedToolbarContainer .titlebar-restore {
+    display: flex !important;
+  }
+
+  #unifiedToolbarContainer .titlebar-button {
+    inline-size: 32px !important;
+    block-size: 32px !important;
+    padding: 8px !important;
+    margin: 0 !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    appearance: none !important;
+    -moz-default-appearance: none !important;
+  }
+
+  #unifiedToolbarContainer .titlebar-button:hover {
+    background: var(--yu-hover) !important;
+  }
+
+  #unifiedToolbarContainer .titlebar-button > .toolbarbutton-icon {
+    inline-size: 16px !important;
+    block-size: 16px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    appearance: none !important;
+    -moz-default-appearance: none !important;
+    background: none !important;
+  }
+
+  #unifiedToolbarContainer .titlebar-min > .toolbarbutton-icon { list-style-image: var(--yu-min-b) !important; }
+  #unifiedToolbarContainer :is(.titlebar-max, .titlebar-restore) > .toolbarbutton-icon { list-style-image: var(--yu-max-b) !important; }
+  #unifiedToolbarContainer .titlebar-close > .toolbarbutton-icon { list-style-image: var(--yu-x-b) !important; }
 }
 
 @-moz-document url("about:3pane"), url("chrome://messenger/content/messenger/about3Pane.xhtml") {
+  :root {
+    --yu-inbox-t: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%231f2328' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 9h3.5l1 2h3l1-2H14M2 9l1.5-6h9L14 9v4H2z'/%3E%3C/svg%3E");
+    --yu-inbox-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%230b63c4' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 9h3.5l1 2h3l1-2H14M2 9l1.5-6h9L14 9v4H2z'/%3E%3C/svg%3E");
+    --yu-draft-t: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%231f2328' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 2h6l3 3v9H4zM10 2v3h3'/%3E%3C/svg%3E");
+    --yu-draft-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%230b63c4' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 2h6l3 3v9H4zM10 2v3h3'/%3E%3C/svg%3E");
+    --yu-sent-t: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%231f2328' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2 2 7l5 2 2 5z'/%3E%3C/svg%3E");
+    --yu-sent-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%230b63c4' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2 2 7l5 2 2 5z'/%3E%3C/svg%3E");
+    --yu-arch-t: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%231f2328' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 3h12v3H2zM3 6v7h10V6M6.5 9h3'/%3E%3C/svg%3E");
+    --yu-arch-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%230b63c4' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 3h12v3H2zM3 6v7h10V6M6.5 9h3'/%3E%3C/svg%3E");
+    --yu-trash-t: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%231f2328' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5h10M6 4.5V3h4v1.5M4.5 4.5l.7 9h5.6l.7-9'/%3E%3C/svg%3E");
+    --yu-trash-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%230b63c4' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5h10M6 4.5V3h4v1.5M4.5 4.5l.7 9h5.6l.7-9'/%3E%3C/svg%3E");
+    --yu-folder-t: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%231f2328' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 4h4l1.5 1.5H14V13H2z'/%3E%3C/svg%3E");
+    --yu-folder-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%230b63c4' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 4h4l1.5 1.5H14V13H2z'/%3E%3C/svg%3E");
+    --yu-junk-t: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%231f2328' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='8' r='5.5'/%3E%3Cpath d='M4.1 4.1l7.8 7.8'/%3E%3C/svg%3E");
+    --yu-junk-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%230b63c4' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='8' r='5.5'/%3E%3Cpath d='M4.1 4.1l7.8 7.8'/%3E%3C/svg%3E");
+    --yu-chev-m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%238b949e' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 4l4 4-4 4'/%3E%3C/svg%3E");
+    --yu-clip-m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%238b949e' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.5 5 6 9.5a1.4 1.4 0 0 0 2 2L13 6.5a2.8 2.8 0 0 0-4-4L4 7.5a4.2 4.2 0 0 0 6 6l3.5-3.5'/%3E%3C/svg%3E");
+    --yu-star-m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%238b949e' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 2.2l1.8 3.7 4 .6-2.9 2.8.7 4L8 11.4l-3.6 1.9.7-4L2.2 6.5l4-.6z'/%3E%3C/svg%3E");
+    --yu-starf-m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%238b949e' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath fill='%23d4a72c' stroke='%23d4a72c' d='M8 2.2l1.8 3.7 4 .6-2.9 2.8.7 4L8 11.4l-3.6 1.9.7-4L2.2 6.5l4-.6z'/%3E%3C/svg%3E");
+  }
+
   :root[yu-no-account] :is(#placeholderNoMessages, #threadPaneHeaderBar) {
     display: none !important;
   }
 
-  #paneLayout.layout-vertical:not([style*="--folderPaneSplitter-width"]) {
-    --folderPaneSplitter-width: clamp(10em, 17vw, 16em) !important;
+  body.layout-vertical:not([style*="--folderPaneSplitter-width"]) {
+    --folderPaneSplitter-width: 200px !important;
   }
 
-  #paneLayout.layout-vertical:not([style*="--messagePaneSplitter-width"]) {
-    --messagePaneSplitter-width: clamp(20em, 48vw, 64em) !important;
+  body.layout-vertical:not([style*="--messagePaneSplitter-width"]) {
+    --messagePaneSplitter-width: calc(100vw - 560px) !important;
+  }
+
+  /* Folder pane */
+  #folderPane {
+    background: var(--yu-side) !important;
+    border-inline-end: 1px solid var(--yu-rule) !important;
+    color: var(--yu-text) !important;
+  }
+
+  #folderPaneSplitter, #messagePaneSplitter {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    inline-size: 4px !important;
+    min-inline-size: 4px !important;
+    margin-inline: -2px !important;
+    z-index: 2;
+  }
+
+  #folderPaneHeaderBar {
+    display: none !important;
+  }
+
+  #folderTree {
+    padding: 12px 8px !important;
+    font: 13px var(--yu-font) !important;
+  }
+
+  #folderTree li, #folderTree ul {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .sidebar-panel-scroll::before, .sidebar-panel-scroll::after {
+    display: none !important;
+  }
+
+  #folderTree .icon::after {
+    display: none !important;
+  }
+
+  #folderTree .mode-container {
+    display: none !important;
+  }
+
+  #folderTree li > .container {
+    block-size: 32px !important;
+    min-block-size: 32px !important;
+    margin: 0 !important;
+    padding-block: 0 !important;
+    padding-inline: calc(10px + var(--indent)) 10px !important;
+    gap: 10px;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    color: var(--yu-text) !important;
+    font-weight: 400 !important;
+  }
+
+  #folderTree li:not(.selected) > .container:hover {
+    background: var(--yu-hover) !important;
+  }
+
+  #folderTree li.selected > .container,
+  #folderTree li.drop-target > .container {
+    background: var(--yu-sel) !important;
+    color: var(--yu-blue) !important;
+    font-weight: 600 !important;
+  }
+
+  #folderTree li > .container > :is(.new-icon, .account-indicator, .total-count, .folder-size) {
+    display: none !important;
+  }
+
+  #folderTree li > .container > .name {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: normal !important;
+  }
+
+  #folderTree li > .container > .twisty {
+    order: 10;
+    display: none !important;
+    inline-size: 16px !important;
+    block-size: 16px !important;
+    margin: 0 !important;
+  }
+
+  #folderTree li.children[data-folder-type] > .container > .twisty,
+  #folderTree li.children:not([data-server-type]) > .container > .twisty {
+    display: inline-flex !important;
+  }
+
+  #folderTree li > .container > .twisty > .twisty-icon {
+    display: block !important;
+    content: var(--yu-chev-m) !important;
+    inline-size: 16px !important;
+    block-size: 16px !important;
+    transform: rotate(90deg);
+  }
+
+  #folderTree li.collapsed > .container > .twisty > .twisty-icon {
+    transform: none !important;
+  }
+
+  #folderTree li > .container > .icon {
+    inline-size: 16px !important;
+    block-size: 16px !important;
+    margin: 0 !important;
+    background: var(--yu-folder-t) no-repeat center / 16px 16px !important;
+    -moz-context-properties: none !important;
+  }
+
+  #folderTree li.selected > .container > .icon { background-image: var(--yu-folder-a) !important; }
+  #folderTree li[data-folder-type="inbox"] > .container > .icon { background-image: var(--yu-inbox-t) !important; }
+  #folderTree li[data-folder-type="inbox"].selected > .container > .icon { background-image: var(--yu-inbox-a) !important; }
+  #folderTree li[data-folder-type="drafts"] > .container > .icon { background-image: var(--yu-draft-t) !important; }
+  #folderTree li[data-folder-type="drafts"].selected > .container > .icon { background-image: var(--yu-draft-a) !important; }
+  #folderTree li[data-folder-type="sent"] > .container > .icon { background-image: var(--yu-sent-t) !important; }
+  #folderTree li[data-folder-type="sent"].selected > .container > .icon { background-image: var(--yu-sent-a) !important; }
+  #folderTree li[data-folder-type="archive"] > .container > .icon { background-image: var(--yu-arch-t) !important; }
+  #folderTree li[data-folder-type="archive"].selected > .container > .icon { background-image: var(--yu-arch-a) !important; }
+  #folderTree li[data-folder-type="trash"] > .container > .icon { background-image: var(--yu-trash-t) !important; }
+  #folderTree li[data-folder-type="trash"].selected > .container > .icon { background-image: var(--yu-trash-a) !important; }
+  #folderTree li[data-folder-type="junk"] > .container > .icon { background-image: var(--yu-junk-t) !important; }
+  #folderTree li[data-folder-type="junk"].selected > .container > .icon { background-image: var(--yu-junk-a) !important; }
+
+  #folderTree li > .container > .unread-count {
+    margin: 0 0 0 auto !important;
+    padding: 0 !important;
+    min-inline-size: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    color: var(--yu-blue) !important;
+    font: 600 12px var(--yu-font) !important;
+  }
+
+  #folderTree li:not(.unread) > .container > .unread-count {
+    display: none !important;
+  }
+
+  /* A single mail account is shown as its folders; Local Folders only when it holds mail. */
+  #folderTree li[data-server-type]:first-child:has(+ li[data-server-type="none"]:last-child) > .container,
+  #folderTree li[data-server-type="none"]:not(:only-child):not(:has(li.total)) {
+    display: none !important;
+  }
+
+  #folderTree li[data-server-type]:first-child:has(+ li[data-server-type="none"]:last-child) ul {
+    --indent: calc(16px * (var(--depth) - 1)) !important;
+  }
+
+  #folderTree li:is([data-folder-type="junk"], [data-folder-type="templates"],
+    [data-folder-type="outbox"]):not(.total, .children) {
+    display: none !important;
+  }
+
+  #folderTree li[data-server-type] > ul { display: flex !important; flex-direction: column; }
+  #folderTree li[data-server-type] > ul > li { order: 6; }
+  #folderTree li[data-server-type] > ul > li[data-folder-type="inbox"] { order: 1; }
+  #folderTree li[data-server-type] > ul > li[data-folder-type="drafts"] { order: 2; }
+  #folderTree li[data-server-type] > ul > li[data-folder-type="sent"] { order: 3; }
+  #folderTree li[data-server-type] > ul > li[data-folder-type="archive"] { order: 4; }
+  #folderTree li[data-server-type] > ul > li[data-folder-type="trash"] { order: 5; }
+
+  #threadTree:focus-visible, #threadTree:focus { outline: none !important; }
+
+  /* Message list */
+  #threadPane {
+    background: #fff !important;
+    border-inline-end: 1px solid var(--yu-rule) !important;
   }
 
   #threadPaneHeaderBar {
-    border-block-end: 1px solid var(--sidebar-border);
+    block-size: 44px !important;
+    min-block-size: 44px !important;
+    padding: 0 16px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    background: #fff !important;
+    align-items: center !important;
+  }
+
+  #threadPaneHeaderBar .list-header-bar-container-start {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   #threadPaneHeaderBar .list-header-title {
-    font-size: calc(15rem / 13) !important;
-    font-weight: 600 !important;
+    font: 600 15px var(--yu-font) !important;
+    color: var(--yu-text) !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
-  #folderTree .container > .name,
-  #folderTree .folder-count-badge,
+  #threadPaneFolderCountContainer {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #threadPaneHeaderBar .thread-pane-count-info:not(.yu-count) {
+    display: none !important;
+  }
+
+  #threadPaneHeaderBar .yu-count {
+    font: 400 12px var(--yu-font) !important;
+    color: var(--yu-muted) !important;
+    margin: 0 0 0 5px !important;
+    padding: 0 !important;
+  }
+
+  #threadPaneHeaderBar .list-header-bar-container-end,
+  #threadPaneHeaderBar ~ #quickFilterBar:not([yu-open]) {
+    display: none !important;
+  }
+
+  #threadTree[rows="thread-card"] {
+    padding: 0 !important;
+    background: #fff !important;
+    --tree-card-inline: 0px;
+    --tree-card-block: 0px;
+    font: 13px var(--yu-font) !important;
+  }
+
   #threadTree[rows="thread-card"] .card-layout {
-    font-weight: 400 !important;
+    background: #fff !important;
+    outline: none !important;
   }
 
-  #folderTree .folder-count-badge,
-  #threadPaneHeaderBar .thread-pane-count-info,
-  #threadTree[rows="thread-card"] .card-container :is(.date, .yu-mail-preview) {
-    font-size: var(--yu-mail-font-small) !important;
+  #threadTree[rows="thread-card"] .card-layout > td {
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
   }
 
-  #threadTree[rows="thread-card"] .card-container :is(.sender, .subject) {
-    font-size: 1rem !important;
-    font-weight: 400 !important;
+  #threadTree[rows="thread-card"] .card-layout > td > .card-container {
+    display: block !important;
+    block-size: 100% !important;
+    margin: 0 !important;
+    padding: 10px 16px !important;
+    border: 0 !important;
+    border-block-start: 1px solid var(--yu-rule-soft) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    color: var(--yu-text) !important;
+    line-height: normal !important;
   }
 
-  #threadTree[rows="thread-card"] .card-layout[data-properties~="unread"]
-    .card-container :is(.sender, .subject) {
-    font-weight: 600 !important;
+  #threadTree[rows="thread-card"] .card-layout:hover > td > .card-container {
+    background: var(--yu-side) !important;
+  }
+
+  #threadTree[rows="thread-card"] .card-layout.selected > td > .card-container {
+    background: var(--yu-sel-soft) !important;
+  }
+
+  #threadTree[rows="thread-card"]:focus-within .card-layout.current > td > .card-container {
+    outline: none !important;
+  }
+
+  #threadTree[rows="thread-card"] .card-layout[data-properties~="unread"] > td > .card-container::before {
+    content: "" !important;
+    position: absolute !important;
+    inset-inline-start: 6px !important;
+    inset-block-start: 16px !important;
+    inline-size: 6px !important;
+    block-size: 6px !important;
+    border-radius: 50% !important;
+    background: var(--yu-blue) !important;
+  }
+
+  #threadTree[rows="thread-card"] .card-container > .thread-card-column:first-child,
+  #threadTree[rows="thread-card"] .card-container :is(.tree-button-more, .account-indicator,
+    .state, .sort-header-details, .tree-button-spam, .thread-card-tags-info) {
+    display: none !important;
+  }
+
+  #threadTree[rows="thread-card"] .card-container > .thread-card-column {
+    display: block !important;
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  #threadTree[rows="thread-card"] .card-container .thread-card-row {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: baseline !important;
+    gap: 8px !important;
+    line-height: normal !important;
+  }
+
+  #threadTree[rows="thread-card"] .card-container .sender {
+    flex: 1 1 auto;
+    padding: 0 !important;
+    font: 400 13px var(--yu-font) !important;
+    color: var(--yu-text) !important;
+  }
+
+  #threadTree[rows="thread-card"] .card-container .date {
+    font: 400 12px var(--yu-font) !important;
+    color: var(--yu-muted) !important;
+    opacity: 1 !important;
+    position: relative;
+    inset-block-start: -1px;
   }
 
   #threadTree[rows="thread-card"] .card-container .thread-card-dynamic-row {
-    grid-template: "subject subject subject" max-content
-                   "button preview info" minmax(auto, 1fr)
-                   / auto minmax(0, 1fr) auto !important;
+    display: grid !important;
+    grid-template: "subject subject" auto "preview info" auto / minmax(0, 1fr) auto !important;
+    gap: 0 !important;
+    align-items: center !important;
+    line-height: normal !important;
+  }
+
+  #threadTree[rows="thread-card"] .card-container .thread-card-button {
+    display: none !important;
+  }
+
+  #threadTree[rows="thread-card"] .card-container .thread-card-subject-container {
+    grid-area: subject;
+    margin-block-start: 2px;
+    padding: 0 !important;
+    min-inline-size: 0;
+    display: flex;
+  }
+
+  #threadTree[rows="thread-card"] .card-container .subject {
+    font: 400 13px var(--yu-font) !important;
+    color: var(--yu-text) !important;
+  }
+
+  #threadTree[rows="thread-card"] .card-layout[data-properties~="unread"] .card-container :is(.sender, .subject) {
+    font-weight: 600 !important;
+    color: var(--yu-text) !important;
   }
 
   #threadTree[rows="thread-card"] .yu-mail-preview {
     grid-area: preview;
-    min-width: 0;
-    padding-inline-start: 3px;
+    display: block !important;
+    margin-block-start: 2px;
+    padding: 0 !important;
+    min-inline-size: 0;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    color: var(--yu-mail-secondary);
+    font: 400 12px var(--yu-font) !important;
+    color: var(--yu-muted) !important;
   }
 
-  #threadTree[rows="thread-card"] .yu-mail-preview:empty {
-    display: none;
+  #threadTree[rows="thread-card"] .card-container .thread-card-icon-info {
+    grid-area: info;
+    display: flex !important;
+    gap: 4px !important;
+    margin: 2px 0 0 6px !important;
+    align-items: center;
+    position: relative;
+    inset-block-start: -1px;
   }
 
-  @container threadPane (max-width: 380px) {
-    #threadPaneHeaderBar {
-      flex-wrap: wrap;
-    }
-
-    #threadPaneHeaderBar .list-header-bar-container-start {
-      flex: 1 0 100%;
-    }
+  #threadTree[rows="thread-card"] .card-container .thread-card-icon-info > :is(img, button) {
+    inline-size: 16px !important;
+    block-size: 16px !important;
+    min-inline-size: 16px !important;
+    min-block-size: 16px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    opacity: 1 !important;
+    border: 0 !important;
+    background: transparent no-repeat center / 16px 16px !important;
   }
 
-  @media (prefers-contrast: no-preference) and (forced-colors: none) {
-    :root:not([lwt-tree]) {
-      --yu-mail-selected: light-dark(#dcecff, #293e59);
-      --yu-mail-text-accent: light-dark(#084f91, #a5d4ff);
-      --yu-mail-mark: light-dark(#0f60ab, #82bfff);
-      --sidebar-background: light-dark(#f4f6fa, #202630) !important;
-      --sidebar-border: var(--yu-mail-rule) !important;
-    }
+  #threadTree[rows="thread-card"] .card-container .attachment-icon {
+    content: var(--yu-clip-m) !important;
+  }
 
-    :root:not([lwt-tree]) #folderTree {
-      --list-container-background-selected: var(--yu-mail-selected);
-      --list-container-background-selected-current: var(--yu-mail-selected);
-      --list-container-background-selected-current-focused: var(--yu-mail-selected);
-      --list-container-background-hover: var(--yu-mail-hover);
-      --list-container-border-selected: var(--yu-mail-rule);
-      --list-container-border-selected-current: var(--yu-mail-rule);
-      --list-indicator-background-selected: var(--yu-mail-mark);
-      --list-indicator-border-selected: var(--yu-mail-mark);
-    }
+  #threadTree[rows="thread-card"] .card-container .tree-button-flag {
+    display: none !important;
+    background-image: var(--yu-star-m) !important;
+  }
 
-    :root:not([lwt-tree]) #folderTree
-      li:not([data-tag-key], [data-has-error="true"], [data-is-busy="true"])
-      > .container > .icon:not([style*="--icon-color"]) {
-      --icon-color: var(--yu-mail-secondary) !important;
-      fill: transparent !important;
-    }
+  #threadTree[rows="thread-card"] .card-layout:hover .tree-button-flag {
+    display: block !important;
+  }
 
-    :root:not([lwt-tree]) #folderTree
-      li.selected:not([data-tag-key], [data-has-error="true"], [data-is-busy="true"])
-      > .container > .icon:not([style*="--icon-color"]) {
-      --icon-color: var(--yu-mail-text-accent) !important;
-    }
-
-    :root:not([lwt-tree]) #folderTree li.selected > .container > .name {
-      color: var(--yu-mail-text-accent);
-    }
-
-    :root:not([lwt-tree]) #threadPaneHeaderBar .thread-pane-count-info {
-      color: var(--yu-mail-secondary);
-    }
-
-    :root:not([lwt-tree]) #folderPaneWriteMessage:not(:disabled) {
-      color: white !important;
-      background-color: #0f60ab !important;
-      border-color: transparent !important;
-    }
-
-    :root:not([lwt-tree]) #folderPaneWriteMessage:not(:disabled):hover {
-      background-color: #0b518f !important;
-    }
-
-    :root:not([lwt-tree]) #folderPaneWriteMessage:not(:disabled):active {
-      background-color: #0a4175 !important;
-    }
-
-    :root:not([lwt-tree]) #folderPaneWriteMessage:disabled {
-      color: GrayText !important;
-      background-color: light-dark(#eef1f5, #2a313b) !important;
-      border-color: transparent !important;
-    }
-
-    :root:not([lwt-tree]) #threadTree[rows="thread-card"] {
-      --tree-pane-background: var(--layout-background-0);
-      --tree-card-inline: 6px;
-      --tree-card-block: 0px;
-      --tree-card-background-current: var(--yu-mail-hover);
-      --tree-card-background-current-unfocused: var(--yu-mail-hover);
-      --tree-card-background-selected: var(--yu-mail-selected);
-      --tree-card-background-selected-current: var(--yu-mail-selected);
-      --tree-card-background-selected-unfocused: var(--yu-mail-selected);
-      --tree-card-background-selected-current-unfocused: var(--yu-mail-selected);
-      --tree-card-background-selected-current-unfocused-hover: light-dark(#d1e5fb, #314964);
-    }
-
-    :root:not([lwt-tree]) #threadTree[rows="thread-card"]
-      .card-layout:not([data-properties~="dummy"], [data-properties~="junk"])
-      > td > .card-container {
-      border-color: transparent !important;
-      border-inline-start-width: 3px !important;
-      border-radius: 0 !important;
-      border-block-end-color: var(--yu-mail-rule) !important;
-      box-shadow: none !important;
-    }
-
-    :root:not([lwt-tree]) #threadTree[rows="thread-card"]:focus-within
-      .card-layout.current:not([data-properties~="dummy"], [data-properties~="junk"])
-      > td > .card-container {
-      outline: 1px solid var(--yu-mail-mark);
-      outline-offset: -1px;
-    }
-
-    :root:not([lwt-tree]) #threadTree[rows="thread-card"]
-      .card-layout[data-properties~="unread"]:not([data-properties~="dummy"], [data-properties~="junk"])
-      > td > .card-container {
-      border-inline-start: 3px solid var(--yu-mail-mark) !important;
-    }
-
-    :root:not([lwt-tree]) #threadTree[rows="thread-card"]
-      .card-layout[data-properties~="unread"]:not([data-properties~="dummy"], [data-properties~="junk"])
-      .subject {
-      color: var(--yu-mail-text-accent) !important;
-    }
+  #threadTree[rows="thread-card"] .card-layout[data-properties~="flagged"] .tree-button-flag {
+    display: block !important;
+    background-image: var(--yu-starf-m) !important;
   }
 }
 
 @-moz-document url("about:message"), url("chrome://messenger/content/messenger/aboutMessage.xhtml") {
-  #messagepanebox .message-header-container {
-    padding: 12px 16px !important;
-    border-block-end: 1px solid var(--sidebar-border);
+  :root {
+    --yu-reply-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2357606a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6.5 4 2.5 8l4 4M2.5 8H10a3.5 3.5 0 0 1 3.5 3.5V13'/%3E%3C/svg%3E");
+    --yu-fwd-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2357606a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 4l4 4-4 4M13.5 8H6a3.5 3.5 0 0 0-3.5 3.5V13'/%3E%3C/svg%3E");
+    --yu-arch-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2357606a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 3h12v3H2zM3 6v7h10V6M6.5 9h3'/%3E%3C/svg%3E");
+    --yu-trash-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2357606a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5h10M6 4.5V3h4v1.5M4.5 4.5l.7 9h5.6l.7-9'/%3E%3C/svg%3E");
+    --yu-more-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2357606a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='3.5' cy='8' r='.8'/%3E%3Ccircle cx='8' cy='8' r='.8'/%3E%3Ccircle cx='12.5' cy='8' r='.8'/%3E%3C/svg%3E");
+    --yu-clip-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2357606a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.5 5 6 9.5a1.4 1.4 0 0 0 2 2L13 6.5a2.8 2.8 0 0 0-4-4L4 7.5a4.2 4.2 0 0 0 6 6l3.5-3.5'/%3E%3C/svg%3E");
   }
 
-  #messagepanebox .message-header-large-subject #expandedsubjectBox {
-    font-size: calc(18rem / 13) !important;
-    font-weight: 600 !important;
-    line-height: 1.4 !important;
+  #mail-notification-top:not(:has(notification-message)) {
+    display: none !important;
   }
 
-  @media (prefers-contrast: no-preference) and (forced-colors: none) {
-    :root:not([lwtheme]) #header-view-toolbar :is(
-      .message-header-view-button:not([is="toolbarbutton-menu-button"]),
-      .message-header-view-button > .toolbarbutton-menubutton-button,
-      .message-header-view-button > .toolbarbutton-menubutton-dropmarker
-    ) {
-      background-color: transparent !important;
-      border-color: transparent !important;
-      border-radius: 4px !important;
-      padding-inline: 6px !important;
-    }
+  #messagepanebox, #singleMessage, #msgHeaderView {
+    background: #fff !important;
+  }
 
-    :root:not([lwtheme]) #header-view-toolbar :is(
-      .message-header-view-button:not([is="toolbarbutton-menu-button"], [disabled]):is(:hover, [open], [checked]),
-      .message-header-view-button:not([disabled]):is(:hover, [open]) > .toolbarbutton-menubutton-button,
-      .message-header-view-button:not([disabled]):is(:hover, [open]) > .toolbarbutton-menubutton-dropmarker
-    ) {
-      background-color: var(--yu-mail-hover) !important;
-    }
+  #messageHeader {
+    display: grid !important;
+    grid-template:
+      "acts acts" auto
+      "subject subject" auto
+      "from date" auto
+      "extra extra" auto
+      / minmax(0, 1fr) auto !important;
+    align-items: center;
+    padding: 16px 24px 11.5px !important;
+    margin: 0 !important;
+    gap: 0 !important;
+    border: 0 !important;
+    border-block-end: 1px solid var(--yu-rule-soft) !important;
+    background: #fff !important;
+    color: var(--yu-text) !important;
+    font: 13px var(--yu-font) !important;
+  }
+
+  #headerSenderToolbarContainer, #headerSubjectSecurityContainer, #expandedtoRow {
+    display: contents !important;
+  }
+
+  #header-view-toolbox {
+    grid-area: acts;
+    justify-self: end;
+    margin: 0 0 8px !important;
+    padding: 0 !important;
+  }
+
+  #header-view-toolbar {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-start !important;
+    gap: 2px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #header-view-toolbar > :is(#hdrJunkButton, #starMessageButton, #hdrReplyAllButton,
+    #hdrReplyListButton, #hdrFollowupButton, #hdrReplyToSenderButton, #hdrDummyReplyButton) {
+    display: none !important;
+  }
+
+  #hdrSmartReplyButton {
+    display: flex !important;
+    margin: 0 !important;
+  }
+
+  #header-view-toolbar :is(#hdrReplyButton, #hdrForwardButton, #hdrArchiveButton, #hdrTrashButton) {
+    block-size: 30px !important;
+    min-block-size: 30px !important;
+    margin: 0 !important;
+    padding: 0 10px !important;
+    gap: 6px !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    color: var(--yu-icon) !important;
+    font: 400 13px var(--yu-font) !important;
+    appearance: none !important;
+  }
+
+  #header-view-toolbar :is(#hdrReplyButton, #hdrForwardButton, #hdrArchiveButton, #hdrTrashButton) > .toolbarbutton-icon {
+    inline-size: 16px !important;
+    block-size: 16px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #header-view-toolbar :is(#hdrReplyButton, #hdrForwardButton, #hdrArchiveButton, #hdrTrashButton) > .toolbarbutton-text {
+    margin: 0 !important;
+    padding: 0 !important;
+    font: inherit !important;
+    color: inherit !important;
+  }
+
+  #hdrReplyButton > .toolbarbutton-icon { list-style-image: var(--yu-reply-b) !important; content: var(--yu-reply-b) !important; }
+  #hdrForwardButton > .toolbarbutton-icon { list-style-image: var(--yu-fwd-b) !important; content: var(--yu-fwd-b) !important; }
+  #hdrArchiveButton > .toolbarbutton-icon { list-style-image: var(--yu-arch-b) !important; content: var(--yu-arch-b) !important; }
+  #hdrTrashButton > .toolbarbutton-icon { list-style-image: var(--yu-trash-b) !important; content: var(--yu-trash-b) !important; }
+
+  #header-view-toolbar > :is(.webextension-action, #otherActionsButton) {
+    inline-size: 32px !important;
+    min-inline-size: 32px !important;
+    block-size: 32px !important;
+    min-block-size: 32px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    appearance: none !important;
+  }
+
+  #header-view-toolbar > .webextension-action .toolbarbutton-icon {
+    inline-size: 18px !important;
+    block-size: 18px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #header-view-toolbar > :is(.webextension-action, #otherActionsButton) > :is(.toolbarbutton-text, dropmarker) {
+    display: none !important;
+  }
+
+  #otherActionsButton .toolbarbutton-icon {
+    display: block !important;
+    content: var(--yu-more-b) !important;
+    inline-size: 16px !important;
+    block-size: 16px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #header-view-toolbar > :is(toolbarbutton, toolbaritem > toolbarbutton):hover {
+    background: var(--yu-hover) !important;
+  }
+
+  #expandedsubjectRow {
+    grid-area: subject;
+    margin: 1px 0 11px !important;
+    padding: 0 !important;
+  }
+
+  #expandedsubjectBox {
+    margin: 0 !important;
+    padding: 0 !important;
+    font: 600 18px var(--yu-font) !important;
+    line-height: 24.5px !important;
+    block-size: 24.5px !important;
+    color: var(--yu-text) !important;
+  }
+
+  #expandedfromRow {
+    grid-area: from;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-inline-size: 0;
+  }
+
+  #expandedfromBox :is(.recipient-multi-line-name, .recipient-multi-line-address) {
+    line-height: normal !important;
+    position: relative;
+    inset-block-start: -1px;
+  }
+
+  #expandedfromBox, #expandedfromBox .recipients-list {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #expandedfromBox .header-recipient {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  #expandedfromBox .recipient-avatar {
+    inline-size: 32px !important;
+    block-size: 32px !important;
+    min-inline-size: 32px !important;
+    margin: 0 !important;
+    border-radius: 50% !important;
+    background: var(--yu-sel) !important;
+    color: var(--yu-blue) !important;
+    font: 600 13px var(--yu-font) !important;
+  }
+
+  #expandedfromBox .recipient-multi-line {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #expandedfromBox .recipient-multi-line-name {
+    font: 400 13px var(--yu-font) !important;
+    color: var(--yu-text) !important;
+    line-height: normal !important;
+  }
+
+  #expandedfromBox .recipient-multi-line-address {
+    font: 400 12px var(--yu-font) !important;
+    color: var(--yu-muted) !important;
+    line-height: normal !important;
+  }
+
+  #expandedfromBox .recipient-address-book-button,
+  #expandedtoRow > .header-row-grow {
+    display: none !important;
+  }
+
+  #dateLabel {
+    grid-area: date;
+    align-self: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font: 400 12px var(--yu-font) !important;
+    color: var(--yu-muted) !important;
+    position: relative;
+    inset-block-start: -1px;
+  }
+
+  #extraHeadersArea {
+    grid-area: extra;
+  }
+
+  #messagepane {
+    flex: 0 1 auto !important;
+    min-block-size: 0 !important;
+  }
+
+  #attachment-splitter {
+    display: none !important;
+  }
+
+  #attachmentView {
+    align-self: flex-start;
+    margin: 0 24px 16px !important;
+    border: 1px solid var(--yu-rule) !important;
+    border-radius: 8px !important;
+    background: #fff !important;
+  }
+
+  #attachmentBar {
+    padding: 10px 12px !important;
+    margin: 0 !important;
+    min-block-size: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: var(--yu-icon) !important;
+    font: 13px var(--yu-font) !important;
+  }
+
+  #attachmentBar > :is(#attachmentToggle, spacer, #attachment-view-toolbox) {
+    display: none !important;
+  }
+
+  #attachmentInfo {
+    gap: 8px;
+    margin: 0 !important;
+    padding: 0 !important;
+    align-items: center;
+  }
+
+  #attachmentIcon {
+    content: var(--yu-clip-b) !important;
+    inline-size: 16px !important;
+    block-size: 16px !important;
+    margin: 0 !important;
+  }
+
+  #attachmentCount {
+    display: none !important;
+  }
+
+  #attachmentName, #attachmentSize {
+    margin: 0 !important;
+    padding: 0 !important;
+    font: 13px var(--yu-font) !important;
+    color: var(--yu-icon) !important;
+    opacity: 1 !important;
+  }
+
+  #attachmentSize::before {
+    content: "· " attr(value) !important;
+  }
+
+  #attachmentName + #attachmentSize {
+    margin-inline-start: -4px !important;
+  }
+}
+
+@-moz-document url-prefix("imap:"), url-prefix("mailbox:"), url-prefix("news:"), url-prefix("ews:") {
+  body {
+    margin: 20px 24px !important;
+  }
+
+  :is(.moz-text-plain, .moz-text-flowed, .moz-text-html) {
+    font: 14px/1.7 "Noto Sans", "Noto Sans CJK SC", sans-serif !important;
+    color: #1f2328;
+  }
+
+  :is(.moz-text-plain, .moz-text-flowed) pre, pre.moz-quote-pre {
+    font: inherit !important;
+    margin: 0 !important;
+    white-space: pre-wrap !important;
+  }
+
+  :is(.moz-text-plain, .moz-text-flowed) + .moz-mime-attachment-header,
+  .moz-mime-attachment-header, .moz-mime-attachment-header-name, .moz-mime-attachment-table, .moz-mime-attachment-wrap {
+    display: none !important;
   }
 }
 
