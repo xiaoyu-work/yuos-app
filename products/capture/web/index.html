@@ -1,24 +1,132 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Capture</title><link rel="stylesheet" href="shared/ui.css"></head><body>
-<header><div><h1>Capture</h1><p data-app-label>System screenshot capture through the authorized portal</p></div></header>
-<main class="stack"><div class="split"><section class="card stack"><h2>Capture a screenshot</h2>
-<form id="capture-form"><label>Capture mode<select id="mode">
-<option value="screen">Non-interactive portal screen capture</option>
-<option disabled>Interactive region / window - native portal only</option>
-<option disabled>Clipboard capture - native portal only</option></select></label>
-<label>Existing authorized output directory<input id="directory" placeholder="/home/you/Pictures" maxlength="4096" autocomplete="off"></label>
-<p class="small muted">Leave blank to request the manifest's owner-resolved Pictures default. If the Host cannot resolve it, the request fails.
-An explicit path must be an existing absolute Linux directory; this page does not create directories or choose a destination outside its grant.</p>
-<label><span><input id="modal" type="checkbox" checked> Request a modal portal dialog</span></label>
-<button id="capture" class="primary" type="submit">Capture to a new PNG</button></form>
-<p class="small muted">This entry always sends interactive=false. Screen selection, clipboard access, delay, cursor options and video recording
-are not exposed by its tool. Browser UI access does not grant screen access.</p></section>
-<section class="card stack"><h2>Output</h2><div id="result" class="stack"><p class="empty">No capture requested.</p></div>
-<p class="small muted">The service returns a saved path or explicit cancellation, not image bytes.
-This view cannot show a live desktop or load a host file as a preview. A display, portal, authenticated session and screen/output grants are required.</p></section></div>
-<p id="notice" class="notice" role="status" aria-live="polite"></p>
-<section class="card stack"><h2>Responses in this page</h2><div id="history" class="stack"><p class="empty">No completed capture responses.</p></div>
-<p class="small muted">This is not a persistent screenshot library. Cancellation and unknown output are not reported as saved screenshots.</p></section>
-<details class="card"><summary>Latest backend response</summary><div id="raw"></div></details>
-</main><script src="shared/client.js"></script><script src="shared/ui.js"></script><script src="app.js"></script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Capture</title>
+  <link rel="stylesheet" href="capture.css">
+</head>
+<body>
+  <svg class="symbols" aria-hidden="true">
+    <symbol id="icon-screen" viewBox="0 0 32 32"><rect x="4" y="7" width="24" height="16" rx="2"/><path d="M4 18h24M12 27h8M16 23v4"/></symbol>
+    <symbol id="icon-region" viewBox="0 0 32 32"><rect x="5" y="8" width="22" height="16" rx="2" stroke-dasharray="3 2.5"/><path d="M22 20l5 5"/></symbol>
+    <symbol id="icon-window" viewBox="0 0 32 32"><rect x="5" y="8" width="22" height="16" rx="2"/><path d="M5 12.5h22M8 10.3h.01M10.5 10.3h.01"/></symbol>
+    <symbol id="icon-clipboard" viewBox="0 0 32 32"><rect x="8" y="7" width="16" height="20" rx="2"/><path d="M12 7V5.5h8V7M12 14h8M12 18h8M12 22h5"/></symbol>
+    <symbol id="icon-camera" viewBox="0 0 24 24"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.3L9.3 5h5.4l1.5 2h2.3A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.8" r="3.3"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="icon-folder" viewBox="0 0 24 24"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4.3l1.9 2h8.8A1.5 1.5 0 0 1 21 9.5v8A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/></symbol>
+    <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.8h.01"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12.3 2.4 2.4 4.6-5"/></symbol>
+    <symbol id="icon-cancel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m9.3 9.3 5.4 5.4M14.7 9.3l-5.4 5.4"/></symbol>
+    <symbol id="icon-warning" viewBox="0 0 24 24"><path d="M12 4 21 19.5H3z"/><path d="M12 10v4.5M12 17h.01"/></symbol>
+  </svg>
+
+  <aside class="sidebar">
+    <div id="app-title" class="sidebar-title" data-text="app">Capture</div>
+    <nav aria-labelledby="app-title">
+      <button type="button" id="nav-capture" aria-controls="capture-view" aria-current="page">
+        <svg aria-hidden="true"><use href="#icon-camera"/></svg>
+        <span data-text="capturePage">New Screenshot</span>
+      </button>
+      <button type="button" id="nav-history" aria-controls="history-view">
+        <svg aria-hidden="true"><use href="#icon-clock"/></svg>
+        <span data-text="historyPage">This Session</span><span id="history-count" class="count" hidden></span>
+      </button>
+    </nav>
+    <p class="sidebar-note" data-text="sidebarNote"></p>
+  </aside>
+
+  <main>
+    <header class="titlebar"><h1 id="page-title">New Screenshot</h1><span id="app-id">yuos-screenshot</span></header>
+    <div class="content">
+      <p id="notice" class="notice" role="status"></p>
+      <section id="capture-view" aria-labelledby="page-title">
+        <h2 id="mode-title" class="sr-only" data-text="captureMode">Capture mode</h2>
+        <ul class="modes" aria-labelledby="mode-title">
+          <li class="mode available">
+            <svg aria-hidden="true"><use href="#icon-screen"/></svg>
+            <strong data-text="screen">Entire Screen</strong><small data-text="screenNote"></small>
+          </li>
+          <li class="mode unavailable">
+            <svg aria-hidden="true"><use href="#icon-region"/></svg>
+            <strong data-text="region">Region</strong>
+            <small><svg aria-hidden="true"><use href="#icon-lock"/></svg><span data-text="nativeOnly"></span></small>
+          </li>
+          <li class="mode unavailable">
+            <svg aria-hidden="true"><use href="#icon-window"/></svg>
+            <strong data-text="window">Window</strong>
+            <small><svg aria-hidden="true"><use href="#icon-lock"/></svg><span data-text="nativeOnly"></span></small>
+          </li>
+          <li class="mode unavailable">
+            <svg aria-hidden="true"><use href="#icon-clipboard"/></svg>
+            <strong data-text="clipboard">Clipboard</strong>
+            <small><svg aria-hidden="true"><use href="#icon-lock"/></svg><span data-text="nativeOnly"></span></small>
+          </li>
+        </ul>
+        <form id="capture-form" aria-labelledby="options-title">
+          <h2 id="options-title" class="section-label" data-text="options">Options</h2>
+          <div class="settings-row directory-row">
+            <div>
+              <label for="directory" data-text="saveTo">Save to</label>
+              <div class="muted" data-text="saveToNote"></div>
+            </div>
+            <div class="directory-controls">
+              <span class="default-directory" data-text="defaultPictures"></span>
+              <div class="directory-field">
+                <svg aria-hidden="true"><use href="#icon-folder"/></svg>
+                <input id="directory" placeholder="/home/you/Pictures" maxlength="4096" autocomplete="off" aria-describedby="directory-note">
+              </div>
+            </div>
+          </div>
+          <div class="settings-row">
+            <label for="modal" data-text="modal">Request a modal portal dialog</label>
+            <input type="checkbox" id="modal" class="switch" checked>
+          </div>
+          <p id="directory-note" class="note" data-text="directoryNote"></p>
+          <div class="actions">
+            <button type="submit" id="capture" class="primary" disabled>
+              <svg aria-hidden="true"><use href="#icon-camera"/></svg><span data-text="capture">Capture to a New PNG</span>
+            </button>
+            <span id="progress" class="progress" hidden><span class="spinner" aria-hidden="true"></span><span data-text="working"></span></span>
+          </div>
+        </form>
+
+        <div id="output" class="output" role="status" aria-atomic="true">
+          <span class="output-icon"><svg aria-hidden="true"><use href="#icon-camera"/></svg></span>
+          <div>
+            <h2 id="result-title"></h2>
+            <p id="result-detail"></p>
+            <p id="result-time" class="note" hidden></p>
+          </div>
+        </div>
+        <p id="output-note" class="note" data-text="outputNote" hidden></p>
+        <p class="note scope-note" data-text="scopeNote"></p>
+      </section>
+
+      <section id="history-view" aria-labelledby="page-title" hidden>
+        <p id="history-empty" class="empty" data-text="historyEmpty"></p>
+        <table id="history-table" aria-labelledby="page-title" hidden>
+          <thead><tr>
+            <th scope="col" data-text="result">Result</th>
+            <th scope="col" data-text="detail">Detail</th>
+            <th scope="col" data-text="localTime">Local response time</th>
+          </tr></thead>
+          <tbody id="history"></tbody>
+        </table>
+        <p class="note" data-text="historyNote"></p>
+        <details class="disclosure">
+          <summary data-text="raw">Latest backend response</summary>
+          <p id="raw-empty" class="note" data-text="rawEmpty"></p>
+          <div id="raw"></div>
+        </details>
+      </section>
+    </div>
+    <footer><svg aria-hidden="true"><use href="#icon-info"/></svg><span data-text="footer"></span></footer>
+  </main>
+
+  <script src="shared/client.js"></script>
+  <script src="shared/ui.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

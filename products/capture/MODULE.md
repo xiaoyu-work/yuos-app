@@ -3,6 +3,7 @@
 | Path | Responsibility |
 | --- | --- |
 | `apps/yuos-screenshot/app.json` | One MCP tool, fixed native identity and separate screen/output grants |
+| `web/` | English and Simplified Chinese Host views for a new non-interactive capture and the latest 20 completed responses on that page |
 | `native/yuos-screenshot/src/main.rs` | Original interactive/modal/notify CLI and translations; shared non-interactive OS client |
 | `native/yuos-screenshot/src/gui.rs` | Published-SDK generic clients for private per-window OS portal status and source-bound notifications; no user bus or file access from returned metadata |
 | `native/yuos-screenshot/src/mcp.rs` | Strict pre-service arguments and manifest-bound authenticated MCP |
@@ -17,6 +18,13 @@ independent of the shell toolkit. This crate has no libcosmic renderer,
 file-chooser dependency, bundled font or optional Cargo feature to substitute.
 Only the allowlisted immutable SDK/runtime inputs come from `platform.lock.json`.
 Generated inputs belong under `build/capture-native`, not another checkout.
+
+The Web interface uses the browser's language and inherits the Host theme.
+Its mode tiles do not enable region, window or clipboard capture. It calls
+the existing screenshot tool exactly once per submission, with the portal
+modal preference and, if supplied, an authorized absolute output directory.
+The view does not manage native window controls, request additional grants,
+preview files, or persist response history.
 
 The OS owns capture permission, authenticated session selection, its portal
 helper, deadlines, output-directory pinning, non-overwriting persistence
