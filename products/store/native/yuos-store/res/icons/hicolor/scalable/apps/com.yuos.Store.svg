@@ -1,11 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
-  <rect x="16" y="16" width="224" height="224" rx="56" fill="#F7F8FA" stroke="#E1E3E8" stroke-width="4"/>
-  <path d="M61 94h134l-10 102H71L61 94z" fill="#1F1F20" stroke="#1F1F20" stroke-width="10" stroke-linejoin="round"/>
-  <path d="M94 99V82c0-21 14-36 34-36s34 15 34 36v17" fill="none" stroke="#1F1F20" stroke-width="12" stroke-linecap="round"/>
-  <g fill="#FFFFFF">
-    <rect x="91" y="124" width="25" height="25" rx="7"/>
-    <rect x="140" y="124" width="25" height="25" rx="7"/>
-    <rect x="91" y="159" width="25" height="25" rx="7"/>
-    <rect x="140" y="159" width="25" height="25" rx="7"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
+  <defs>
+    <linearGradient id="ys_bag" x1="36" y1="68" x2="220" y2="220" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF7849"/>
+      <stop offset="1" stop-color="#EC4899"/>
+    </linearGradient>
+  </defs>
+  <path d="M92 78V64C92 44.118 108.118 28 128 28C147.882 28 164 44.118 164 64V78" stroke="#F43F5E" stroke-width="15" stroke-linecap="round"/>
+  <path d="M40 96C40 82.745 50.745 72 64 72H192C205.255 72 216 82.745 216 96L206 192C204.8 203.4 195.2 212 183.7 212H72.3C60.8 212 51.2 203.4 50 192L40 96Z" fill="url(#ys_bag)"/>
+  <!-- Clean 4-point star spark in center -->
+  <path d="M128 104L140 132L168 144L140 156L128 184L116 156L88 144L116 132L128 104Z" fill="#FFFFFF"/>
 </svg>

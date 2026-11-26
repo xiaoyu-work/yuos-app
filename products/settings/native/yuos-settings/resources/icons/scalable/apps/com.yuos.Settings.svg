@@ -1,8 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
-  <rect x="16" y="16" width="224" height="224" rx="56" fill="#F7F8FA" stroke="#E1E3E8" stroke-width="4"/>
-  <circle cx="128" cy="128" r="72" fill="#1F1F20"/>
-  <g fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round">
-    <circle cx="128" cy="128" r="27"/>
-    <path d="M128 64v16m0 96v16M64 128h16m96 0h16M83 83l12 12m66 66 12 12m0-90-12 12m-66 66-12 12"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
+  <rect x="28" y="28" width="200" height="200" rx="52" fill="#1E293B"/>
+  <!-- Top slider: cyan track + right white knob -->
+  <rect x="58" y="76" width="140" height="36" rx="18" fill="#0EA5E9"/>
+  <circle cx="176" cy="94" r="18" fill="#FFFFFF"/>
+  <!-- Bottom slider: mint track + left white knob -->
+  <rect x="58" y="144" width="140" height="36" rx="18" fill="#10B981"/>
+  <circle cx="80" cy="162" r="18" fill="#FFFFFF"/>
 </svg>
