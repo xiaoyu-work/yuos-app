@@ -1,8 +1,29 @@
 @-moz-document url("chrome://messenger/content/messenger.xhtml") {
+  unified-toolbar li[item-id="search-bar"] {
+    min-width: 16em;
+  }
+
   @media (prefers-contrast: no-preference) and (forced-colors: none) {
     :root:not([lwtheme], [customizingUnifiedToolbar]) unified-toolbar {
       background-color: light-dark(#e7eef9, #202630) !important;
       border-block-end-color: light-dark(#dce3ed, #343e4c) !important;
+    }
+
+    :root:not([lwtheme]) unified-toolbar li[item-id="write-message"] button:not(:disabled) {
+      color: white !important;
+      background-color: #0f60ab !important;
+      border-color: transparent !important;
+      margin-inline-end: 8px;
+    }
+
+    :root:not([lwtheme]) unified-toolbar li[item-id="write-message"] button:not(:disabled):hover {
+      background-color: #0b518f !important;
+    }
+
+    :root:not([lwtheme]) unified-toolbar li:is([item-id="archive"], [item-id="move-to"],
+      [item-id="forward-inline"], [item-id="tag-message"]) {
+      border-inline-end: 1px solid light-dark(#c9d4e3, #3d4858);
+      padding-inline-end: 4px;
     }
   }
 }
@@ -22,6 +43,31 @@
 
   #threadPaneHeaderBar .list-header-title {
     font-weight: 600 !important;
+  }
+
+  #threadTree[rows="thread-card"] .card-container .thread-card-dynamic-row {
+    grid-template: "subject subject subject" max-content
+                   "button preview info" minmax(auto, 1fr)
+                   / auto minmax(0, 1fr) auto !important;
+  }
+
+  #threadTree[rows="thread-card"] .yu-mail-preview {
+    grid-area: preview;
+    min-width: 0;
+    padding-inline-start: 3px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 0.92em;
+    color: var(--color-text-secondary, GrayText);
+  }
+
+  #threadTree[rows="thread-card"] .yu-mail-preview:empty {
+    display: none;
+  }
+
+  #threadTree[rows="thread-card"] .card-layout[data-properties~="unread"] .sender {
+    font-weight: 700;
   }
 
   @container threadPane (max-width: 380px) {
@@ -114,5 +160,74 @@
 
   #messagepanebox .message-header-large-subject #expandedsubjectBox {
     font-weight: 600 !important;
+  }
+}
+
+@-moz-document url("chrome://messenger/content/messengercompose/messengercompose.xhtml") {
+  #composeToolbar2 {
+    background: transparent !important;
+    padding: 6px 10px !important;
+    gap: 2px;
+  }
+
+  #MsgHeadersToolbar {
+    padding-inline: 12px !important;
+    background-color: var(--layout-background-0, Field) !important;
+  }
+
+  #MsgHeadersToolbar .address-container,
+  #msgSubject {
+    border-width: 0 0 1px !important;
+    border-radius: 0 !important;
+    border-color: var(--yu-mail-rule, light-dark(#dce3ed, #343e4c)) !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  #MsgHeadersToolbar .address-container:focus-within,
+  #msgSubject:focus {
+    border-color: #0f60ab !important;
+    outline: none !important;
+  }
+
+  #msgSubject {
+    font-weight: 600;
+  }
+
+  #FormatToolbar {
+    background-color: var(--layout-background-0, Field) !important;
+    border-block-end: 1px solid var(--yu-mail-rule, light-dark(#dce3ed, #343e4c));
+  }
+
+  @media (prefers-contrast: no-preference) and (forced-colors: none) {
+    :root:not([lwtheme]) {
+      --yu-mail-rule: light-dark(#dce3ed, #343e4c);
+    }
+
+    :root:not([lwtheme]) #compose-toolbox {
+      background-color: light-dark(#e7eef9, #202630) !important;
+      border-block-end: 1px solid var(--yu-mail-rule);
+    }
+
+    :root:not([lwtheme]) #button-send {
+      color: white !important;
+      background-color: #0f60ab !important;
+      border-color: transparent !important;
+      border-radius: 4px;
+      padding-inline: 10px !important;
+    }
+
+    :root:not([lwtheme]) #button-send:not([disabled="true"]):hover {
+      background-color: #0b518f !important;
+    }
+
+    :root:not([lwtheme]) #button-send[disabled="true"] {
+      opacity: 0.55;
+    }
+
+    :root:not([lwtheme]) #button-send :is(.toolbarbutton-icon, .toolbarbutton-text) {
+      color: white !important;
+      fill: white !important;
+    }
   }
 }
