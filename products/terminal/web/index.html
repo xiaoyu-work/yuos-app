@@ -1,36 +1,111 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Terminal</title><link rel="stylesheet" href="shared/ui.css"></head><body>
-<header><div><h1>Terminal</h1><p data-app-label>Authorized commands and process control</p></div></header>
-<main class="stack"><p class="muted small">A structured, authorized command runner, not an interactive PTY.
-Nothing executes until you submit it. There is no live stdin or output stream. A Web timeout may leave an outcome unknown; never blindly rerun a mutation.</p>
-<section class="card stack"><h2>Run a program</h2><form id="command">
-<label>Executable or program name<input id="program" required autocomplete="off" placeholder="Program to execute"></label>
-<label>Ordered arguments - one field per argument, including empty arguments</label>
-<div id="arguments" class="stack"></div><div><button id="add-argument" type="button">Add argument</button></div>
-<div class="toolbar"><label>Run mode<select id="mode"><option value="run">Capture output</option></select></label>
-<label id="timeout-label">Timeout (seconds)<input id="timeout" type="number" min="1" step="1" value="30" required></label></div>
-<label id="shell-option" hidden><span><input id="shell" type="checkbox"> Use shell syntax (explicit opt-in)</span>
-<span>Shell mode joins the command and arguments with spaces and permits substitutions, pipelines and redirects. Argument boundaries are not preserved.</span></label>
-<div class="toolbar"><button id="run" type="submit" class="primary">Run program</button>
-<button id="which" type="button">Locate executable only</button><button id="desktop" type="button" hidden>Open native terminal</button></div></form>
-<p id="lookup" class="prose"></p></section>
-<p id="notice" class="notice" role="status" aria-live="polite"></p><p id="outcome" class="notice" aria-live="polite"></p>
-<section class="card stack"><div class="row"><h2>Captured output</h2><span id="exit" class="pill">No command run</span></div>
-<h3>Standard output</h3><pre id="stdout">No output yet.</pre><h3>Standard error</h3><pre id="stderr">No output yet.</pre>
-<p id="output-info" class="muted small"></p></section>
-<section id="scripts" class="card stack" hidden><h2>Run a script explicitly</h2>
-<form id="script-form"><label>Source<select id="script-source"><option value="inline">Inline code</option>
-<option value="file">Authorized script file</option></select></label>
-<label id="code-label">Code<textarea id="code" spellcheck="false" class="editor"></textarea></label>
-<label id="script-file-label" hidden>Script file<input id="script-file" placeholder="/authorized/path/script.py"></label>
-<div class="toolbar"><label>Interpreter<select id="language"><option value="bash">Bash</option><option value="python">Python</option>
-<option value="node">Node.js</option></select></label><label>Timeout (seconds)<input id="script-timeout" type="number" min="1" step="1" value="30" required></label></div>
-<p class="muted small">Inline code needs its own wildcard execution authority. No script is generated or run automatically.</p>
-<button type="submit" class="primary">Run this script</button></form></section>
-<section class="card stack"><div class="row"><h2>Background jobs</h2><button id="refresh-jobs" type="button">Refresh jobs</button></div>
-<p id="jobs-help" class="muted small"></p><div id="jobs" class="stack"></div></section>
-<section class="card stack"><h2>This page's completed requests</h2><p class="muted small">Reusing a request fills the form only; it never executes it.</p>
-<div id="history" class="list"></div></section>
-<details class="card"><summary>Latest backend response</summary><div id="raw"></div></details>
-</main><script src="shared/client.js"></script><script src="shared/ui.js"></script><script src="app.js"></script></body></html>
+<title>Terminal</title><link rel="stylesheet" href="shared/ui.css"><link rel="stylesheet" href="terminal.css"></head><body>
+<svg class="sprite" aria-hidden="true">
+  <symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m10 8.8 5 3.2-5 3.2z"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5z"/><path d="M14 3v4.5h4.5M10 12l-2 2 2 2M14 12l2 2-2 2"/></symbol>
+  <symbol id="i-jobs" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M7 9h2M7 12.5h2M7 16h2M11.5 9H17M11.5 12.5H17M11.5 16H15"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="i-term" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="m7.5 10 2.5 2-2.5 2M12 14.5h4"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
+  <symbol id="i-open" viewBox="0 0 24 24"><path d="M9 6.5H6.5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V15M13 4.5h6.5V11M19.5 4.5 11 13"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M19 12a7 7 0 1 1-2.1-5M19 4.5V9h-4.5"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><rect x="9" y="9" width="6" height="6" rx="1"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+</svg>
+<div class="shell">
+<aside class="side">
+  <div class="side-top"><svg class="app-icon"><use href="#i-term"/></svg><span class="name" data-t="app">Terminal</span></div>
+  <nav class="side-scroll" aria-label="Terminal tools">
+    <div class="sec" data-t="tools">Tools</div>
+    <button type="button" class="it" data-view="runner"><svg><use href="#i-play"/></svg><span data-t="runner">Command Runner</span></button>
+    <button type="button" class="it" data-view="scripts"><svg><use href="#i-code"/></svg><span data-t="scripts">Scripts</span></button>
+    <button type="button" class="it" data-view="jobs"><svg><use href="#i-jobs"/></svg><span data-t="jobs">Background Jobs</span><span id="jobs-count" class="meta badge" hidden></span></button>
+    <button type="button" class="it" data-view="history"><svg><use href="#i-clock"/></svg><span data-t="history">Request History</span></button>
+  </nav>
+  <div class="side-foot"><span data-app-label>Authorized commands and process control</span></div>
+</aside>
+<div class="main">
+<header class="bar"><h1 id="view-title" class="title">Command Runner</h1></header>
+<main class="page"><div class="inner">
+<p id="notice" class="notice" role="status" aria-live="polite"></p>
+
+<section id="v-runner" class="view">
+  <p class="lede" data-t="runnerLede"></p>
+  <h2 data-t="runProgram">Run a Program</h2>
+  <form id="command">
+    <div class="group">
+      <div class="fr"><label for="program" data-t="program">Program</label>
+        <div><div class="line"><input id="program" class="mono" required autocomplete="off" placeholder="Program to execute" data-tp="programPh">
+          <button id="which" type="button"><svg><use href="#i-search"/></svg><span data-t="locate">Locate</span></button></div>
+          <p id="lookup" class="lookup prose"></p></div></div>
+      <div class="fr"><span class="fl" data-t="arguments">Arguments</span>
+        <div><div id="arguments" class="args"></div>
+          <div class="line help-line"><button id="add-argument" type="button" class="link"><svg><use href="#i-plus"/></svg><span data-t="addArg">Add Argument</span></button>
+          <span class="help" data-t="argsHelp"></span></div></div></div>
+      <div class="fr"><label for="mode" data-t="mode">Mode</label>
+        <div><select id="mode" class="seg-source"><option value="run" data-t="capture">Capture Output</option></select></div></div>
+      <div class="fr" id="timeout-label"><label for="timeout" data-t="timeout">Timeout</label>
+        <div class="line"><input id="timeout" class="num" type="number" min="1" step="1" value="30" required><span class="unit" data-t="seconds">seconds</span></div></div>
+      <div class="fr" id="shell-option" hidden><span class="fl" data-t="shell">Shell Syntax</span>
+        <div><label class="chk"><input id="shell" type="checkbox"><span data-t="shellOpt">Use shell syntax (explicit opt-in)</span></label>
+          <p class="help" data-t="shellHelp"></p></div></div>
+    </div>
+    <div class="acts"><button id="run" type="submit" class="primary"><svg><use href="#i-play"/></svg><span id="run-label">Run Program</span></button>
+      <span class="flex"></span><button id="desktop" type="button" hidden><svg><use href="#i-open"/></svg><span data-t="openNative">Open Native Terminal…</span></button></div>
+  </form>
+</section>
+
+<section id="v-scripts" class="view" hidden>
+  <div id="scripts">
+  <p class="lede" data-t="scriptsLede"></p>
+  <h2 data-t="runScript">Run a Script Explicitly</h2>
+  <form id="script-form">
+    <div class="group">
+      <div class="fr"><label for="script-source" data-t="source">Source</label>
+        <div><select id="script-source" class="seg-source"><option value="inline" data-t="inline">Inline Code</option>
+          <option value="file" data-t="scriptFile">Authorized Script File</option></select></div></div>
+      <div class="fr"><label for="language" data-t="interpreter">Interpreter</label>
+        <div><select id="language" class="seg-source"><option value="bash">Bash</option><option value="python">Python</option>
+          <option value="node">Node.js</option></select></div></div>
+      <div class="fr" id="code-label"><label for="code" data-t="code">Code</label><div><textarea id="code" spellcheck="false" class="editor"></textarea></div></div>
+      <div class="fr" id="script-file-label" hidden><label for="script-file" data-t="scriptFile">Script File</label>
+        <div><input id="script-file" class="mono" placeholder="/authorized/path/script.py"></div></div>
+      <div class="fr"><label for="script-timeout" data-t="timeout">Timeout</label>
+        <div class="line"><input id="script-timeout" class="num" type="number" min="1" step="1" value="30" required><span class="unit" data-t="seconds">seconds</span></div></div>
+    </div>
+    <p class="help" data-t="scriptHelp"></p>
+    <div class="acts"><button type="submit" class="primary"><svg><use href="#i-play"/></svg><span data-t="runThisScript">Run This Script</span></button></div>
+  </form>
+  </div>
+</section>
+
+<section id="v-output" class="view">
+  <h2><span data-t="output">Captured Output</span><span id="exit" class="pill r">No command run</span></h2>
+  <div class="line out-head"><div class="seg" id="stream-seg">
+    <button type="button" class="on" data-stream="stdout" data-t="stdout">Standard Output</button>
+    <button type="button" data-stream="stderr" data-t="stderr">Standard Error</button></div>
+    <span id="output-info" class="help"></span></div>
+  <pre id="stdout" class="out">No output yet.</pre><pre id="stderr" class="out" hidden>No output yet.</pre>
+  <p id="outcome" class="notice info" aria-live="polite"></p>
+  <details class="disc"><summary><svg><use href="#i-chev"/></svg><span data-t="raw">Latest Backend Response</span></summary><div id="raw"></div></details>
+</section>
+
+<section id="v-jobs" class="view" hidden>
+  <h2><span data-t="jobs">Background Jobs</span><button id="refresh-jobs" type="button" class="r"><svg><use href="#i-refresh"/></svg><span data-t="refresh">Refresh</span></button></h2>
+  <p id="jobs-help" class="lede"></p>
+  <div id="jobs" class="list-table jobs"></div>
+</section>
+
+<section id="v-history" class="view" hidden>
+  <p class="lede" data-t="historyHelp"></p>
+  <div id="history" class="list-table hist"></div>
+</section>
+
+</div></main>
+</div>
+</div>
+<script src="shared/client.js"></script><script src="shared/ui.js"></script><script src="app.js"></script></body></html>

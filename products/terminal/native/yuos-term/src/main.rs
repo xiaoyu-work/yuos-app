@@ -91,6 +91,18 @@ pub fn icon_cache_get(name: &'static str, size: u16) -> widget::icon::Icon {
     icon_cache.get(name, size)
 }
 
+fn header_tool<'a>(icon: &'static str, label: String, message: Message) -> Element<'a, Message> {
+    widget::tooltip(
+        widget::button::custom(icon_cache_get(icon, 16))
+            .on_press(message)
+            .padding(6)
+            .class(style::Button::Icon),
+        widget::text::body(label),
+        widget::tooltip::Position::Bottom,
+    )
+    .into()
+}
+
 /// Runs application with these settings
 #[rustfmt::skip]
 fn main() -> Result<(), Box<dyn Error>> {
@@ -644,6 +656,91 @@ impl App {
             .set(self.core.window.show_context);
         self.shortcut_search_regex = None;
         self.shortcut_search_value.clear();
+    }
+
+    fn find_card(&self, space_xxs: u16) -> Element<'_, Message> {
+        let find_input = widget::text_input::text_input(
+            fl!("find-placeholder"),
+            &self.find_search_value,
+        )
+        .id(self.find_search_id.clone())
+        .on_input(Message::FindSearchValueChanged)
+        // This is inverted for ease of use, usually in terminals you want to search
+        // upwards, which is FindPrevious
+        .on_submit(|_| {
+            if self.modifiers.contains(Modifiers::SHIFT) {
+                Message::FindNext
+            } else {
+                Message::FindPrevious
+            }
+        })
+        .leading_icon(icon_cache_get("edit-find-symbolic", 16).into())
+        .width(Length::Fixed(240.0))
+        .trailing_icon(
+            button::custom(icon_cache_get("edit-clear-symbolic", 16))
+                .on_press(Message::FindSearchValueChanged(String::new()))
+                .class(style::Button::Icon)
+                .into(),
+        );
+        let find_widget = widget::row::with_children(vec![
+            find_input.into(),
+            widget::tooltip(
+                button::custom(icon_cache_get("go-up-symbolic", 16))
+                    .on_press(Message::FindPrevious)
+                    .padding(space_xxs)
+                    .class(style::Button::Icon),
+                widget::text::body(fl!("find-previous")),
+                widget::tooltip::Position::Top,
+            )
+            .into(),
+            widget::tooltip(
+                button::custom(icon_cache_get("go-down-symbolic", 16))
+                    .on_press(Message::FindNext)
+                    .padding(space_xxs)
+                    .class(style::Button::Icon),
+                widget::text::body(fl!("find-next")),
+                widget::tooltip::Position::Top,
+            )
+            .into(),
+            button::custom(icon_cache_get("window-close-symbolic", 16))
+                .on_press(Message::Find(false))
+                .padding(space_xxs)
+                .class(style::Button::Icon)
+                .into(),
+        ])
+        .align_y(Alignment::Center)
+        .spacing(2);
+
+        // Compact card at the pane's top right: window surface, hairline
+        // border and a light shadow instead of a heavy floating strip.
+        let card = widget::container(find_widget)
+            .padding(space_xxs)
+            .class(style::Container::Custom(Box::new(|theme| {
+                let cosmic = theme.cosmic();
+                let mut hairline = cosmic.on_bg_color();
+                hairline.alpha = if cosmic.is_dark { 0.16 } else { 0.1 };
+                cosmic::iced::widget::container::Style {
+                    icon_color: Some(Color::from(cosmic.background.on)),
+                    text_color: Some(Color::from(cosmic.background.on)),
+                    background: Some(iced::Background::Color(cosmic.background.base.into())),
+                    border: iced::Border {
+                        radius: cosmic.radius_s().into(),
+                        width: 1.0,
+                        color: hairline.into(),
+                    },
+                    shadow: iced::Shadow {
+                        color: Color::from_rgba(0.0, 0.0, 0.0, 0.1),
+                        offset: iced::Vector::new(0.0, 2.0),
+                        blur_radius: 8.0,
+                    },
+                    snap: false,
+                }
+            })));
+        widget::container(card)
+            .width(Length::Fill)
+            .align_x(Alignment::End)
+            .padding([space_xxs, space_xxs * 2])
+            .into()
     }
 
     fn update_config(&mut self) -> Task<Message> {
@@ -3424,18 +3521,37 @@ impl Application for App {
     }
 
     fn header_end(&self) -> Vec<Element<'_, Self::Message>> {
+        let tool = header_tool;
+        let ask_yu = fl!("ask-yu");
         vec![
-            // Yu OS Glass: ghost-glass icon button with a tooltip, matching the
-            // floating new-tab affordance from the reference terminal chrome.
-            widget::tooltip(
-                widget::button::custom(icon_cache_get("list-add-symbolic", 16))
-                    .on_press(Message::TabNew)
-                    .padding(8)
-                    .class(style::Button::Icon),
-                widget::text::body(fl!("new-tab")),
-                widget::tooltip::Position::Bottom,
+            tool(
+                "split-vertical-symbolic",
+                fl!("split-vertical"),
+                Message::PaneSplit(pane_grid::Axis::Vertical),
+            ),
+            tool(
+                "split-horizontal-symbolic",
+                fl!("split-horizontal"),
+                Message::PaneSplit(pane_grid::Axis::Horizontal),
+            ),
+            tool("edit-find-symbolic", fl!("find"), Message::Find(true)),
+            widget::container(widget::divider::vertical::light())
+                .height(Length::Fixed(16.0))
+                .padding([0, 4])
+                .into(),
+            widget::button::custom(
+                widget::row::with_children(vec![
+                    icon_cache_get("yu-spark-symbolic", 16).into(),
+                    widget::text::body(ask_yu.trim_end_matches('…').to_string()).into(),
+                ])
+                .spacing(4)
+                .align_y(Alignment::Center),
             )
+            .on_press(Message::AskYu)
+            .padding([4, 8])
+            .class(style::Button::Icon)
             .into(),
+            tool("list-add-symbolic", fl!("new-tab"), Message::TabNew),
         ]
     }
 
@@ -3484,32 +3600,30 @@ impl Application for App {
                             .on_activate(Message::TabActivate)
                             .on_close(|entity| Message::TabClose(Some(entity))),
                     )
-                    // Frosted tab strip: rounded top corners (radius_l) and a
-                    // faint neutral hairline, leaning on the compositor blur
-                    // for depth instead of a heavy boxed chrome.
+                    // Flat tab strip on the window surface; a hairline below
+                    // separates it from the terminal instead of a boxed chrome.
                     .class(style::Container::Custom(Box::new(|theme| {
                         let cosmic = theme.cosmic();
-                        let radius_l = cosmic.radius_l();
-                        let mut hairline = cosmic.on_bg_color();
-                        hairline.alpha = if cosmic.is_dark { 0.15 } else { 0.09 };
                         cosmic::iced::widget::container::Style {
                             icon_color: Some(Color::from(cosmic.background.on)),
                             text_color: Some(Color::from(cosmic.background.on)),
                             background: Some(iced::Background::Color(
                                 cosmic.background.base.into(),
                             )),
-                            border: iced::Border {
-                                radius: [radius_l[0], radius_l[1], 0.0, 0.0].into(),
-                                width: 1.0,
-                                color: hairline.into(),
-                            },
+                            border: iced::Border::default(),
                             shadow: iced::Shadow::default(),
                             snap: true,
                         }
                     })))
+                    .padding([0, space_xxs])
                     .width(Length::Fill),
                 );
+                tab_column = tab_column.push(widget::divider::horizontal::light());
             }
+
+            //Only draw find in the currently focused pane
+            let find_card = (self.find && pane == self.pane_model.focused())
+                .then(|| self.find_card(space_xxs));
 
             let entity = tab_model.active();
             let entity_middle_click = tab_model.active();
@@ -3579,96 +3693,11 @@ impl Application for App {
                 } else {
                     terminal_box.into()
                 };
+                let tab_element = match find_card {
+                    Some(card) => cosmic::iced::widget::stack![tab_element, card].into(),
+                    None => tab_element,
+                };
                 tab_column = tab_column.push(tab_element);
-            }
-
-            //Only draw find in the currently focused pane
-            if self.find && pane == self.pane_model.focused() {
-                let find_input = widget::text_input::text_input(
-                    fl!("find-placeholder"),
-                    &self.find_search_value,
-                )
-                .id(self.find_search_id.clone())
-                .on_input(Message::FindSearchValueChanged)
-                // This is inverted for ease of use, usually in terminals you want to search
-                // upwards, which is FindPrevious
-                .on_submit(|_| {
-                    if self.modifiers.contains(Modifiers::SHIFT) {
-                        Message::FindNext
-                    } else {
-                        Message::FindPrevious
-                    }
-                })
-                .width(Length::Fixed(320.0))
-                .trailing_icon(
-                    button::custom(icon_cache_get("edit-clear-symbolic", 16))
-                        .on_press(Message::FindSearchValueChanged(String::new()))
-                        .class(style::Button::Icon)
-                        .into(),
-                );
-                let find_widget = widget::row::with_children(vec![
-                    find_input.into(),
-                    widget::tooltip(
-                        button::custom(icon_cache_get("go-up-symbolic", 16))
-                            .on_press(Message::FindPrevious)
-                            .padding(space_xxs)
-                            .class(style::Button::Icon),
-                        widget::text::body(fl!("find-previous")),
-                        widget::tooltip::Position::Top,
-                    )
-                    .into(),
-                    widget::tooltip(
-                        button::custom(icon_cache_get("go-down-symbolic", 16))
-                            .on_press(Message::FindNext)
-                            .padding(space_xxs)
-                            .class(style::Button::Icon),
-                        widget::text::body(fl!("find-next")),
-                        widget::tooltip::Position::Top,
-                    )
-                    .into(),
-                    widget::space::horizontal().into(),
-                    button::custom(icon_cache_get("window-close-symbolic", 16))
-                        .on_press(Message::Find(false))
-                        .padding(space_xxs)
-                        .class(style::Button::Icon)
-                        .into(),
-                ])
-                .align_y(Alignment::Center)
-                .padding(space_xxs)
-                .spacing(space_xxs);
-
-                tab_column = tab_column.push(
-                    // The find bar floats as a frosted card: radius_l surface,
-                    // a neutral hairline and a soft drop shadow for elevation,
-                    // rather than a docked grey strip.
-                    widget::container(find_widget)
-                        .padding(space_xxs)
-                        .class(style::Container::Custom(Box::new(|theme| {
-                            let cosmic = theme.cosmic();
-                            let mut hairline = cosmic.on_bg_color();
-                            hairline.alpha = if cosmic.is_dark { 0.18 } else { 0.11 };
-                            cosmic::iced::widget::container::Style {
-                                icon_color: Some(Color::from(cosmic.primary.on)),
-                                text_color: Some(Color::from(cosmic.primary.on)),
-                                background: Some(iced::Background::Color(
-                                    cosmic.primary.base.into(),
-                                )),
-                                border: iced::Border {
-                                    radius: cosmic.radius_l().into(),
-                                    width: 1.0,
-                                    color: hairline.into(),
-                                },
-                                shadow: iced::Shadow {
-                                    color: Color::from_rgba(0.0, 0.0, 0.0, 0.25),
-                                    offset: iced::Vector::new(0.0, 4.0),
-                                    blur_radius: 16.0,
-                                },
-                                snap: false,
-                            }
-                        }))),
-                );
-            } else {
-                // TODO
             }
 
             DndDestination::for_data::<DndDrop>(tab_column, move |data, action| {
