@@ -15,10 +15,13 @@ import sys
 import time
 import urllib.parse
 import urllib.request
+from contextlib import closing
 from datetime import datetime, timedelta, timezone
+from uuid import uuid4
 
 from _shared.credentials import load_credential  # noqa: E402
 from _shared.safe_http import open_url  # noqa: E402
+from invite_ics import normalize_mailbox, parse_invitation
 from yuos_sdk import events  # noqa: E402
 from yuos_sdk.app import data_dir  # noqa: E402
 from yuos_sdk.objects import format_reference  # noqa: E402
@@ -436,19 +439,20 @@ def cmd_list(args):
 # create command
 # ---------------------------------------------------------------------------
 
-def _create_local(title, start, end, description, location):
-    event_id = _new_id()
+def _insert_local(conn, title, start, end, description, location, *, event_id=None):
+    event_id = event_id or _new_id()
     now = _now_iso()
-    conn = _init_db()
-    try:
-        conn.execute(
-            "INSERT INTO events (id, title, start_time, end_time, description, location, created_at, updated_at) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            (event_id, title, start, end, description, location, now, now),
-        )
-        conn.commit()
-    finally:
-        conn.close()
+    conn.execute(
+        "INSERT INTO events (id, title, start_time, end_time, description, location, created_at, updated_at) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (event_id, title, start, end, description, location, now, now),
+    )
+    return event_id
+
+
+def _create_local(title, start, end, description, location):
+    with closing(_init_db()) as conn, conn:
+        event_id = _insert_local(conn, title, start, end, description, location)
     return {
         "id": event_id,
         "title": title,
@@ -533,38 +537,35 @@ def cmd_create(args):
 # update command
 # ---------------------------------------------------------------------------
 
+def _write_local(conn, event_id, fields):
+    col_map = {
+        "title": "title",
+        "start": "start_time",
+        "end": "end_time",
+        "description": "description",
+        "location": "location",
+    }
+    columns = [(col, fields[key]) for key, col in col_map.items() if key in fields]
+    if not columns:
+        return False
+    columns.append(("updated_at", _now_iso()))
+    sets = ", ".join(f"{col} = ?" for col, _ in columns)
+    return conn.execute(
+        f"UPDATE events SET {sets} WHERE id = ?", [v for _, v in columns] + [event_id]
+    ).rowcount == 1
+
+
 def _update_local(event_id, fields):
-    conn = _init_db()
-    try:
-        row = conn.execute("SELECT id FROM events WHERE id = ?", (event_id,)).fetchone()
-        if row is None:
-            return None
-        col_map = {
-            "title": "title",
-            "start": "start_time",
-            "end": "end_time",
-            "description": "description",
-            "location": "location",
-        }
-        sets = []
-        values = []
-        for key, col in col_map.items():
-            if key in fields:
-                sets.append(f"{col} = ?")
-                values.append(fields[key])
-        if not sets:
-            return {"id": event_id}
-        sets.append("updated_at = ?")
-        values.append(_now_iso())
-        values.append(event_id)
-        conn.execute(f"UPDATE events SET {', '.join(sets)} WHERE id = ?", values)
-        conn.commit()
+    with closing(_init_db()) as conn, conn:
+        _write_local(conn, event_id, fields)
         updated = conn.execute(
             "SELECT id, title, start_time, end_time, description, location FROM events WHERE id = ?",
             (event_id,),
         ).fetchone()
-    finally:
-        conn.close()
+    if updated is None:
+        return None
+    if not fields:
+        return {"id": event_id}
     return {
         "id": updated[0], "title": updated[1], "start": updated[2],
         "end": updated[3], "description": updated[4], "location": updated[5],
@@ -652,17 +653,13 @@ def cmd_update(args):
 # delete command
 # ---------------------------------------------------------------------------
 
+def _remove_local(conn, event_id):
+    return conn.execute("DELETE FROM events WHERE id = ?", (event_id,)).rowcount == 1
+
+
 def _delete_local(event_id):
-    conn = _init_db()
-    try:
-        row = conn.execute("SELECT id FROM events WHERE id = ?", (event_id,)).fetchone()
-        if row is None:
-            return False
-        conn.execute("DELETE FROM events WHERE id = ?", (event_id,))
-        conn.commit()
-    finally:
-        conn.close()
-    return True
+    with closing(_init_db()) as conn, conn:
+        return _remove_local(conn, event_id)
 
 
 def _delete_google(event_id):
@@ -733,6 +730,91 @@ def cmd_today(args):
     return cmd_list(new_args)
 
 
+def _meeting_times(start_iso, end_iso):
+    start = datetime.fromisoformat(start_iso.replace("Z", "+00:00"))
+    end = datetime.fromisoformat(end_iso.replace("Z", "+00:00"))
+    if start.tzinfo is None or end.tzinfo is None or end <= start:
+        raise ValueError("meeting times require offsets and end must follow start")
+    return start, end
+
+
+class InviteImportError(ValueError):
+    def __init__(self, code, message):
+        super().__init__(message)
+        self.code = code
+
+
+def import_invite(ics, response=None, *, source, verified_organizer):
+    """Apply a confirmed action; source and organizer must come from trusted context."""
+    if (not isinstance(source, str) or not source or not source.isprintable() or len(source) > 256
+            or source != source.strip()):
+        raise InviteImportError("invite_not_applicable", "invitation source could not be verified")
+    try:
+        verified_organizer = normalize_mailbox(verified_organizer)
+    except ValueError:
+        raise InviteImportError("invite_not_applicable", "invitation source could not be verified") from None
+    try:
+        uid, sequence, organizer, attendees, fields = parse_invitation(ics)
+        if fields is None:
+            if response is not None:
+                raise ValueError("cancellation does not take a response")
+            status = "cancelled"
+        else:
+            responses = {"accept": "accepted", "tentative": "tentative", "decline": "declined"}
+            if not isinstance(response, str) or response not in responses:
+                raise ValueError("invitation response must be accept, tentative, or decline")
+            _meeting_times(fields["start"], fields["end"])
+            status = responses[response]
+    except ValueError as error:
+        raise InviteImportError("invalid_invitation", str(error)) from None
+    if organizer != verified_organizer:
+        raise InviteImportError("invite_not_applicable", "invitation source could not be verified")
+    _require_provider_access("local", write=True)
+
+    invite_key = hashlib.sha256(json.dumps([source, organizer, uid]).encode()).hexdigest()
+    content_digest = hashlib.sha256(json.dumps([fields, attendees], sort_keys=True).encode()).hexdigest()
+    with closing(_init_db()) as conn, conn:
+        conn.execute("BEGIN IMMEDIATE")
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS invite_imports (
+                invite_key TEXT PRIMARY KEY,
+                sequence INTEGER NOT NULL,
+                status TEXT NOT NULL,
+                content_digest TEXT NOT NULL,
+                event_id TEXT UNIQUE NOT NULL
+            )
+        """)
+        current = conn.execute(
+            "SELECT sequence, status, content_digest, event_id FROM invite_imports WHERE invite_key = ?",
+            (invite_key,),
+        ).fetchone()
+        if current is None:
+            if status == "cancelled":
+                raise InviteImportError("invite_not_applicable", "no matching invitation to cancel")
+            # Keep receipts stable without sharing the ID space of ordinary local events.
+            event_id = f"evt-invite-{uuid4().hex}"
+        else:
+            old_sequence, old_status, old_digest, event_id = current
+            if sequence < old_sequence:
+                raise InviteImportError("stale_invitation", "a newer invitation is already recorded")
+            if sequence == old_sequence:
+                if (status, content_digest) != (old_status, old_digest):
+                    raise InviteImportError("invitation_conflict", "invitation differs at the recorded sequence")
+                return {"event_id": event_id, "status": status}
+        if status in {"cancelled", "declined"}:
+            if current is not None:
+                _remove_local(conn, event_id)
+        elif current is None or not _write_local(conn, event_id, fields):
+            _insert_local(conn, **fields, event_id=event_id)
+        conn.execute("""
+            INSERT INTO invite_imports (invite_key, sequence, status, content_digest, event_id)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(invite_key) DO UPDATE SET
+                sequence = excluded.sequence, status = excluded.status, content_digest = excluded.content_digest
+        """, (invite_key, sequence, status, content_digest, event_id))
+        return {"event_id": event_id, "status": status}
+
+
 def cmd_invite(args):
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--provider", required=True, choices=["google", "outlook"])
@@ -756,10 +838,7 @@ def cmd_invite(args):
             or len(set(address.casefold() for address in attendees)) != len(attendees)
         ):
             raise ValueError("attendees must be a JSON array of 1..100 distinct email addresses")
-        start = datetime.fromisoformat(options.start.replace("Z", "+00:00"))
-        end = datetime.fromisoformat(options.end.replace("Z", "+00:00"))
-        if start.tzinfo is None or end.tzinfo is None or end <= start:
-            raise ValueError("meeting times require offsets and end must follow start")
+        start, end = _meeting_times(options.start, options.end)
     except (SystemExit, ValueError) as error:
         return {"error": f"invalid invitation: {error}"}
     _require_provider_access(options.provider, write=True)

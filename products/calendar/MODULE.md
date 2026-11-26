@@ -8,6 +8,7 @@ work; Calendar never calls another App.
 | --- | --- |
 | `apps/calendar/app.json` | Existing identity, provider choices and per-provider authority |
 | `apps/calendar/main.py` | Local SQLite events and remote provider operations |
+| `apps/calendar/invite_ics.py` | Bounded parser for single-event imports |
 | `apps/calendar/server.py` | MCP transport over the same implementation |
 | `apps/calendar/test_main.py` | Local event and provider behavior |
 | `apps/panel-calendar/` | Existing native identity, manifest-bound GUI/MCP entry and unchanged named Calendar read grant |
@@ -99,6 +100,38 @@ for conditional patching. Outlook uses its dedicated response actions.
 Times require offsets; Outlook receives explicit UTC date/time values.
 Local event CRUD is unchanged and does not pretend to deliver invitations.
 Returned notification fields report requested delivery, not guest receipt.
+
+## Importing an email invitation (provider logic only)
+
+The private `import_invite(ics, response=None, *, source, verified_organizer)`
+entrypoint applies a confirmed action to the current owner's local Calendar.
+It requires the existing `data.db.write:Name(calendar)` permission. The future
+`calendar/import_invite` Gateway tool takes `ics` and `response`
+(`accept`, `tentative`, or `decline` for `METHOD:REQUEST`; omitted for
+`METHOD:CANCEL`). Success returns only `event_id` and `status` (`accepted`,
+`tentative`, `declined`, or `cancelled`). A decline or cancellation retains the
+receipt ID but leaves no event in the agenda. Calendar does not send RSVP.
+
+Only a single non-recurring `VEVENT` in a UTF-8 iCalendar 2.0 `VCALENDAR` of up
+to 64 KiB is accepted. Requests need a UID, organizer and attendee `mailto:`
+addresses, a summary, and explicit UTC start and end times. Cancels need a UID,
+organizer, and explicit sequence. The parser does not load attachments or URLs;
+recurrences, nested components, all-day dates, and non-UTC times are unsupported.
+
+The existing `calendar/events.db` stores import receipts and event changes in
+one transaction. Within the owner's partition, each verified source mailbox,
+organizer, and UID maps to one receipt ID. An identical revision returns that
+ID without rewriting the event. A higher sequence can update it; lower or
+conflicting revisions fail. Cancellation must match a previous import and
+retains its revision so stale invitations cannot recreate it. Business errors
+use `invalid_invitation`, `invite_not_applicable`, `stale_invitation`, or
+`invitation_conflict`.
+
+The entrypoint is **not exposed** through the current MCP manifest, desktop UI,
+or CLI. Gateway activation needs the App-only route, protected confirmation,
+the verified Email publisher key, and trusted source-mailbox and organizer
+bindings outside the tool arguments. Neither the iCalendar fields nor an
+App ID alone can establish those bindings.
 
 From the repository root:
 
