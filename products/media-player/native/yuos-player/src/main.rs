@@ -8,12 +8,10 @@ use cosmic::iced::event::{self, Event};
 use cosmic::iced::keyboard::{Event as KeyEvent, Key, Modifiers};
 use cosmic::iced::mouse::{Event as MouseEvent, ScrollDelta};
 use cosmic::iced::window::{self, set_mode};
-use cosmic::iced::{
-    Alignment, Color, ContentFit, Length, Limits, Subscription,
-};
+use cosmic::iced::{Length, Limits, Subscription};
 use cosmic::widget::menu::action::MenuAction;
-use cosmic::widget::{self, Slider, nav_bar, segmented_button};
-use cosmic::{Application, ApplicationExt, Element, action, cosmic_theme, executor, font, theme};
+use cosmic::widget::{self, nav_bar, segmented_button};
+use cosmic::{Application, ApplicationExt, Element, action, cosmic_theme, executor, font};
 use iced_video_player::gst::prelude::*;
 use iced_video_player::{VideoPlayer, gst, gst_pbutils};
 use crate::video::NativeVideo as Video;
@@ -46,6 +44,7 @@ mod playback;
 mod project;
 mod style;
 mod thumbnail;
+mod ui;
 mod video;
 #[cfg(feature = "xdg-portal")]
 mod xdg_portals;
@@ -167,6 +166,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let mut settings = Settings::default();
     settings = settings.theme(config.app_theme.theme());
+    settings = settings.default_text_size(13.0);
     settings = settings.size_limits(Limits::NONE.min_width(360.0).min_height(180.0));
 
 
@@ -265,6 +265,7 @@ impl AsRef<str> for TextCode {
 pub enum Message {
     Config(Config),
     ConfigState(ConfigState),
+    DropdownClose,
     DropdownToggle(DropdownKind),
     DurationChanged(Duration),
     FileClose,
@@ -634,11 +635,9 @@ impl App {
                 .as_ref()
                 .is_some_and(|video| video.has_video())
         {
-            self.core.window.show_headerbar = !self.fullscreen;
             self.controls = true;
             self.controls_time = Instant::now();
         } else if self.controls && self.controls_time.elapsed() > CONTROLS_TIMEOUT {
-            self.core.window.show_headerbar = false;
             self.controls = false;
         }
         self.update_mpris_state();
@@ -961,7 +960,11 @@ impl Application for App {
     }
 
     fn nav_model(&self) -> Option<&nav_bar::Model> {
-        Some(&self.nav_model)
+        (!self.fullscreen).then_some(&self.nav_model)
+    }
+
+    fn nav_bar(&self) -> Option<Element<'_, cosmic::Action<Self::Message>>> {
+        self.folders()
     }
 
     fn on_escape(&mut self) -> Task<Self::Message> {
@@ -1032,14 +1035,12 @@ impl Application for App {
     }
 
     fn style(&self) -> Option<cosmic::iced::core::theme::Style> {
-        // This ensures we have a solid background color even when using no content container
-
-        let theme = self.core.system_theme();
-
+        let theme = self.flags.config.app_theme.theme();
+        let foreground = theme.cosmic().on_bg_color().into();
         Some(cosmic::iced::core::theme::Style {
-            background_color: theme.cosmic().bg_color().into(),
-            icon_color: theme.cosmic().on_bg_color().into(),
-            text_color: theme.cosmic().on_bg_color().into(),
+            background_color: style::surface_color(&theme),
+            icon_color: foreground,
+            text_color: foreground,
         })
     }
 
@@ -1059,6 +1060,7 @@ impl Application for App {
                     self.flags.config_state = config_state;
                 }
             }
+            Message::DropdownClose => self.dropdown_opt = None,
             Message::DropdownToggle(menu_kind) => {
                 if self.dropdown_opt.take() != Some(menu_kind) {
                     self.dropdown_opt = Some(menu_kind);
@@ -1245,6 +1247,7 @@ impl Application for App {
                 }
             }
             Message::AudioCode(code) => {
+                self.dropdown_opt = None;
                 if let Ok(code) = i32::try_from(code)
                     && let Some(video) = &self.video_opt
                 {
@@ -1270,6 +1273,7 @@ impl Application for App {
                 }
             }
             Message::TextCode(index) => {
+                self.dropdown_opt = None;
                 if let Some(text_code) = self.text_codes.get(index) {
                     if let Some(id) = text_code.id {
                         if let Some(video) = &self.video_opt {
@@ -1699,8 +1703,17 @@ impl Application for App {
     }
 
     fn header_start(&self) -> Vec<Element<'_, Self::Message>> {
+        use cosmic::iced::core::text::{Ellipsize, EllipsizeHeightLimit};
+        vec![widget::container(widget::text(self.media_title())
+            .size(15)
+            .font(font::semibold())
+            .ellipsize(Ellipsize::End(EllipsizeHeightLimit::Lines(1))))
+            .max_width(if self.core.is_condensed() { 112 } else { 400 })
+            .into()]
+    }
+
+    fn header_end(&self) -> Vec<Element<'_, Self::Message>> {
         vec![menu::menu_bar(
-            &self.flags.config,
             &self.flags.config_state,
             &self.key_binds,
             &self.projects,
@@ -1709,390 +1722,22 @@ impl Application for App {
         )]
     }
 
-    /// Creates a view after each update.
     fn view(&self) -> Element<'_, Self::Message> {
-        let theme = theme::active();
-        let cosmic_theme::Spacing {
-            space_xxs,
-            space_xs,
-            space_s,
-            space_m,
-            ..
-        } = theme.cosmic().spacing;
-
-        let format_time = |time_float: f64| -> String {
-            let time = time_float.floor() as i64;
-            let seconds = time % 60;
-            let minutes = (time / 60) % 60;
-            let hours = (time / 60) / 60;
-            format!("{:02}:{:02}:{:02}", hours, minutes, seconds)
-        };
-
         let Some(video) = &self.video_opt else {
-            let card = widget::container(
-                widget::column::with_capacity(3)
-                    .align_x(Alignment::Center)
-                    .spacing(space_m)
-                    .push(widget::icon::from_name("folder-symbolic").size(64))
-                    .push(widget::text::body(fl!("no-video-or-audio-file-open")))
-                    .push(
-                        widget::button::suggested(fl!("open-file"))
-                            .on_press(Message::FileOpen),
-                    ),
-            )
-            .padding([space_m + space_s, space_m + space_s])
-            .class(style::now_playing_card());
-
-            let column = widget::column::with_capacity(3)
-                .align_x(Alignment::Center)
-                .width(Length::Fill)
-                .height(Length::Fill)
-                .push(widget::space::vertical())
-                .push(card)
-                .push(widget::space::vertical());
-
-            return widget::container(column)
-                .width(Length::Fill)
-                .height(Length::Fill)
-                .class(theme::Container::WindowBackground)
-                .into();
+            return self.empty_view();
         };
-
-        let muted = video.muted();
-        let volume = video.volume();
-
-        let mut video_player: Element<_> = VideoPlayer::new(video)
-            .mouse_hidden(!self.controls)
+        let size = if video.has_video() { Length::Fill } else { Length::Fixed(1.0) };
+        let player = VideoPlayer::new(video)
+            .mouse_hidden(self.fullscreen && !self.controls)
             .on_duration_changed(Message::DurationChanged)
             .on_end_of_stream(Message::PlayNext)
             .on_missing_plugin(Message::MissingPlugin)
             .on_new_frame(Message::NewFrame)
-            .width(Length::Fill)
-            .height(Length::Fill)
-            .id(cosmic::widget::Id::new("video-player".to_string()))
+            .width(size)
+            .height(size)
+            .id(widget::Id::new("video-player".to_string()))
             .into();
-
-        let mut background_color = Color::BLACK;
-        let mut text_color_opt = None;
-        if !video.has_video() {
-            background_color = theme.cosmic().bg_component_color().into();
-            text_color_opt = Some(Color::from(theme.cosmic().on_bg_component_color()));
-
-            let mut col = widget::column::with_capacity(10);
-            col = col.push(widget::space::vertical());
-            if let Some(album_art) = &self.album_art_opt {
-                col = col.push(
-                    widget::container(
-                        widget::image(widget::image::Handle::from_path(album_art.path()))
-                            .content_fit(ContentFit::ScaleDown)
-                            .width(Length::Fill),
-                    )
-                    .padding(space_xxs)
-                    .class(style::now_playing_card()),
-                );
-            } else {
-                col = col.push(
-                    widget::container(
-                        widget::icon::from_name("audio-x-generic-symbolic").size(256),
-                    )
-                    .padding(space_m)
-                    .class(style::now_playing_card()),
-                );
-            }
-            col = col.push(widget::space::vertical().height(space_s));
-            if self.mpris_meta.title.is_empty() {
-                col = col.push(widget::text::title4(fl!("untitled")));
-            } else {
-                col = col.push(widget::text::title4(&self.mpris_meta.title));
-            }
-            if self.mpris_meta.artists.is_empty() {
-                col = col.push(widget::text::body(fl!("unknown-author")));
-            } else {
-                for artist in self.mpris_meta.artists.iter() {
-                    col = col.push(widget::text::body(artist));
-                }
-            }
-            col = col.push(widget::space::vertical().height(space_s));
-            if !self.mpris_meta.album.is_empty() {
-                col = col.push(widget::text::body(fl!(
-                    "album",
-                    album = self.mpris_meta.album.as_str()
-                )));
-            }
-            if let Some(year) = &self.mpris_meta.album_year_opt {
-                col = col.push(widget::text::body(format!("{}", year)));
-            }
-            col = col.push(widget::space::vertical());
-
-            // Space to keep from going under control overlay
-            let mut control_height = space_xxs + 32 + space_xxs;
-            if self.core.is_condensed() {
-                control_height += space_xxs + 32;
-            }
-
-            // This is a hack to have the video player running but not visible (since the controls will cover it as an overlay)
-            video_player = widget::row::with_children(vec![
-                widget::space::horizontal().into(),
-                widget::container(col.push(widget::container(video_player).height(control_height)))
-                    .width(320)
-                    .into(),
-                widget::space::horizontal().into(),
-            ])
-            .into();
-        }
-
-        let mouse_area = widget::mouse_area(video_player)
-            .on_press(Message::PlayPause)
-            .on_double_press(Message::Fullscreen);
-
-        let mut popover = widget::popover(mouse_area).position(widget::popover::Position::Bottom);
-        let mut popup_items = Vec::<Element<_>>::with_capacity(3);
-        if let Some(dropdown) = self.dropdown_opt {
-            let mut items = Vec::<Element<_>>::new();
-            match dropdown {
-                DropdownKind::Audio => {
-                    items.push(
-                        widget::row::with_children(vec![
-                            widget::button::icon(
-                                widget::icon::from_name({
-                                    if muted {
-                                        "audio-volume-muted-symbolic"
-                                    } else {
-                                        if volume >= (2.0 / 3.0) {
-                                            "audio-volume-high-symbolic"
-                                        } else if volume >= (1.0 / 3.0) {
-                                            "audio-volume-medium-symbolic"
-                                        } else {
-                                            "audio-volume-low-symbolic"
-                                        }
-                                    }
-                                })
-                                .size(16),
-                            )
-                            .on_press(Message::AudioToggle)
-                            .into(),
-                            Slider::new(0.0..=1.0, volume, Message::AudioVolume)
-                                .step(0.01)
-                                .into(),
-                        ])
-                        .align_y(Alignment::Center)
-                        .into(),
-                    );
-                }
-                DropdownKind::Subtitle => {
-                    if !self.audio_codes.is_empty() {
-                        items.push(widget::text::heading(fl!("audio")).into());
-                        items.push(
-                            widget::dropdown(
-                                &self.audio_codes,
-                                usize::try_from(self.current_audio).ok(),
-                                Message::AudioCode,
-                            )
-                            .into(),
-                        );
-                    }
-                    if !self.text_codes.is_empty() {
-                        items.push(widget::text::heading(fl!("subtitles")).into());
-                        items.push(
-                            widget::dropdown(
-                                &self.text_codes,
-                                self.text_codes
-                                    .iter()
-                                    .position(|x| x.id == self.current_text),
-                                Message::TextCode,
-                            )
-                            .into(),
-                        );
-                    }
-                }
-            }
-
-            let mut column = widget::column::with_capacity(items.len());
-            for item in items {
-                column = column.push(widget::container(item).padding([space_xxs, space_m]));
-            }
-
-            popup_items.push(
-                widget::row::with_children(vec![
-                    widget::space::horizontal().into(),
-                    widget::container(column)
-                        .padding(space_xxs)
-                        .class(style::popover_card())
-                        .width(Length::Fixed(240.0))
-                        .into(),
-                ])
-                .into(),
-            );
-        }
-        if self.controls {
-            let mut row = widget::row::with_capacity(9)
-                .align_y(Alignment::Center)
-                .spacing(space_xxs)
-                .push(
-                    if self
-                        .video_opt
-                        .as_ref()
-                        .map_or(true, |video| video.has_video())
-                    {
-                        widget::button::icon(
-                            widget::icon::from_svg_bytes(JUMP_BACKWARD_ICON).symbolic(true),
-                        )
-                        .on_press(Message::SeekRelative(-10.0))
-                    } else {
-                        widget::button::icon(
-                            widget::icon::from_name("media-skip-backward-symbolic").size(16),
-                        )
-                        .on_press(Message::PlayPrev)
-                    },
-                );
-            row = row.push(
-                widget::button::icon(
-                    if self.video_opt.as_ref().map_or(true, |video| video.paused()) {
-                        widget::icon::from_name("media-playback-start-symbolic").size(16)
-                    } else {
-                        widget::icon::from_name("media-playback-pause-symbolic").size(16)
-                    },
-                )
-                .on_press(Message::PlayPause),
-            );
-
-            row = row.push(
-                if self
-                    .video_opt
-                    .as_ref()
-                    .map_or(true, |video| video.has_video())
-                {
-                    widget::button::icon(
-                        widget::icon::from_svg_bytes(JUMP_FORWARD_ICON).symbolic(true),
-                    )
-                    .on_press(Message::SeekRelative(10.0))
-                } else {
-                    widget::button::icon(
-                        widget::icon::from_name("media-skip-forward-symbolic").size(16),
-                    )
-                    .on_press(Message::PlayNext)
-                },
-            );
-
-            row = row.push(widget::tooltip(
-                widget::button::icon(
-                    widget::icon::from_name(match self.flags.config_state.player_state.repeat {
-                        RepeatState::Disabled => "media-playlist-no-repeat-symbolic",
-                        RepeatState::Track => "media-playlist-repeat-song-symbolic",
-                    })
-                    .size(16),
-                )
-                .on_press(Message::RepeatToggled(
-                    match self.flags.config_state.player_state.repeat {
-                        RepeatState::Disabled => RepeatState::Track,
-                        RepeatState::Track => RepeatState::Disabled,
-                    },
-                )),
-                widget::text(match self.flags.config_state.player_state.repeat {
-                    RepeatState::Disabled => fl!("repeat-disabled"),
-                    RepeatState::Track => fl!("repeat-track"),
-                }),
-                widget::tooltip::Position::Top,
-            ));
-            if self.core.is_condensed() {
-                row = row.push(widget::space::horizontal());
-            } else {
-                row = row
-                    .push(widget::text(format_time(self.position)).font(font::mono()))
-                    .push(
-                        Slider::new(0.0..=self.duration, self.position, Message::Seek)
-                            .step(0.1)
-                            .on_release(Message::SeekRelease),
-                    )
-                    .push(
-                        widget::text(format_time(self.duration - self.position)).font(font::mono()),
-                    );
-            }
-            row = row
-                .push(
-                    widget::button::icon(
-                        widget::icon::from_name("media-view-subtitles-symbolic").size(16),
-                    )
-                    .on_press(Message::DropdownToggle(DropdownKind::Subtitle)),
-                )
-                .push(
-                    widget::button::icon(
-                        widget::icon::from_name("view-fullscreen-symbolic").size(16),
-                    )
-                    .on_press(Message::Fullscreen),
-                )
-                .push(
-                    //TODO: scroll up/down on icon to change volume
-                    widget::button::icon(
-                        widget::icon::from_name({
-                            if muted {
-                                "audio-volume-muted-symbolic"
-                            } else {
-                                if volume >= (2.0 / 3.0) {
-                                    "audio-volume-high-symbolic"
-                                } else if volume >= (1.0 / 3.0) {
-                                    "audio-volume-medium-symbolic"
-                                } else {
-                                    "audio-volume-low-symbolic"
-                                }
-                            }
-                        })
-                        .size(16),
-                    )
-                    .on_press(Message::DropdownToggle(DropdownKind::Audio)),
-                );
-            popup_items.push(
-                widget::container(
-                    widget::container(row)
-                        .padding([space_xs, space_m])
-                        .class(style::control_bar()),
-                )
-                .padding([0, space_m, space_s, space_m])
-                .into(),
-            );
-
-            if self.core.is_condensed() {
-                popup_items.push(
-                    widget::container(
-                        widget::container(
-                            widget::row::with_capacity(3)
-                                .align_y(Alignment::Center)
-                                .spacing(space_xxs)
-                                .push(widget::text(format_time(self.position)).font(font::mono()))
-                                .push(
-                                    Slider::new(0.0..=self.duration, self.position, Message::Seek)
-                                        .step(0.1)
-                                        .on_release(Message::SeekRelease),
-                                )
-                                .push(
-                                    widget::text(format_time(self.duration - self.position))
-                                        .font(font::mono()),
-                                ),
-                        )
-                        .padding([space_xs, space_m])
-                        .class(style::control_bar()),
-                    )
-                    .padding([0, space_m, space_s, space_m])
-                    .into(),
-                );
-            }
-        }
-        if !popup_items.is_empty() {
-            popover = popover.popup(widget::column::with_children(popup_items));
-        }
-
-        widget::container(popover)
-            .width(Length::Fill)
-            .height(Length::Fill)
-            .class(theme::Container::Custom(Box::new(move |_theme| {
-                let mut appearance =
-                    widget::container::Style::default().background(background_color);
-                if let Some(text_color) = text_color_opt {
-                    appearance.text_color = Some(text_color);
-                }
-                appearance
-            })))
-            .into()
+        self.player_view(video, player)
     }
 
     fn subscription(&self) -> Subscription<Self::Message> {

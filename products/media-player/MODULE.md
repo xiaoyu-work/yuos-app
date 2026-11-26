@@ -3,7 +3,8 @@
 | Path | Responsibility |
 | --- | --- |
 | `apps/yuos-player/app.json` | Seven tools and separate exact observation/control grants |
-| `native/yuos-player/src/main.rs` | Original GStreamer/libcosmic UI and authoritative playback state |
+| `native/yuos-player/src/main.rs` | Native application event loop and authoritative playback state |
+| `native/yuos-player/src/{ui,style,menu}.rs` | Folders, now-playing views, docked transport, fullscreen controls, and menus |
 | `native/yuos-player/src/argparse.rs`, `native/yuos-player/test/unit/argparse.rs` | Native media/thumbnail arguments, bounded Host GUI selector adaptation and parser regressions |
 | `native/yuos-player/src/playback.rs` | Shared native state snapshots and typed UI commands |
 | `native/yuos-player/src/managed.rs` | Published generic SDK exchange for the exact managed GUI; commands and status go through the original UI event loop |

@@ -3,14 +3,43 @@
 use cosmic::widget::RcElementWrapper;
 use cosmic::widget::menu::key_bind::KeyBind;
 use cosmic::widget::menu::{self, ItemHeight, ItemWidth, MenuBar};
-use cosmic::{Element, theme};
+use cosmic::widget::{self, icon};
+use cosmic::{Element, Theme, theme};
 use std::collections::HashMap;
 use std::path::PathBuf;
 
-use crate::{Action, Config, ConfigState, Message, fl};
+use crate::{Action, ConfigState, Message, fl};
+
+fn menu_label(label: String) -> RcElementWrapper<Message> {
+    RcElementWrapper::new(
+        widget::button::custom(
+            widget::row::with_children(vec![
+                widget::text(label).size(13).into(),
+                icon::from_name("go-down-symbolic").size(9).into(),
+            ])
+            .align_y(cosmic::iced::Alignment::Center)
+            .spacing(4),
+        )
+        .padding([4, 8])
+        .class(theme::Button::MenuRoot)
+        .into(),
+    )
+}
+
+fn appearance(theme: &Theme) -> menu::Appearance {
+    let cosmic = theme.cosmic();
+    menu::Appearance {
+        background: crate::style::surface_color(theme),
+        border_width: 1.0,
+        bar_border_radius: [6.0; 4],
+        menu_border_radius: [8.0; 4],
+        border_color: cosmic.background.component.divider.into(),
+        background_expand: [1; 4],
+        path: cosmic.background.component.hover.into(),
+    }
+}
 
 pub fn menu_bar<'a>(
-    _config: &Config,
     config_state: &ConfigState,
     key_binds: &HashMap<KeyBind, Action>,
     projects: &[(String, PathBuf)],
@@ -91,12 +120,12 @@ pub fn menu_bar<'a>(
     if has_video {
         playback.push(menu::Item::Button(
             fl!("next-frame"),
-            None,
+            Some(icon::from_name("go-next-symbolic").handle()),
             Action::NextFrame,
         ));
         playback.push(menu::Item::Button(
             fl!("previous-frame"),
-            None,
+            Some(icon::from_name("go-previous-symbolic").handle()),
             Action::PreviousFrame,
         ));
     }
@@ -112,15 +141,23 @@ pub fn menu_bar<'a>(
     ));
     MenuBar::new(vec![
         menu::Tree::with_children(
-            RcElementWrapper::new(Element::from(menu::root(fl!("file")))),
+            menu_label(fl!("file")),
             menu::items(
                 key_binds,
                 vec![
-                    menu::Item::Button(fl!("open-media"), None, Action::FileOpen),
+                    menu::Item::Button(
+                        fl!("open-media"),
+                        Some(icon::from_name("document-open-symbolic").handle()),
+                        Action::FileOpen,
+                    ),
                     menu::Item::Folder(fl!("open-recent-media"), recent_files),
                     menu::Item::Button(fl!("close-file"), None, Action::FileClose),
                     menu::Item::Divider,
-                    menu::Item::Button(fl!("open-media-folder"), None, Action::FolderOpen),
+                    menu::Item::Button(
+                        fl!("open-media-folder"),
+                        Some(icon::from_name("folder-open-symbolic").handle()),
+                        Action::FolderOpen,
+                    ),
                     menu::Item::Folder(fl!("open-recent-media-folder"), recent_projects),
                     menu::Item::Folder(fl!("close-media-folder"), close_projects),
                     menu::Item::Divider,
@@ -129,12 +166,13 @@ pub fn menu_bar<'a>(
             ),
         ),
         menu::Tree::with_children(
-            RcElementWrapper::new(Element::from(menu::root(fl!("playback")))),
+            menu_label(fl!("playback")),
             menu::items(key_binds, playback),
         ),
     ])
-    .item_height(ItemHeight::Dynamic(40))
-    .item_width(ItemWidth::Uniform(320))
+    .item_height(ItemHeight::Dynamic(27))
+    .item_width(ItemWidth::Uniform(288))
+    .style(appearance as fn(&Theme) -> menu::Appearance)
     .spacing(theme::active().cosmic().spacing.space_xxxs.into())
     .into()
 }

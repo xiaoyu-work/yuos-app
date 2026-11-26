@@ -1,5 +1,7 @@
 album = Album: {$album}
+release-year = Year: {$year}
 audio = Audio
+media-folders = Media folders
 no-video-or-audio-file-open = No video or audio file open
 off = Off
 open-file = Open file

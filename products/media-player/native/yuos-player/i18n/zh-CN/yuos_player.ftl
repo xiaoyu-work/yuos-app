@@ -1,5 +1,7 @@
 album = 专辑：{ $album }
-audio = 音频
+release-year = 年份：{ $year }
+audio = 音轨
+media-folders = 媒体文件夹
 no-video-or-audio-file-open = 未打开视频或音频文件
 open-file = 打开文件
 open-folder = 打开文件夹
@@ -37,15 +39,15 @@ close-media-folder = 关闭媒体文件夹
 quit = 退出
 off = 已关闭
 clear-recent = 清空近期列表
-repeat-disabled = 重复已禁用
-repeat-track = 重复轨道
-playback = 回放
+repeat-disabled = 循环已关闭
+repeat-track = 单曲循环
+playback = 播放
 next-frame = 下一帧
 previous-frame = 上一帧
-ab-repeat = A-B 重复
-ab-repeat-set-a = A-B 重复（A）
-ab-repeat-set-b = A-B 重复（B）
-ab-repeat-clear = 清除 A-B 重复
+ab-repeat = A-B 循环
+ab-repeat-set-a = A-B 循环（A）
+ab-repeat-set-b = A-B 循环（B）
+ab-repeat-clear = 清除 A-B 循环
 
 # XDG Metadata
 
