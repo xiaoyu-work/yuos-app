@@ -404,20 +404,160 @@ function sleep(ms) {
 }
 
 // ---------------------------------------------------------------------------
-// Side panel controls
+// Side panel & internal Browser AI controls
 // ---------------------------------------------------------------------------
 
-chrome.runtime.onInstalled.addListener(() => {
+function configureSidePanel() {
   void chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch((error) => {
     console.warn("[yuos-agent] cannot configure the side panel:", error);
   });
   void chrome.action.setIcon({
     imageData: iconContext.getImageData(0, 0, 32, 32),
   }).catch(() => {});
-});
+}
+
+configureSidePanel();
+chrome.runtime.onInstalled.addListener(configureSidePanel);
+chrome.runtime.onStartup.addListener(configureSidePanel);
+
+async function handleInternalBrowserAction(action, args = {}) {
+  const windowId = args.windowId;
+  const [activeTab] = await chrome.tabs.query(
+    windowId !== undefined ? { active: true, windowId } : { active: true, currentWindow: true }
+  );
+
+  if (action === "get_context") {
+    const allTabs = (await chrome.tabs.query(windowId !== undefined ? { windowId } : {}))
+      .filter((t) => !t.incognito)
+      .map((t) => ({ id: t.id, title: t.title || "", url: t.url || "", active: !!t.active }));
+    if (!activeTab?.id || !activeTab.url || activeTab.incognito) {
+      return { active_tab: null, tabs: allTabs };
+    }
+    let expected;
+    try {
+      expected = originScope(activeTab.url);
+    } catch (_) {
+      return {
+        active_tab: { id: activeTab.id, title: activeTab.title || "", url: activeTab.url || "" },
+        tabs: allTabs,
+      };
+    }
+    let textSnap = null;
+    let querySnap = null;
+    try {
+      textSnap = await sendToContent(activeTab.id, {
+        kind: "snapshot",
+        snapshot_kind: "text",
+        expected_origin: expected,
+      });
+    } catch (_) {}
+    try {
+      querySnap = await sendToContent(activeTab.id, {
+        kind: "query",
+        selector: "a[href], button, input, textarea, select, [role='button'], [role='link']",
+        expected_origin: expected,
+      });
+    } catch (_) {}
+    return {
+      active_tab: {
+        id: activeTab.id,
+        title: activeTab.title || textSnap?.title || "",
+        url: activeTab.url || textSnap?.url || "",
+        text: (textSnap?.text || "").slice(0, 8000),
+        elements: (querySnap?.matches || [])
+          .filter((el) => el.visible && !el.secret)
+          .slice(0, 35)
+          .map((el) => ({ ref: el.ref, tag: el.tag, text: el.text, attrs: el.attrs })),
+      },
+      tabs: allTabs,
+    };
+  }
+
+  if (action === "navigate_tab") {
+    let url = String(args.url || "").trim();
+    if (!url) throw new Error("url is required");
+    if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
+    const targetId = activeTab?.id;
+    if (!targetId) {
+      const created = await chrome.tabs.create({ url, active: true });
+      await sleep(1200);
+      return { navigated: created.id, url };
+    }
+    await chrome.tabs.update(targetId, { url });
+    await sleep(1200);
+    return { navigated: targetId, url };
+  }
+
+  if (action === "open_tab") {
+    let url = String(args.url || "").trim();
+    if (!url) throw new Error("url is required");
+    if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
+    const created = await chrome.tabs.create({ url, active: true, windowId });
+    await sleep(1200);
+    return { opened_tab_id: created.id, url };
+  }
+
+  if (action === "switch_tab") {
+    const tabId = Number(args.tab_id);
+    const target = await chrome.tabs.get(tabId);
+    await chrome.windows.update(target.windowId, { focused: true });
+    await chrome.tabs.update(tabId, { active: true });
+    return { switched_to: tabId, title: target.title || "", url: target.url || "" };
+  }
+
+  if (action === "close_tab") {
+    const tabId = Number(args.tab_id);
+    await chrome.tabs.remove(tabId);
+    return { closed_tab_id: tabId };
+  }
+
+  if (!activeTab?.id || !activeTab.url) {
+    throw new Error("no active web page tab");
+  }
+  const expected = originScope(activeTab.url);
+
+  if (action === "click_element") {
+    const res = await sendToContent(activeTab.id, {
+      kind: "smartClick",
+      target: args.target,
+      expected_origin: expected,
+    });
+    await sleep(600);
+    return res;
+  }
+
+  if (action === "fill_input") {
+    return sendToContent(activeTab.id, {
+      kind: "smartFill",
+      target: args.target,
+      value: args.value,
+      expected_origin: expected,
+    });
+  }
+
+  if (action === "scroll_page") {
+    return sendToContent(activeTab.id, {
+      kind: "scroll",
+      direction: args.direction || "down",
+      expected_origin: expected,
+    });
+  }
+
+  if (action === "read_page") {
+    return handleInternalBrowserAction("get_context", { windowId });
+  }
+
+  throw new Error(`unknown browser action: ${action}`);
+}
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (sender.url !== chrome.runtime.getURL("popup.html")) return false;
+  if (msg?.browserAction) {
+    handleInternalBrowserAction(msg.browserAction, msg.args || {})
+      .then((result) => sendResponse({ ok: true, result }))
+      .catch((err) => sendResponse({ ok: false, error: err?.message || String(err) }));
+    return true;
+  }
   if (msg?.browserAccess !== "pause" && msg?.browserAccess !== "resume") {
     return false;
   }

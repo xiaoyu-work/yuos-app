@@ -510,6 +510,89 @@
         node_count: budget.nodes,
       };
     },
+
+    smartClick({ target }) {
+      const needle = String(target || "").trim();
+      if (!needle) throw new Error("click target is required");
+      let el = needle.startsWith("doc#") ? resolveRef(needle) : null;
+      if (!el) {
+        try { el = document.querySelector(needle); } catch (_) { el = null; }
+      }
+      if (!el) {
+        const lower = needle.toLowerCase();
+        const candidates = document.querySelectorAll(
+          "a, button, [role='button'], [role='link'], input[type='submit'], input[type='button'], summary"
+        );
+        for (const node of candidates) {
+          if (!visible(node)) continue;
+          const label = (explicitAccessibleName(node) || safeRenderedText(node, 160)).toLowerCase();
+          if (label === lower || (label && label.includes(lower))) {
+            el = node;
+            break;
+          }
+        }
+      }
+      if (!el) throw new Error(`element not found: ${needle}`);
+      el.scrollIntoView({ behavior: "instant", block: "center" });
+      if (typeof el.click === "function") el.click();
+      else el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+      return { clicked: true, tag: (el.tagName || "").toLowerCase(), text: safeRenderedText(el, 120) };
+    },
+
+    smartFill({ target, value }) {
+      const needle = String(target || "").trim();
+      if (!needle) throw new Error("fill target is required");
+      let el = needle.startsWith("doc#") ? resolveRef(needle) : null;
+      if (!el) {
+        try { el = document.querySelector(needle); } catch (_) { el = null; }
+      }
+      if (!el) {
+        const lower = needle.toLowerCase();
+        const candidates = document.querySelectorAll("input, textarea, select, [contenteditable='true']");
+        for (const node of candidates) {
+          if (!visible(node)) continue;
+          const label = [
+            explicitAccessibleName(node),
+            node.getAttribute("name"),
+            node.getAttribute("id"),
+            node.getAttribute("placeholder"),
+          ].filter(Boolean).join(" ").toLowerCase();
+          if (label.includes(lower)) {
+            el = node;
+            break;
+          }
+        }
+      }
+      if (!el) throw new Error(`input element not found: ${needle}`);
+      if (isSecretField(el)) {
+        throw new Error("refusing to fill a secret/password field automatically");
+      }
+      const textValue = String(value ?? "");
+      if ("value" in el) {
+        const proto = Object.getPrototypeOf(el);
+        const desc =
+          Object.getOwnPropertyDescriptor(proto, "value") ||
+          Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value");
+        if (desc && desc.set) desc.set.call(el, textValue);
+        else el.value = textValue;
+      } else if (el.isContentEditable) {
+        el.textContent = textValue;
+      } else {
+        throw new Error("element is not fillable");
+      }
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+      el.dispatchEvent(new Event("change", { bubbles: true }));
+      return { filled: true, target: needle };
+    },
+
+    scroll({ direction }) {
+      const dir = String(direction || "down").toLowerCase();
+      if (dir === "top") window.scrollTo({ top: 0, behavior: "smooth" });
+      else if (dir === "bottom") window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
+      else if (dir === "up") window.scrollBy({ top: -Math.round(window.innerHeight * 0.75), behavior: "smooth" });
+      else window.scrollBy({ top: Math.round(window.innerHeight * 0.75), behavior: "smooth" });
+      return { scrolled: dir, scrollY: Math.round(window.scrollY) };
+    },
   };
 
   chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {

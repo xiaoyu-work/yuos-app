@@ -61,7 +61,7 @@ async function refreshTab() {
   let next;
   try { next = await currentTab(); } catch (_) { next = null; }
   if (revision !== tabRevision) return;
-  if (!sameTab(tab, next)) elements["include-tab"].checked = false;
+  if (!sameTab(tab, next)) elements["include-tab"].checked = Boolean(next) && accessPaused !== true;
   tab = next;
   updateControls();
 }
@@ -132,8 +132,76 @@ function openStream(request) {
   try {
     connection = chrome.runtime.connectNative(CHAT_HOST);
     stream = connection;
-    connection.onMessage.addListener(({ event, data }) => {
+    connection.onMessage.addListener(async ({ event, data }) => {
       if (stream !== connection || !turn) return;
+      if (event === "assistant_turn") {
+        connection.disconnect();
+        stream = undefined;
+        if (turn.stopping) {
+          finish("Stopped.");
+          return;
+        }
+        if (data?.error) {
+          finish(data.error, true);
+          return;
+        }
+        const toolCalls = Array.isArray(data?.tool_calls) ? data.tool_calls : [];
+        if (toolCalls.length > 0 && (turn.stepCount || 0) < 6) {
+          turn.stepCount = (turn.stepCount || 0) + 1;
+          const results = [];
+          for (const call of toolCalls) {
+            if (turn.stopping) {
+              finish("Stopped.");
+              return;
+            }
+            status(`Running ${call.name}...`);
+            try {
+              const resp = await chrome.runtime.sendMessage({
+                browserAction: call.name,
+                args: { ...(call.input || {}), windowId },
+              });
+              if (resp && resp.ok) {
+                results.push({ id: call.id, content: JSON.stringify(resp.result ?? {}) });
+              } else {
+                results.push({
+                  id: call.id,
+                  content: JSON.stringify({ error: resp?.error || "Browser action failed" }),
+                  is_error: true,
+                });
+              }
+            } catch (err) {
+              results.push({
+                id: call.id,
+                content: JSON.stringify({ error: err?.message || String(err) }),
+                is_error: true,
+              });
+            }
+          }
+          await refreshTab();
+          const turnRecord = {
+            calls: toolCalls.map((c) => ({ id: c.id, name: c.name, input: c.input || {} })),
+            results,
+          };
+          if (data.provider_state) turnRecord.provider_state = data.provider_state;
+          if (data.text) turnRecord.text = data.text;
+          turn.toolTurns = [...(turn.toolTurns || []), turnRecord];
+          const nextContext = await fetchPageContext(elements["include-tab"].checked);
+          openStream({
+            action: "assist",
+            payload: {
+              prompt: turn.prompt,
+              history: turn.history,
+              page_context: nextContext.active_tab,
+              tabs: nextContext.tabs,
+              tool_turns: turn.toolTurns,
+            },
+          });
+          return;
+        }
+        showAnswer(data?.text || turn.answer || "Done.");
+        finish("");
+        return;
+      }
       switch (event) {
         case "task":
           if (turn.taskId && turn.taskId !== data.task_id) {
@@ -249,6 +317,22 @@ function requestCancel() {
   }
 }
 
+async function fetchPageContext(includeTab) {
+  try {
+    const resp = await chrome.runtime.sendMessage({
+      browserAction: "get_context",
+      args: { windowId },
+    });
+    if (resp && resp.ok && resp.result) {
+      return {
+        active_tab: includeTab ? resp.result.active_tab : null,
+        tabs: resp.result.tabs || [],
+      };
+    }
+  } catch (_) {}
+  return { active_tab: null, tabs: [] };
+}
+
 async function sendMessage(prompt, includeTab) {
   prompt = prompt.trim();
   if (!ready || !prompt || turn) return;
@@ -256,31 +340,36 @@ async function sendMessage(prompt, includeTab) {
     status("Message exceeds 32 KiB.", true);
     return;
   }
-  const request = { action: "chat", prompt };
   const revision = conversationRevision;
-  if (includeTab) {
-    const selected = tab;
-    let live;
-    try { live = await currentTab(); } catch (_) { live = null; }
-    if (turn || revision !== conversationRevision) return;
-    if (accessPaused || !selected || !sameTab(selected, live) || !sameTab(tab, live)) {
-      await refreshTab();
-      status("The selected tab changed or is unavailable. Select it again to continue.", true);
-      return;
-    }
-    request.tab = live;
-  }
-  if (sessionId) request.session_id = sessionId;
+  const ctx = await fetchPageContext(includeTab && !accessPaused);
+  if (turn || revision !== conversationRevision) return;
+  const priorHistory = messages.slice(-12).map(({ role, text }) => ({ role, text }));
   messages = [
     ...messages.slice(-(MAX_MESSAGES - 2)),
     { role: "user", text: prompt },
     { role: "assistant", text: "" },
   ];
-  turn = { answer: "", stopping: false };
+  turn = {
+    prompt,
+    history: priorHistory,
+    toolTurns: [],
+    stepCount: 0,
+    answer: "",
+    stopping: false,
+  };
   if (elements.prompt.value.trim() === prompt) elements.prompt.value = "";
   saveChat();
   showMessages();
-  openStream(request);
+  openStream({
+    action: "assist",
+    payload: {
+      prompt,
+      history: priorHistory,
+      page_context: ctx.active_tab,
+      tabs: ctx.tabs,
+      tool_turns: [],
+    },
+  });
 }
 
 elements.composer.addEventListener("submit", (event) => {

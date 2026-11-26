@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "Yu OS Agent",
-  "short_name": "Yu OS Agent",
+  "name": "Helium AI",
+  "short_name": "Helium AI",
   "version": "0.1.0",
-  "description": "Chat with Yu OS Agent and let it read or act on authorized browser tabs.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu0GnZCXOPWPk0qabuan+NXlltO+CXSuOjZB8hYS644J5Nb2nNM0Xr7QYZ6ogkXm7X66gByPSoQh8GWSY9oskqSo4+FMJE9HNNY38ASilc53UQQY89YrndeGdj7WTokgJDTg0KrJhihdZw2/MNCldnxSGF6UeQNf35d2OZLBJJsJ51ApEhYaPGarIki3mgZ9v3QmkpyBJ5DSAGdoxE33/LRoa7bWhh1is2ZmV2vUluikeBcHL6TlYJRbPIoXZ+AiyJGbn5IrQOI96hhNK/v56hc6M6huVn4irwMi3ob7aP63klk0QXZtrAgta4vgkRUVa8DcCPfAoiTwhp/jNT9RcQwIDAQAB",
+  "description": "Built-in AI assistant for Helium that reads pages and controls the browser, plus the MCP bridge.",
   "incognito": "not_allowed",
   "_trust_model_comment": "host_permissions:<all_urls> is intentional for the local-trust agent: the extension can read/write any tab the user has open. Access is gated by yuosd, which derives an exact per-host capability and injects the expected page origin; the Native Messaging host accepts only yuosd. Operators who want to narrow the trust surface SHOULD edit host_permissions to an explicit allowlist of origins before deploying.",
   "minimum_chrome_version": "120",
@@ -34,6 +35,6 @@
     "default_path": "popup.html"
   },
   "action": {
-    "default_title": "Yu OS Agent"
+    "default_title": "Helium AI"
   }
 }

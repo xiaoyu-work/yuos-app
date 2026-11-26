@@ -366,6 +366,38 @@
           "recovery": "unknown"
         }
       ]
+    },
+    "assist": {
+      "label": {
+        "en": "Run the built-in Browser AI assistant with browser control tools"
+      },
+      "args": [
+        {
+          "name": "payload",
+          "kind": "text",
+          "required": true
+        }
+      ],
+      "needs": [
+        {
+          "verb": "ai.chat.untrusted",
+          "scope": {
+            "kind": "wild"
+          },
+          "why": {
+            "en": "Run the Browser App's built-in AI assistant on the current page and execute browser actions."
+          }
+        }
+      ],
+      "effects": [
+        {
+          "kind": "external",
+          "label": {
+            "en": "Request SDK AI processing under existing consent and budget"
+          },
+          "recovery": "unknown"
+        }
+      ]
     }
   },
   "schema_version": 2,
@@ -709,6 +741,39 @@
             "kind": "update",
             "label": {
               "en": "May record this App's successful result in its own Agent memory scope"
+            },
+            "recovery": "unknown"
+          }
+        ]
+      },
+      {
+        "name": "web.assist",
+        "summary": {
+          "en": "Run the built-in Browser AI assistant with browser control tools"
+        },
+        "args": [
+          {
+            "name": "payload",
+            "kind": "text",
+            "required": true
+          }
+        ],
+        "needs": [
+          {
+            "verb": "ai.chat.untrusted",
+            "scope": {
+              "kind": "wild"
+            },
+            "why": {
+              "en": "Run the Browser App's built-in AI assistant on the current page and execute browser actions."
+            }
+          }
+        ],
+        "effects": [
+          {
+            "kind": "external",
+            "label": {
+              "en": "Request SDK AI processing under existing consent and budget"
             },
             "recovery": "unknown"
           }
