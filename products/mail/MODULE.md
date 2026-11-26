@@ -46,6 +46,12 @@ yu activity attach-object ACTIVITY_ID --label "Source email" \
 
 ## Existing transport and packaging
 
+The Mail desktop package installs the Yu Mail AI XPI into the distribution's
+Thunderbird. The XPI owns the Assistant, options, and AI popups in
+`extension/ui/`; their shared styles live in `extension/lib/ui.css`.
+Thunderbird still owns the inbox, native compose window, and window controls.
+The checked-in `comm/` source build is not the desktop package's runtime.
+
 `sync` reads the extension's bounded native inbox-arrival journal without a
 model request. The first pass records a non-replaying baseline; subsequent
 passes publish `message.received` references before advancing the App-private

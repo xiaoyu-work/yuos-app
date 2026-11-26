@@ -1,39 +1,50 @@
-body.options-page {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 24px;
-}
-.options-page h1 { margin-top: 0; }
+.options-page { --options-gutter: max(16px, calc((100% - 1000px) / 2)); }
 
-.opt-card {
-  background: var(--yuos-panel);
-  border: 1px solid var(--yuos-border);
-  border-radius: var(--yuos-radius);
-  padding: 14px 16px;
-  margin: 12px 0;
+.options-content {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+  padding: 16px var(--options-gutter) 24px;
 }
-.opt-card h2 {
-  margin: 0 0 4px 0;
-  font-size: 14px;
+
+@media (max-width: 680px) {
+  .options-content { grid-template-columns: minmax(0, 1fr); gap: 20px; }
 }
+
+.opt-group + .opt-group { margin-block-start: 20px; }
+.opt-group h2 { margin-block-end: 4px; }
+.opt-group p { margin-block-end: 8px; }
 .opt-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 6px 0;
+  justify-content: space-between;
+  gap: 12px;
+  min-block-size: 38px;
+  padding-block: 4px;
+  border-block-end: 1px solid var(--yuos-border);
+}
+label.opt-row, .opt-row label {
+  margin: 0;
+  color: var(--yuos-text);
   font-size: 13px;
 }
+label.opt-row { cursor: pointer; }
+.opt-row :is(input[type="text"], select) { inline-size: min(42%, 160px); }
+.opt-row input[type="checkbox"] { flex: none; accent-color: var(--yuos-primary); }
 
 .save-bar {
   position: sticky;
-  bottom: 0;
+  inset-block-start: 0;
+  z-index: 1;
   background: var(--yuos-bg);
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
-  padding: 12px 0;
-  border-top: 1px solid var(--yuos-border);
-  justify-content: flex-end;
+  min-block-size: 52px;
+  padding: 8px var(--options-gutter);
+  border-block-end: 1px solid var(--yuos-border);
 }
+.save-bar h1 { margin: 0; margin-inline-end: auto; }
 
-#status-line { white-space: pre-wrap; }
+#status-line { white-space: pre-wrap; overflow-wrap: anywhere; }

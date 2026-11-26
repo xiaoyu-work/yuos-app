@@ -1,93 +1,89 @@
-/* yuos-mail-ai — shared popup / page styles.
- * Loaded by every HTML surface in the extension. Aim: visual coherence
- * with the yu perms emerald / amber / red palette (see
- * desktop/agent/web/docs/design-system.md). */
+/* Shared styles for Mail's Thunderbird extension pages and popups. */
 
 :root {
-  --yuos-bg:         #0b0f13;
-  --yuos-panel:      #131922;
-  --yuos-panel-2:    #1b2330;
-  --yuos-text:       #e6edf3;
-  --yuos-muted:      #94a3b8;
-  --yuos-border:     #2a3340;
-  --yuos-emerald:    #10b981;
-  --yuos-emerald-2:  #059669;
-  --yuos-amber:      #f59e0b;
-  --yuos-red:        #ef4444;
-  --yuos-blue:       #3b82f6;
-  --yuos-purple:     #a855f7;
-  --yuos-radius:     8px;
-  --yuos-shadow:     0 4px 18px rgba(0, 0, 0, .35);
+  color-scheme: light dark;
+  --yuos-bg:       #fff;
+  --yuos-panel-2:  #f1f3f6;
+  --yuos-text:     #1d1d1f;
+  --yuos-muted:    #64646c;
+  --yuos-border:   rgb(0 0 0 / .10);
+  --yuos-control:  #a5a8b0;
+  --yuos-accent:   #0066d8;
+  --yuos-primary:  #0066d8;
+  --yuos-primary-hover: #0059bd;
+  --yuos-ai:       #6044cb;
+  --yuos-emerald:  #08734d;
+  --yuos-amber:    #855600;
+  --yuos-red:      #aa2634;
+  --yuos-radius:   6px;
 }
 
-@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
   :root {
-    --yuos-bg:         #fafafa;
-    --yuos-panel:      #ffffff;
-    --yuos-panel-2:    #f3f4f6;
-    --yuos-text:       #111827;
-    --yuos-muted:      #6b7280;
-    --yuos-border:     #e5e7eb;
-    --yuos-shadow:     0 4px 18px rgba(0, 0, 0, .08);
+    --yuos-bg:      #202124;
+    --yuos-panel-2: #2e3035;
+    --yuos-text:    #f2f2f4;
+    --yuos-muted:   #aeb0b9;
+    --yuos-border:  rgb(255 255 255 / .13);
+    --yuos-control: #747983;
+    --yuos-accent:  #87bcff;
+    --yuos-ai:      #c0b2ff;
+    --yuos-emerald: #70dab5;
+    --yuos-amber:   #f7c872;
+    --yuos-red:     #ff9b9e;
   }
 }
 
+*, *::before, *::after { box-sizing: border-box; }
+
 html, body {
   margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-               "Helvetica Neue", Arial, sans-serif;
-  font-size: 13px;
-  line-height: 1.5;
+  font: 13px/1.45 -apple-system, "SF Pro Text", Inter, "Segoe UI Variable Text",
+        "Segoe UI", system-ui, sans-serif;
   background: var(--yuos-bg);
   color: var(--yuos-text);
 }
 
-body {
-  min-width: 360px;
-  padding: 14px;
-}
-
 h1, h2, h3 { margin: 0 0 10px 0; font-weight: 600; }
-h1 { font-size: 16px; }
-h2 { font-size: 14px; color: var(--yuos-muted); }
+h1 { font-size: 15px; }
+h2 { font-size: 13px; }
 h3 { font-size: 13px; }
 
 p { margin: 4px 0; }
 
 button {
-  background: var(--yuos-panel);
+  background: var(--yuos-bg);
   color: var(--yuos-text);
   border: 1px solid var(--yuos-border);
   border-radius: var(--yuos-radius);
-  padding: 6px 12px;
-  font-size: 13px;
+  min-block-size: 28px;
+  padding: 3px 10px;
+  font: inherit;
   cursor: pointer;
-  transition: background .12s ease, border-color .12s ease;
 }
 button:hover           { background: var(--yuos-panel-2); }
 button:disabled        { opacity: .5; cursor: not-allowed; }
 button.primary         {
-  background: var(--yuos-emerald);
-  border-color: var(--yuos-emerald-2);
+  background: var(--yuos-primary);
+  border-color: var(--yuos-primary);
   color: white;
 }
-button.primary:hover   { background: var(--yuos-emerald-2); }
-button.ghost           { background: transparent; }
+button.primary:hover   { background: var(--yuos-primary-hover); }
+button.ghost           { background: transparent; border-color: transparent; }
 button.ghost:hover     { background: var(--yuos-panel-2); }
+:focus-visible         { outline: 2px solid var(--yuos-accent); outline-offset: 2px; }
 
-select, input[type=text], input[type=search], textarea {
-  background: var(--yuos-panel);
+select, input[type="text"], input[type="search"], textarea {
+  background: var(--yuos-bg);
   color: var(--yuos-text);
-  border: 1px solid var(--yuos-border);
+  border: 1px solid var(--yuos-control);
   border-radius: var(--yuos-radius);
-  padding: 6px 8px;
-  font-size: 13px;
-  font-family: inherit;
-  width: 100%;
-  box-sizing: border-box;
+  padding: 4px 8px;
+  font: inherit;
+  inline-size: 100%;
+  min-inline-size: 0;
 }
-textarea { resize: vertical; min-height: 80px; }
+textarea { display: block; resize: vertical; }
 
 label {
   display: block;
@@ -102,16 +98,31 @@ hr {
   margin: 12px 0;
 }
 
-.row { display: flex; gap: 8px; align-items: center; }
-.row > * { flex: 0 0 auto; }
-.row .grow { flex: 1 1 auto; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.row select { inline-size: auto; }
+.row .grow { flex: 1 1 0; }
+
+.popup {
+  padding: 12px 14px;
+  overflow-wrap: anywhere;
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-block-end: 10px;
+  padding-block-end: 6px;
+  border-block-end: 1px solid var(--yuos-border);
+}
+.popup-header h1 { margin: 0; }
+.icon-button { flex: none; inline-size: 28px; padding: 0; line-height: 1; }
+.icon-button svg { display: block; margin: auto; }
 
 .card {
-  background: var(--yuos-panel);
-  border: 1px solid var(--yuos-border);
-  border-radius: var(--yuos-radius);
-  padding: 10px 12px;
-  margin: 8px 0;
+  border-block-start: 1px solid var(--yuos-border);
+  padding-block: 10px;
 }
 
 .bullet-list { margin: 4px 0 0 16px; padding: 0; }
@@ -126,11 +137,11 @@ hr {
   border: 1px solid var(--yuos-border);
   margin-right: 4px;
 }
-.tag.emerald { background: rgba(16,185,129,.15);  border-color: var(--yuos-emerald); color: var(--yuos-emerald); }
-.tag.amber   { background: rgba(245,158,11,.15);  border-color: var(--yuos-amber);   color: var(--yuos-amber); }
-.tag.red     { background: rgba(239,68,68,.15);   border-color: var(--yuos-red);     color: var(--yuos-red); }
-.tag.blue    { background: rgba(59,130,246,.15);  border-color: var(--yuos-blue);    color: var(--yuos-blue); }
-.tag.purple  { background: rgba(168,85,247,.15);  border-color: var(--yuos-purple);  color: var(--yuos-purple); }
+.tag.emerald { border-color: var(--yuos-emerald); color: var(--yuos-emerald); }
+.tag.amber   { border-color: var(--yuos-amber);   color: var(--yuos-amber); }
+.tag.red     { border-color: var(--yuos-red);     color: var(--yuos-red); }
+.tag.blue    { border-color: var(--yuos-accent);  color: var(--yuos-accent); }
+.tag.purple  { border-color: var(--yuos-ai);      color: var(--yuos-ai); }
 .tag.muted   { color: var(--yuos-muted); }
 
 .muted { color: var(--yuos-muted); font-size: 12px; }
@@ -143,17 +154,16 @@ hr {
   width: 14px;
   height: 14px;
   border: 2px solid var(--yuos-border);
-  border-top-color: var(--yuos-emerald);
+  border-top-color: var(--yuos-ai);
   border-radius: 50%;
   animation: yuos-spin .8s linear infinite;
 }
 @keyframes yuos-spin { to { transform: rotate(360deg); } }
 
 .error {
-  background: rgba(239,68,68,.08);
-  border: 1px solid rgba(239,68,68,.4);
-  border-radius: var(--yuos-radius);
-  padding: 10px 12px;
+  border-inline-start: 2px solid var(--yuos-red);
+  padding: 6px 10px;
+  overflow-wrap: anywhere;
 }
 .error pre {
   white-space: pre-wrap;
@@ -163,30 +173,39 @@ hr {
   color: var(--yuos-muted);
 }
 
-.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--yuos-border); }
-.tab {
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  border-radius: 0;
-  color: var(--yuos-muted);
-  padding: 6px 10px;
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 8px;
+  background: var(--yuos-panel-2);
 }
-.tab.active {
-  color: var(--yuos-text);
-  border-bottom-color: var(--yuos-emerald);
+.tab {
+  flex: 1;
+  background: transparent;
+  color: var(--yuos-muted);
+  border-color: transparent;
+  padding: 3px 10px;
+}
+.tab.active, .tab.active:hover {
+  background: var(--yuos-bg);
+  color: var(--yuos-accent);
+  border-color: var(--yuos-border);
 }
 
 .footer-row {
-  margin-top: 12px;
+  border-block-start: 1px solid var(--yuos-border);
+  padding-block-start: 8px;
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   justify-content: flex-end;
 }
 
-.usage-line {
-  margin-top: 8px;
+.usage-line:not(:empty) {
+  margin-block-start: 8px;
   font-size: 11px;
   color: var(--yuos-muted);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  overflow-wrap: anywhere;
 }

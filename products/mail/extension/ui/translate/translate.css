@@ -1,10 +1,10 @@
-.translate-popup { width: 440px; }
+.translate-popup { inline-size: min(360px, 100%); }
+.translate-popup .row > label { margin: 0; }
+#source { min-block-size: 64px; }
 
 .translation {
-  background: var(--yuos-panel);
-  border: 1px solid var(--yuos-border);
-  border-radius: var(--yuos-radius);
-  padding: 10px 12px;
-  margin: 10px 0 0 0;
+  border-inline-start: 2px solid var(--yuos-ai);
+  padding: 4px 10px;
+  margin-block-start: 10px;
   white-space: pre-wrap;
 }

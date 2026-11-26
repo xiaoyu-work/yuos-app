@@ -1,20 +1,20 @@
 /* Compose popup. */
 
-.compose-popup     { width: 480px; }
-.panel             { padding-top: 10px; }
+/* Thunderbird sizes toolbar popups from their content's intrinsic width. */
+.compose-popup { inline-size: 460px; }
+.panel { padding-block-start: 4px; }
+.panel .row > label { margin: 0; }
+.panel :is(input, textarea) { background: var(--yuos-panel-2); }
 
 .suggestion {
-  background: var(--yuos-panel);
-  border: 1px solid var(--yuos-border);
-  border-radius: var(--yuos-radius);
-  padding: 10px 12px;
-  margin: 8px 0;
+  border-block-start: 1px solid var(--yuos-border);
+  padding-block: 10px;
 }
+.suggestion:first-child { margin-block-start: 12px; }
 .suggestion .style-tag {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: .5px;
-  color: var(--yuos-muted);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--yuos-ai);
   margin-bottom: 4px;
 }
 .suggestion .body {
@@ -25,16 +25,15 @@
 .suggestion .actions {
   margin-top: 8px;
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   justify-content: flex-end;
 }
 
 .compose-output {
-  background: var(--yuos-panel);
-  border: 1px solid var(--yuos-border);
-  border-radius: var(--yuos-radius);
-  padding: 10px 12px;
-  margin: 10px 0 0 0;
+  border-inline-start: 2px solid var(--yuos-ai);
+  padding: 4px 10px;
+  margin-block-start: 12px;
   white-space: pre-wrap;
 }
 .compose-subject {
@@ -44,6 +43,7 @@
 .compose-actions {
   margin-top: 10px;
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   justify-content: flex-end;
 }

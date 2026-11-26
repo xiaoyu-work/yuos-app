@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="composeAction.css">
   <title data-i18n="compose_title">Compose AI</title>
 </head>
-<body class="compose-popup">
+<body class="popup compose-popup">
 
   <div class="tabs">
     <button class="tab active" data-mode="reply"   data-i18n="tab_smart_reply">Smart Reply</button>
@@ -16,7 +16,7 @@
   <!-- ================= Smart Reply panel ================= -->
   <section id="panel-reply" class="panel">
 
-    <label data-i18n="label_intent">Optional hint (what you want to say)</label>
+    <label for="reply-intent" data-i18n="label_intent">Optional hint (what you want to say)</label>
     <input type="text" id="reply-intent" data-i18n-placeholder="ph_reply_intent" placeholder="e.g. decline politely">
 
     <div class="row" style="margin-top: 8px;">
@@ -33,12 +33,12 @@
   <!-- ================= Smart Compose panel ================= -->
   <section id="panel-compose" class="panel" style="display: none;">
 
-    <label data-i18n="label_intent_compose">What do you want to say?</label>
-    <textarea id="compose-intent" data-i18n-placeholder="ph_compose_intent"
+    <label for="compose-intent" data-i18n="label_intent_compose">What do you want to say?</label>
+    <textarea id="compose-intent" rows="3" data-i18n-placeholder="ph_compose_intent"
               placeholder="e.g. confirm the meeting on Friday at 3pm, and ask for the agenda"></textarea>
 
     <div class="row" style="margin-top: 8px;">
-      <label style="margin: 0 4px 0 0;" data-i18n="label_style">Style</label>
+      <label for="compose-style" data-i18n="label_style">Style</label>
       <select id="compose-style">
         <option value="formal" data-i18n="style_formal">Formal</option>
         <option value="casual" data-i18n="style_casual">Casual</option>

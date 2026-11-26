@@ -9,8 +9,10 @@
 <body class="assistant-page">
 
   <header class="assistant-header">
-    <h1 data-i18n="assistant_title">Mail Assistant</h1>
-    <div class="grow"></div>
+    <h1>
+      <img src="../../icons/icon.svg" alt="" width="16" height="16">
+      <span data-i18n="assistant_title">Mail Assistant</span>
+    </h1>
     <button class="ghost" id="btn-clear" data-i18n="action_clear_history">Clear history</button>
     <button class="ghost" id="btn-options" data-i18n="action_options">Options</button>
   </header>
@@ -18,7 +20,8 @@
   <main id="messages" class="messages"></main>
 
   <footer class="composer">
-    <textarea id="input" rows="2" data-i18n-placeholder="ph_assistant_input"></textarea>
+    <textarea id="input" rows="2" data-i18n-placeholder="ph_assistant_input"
+              data-i18n-title="ph_assistant_input"></textarea>
     <button class="primary" id="btn-send" data-i18n="action_send">Send</button>
   </footer>
 

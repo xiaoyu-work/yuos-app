@@ -1,23 +1,21 @@
 /* Summarize popup — small overrides on top of lib/ui.css. */
 
-.summarize-popup        { width: 420px; }
+.summarize-popup { inline-size: 420px; }
 
-.summary-text           { font-size: 14px; font-weight: 500; }
-.section-label          {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: .5px;
+.summary-text { font-weight: 600; }
+.section-label {
+  font-size: 12px;
+  font-weight: 600;
   color: var(--yuos-muted);
-  margin-top: 10px;
 }
 
 .action-item {
   display: flex;
   gap: 6px;
   padding: 4px 0;
-  border-top: 1px dashed var(--yuos-border);
+  border-block-start: 1px solid var(--yuos-border);
 }
-.action-item:first-child { border-top: none; }
+.action-item:first-child { border-block-start: 0; }
 .action-item .check {
   flex: 0 0 14px;
   height: 14px;
