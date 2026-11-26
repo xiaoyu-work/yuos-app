@@ -1,34 +1,129 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Clipboard</title><link rel="stylesheet" href="shared/ui.css"></head><body>
-<header><div><h1 id="title">Clipboard</h1><p data-app-label>Selection access and native history keep separate grants</p></div></header>
-<main class="stack"><p id="notice" class="notice" role="status" aria-live="polite"></p>
-<div id="selection-workspace" class="stack" hidden>
-<section class="card stack"><h2>Choose a selection</h2><p>No clipboard contents are read on page load or selection. Primary selection is opt-in. Read and write permissions are independent.</p>
-<label>Selection<select id="selection"><option value="clipboard">Clipboard selection</option><option value="primary">Primary selection</option></select></label>
-<label>MIME type (optional; blank keeps the OS default)<input id="mime" placeholder="text/plain;charset=utf-8" maxlength="255" autocomplete="off"></label>
-<div class="toolbar"><button id="status">Inspect selection status</button><button id="load-types">Load available formats</button><button id="read" class="primary">Read content explicitly</button></div>
-<div id="types" class="toolbar"><p class="muted">Formats are not loaded. Choosing a format does not read it.</p></div></section>
-<section class="card stack"><div class="row"><h2 id="content-label">Private content preview</h2><button id="hide-content">Hide local preview</button></div>
-<p>Text is shown safely, never interpreted as HTML. Hiding this preview does not clear the system selection.</p>
-<pre id="content">No selection content is displayed.</pre></section>
-<section class="card stack"><h2>Replace selection from a file</h2><p>Needs clipboard.write:selection and exact source-file read permission. There is no browser clipboard bridge, arbitrary text write or history permission fallback.</p>
-<form id="write-form"><label>Canonical source file<input id="source" required placeholder="/home/user/clip.txt" autocomplete="off"></label>
-<button type="submit">Review source-file write...</button></form>
-<div class="toolbar"><button id="clear" class="danger">Clear selected selection...</button></div></section>
-<section class="card stack"><h2 id="result-title">Clipboard evidence</h2><div id="result"><p class="muted">No service request has been made.</p></div></section></div>
-<div id="native-history" class="stack" hidden>
-<section class="card stack"><h2>Existing CopyQ history</h2>
-<p>History is loaded only when you request it. Read uses clipboard.read:history, not selection access. This entry calls only its own history tools; it never borrows Clipboard Manager grants or the browser clipboard.</p>
-<div class="toolbar"><button id="history-load" class="primary">Load history explicitly</button><button id="history-hide">Hide local previews</button></div>
-<p id="history-state" class="muted">History has not been loaded. Missing CopyQ or OS service is reported as unavailable, never as sample or empty history.</p>
-<div id="history-items" class="stack"><p class="muted">No service request has been made.</p></div></section>
-<section class="card stack"><h2>Selected history preview</h2><p>Selecting an already loaded preview does not read the live selection or fetch more content. Previews are plain text, at most 180 characters plus truncation.</p>
-<pre id="history-preview">No history item selected.</pre><p id="history-time" class="muted">Copy time not reported.</p><code id="history-identity"></code>
-<div class="toolbar"><button id="history-restore" disabled>Review restore to live clipboard...</button><button id="history-remove" class="danger" disabled>Review delete item...</button></div>
-<p>Restore separately requires clipboard.write:selection. A missing grant is a denial, not a reason to run CopyQ directly. Item identities are rechecked by the OS, not interpreted as row numbers.</p></section>
-<section class="card stack"><h2>Clear history</h2><p>Clear needs only clipboard.write:history and explicit confirmation. It does not grant selection read or write, and no undo is promised.</p>
-<button id="history-clear" class="danger">Review clear history...</button></section>
-<section class="card stack"><h2>History action response</h2><div id="history-result"><p class="muted">No history action has been requested.</p></div></section>
-</div></main>
-<script src="shared/client.js"></script><script src="shared/ui.js"></script><script src="app.js"></script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Clipboard</title>
+  <link rel="stylesheet" href="shared/ui.css">
+  <link rel="stylesheet" href="clipboard.css">
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" class="symbols" aria-hidden="true">
+  <symbol id="icon-clipboard" viewBox="0 0 16 16"><path d="M5 3H3v11h10V3h-2M5 2h6v3H5z"/></symbol>
+  <symbol id="icon-history" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 4.5V8l2 1.5"/></symbol>
+  <symbol id="icon-selection" viewBox="0 0 16 16"><path d="M2 4h12M2 8h12M2 12h8"/></symbol>
+  <symbol id="icon-load" viewBox="0 0 16 16"><path d="M8 2v8M5 7l3 3 3-3M3 13h10"/></symbol>
+  <symbol id="icon-hide" viewBox="0 0 16 16"><path d="M1.5 8s2.5-4 6.5-4 6.5 4 6.5 4-2.5 4-6.5 4-6.5-4-6.5-4zM2 14 14 2"/></symbol>
+  <symbol id="icon-refresh" viewBox="0 0 16 16"><path d="M13 5V2.5M13 5h-2.5M13 5a5.2 5.2 0 1 0 .2 5.5"/></symbol>
+  <symbol id="icon-delete" viewBox="0 0 16 16"><path d="M2.5 4h11M6 4V2h4v2M4 4l.8 10h6.4L12 4M7 6.5v5m2-5v5"/></symbol>
+  <symbol id="icon-restore" viewBox="0 0 16 16"><path d="M6 3 2.5 6.5 6 10M2.5 6.5H10a3.5 3.5 0 0 1 3.5 3.5v2"/></symbol>
+  <symbol id="icon-info" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 7.5v3.2m0-5.4h.01"/></symbol>
+  <symbol id="icon-lock" viewBox="0 0 16 16"><rect x="4" y="7" width="8" height="6.5" rx="1"/><path d="M5.5 7V5a2.5 2.5 0 1 1 5 0v2"/></symbol>
+</svg>
+<div class="clipboard-shell">
+  <aside class="sidebar" aria-label="Clipboard workspace">
+    <div class="brand"><svg class="icon"><use href="#icon-clipboard"/></svg> <span data-zh="剪贴板">Clipboard</span></div>
+    <nav id="selection-nav" aria-label="Selection" hidden>
+      <h2 data-zh="选区">Selection</h2>
+      <button type="button" id="nav-clipboard" aria-current="true"><svg class="icon"><use href="#icon-clipboard"/></svg> <span data-zh="剪贴板选区">Clipboard selection</span></button>
+      <button type="button" id="nav-primary"><svg class="icon"><use href="#icon-selection"/></svg> <span data-zh="主选区">Primary selection</span> <small data-zh="需开启">opt-in</small></button>
+    </nav>
+    <div id="history-nav" hidden>
+      <h2 data-zh="历史">History</h2>
+      <div class="sidebar-current" aria-current="page"><svg class="icon"><use href="#icon-history"/></svg> <span data-zh="CopyQ 历史">CopyQ history</span></div>
+    </div>
+    <p class="app-label" data-app-label></p>
+  </aside>
+  <main>
+    <header class="window-toolbar">
+      <h1 id="title" data-zh="剪贴板">Clipboard</h1>
+      <div id="selection-actions" class="toolbar" hidden>
+        <button id="status" type="button"><svg class="icon"><use href="#icon-info"/></svg><span data-zh="检查状态">Inspect status</span></button>
+        <button id="load-types" type="button"><svg class="icon"><use href="#icon-selection"/></svg><span data-zh="载入格式">Load formats</span></button>
+        <button id="read" class="primary" type="button"><svg class="icon"><use href="#icon-hide"/></svg><span data-zh="读取内容">Read content</span></button>
+      </div>
+      <div id="history-actions" class="toolbar" hidden>
+        <button id="history-load" type="button"><svg class="icon"><use href="#icon-load"/></svg><span data-zh="载入历史">Load history</span></button>
+        <button id="history-hide" type="button"><svg class="icon"><use href="#icon-hide"/></svg><span data-zh="隐藏预览">Hide previews</span></button>
+        <button id="history-refresh" type="button"><svg class="icon"><use href="#icon-refresh"/></svg><span data-zh="刷新">Refresh</span></button>
+        <button id="history-clear" class="danger" type="button"><svg class="icon"><use href="#icon-delete"/></svg><span data-zh="清空历史…">Clear history...</span></button>
+      </div>
+    </header>
+    <p id="notice" class="notice" role="status" aria-live="polite"></p>
+    <div id="selection-workspace" class="selection-grid" hidden>
+      <section>
+        <h2 data-zh="选区">Selection</h2>
+        <fieldset class="selection-switch">
+          <legend class="sr-only" data-zh="选区">Selection</legend>
+          <label><input type="radio" name="selection" id="selection-clipboard" value="clipboard" checked><span data-zh="剪贴板选区">Clipboard selection</span></label>
+          <label><input type="radio" name="selection" id="selection-primary" value="primary"><span data-zh="主选区">Primary selection</span></label>
+        </fieldset>
+        <label class="field"><span data-zh="MIME 类型">MIME type</span><input id="mime" placeholder="Optional · e.g. text/plain" data-zh-placeholder="可选 · 例如 text/plain" maxlength="255" autocomplete="off"></label>
+      </section>
+      <section>
+        <h2 data-zh="格式">Formats</h2>
+        <div id="types" class="toolbar formats"><p class="muted" data-zh="尚未载入格式。选择格式不会读取内容。">Formats are not loaded. Choosing a format does not read it.</p></div>
+      </section>
+      <section class="preview full-width">
+        <div class="section-heading">
+          <h2><svg class="icon"><use href="#icon-lock"/></svg> <span data-zh="私密内容预览">Private content preview</span></h2>
+          <button id="hide-content" type="button"><svg class="icon"><use href="#icon-hide"/></svg><span data-zh="隐藏本地预览">Hide local preview</span></button>
+        </div>
+        <p id="content-label" class="muted" data-zh="预览仅显示纯文本。隐藏预览不会清除系统选区。">Preview is plain text. Hiding it does not clear the system selection.</p>
+        <pre id="content" data-zh="未显示选区内容。">No selection content is displayed.</pre>
+      </section>
+      <section>
+        <h2 data-zh="用源文件替换">Replace from source file</h2>
+        <form id="write-form">
+          <label class="field"><span data-zh="源文件">Source file</span><input id="source" required placeholder="/home/user/clip.txt" autocomplete="off"></label>
+          <button type="submit" data-zh="检查写入…">Review write...</button>
+        </form>
+        <p class="muted" data-zh="需要选区写入和该源文件的读取权限。">Requires selection write and read access to the exact source file.</p>
+      </section>
+      <section>
+        <h2 data-zh="清除选区">Clear selection</h2>
+        <p class="muted" data-zh="只清除所选 Wayland 选区，不影响 CopyQ 历史。">Clears only the selected Wayland selection, not CopyQ history.</p>
+        <button id="clear" class="danger" type="button"><svg class="icon"><use href="#icon-delete"/></svg><span data-zh="清除选区…">Clear selection...</span></button>
+      </section>
+      <section>
+        <h2 id="result-title" data-zh="剪贴板凭据">Clipboard evidence</h2>
+        <div id="result"><p class="muted" data-zh="尚未发起服务请求。">No service request has been made.</p></div>
+      </section>
+      <section>
+        <h2 data-zh="权限">Permissions</h2>
+        <p class="privacy"><svg class="icon"><use href="#icon-lock"/></svg><span data-zh="读取和写入分别授权。在选择「读取内容」之前不会读取任何内容。主选区需要主动选择。">Reading and writing are authorized independently. Nothing is read until you choose Read content. Primary selection is opt-in.</span></p>
+      </section>
+    </div>
+    <div id="native-history" class="history-grid" hidden>
+      <section class="history-list" aria-label="CopyQ history items">
+        <p id="history-state" class="list-caption" role="status" data-zh="最近 20 条文本预览 · 每条最多 180 字">20 most recent text previews · up to 180 characters</p>
+        <div id="history-items" class="history-items">
+          <p class="list-message" data-zh="尚未载入。请选择「载入历史」查看预览。">History has not been loaded. Choose Load history to view previews.</p>
+        </div>
+        <p class="privacy history-privacy"><svg class="icon"><use href="#icon-lock"/></svg><span data-zh="历史由现有的 CopyQ 服务提供，Yu OS 不会另行启动收集器。">History is provided by the existing CopyQ service. Yu OS does not start another collector.</span></p>
+      </section>
+      <aside class="history-details" aria-labelledby="preview-title">
+        <h2 id="preview-title" data-zh="所选预览">Selected preview</h2>
+        <pre id="history-preview" data-zh="未选择历史条目。">No history item selected.</pre>
+        <dl class="detail-grid">
+          <dt data-zh="复制时间">Copied</dt><dd id="history-time" data-zh="未报告复制时间。">Copy time not reported.</dd>
+          <dt data-zh="标识">Identity</dt><dd><code id="history-identity"></code></dd>
+        </dl>
+        <div class="toolbar">
+          <button id="history-restore" class="primary" type="button" disabled><svg class="icon"><use href="#icon-restore"/></svg><span data-zh="恢复到剪贴板…">Restore to clipboard...</span></button>
+          <button id="history-remove" class="danger" type="button" disabled><svg class="icon"><use href="#icon-delete"/></svg><span data-zh="删除此条…">Delete item...</span></button>
+        </div>
+        <p class="privacy"><svg class="icon"><use href="#icon-info"/></svg><span data-zh="这是快照，可能已过期。操作前请先刷新。">This is a snapshot and can become stale. Refresh before acting.</span></p>
+        <section class="history-response">
+          <h2 data-zh="操作响应">History action response</h2>
+          <div id="history-result"><p class="muted" data-zh="尚未请求历史操作。">No history action has been requested.</p></div>
+        </section>
+      </aside>
+    </div>
+  </main>
+</div>
+<script src="shared/client.js"></script>
+<script src="shared/ui.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

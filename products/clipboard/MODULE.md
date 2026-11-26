@@ -18,6 +18,12 @@ native `panel-clipboard` presentation, MCP service and Web history workflow.
 | `PROVENANCE.md`, `native/LICENSE` | Source origin and preserved GPL terms |
 | `package.json` | Product-owned staging and test inputs |
 
+The Web views use a compact selection workspace or a CopyQ list and preview,
+depending on the owning App identity. They do not switch between identities;
+window controls are supplied by the Host. The native panel keeps its
+open-to-load behavior and shows restore/delete controls for the selected
+history entry. Choosing an already loaded preview makes no service request.
+
 Preserve installed identity and separate `clipboard.read:selection` from
 `clipboard.write:selection`. Write additionally needs `fs.read` for its exact
 canonical source path. Clear requires exact true confirmation. The primary

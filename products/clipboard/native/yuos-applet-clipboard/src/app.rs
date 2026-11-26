@@ -1,22 +1,22 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use crate::{
+    HistoryPermission, HistoryPolicy,
     copyq::{self, ClipboardEntry},
     fl,
-    HistoryPermission, HistoryPolicy,
 };
 use cosmic::{
     Element, Task, app,
-    applet::padded_control,
-    cosmic_theme::{Spacing, palette::WithAlpha},
+    cosmic_theme::palette::WithAlpha,
     iced::{
-        Alignment, Background, Border, Color, Length, Shadow, Vector,
+        Alignment, Background, Border, Length,
+        core::text::{Ellipsize, EllipsizeHeightLimit},
         platform_specific::shell::wayland::commands::{
             layer_surface::{Anchor, KeyboardInteractivity, Layer, get_layer_surface},
             popup::{destroy_popup, get_popup},
         },
         runtime::platform_specific::wayland::layer_surface::SctkLayerSurfaceSettings,
-        widget::{column, container, row, scrollable},
+        widget::{column, container, opaque, row, scrollable, stack},
         window,
     },
     surface, theme,
@@ -35,6 +35,7 @@ pub struct ClipboardApplet {
     core: cosmic::app::Core,
     popup: Option<window::Id>,
     history: HistoryState,
+    selected: Option<usize>,
     confirm_clear: bool,
     notice: Option<String>,
     refresh_generation: u64,
@@ -48,6 +49,7 @@ pub enum Message {
     CloseRequested(window::Id),
     Refresh,
     Loaded(u64, Result<Vec<ClipboardEntry>, String>),
+    Select(usize),
     Restore(String),
     Delete(String),
     AskClear,
@@ -71,7 +73,10 @@ impl cosmic::Application for ClipboardApplet {
 
     const APP_ID: &'static str = "com.yuos.AppletClipboard";
 
-    fn init(mut core: cosmic::app::Core, policy: Option<HistoryPolicy>) -> (Self, app::Task<Message>) {
+    fn init(
+        mut core: cosmic::app::Core,
+        policy: Option<HistoryPolicy>,
+    ) -> (Self, app::Task<Message>) {
         let (width, height) = core.applet.suggested_window_size();
         let panel = SctkLayerSurfaceSettings {
             id: window::Id::RESERVED,
@@ -93,6 +98,7 @@ impl cosmic::Application for ClipboardApplet {
                 core,
                 popup: None,
                 history: HistoryState::Ready(Vec::new()),
+                selected: None,
                 confirm_clear: false,
                 notice: None,
                 refresh_generation: 0,
@@ -138,7 +144,10 @@ impl cosmic::Application for ClipboardApplet {
                         None,
                         None,
                     );
-                    Task::batch([get_popup(settings), refresh(self.refresh_generation, self.policy)])
+                    Task::batch([
+                        get_popup(settings),
+                        refresh(self.refresh_generation, self.policy),
+                    ])
                 }
             }
             Message::CloseRequested(id) => {
@@ -153,6 +162,7 @@ impl cosmic::Application for ClipboardApplet {
                     return Task::none();
                 }
                 self.history = HistoryState::Loading;
+                self.selected = None;
                 self.confirm_clear = false;
                 self.notice = None;
                 self.busy = true;
@@ -174,6 +184,15 @@ impl cosmic::Application for ClipboardApplet {
                 };
                 Task::none()
             }
+            Message::Select(index) => {
+                if !self.busy
+                    && !self.confirm_clear
+                    && matches!(&self.history, HistoryState::Ready(entries) if index < entries.len())
+                {
+                    self.selected = Some(index);
+                }
+                Task::none()
+            }
             Message::Restore(identity) => {
                 if self.busy || self.popup.is_none() {
                     return Task::none();
@@ -181,7 +200,11 @@ impl cosmic::Application for ClipboardApplet {
                 self.busy = true;
                 self.notice = None;
                 self.refresh_generation = self.refresh_generation.wrapping_add(1);
-                action(self.refresh_generation, Action::Restore, restore(self.policy, identity))
+                action(
+                    self.refresh_generation,
+                    Action::Restore,
+                    restore(self.policy, identity),
+                )
             }
             Message::Delete(identity) => {
                 if self.busy || self.popup.is_none() {
@@ -190,7 +213,11 @@ impl cosmic::Application for ClipboardApplet {
                 self.busy = true;
                 self.notice = None;
                 self.refresh_generation = self.refresh_generation.wrapping_add(1);
-                action(self.refresh_generation, Action::Delete, remove(self.policy, identity))
+                action(
+                    self.refresh_generation,
+                    Action::Delete,
+                    remove(self.policy, identity),
+                )
             }
             Message::AskClear => {
                 if !self.busy {
@@ -231,6 +258,7 @@ impl cosmic::Application for ClipboardApplet {
                             Task::none()
                         } else {
                             self.history = HistoryState::Loading;
+                            self.selected = None;
                             self.refresh_generation = self.refresh_generation.wrapping_add(1);
                             refresh(self.refresh_generation, self.policy)
                         }
@@ -268,82 +296,102 @@ impl cosmic::Application for ClipboardApplet {
     }
 
     fn view_window(&self, _id: window::Id) -> Element<'_, Message> {
-        let Spacing {
-            space_xxs,
-            space_xs,
-            space_s,
-            ..
-        } = theme::active().cosmic().spacing;
-
-        let header = padded_control(
+        let enabled = !self.busy && !self.confirm_clear;
+        let header = container(
             row![
-                column![
-                    text(fl!("title")).size(16),
-                    text(fl!("privacy-note")).size(10).width(Length::Fill),
-                ]
-                .spacing(2)
-                .width(Length::Fill),
-                button::icon(icon::from_name("view-refresh-symbolic"))
-                    .on_press_maybe((!self.busy).then_some(Message::Refresh)),
+                icon::from_name("edit-paste-symbolic")
+                    .size(16)
+                    .symbolic(true),
+                text(format!("{} · CopyQ", fl!("title")))
+                    .font(cosmic::font::semibold())
+                    .size(15)
+                    .width(Length::Fill),
+                action_button("view-refresh-symbolic", fl!("refresh"))
+                    .class(theme::Button::Icon)
+                    .on_press_maybe(enabled.then_some(Message::Refresh)),
             ]
-            .spacing(space_xs)
+            .spacing(8)
             .align_y(Alignment::Center),
         )
-        .padding([space_xs, space_s]);
+        .padding([8, 12])
+        .width(Length::Fill);
 
-        let body: Element<'_, Message> = if self.confirm_clear {
-            confirmation(space_xs, space_s, self.busy)
-        } else {
-            match &self.history {
-                HistoryState::Loading => state_row("process-working-symbolic", fl!("loading")),
-                HistoryState::Ready(entries) if entries.is_empty() => {
-                    state_row("edit-paste-symbolic", fl!("empty"))
-                }
-                HistoryState::Ready(entries) => {
-                    let mut list = column![].spacing(space_xs);
-                    for entry in entries {
-                        list = list.push(entry_card(entry, self.busy));
-                    }
-                    scrollable(list)
-                        .height(Length::Fixed(440.0))
-                        .width(Length::Fill)
-                        .into()
-                }
-                HistoryState::Unavailable(error) => state_row(
-                    "dialog-warning-symbolic",
-                    format!("{}: {error}", fl!("unavailable")),
-                ),
+        let body: Element<'_, Message> = match &self.history {
+            HistoryState::Loading => state_row("process-working-symbolic", fl!("loading"), None),
+            HistoryState::Ready(entries) if entries.is_empty() => {
+                state_row("edit-paste-symbolic", fl!("empty"), None)
             }
+            HistoryState::Ready(entries) => {
+                let mut list = column![].spacing(2);
+                for (index, entry) in entries.iter().enumerate() {
+                    list = list.push(history_row(
+                        index,
+                        entry,
+                        self.selected == Some(index),
+                        enabled,
+                    ));
+                }
+                let detail = match self.selected.and_then(|index| entries.get(index)) {
+                    Some(entry) => selected_detail(entry, enabled),
+                    None => container(text(fl!("select-entry")).size(12))
+                        .padding([10, 12])
+                        .into(),
+                };
+                column![
+                    container(
+                        scrollable(list)
+                            .height(Length::Fixed(290.0))
+                            .width(Length::Fill)
+                    )
+                    .padding([4, 6]),
+                    divider::horizontal::light(),
+                    detail,
+                    divider::horizontal::light(),
+                    container(
+                        destructive_action(fl!("clear-all"))
+                            .on_press_maybe(enabled.then_some(Message::AskClear)),
+                    )
+                    .padding([4, 6]),
+                ]
+                .width(Length::Fill)
+                .into()
+            }
+            HistoryState::Unavailable(error) => state_row(
+                "dialog-warning-symbolic",
+                fl!("unavailable"),
+                Some(error.as_str()),
+            ),
         };
 
-        let mut content = column![
-            header,
-            padded_control(divider::horizontal::default()).padding([0, space_s]),
-            container(body)
-                .padding([space_xs, space_s])
-                .width(Length::Fill),
-        ]
-        .spacing(space_xxs);
+        let mut content = column![header, divider::horizontal::light(), body,].width(Length::Fill);
         if let Some(notice) = &self.notice {
             content = content.push(
-                container(text(notice).size(11))
-                    .padding([space_xs, space_s])
+                container(text(notice).size(12))
+                    .padding([6, 12])
                     .width(Length::Fill),
             );
         }
-        if matches!(&self.history, HistoryState::Ready(entries) if !entries.is_empty())
-            && !self.confirm_clear
-        {
-            content = content.push(
-                padded_control(
-                    button::destructive(fl!("clear-all"))
-                        .on_press_maybe((!self.busy).then_some(Message::AskClear)),
-                )
-                .padding([0, space_s, space_s, space_s]),
-            );
-        }
+        content = content.push(divider::horizontal::light()).push(
+            container(muted_text(fl!("privacy-note"), 11))
+                .padding([8, 12])
+                .width(Length::Fill),
+        );
 
-        self.core.applet.popup_container(content).into()
+        let panel: Element<'_, Message> = if self.confirm_clear {
+            stack![content, confirmation(self.busy)].into()
+        } else {
+            content.into()
+        };
+        self.core
+            .applet
+            .popup_container(panel)
+            .limits(
+                cosmic::iced::core::layout::Limits::NONE
+                    .min_width(380.0)
+                    .max_width(380.0)
+                    .max_height(600.0),
+            )
+            .into()
     }
 
     fn on_close_requested(&self, id: window::Id) -> Option<Message> {
@@ -354,6 +402,7 @@ impl cosmic::Application for ClipboardApplet {
 impl ClipboardApplet {
     fn clear_popup_state(&mut self) {
         self.history = HistoryState::Ready(Vec::new());
+        self.selected = None;
         self.confirm_clear = false;
         self.notice = None;
         if !self.busy {
@@ -408,102 +457,188 @@ async fn clear(policy: Option<HistoryPolicy>) -> Result<(), String> {
     copyq::clear().await
 }
 
-fn entry_card(entry: &ClipboardEntry, busy: bool) -> Element<'_, Message> {
+fn action_button(icon_name: &'static str, label: String) -> button::Button<'static, Message> {
+    button::custom(
+        row![
+            icon::from_name(icon_name).size(14).symbolic(true),
+            text(label).size(13),
+        ]
+        .spacing(6)
+        .align_y(Alignment::Center),
+    )
+    .padding([4, 7])
+    .class(theme::Button::ListItem([6.0; 4]))
+}
+
+fn destructive_action(label: String) -> button::Button<'static, Message> {
+    button::custom(
+        row![
+            icon::from_name("edit-delete-symbolic")
+                .size(14)
+                .symbolic(true),
+            text(label).size(13).class(theme::Text::Custom(|theme| {
+                cosmic::iced::widget::text::Style {
+                    color: Some(theme.cosmic().destructive_text_color().into()),
+                }
+            })),
+        ]
+        .spacing(6)
+        .align_y(Alignment::Center),
+    )
+    .padding([4, 7])
+    .class(theme::Button::ListItem([6.0; 4]))
+}
+
+fn muted_text<'a>(
+    label: impl Into<std::borrow::Cow<'a, str>> + 'a,
+    size: u16,
+) -> cosmic::widget::Text<'a, cosmic::Theme, cosmic::Renderer> {
+    text(label).size(size).class(theme::Text::Custom(|theme| {
+        cosmic::iced::widget::text::Style {
+            color: Some(theme.cosmic().on_bg_color().with_alpha(0.74).into()),
+        }
+    }))
+}
+
+fn history_row(
+    index: usize,
+    entry: &ClipboardEntry,
+    selected: bool,
+    enabled: bool,
+) -> Element<'_, Message> {
     let age = entry
         .copied_at
         .as_deref()
         .map(format_age)
         .filter(|value| !value.is_empty());
-    let mut heading = row![text(entry.preview.clone()).size(12).width(Length::Fill)]
-        .spacing(8)
-        .align_y(Alignment::Start);
+    let preview = if entry.preview.trim().is_empty() {
+        fl!("blank-entry")
+    } else {
+        entry.preview.replace(['\n', '\r'], " ")
+    };
+    let mut heading = row![
+        text(preview)
+            .size(13)
+            .width(Length::Fill)
+            .ellipsize(Ellipsize::End(EllipsizeHeightLimit::Lines(1))),
+    ]
+    .spacing(8)
+    .align_y(Alignment::Center);
     if let Some(age) = age {
-        heading = heading.push(text(age).size(10));
+        heading = heading.push(
+            text(age)
+                .size(11)
+                .ellipsize(Ellipsize::End(EllipsizeHeightLimit::Lines(1))),
+        );
     }
+    let class = if selected {
+        theme::Button::Suggested
+    } else {
+        theme::Button::ListItem([6.0; 4])
+    };
+    button::custom(heading)
+        .class(class)
+        .width(Length::Fill)
+        .padding([5, 8])
+        .on_press_maybe(enabled.then_some(Message::Select(index)))
+        .into()
+}
 
+fn selected_detail(entry: &ClipboardEntry, enabled: bool) -> Element<'_, Message> {
+    let label = if let Some(time) = entry.copied_at.as_deref() {
+        format!("{} · {}", fl!("selected-preview"), format_age(time))
+    } else {
+        fl!("selected-preview")
+    };
     container(
         column![
-            heading,
+            muted_text(label, 11),
+            container(
+                scrollable(text(entry.preview.as_str()).size(13).width(Length::Fill))
+                    .width(Length::Fill),
+            )
+            .max_height(56),
             row![
-                button::text(fl!("restore"))
-                    .on_press_maybe((!busy).then(|| Message::Restore(entry.identity.clone()))),
-                space::horizontal().width(Length::Fill),
-                button::icon(icon::from_name("edit-delete-symbolic"))
-                    .on_press_maybe((!busy).then(|| Message::Delete(entry.identity.clone()))),
+                action_button("edit-paste-symbolic", fl!("restore"))
+                    .class(theme::Button::Suggested)
+                    .on_press_maybe(enabled.then(|| Message::Restore(entry.identity.clone()))),
+                destructive_action(fl!("delete"))
+                    .on_press_maybe(enabled.then(|| Message::Delete(entry.identity.clone()))),
             ]
+            .spacing(6)
             .align_y(Alignment::Center),
         ]
-        .spacing(8),
+        .spacing(5),
     )
-    .padding([9, 10])
+    .padding([9, 12])
     .width(Length::Fill)
-    .class(theme::Container::custom(glass_card))
     .into()
 }
 
-fn confirmation(space_xs: u16, space_s: u16, busy: bool) -> Element<'static, Message> {
-    container(
+fn confirmation(busy: bool) -> Element<'static, Message> {
+    let dialog = container(
         column![
-            text(fl!("clear-confirm-title")).size(16),
-            text(fl!("clear-confirm-body")).size(12),
+            text(fl!("clear-confirm-title"))
+                .size(15)
+                .font(cosmic::font::semibold()),
+            text(fl!("clear-confirm-body")).size(13),
             row![
                 space::horizontal().width(Length::Fill),
                 button::text(fl!("cancel")).on_press_maybe((!busy).then_some(Message::CancelClear)),
                 button::destructive(fl!("confirm-clear"))
                     .on_press_maybe((!busy).then_some(Message::ConfirmClear)),
             ]
-            .spacing(space_xs),
+            .spacing(6),
         ]
-        .spacing(space_s),
+        .spacing(10),
     )
-    .padding(space_s)
-    .width(Length::Fill)
-    .class(theme::Container::custom(glass_card))
+    .padding(14)
+    .width(Length::Fixed(318.0))
+    .class(theme::Container::custom(|theme| {
+        let cosmic = theme.cosmic();
+        container::Style {
+            background: Some(Background::Color(cosmic.background.base.into())),
+            border: Border {
+                radius: cosmic.radius_m().into(),
+                width: 1.0,
+                color: cosmic.on_bg_color().with_alpha(0.14).into(),
+            },
+            ..Default::default()
+        }
+    }));
+    opaque(
+        container(dialog)
+            .center(Length::Fill)
+            .class(theme::Container::custom(|theme| container::Style {
+                background: Some(Background::Color(
+                    theme.cosmic().background.base.with_alpha(0.65).into(),
+                )),
+                ..Default::default()
+            })),
+    )
     .into()
 }
 
-fn state_row(icon_name: &'static str, label: String) -> Element<'static, Message> {
+fn state_row<'a>(
+    icon_name: &'static str,
+    label: String,
+    detail: Option<&'a str>,
+) -> Element<'a, Message> {
+    let mut message = column![text(label).size(13).font(cosmic::font::semibold())].spacing(4);
+    if let Some(detail) = detail {
+        message = message.push(muted_text(detail, 12));
+    }
     container(
         row![
             icon::from_name(icon_name).size(16).symbolic(true),
-            text(label).size(12).width(Length::Fill),
+            message.width(Length::Fill),
         ]
         .spacing(8)
         .align_y(Alignment::Center),
     )
-    .padding(14)
+    .padding([20, 14])
     .width(Length::Fill)
-    .class(theme::Container::custom(glass_card))
     .into()
-}
-
-fn glass_card(theme: &cosmic::Theme) -> container::Style {
-    let cosmic = theme.cosmic();
-    let mut fill = cosmic.bg_component_color();
-    fill.alpha = if theme.theme_type.is_dark() {
-        0.54
-    } else {
-        0.68
-    };
-    container::Style {
-        background: Some(Background::Color(fill.into())),
-        border: Border {
-            radius: cosmic.radius_m().into(),
-            width: 1.0,
-            color: cosmic.on_bg_color().with_alpha(0.10).into(),
-        },
-        shadow: Shadow {
-            color: Color {
-                r: 0.0,
-                g: 0.0,
-                b: 0.0,
-                a: 0.12,
-            },
-            offset: Vector { x: 0.0, y: 3.0 },
-            blur_radius: 14.0,
-        },
-        ..Default::default()
-    }
 }
 
 fn format_age(value: &str) -> String {
@@ -557,7 +692,6 @@ fn truncate(value: &str, max_chars: usize) -> String {
     } else {
         prefix
     }
-
 }
 
 #[cfg(test)]
