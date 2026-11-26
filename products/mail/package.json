@@ -5,7 +5,8 @@
   "installed_assets": [
     {"source": "thunderbird/yuos-mail.js", "destination": "usr/share/thunderbird/defaults/pref/yuos-mail.js", "apps": ["email"]},
     {"source": "thunderbird/yuos-mail.cfg", "destination": "usr/lib/thunderbird/yuos-mail.cfg", "apps": ["email"]},
-    {"source": "thunderbird/yuos-mail.css", "destination": "usr/lib/thunderbird/distribution/yuos-mail.css", "apps": ["email"]}
+    {"source": "thunderbird/yuos-mail.css", "destination": "usr/lib/thunderbird/distribution/yuos-mail.css", "apps": ["email"]},
+    {"source": "thunderbird/icons", "destination": "usr/lib/thunderbird/distribution/yuos-mail-icons", "apps": ["email"]}
   ],
   "tests": ["apps/email/test_ai.py", "extension/test_contract.py", "test_build.py", "test_extension_package.py"]
 }
