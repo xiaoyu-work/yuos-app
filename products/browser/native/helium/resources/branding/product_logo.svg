@@ -1,1 +1,20 @@
-<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="256" height="256" rx="67" fill="#3450D1"/><path d="M145.966 207.813L128 221L110.034 207.813L118.198 144.891L67.4689 183.379L47 174.5L49.4993 152.438L108.391 128L49.4993 103.562L47 81.5L67.4689 72.6214L118.198 111.109L110.034 48.1871L128 35L145.966 48.1871L137.802 111.109L188.531 72.6214L209 81.5L206.501 103.562L147.609 128L206.501 152.438L209 174.5L188.531 183.379L137.802 144.891L145.966 207.813Z" fill="#FBFCFF"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
+  <defs>
+    <linearGradient id="yb_core" x1="56" y1="56" x2="200" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#1E1B4B"/>
+    </linearGradient>
+    <linearGradient id="yb_top" x1="32" y1="36" x2="224" y2="148" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#34D399"/>
+      <stop offset="0.55" stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#0284C7"/>
+    </linearGradient>
+    <linearGradient id="yb_bot" x1="36" y1="112" x2="224" y2="224" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#4F46E5"/>
+    </linearGradient>
+  </defs>
+  <circle cx="128" cy="128" r="78" fill="url(#yb_core)"/>
+  <path d="M30 136C26 76 72 28 132 28C178 28 216 58 226 100C208 72 176 58 140 62C94 66 64 100 66 142C67 156 52 166 39 158C33 154 31 146 30 136Z" fill="url(#yb_top)"/>
+  <path d="M226 120C230 180 184 228 124 228C78 228 40 198 30 156C48 184 80 198 116 194C162 190 192 156 190 114C189 100 204 90 217 98C223 102 225 110 226 120Z" fill="url(#yb_bot)"/>
+</svg>
