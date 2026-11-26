@@ -236,6 +236,7 @@ def stage_payload(root, entry):
     if name == "mail":
         if entry["variant"] == "agent":
             shutil.rmtree(root / "usr/lib/thunderbird")
+            shutil.rmtree(root / "usr/share/thunderbird")
         else:
             shutil.rmtree(root / "usr/lib/yuos/apps")
     python = root / "usr/lib/yuos/python"

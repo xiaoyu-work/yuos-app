@@ -1,0 +1,118 @@
+@-moz-document url("chrome://messenger/content/messenger.xhtml") {
+  @media (prefers-contrast: no-preference) and (forced-colors: none) {
+    :root:not([lwtheme], [customizingUnifiedToolbar]) unified-toolbar {
+      background-color: light-dark(#e7eef9, #202630) !important;
+      border-block-end-color: light-dark(#dce3ed, #343e4c) !important;
+    }
+  }
+}
+
+@-moz-document url("about:3pane"), url("chrome://messenger/content/messenger/about3Pane.xhtml") {
+  #paneLayout.layout-vertical:not([style*="--folderPaneSplitter-width"]) {
+    --folderPaneSplitter-width: clamp(10em, 17vw, 14em) !important;
+  }
+
+  #paneLayout.layout-vertical:not([style*="--messagePaneSplitter-width"]) {
+    --messagePaneSplitter-width: clamp(20em, 48vw, 64em) !important;
+  }
+
+  #threadPaneHeaderBar {
+    border-block-end: 1px solid var(--sidebar-border);
+  }
+
+  #threadPaneHeaderBar .list-header-title {
+    font-weight: 600 !important;
+  }
+
+  @container threadPane (max-width: 380px) {
+    #threadPaneHeaderBar {
+      flex-wrap: wrap;
+    }
+
+    #threadPaneHeaderBar .list-header-bar-container-start {
+      flex: 1 0 100%;
+    }
+  }
+
+  @media (prefers-contrast: no-preference) and (forced-colors: none) {
+    :root:not([lwt-tree]) {
+      --yu-mail-rule: light-dark(#dce3ed, #343e4c);
+      --yu-mail-hover: light-dark(#ebf2fa, #313b4b);
+      --yu-mail-selected: light-dark(#dcecff, #293e59);
+      --yu-mail-text-accent: light-dark(#084f91, #a5d4ff);
+      --yu-mail-mark: light-dark(#0f60ab, #82bfff);
+      --sidebar-background: light-dark(#f4f6fa, #202630) !important;
+      --sidebar-border: var(--yu-mail-rule) !important;
+    }
+
+    :root:not([lwt-tree]) #folderTree {
+      --list-container-background-selected: var(--yu-mail-selected);
+      --list-container-background-selected-current: var(--yu-mail-selected);
+      --list-container-background-selected-current-focused: var(--yu-mail-selected);
+      --list-container-background-hover: var(--yu-mail-hover);
+      --list-container-border-selected: var(--yu-mail-rule);
+      --list-container-border-selected-current: var(--yu-mail-rule);
+      --list-indicator-background-selected: var(--yu-mail-mark);
+      --list-indicator-border-selected: var(--yu-mail-mark);
+    }
+
+    :root:not([lwt-tree]) #folderTree li.selected > .container > .name {
+      color: var(--yu-mail-text-accent);
+    }
+
+    :root:not([lwt-tree]) #folderPaneWriteMessage:not(:disabled) {
+      color: white !important;
+      background-color: #0f60ab !important;
+      border-color: transparent !important;
+    }
+
+    :root:not([lwt-tree]) #folderPaneWriteMessage:not(:disabled):hover {
+      background-color: #0b518f !important;
+    }
+
+    :root:not([lwt-tree]) #folderPaneWriteMessage:not(:disabled):active {
+      background-color: #0a4175 !important;
+    }
+
+    :root:not([lwt-tree]) #threadTree[rows="thread-card"] {
+      --card-container-padding-block: 0px;
+      --tree-card-background-current: var(--yu-mail-hover);
+      --tree-card-background-current-unfocused: var(--yu-mail-hover);
+      --tree-card-background-selected: var(--yu-mail-selected);
+      --tree-card-background-selected-current: var(--yu-mail-selected);
+      --tree-card-background-selected-unfocused: var(--yu-mail-selected);
+      --tree-card-background-selected-current-unfocused: var(--yu-mail-selected);
+      --tree-card-background-selected-current-unfocused-hover: light-dark(#d1e5fb, #314964);
+    }
+
+    :root:not([lwt-tree]) #threadTree[rows="thread-card"]
+      .card-layout:not([data-properties~="dummy"], [data-properties~="junk"])
+      > td > .card-container {
+      border-radius: 0 !important;
+      border-block-end-color: var(--yu-mail-rule) !important;
+    }
+
+    :root:not([lwt-tree]) #threadTree[rows="thread-card"]
+      .card-layout[data-properties~="unread"]:not([data-properties~="dummy"], [data-properties~="junk"])
+      > td > .card-container {
+      border-inline-start: 3px solid var(--yu-mail-mark) !important;
+    }
+
+    :root:not([lwt-tree]) #threadTree[rows="thread-card"]
+      .card-layout[data-properties~="unread"]:not([data-properties~="dummy"], [data-properties~="junk"])
+      .subject {
+      color: var(--yu-mail-text-accent) !important;
+    }
+  }
+}
+
+@-moz-document url("about:message"), url("chrome://messenger/content/messenger/aboutMessage.xhtml") {
+  #messagepanebox .message-header-container {
+    padding: 10px 12px !important;
+    border-block-end: 1px solid var(--sidebar-border);
+  }
+
+  #messagepanebox .message-header-large-subject #expandedsubjectBox {
+    font-weight: 600 !important;
+  }
+}

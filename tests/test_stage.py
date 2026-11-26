@@ -802,7 +802,7 @@ def test_mail_stage_contains_matching_app_and_ui_without_os_runtime(tmp_path):
     with zipfile.ZipFile(xpi) as archive:
         assert json.loads(archive.read("manifest.json"))["version"] == manifest["version"]
         assert "test_contract.py" not in archive.namelist()
-    with pytest.raises(FileExistsError):
+    with pytest.raises(ValueError, match="Conflicting staged installed asset"):
         stage.stage("mail", tmp_path)
 
 

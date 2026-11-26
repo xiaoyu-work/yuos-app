@@ -52,6 +52,17 @@ Thunderbird. The XPI owns the Assistant, options, and AI popups in
 Thunderbird still owns the inbox, native compose window, and window controls.
 The checked-in `comm/` source build is not the desktop package's runtime.
 
+The Mail desktop package also ships `thunderbird/yuos-mail.*`, a native
+Thunderbird 140 ESR presentation overlay. Packaged defaults choose Vertical
+layout and Cards for new profiles; existing layout choices are not locked
+or rewritten. AutoConfig loads only a package-owned stylesheet from
+`distribution/`. It does not modify user files, lower the AutoConfig sandbox,
+or load code from a URL. It is not a theme extension or part of the Web App.
+On Thunderbird versions other than 140 the custom stylesheet is not loaded.
+The standard UI remains available by setting `yuos.mail.chrome.enabled` to
+`false` in Thunderbird's Config Editor and restarting. Administrators using
+a different site AutoConfig should keep their own configuration.
+
 The signed Email Web entry in `web/` presents Thunderbird's existing accounts
 and folders in a three-pane mailbox with its own search, command bar, list
 and reading area. New mail and replies use the same draft review tools.
