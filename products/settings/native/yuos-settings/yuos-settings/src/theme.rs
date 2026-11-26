@@ -7,14 +7,10 @@ use cosmic::{
     theme,
 };
 
+// One window color for header, sidebar, page and sections; follows the
+// user's window background, dark mode and high contrast.
 fn page_fill(cosmic: &cosmic::cosmic_theme::Theme) -> Color {
-    if cosmic.is_high_contrast {
-        cosmic.background.base.into()
-    } else if cosmic.is_dark {
-        Color::from_rgb8(28, 28, 30)
-    } else {
-        Color::WHITE
-    }
+    cosmic.background.base.into()
 }
 
 #[must_use]
@@ -127,15 +123,9 @@ pub fn sidebar() -> cosmic::theme::Container<'static> {
         cosmic::widget::container::Style {
             text_color: Some(cosmic.on_bg_color().into()),
             icon_color: Some(cosmic.on_bg_color().into()),
-            background: Some(Background::Color(if cosmic.is_high_contrast {
-                cosmic.primary.base.into()
-            } else if cosmic.is_dark {
-                Color::from_rgb8(37, 42, 49)
-            } else {
-                Color::from_rgb8(226, 236, 246)
-            })),
+            background: Some(Background::Color(page_fill(cosmic))),
             border: Border {
-                color: cosmic.on_bg_color().with_alpha(0.09).into(),
+                color: cosmic.on_bg_color().with_alpha(0.10).into(),
                 width: 0.5,
                 radius: 8.0.into(),
             },
