@@ -5,7 +5,8 @@
 | `apps/yuos-notifications/app.json` | Two MCP tools, preserved identity/`ui.notify` grant and explicit durable-ID compatibility |
 | `apps/notify/` | Complete Python send/list facade, bounded validation, shared SDK client, separate grants and manifest-dispatch/history-preservation tests |
 | `test_notify_process.py` | Installed Python MCP in an empty-root/no-bus sandbox, actual SDK wire decoding, explicit errors and cancellation (canned responses only) |
-| `native/yuos-notifications/src/app.rs` | Complete original Layer Shell UI, popup timers, configuration and presentation |
+| `web/` | Shared English/Chinese layout for two separate authenticated Web entries: notify history/send and native post receipts/dismissal |
+| `native/yuos-notifications/src/app.rs` | Layer Shell banner layout, popup timers, configuration and presentation |
 | `native/yuos-notifications/src/mcp.rs` | Bounded post/close intent via the fixed installed SDK CLI; no session bus |
 | `native/yuos-notifications/src/subscriptions/` | Freedesktop server, sender-bound numeric handles and private human panel interaction |
 | `native/yuos-notifications/src/subscriptions/managed.rs` | Published-SDK GUI resource client, real UI acceptance, plain-text cards and exact presentation actions |
@@ -107,9 +108,9 @@ desktop queue, DND, leases and checked cleanup. No App name grants these rights.
 Own-source `data.inbox.read` and MCP `ui.notify` remain independent and never
 inherit the display resource. The real original UI sends acceptance only after
 its notification update; delivery remains distinct from acknowledgement.
-Root notification body data stays literal in both the original popup and panel
+Root notification body data stays literal in both the popup and panel
 projection. Panel icons preserve their artwork while downsampling to 64 pixels
-for the bounded broker packet; the original popup renderer is unchanged.
+for the bounded broker packet; the popup uses its existing icon lookup.
 The OS shell descriptor never enters the App and supplies no raw bus or config.
 OS disposable native cases 42–43 cover actual signed popup pixels, descriptor
 preferences/dismissal, original pointer acknowledgement and checked retirement;

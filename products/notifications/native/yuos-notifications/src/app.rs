@@ -18,13 +18,13 @@ use cosmic_notifications_config::NotificationsConfig;
 use cosmic_notifications_util::markup::html_to_spans;
 use cosmic_notifications_util::{ActionId, CloseReason, Notification};
 use cosmic_panel_config::{CosmicPanelConfig, CosmicPanelOuput, PanelAnchor};
-use iced::Alignment;
-use std::borrow::Cow;
+use iced::{Alignment, Padding};
 use std::collections::VecDeque;
 use std::time::Duration;
 use tokio::sync::mpsc;
 
 static NOTIFICATIONS_APPLET: &str = "com.yuos.AppletNotifications";
+const TOAST_WIDTH: u32 = 344;
 
 pub fn run() -> cosmic::iced::Result {
     cosmic::app::run::<YuOsNotifications>(
@@ -64,6 +64,7 @@ struct YuOsNotifications {
 #[derive(Debug, Clone)]
 enum Message {
     ActivateNotification(u32),
+    ActivateAction(u32, ActionId),
     ActivationToken(Option<String>, u32, Option<ActionId>),
     Dismissed(u32),
     Notification(notifications::Event),
@@ -297,13 +298,13 @@ impl YuOsNotifications {
                     bottom: 8,
                     left: 8,
                 },
-                size: Some((Some(300), Some(1))),
+                size: Some((Some(TOAST_WIDTH), Some(1))),
                 output: IcedOutput::Active, // TODO should we only create the notification on the output the applet is on?
                 size_limits: Limits::NONE
-                    .min_width(300.0)
+                    .min_width(TOAST_WIDTH as f32)
                     .min_height(1.0)
                     .max_height(1920.0)
-                    .max_width(300.0),
+                    .max_width(TOAST_WIDTH as f32),
                 ..Default::default()
             }));
         };
@@ -523,6 +524,9 @@ impl cosmic::Application for YuOsNotifications {
                 tracing::trace!("requesting token for {id}");
                 return self.request_activation(id, None);
             }
+            Message::ActivateAction(id, action) => {
+                return self.request_activation(id, Some(action));
+            }
             Message::ActivationToken(token, id, action) => {
                 tracing::trace!("token for {id}");
                 if let Some(token) = token {
@@ -642,80 +646,91 @@ impl cosmic::Application for YuOsNotifications {
                 .into();
         }
 
-        // Yu OS Glass spacing tokens — generous, token-driven rhythm.
-        let spacing = cosmic::theme::spacing();
-
+        let managed = crate::subscriptions::managed::enabled();
         let (ids, notif_elems): (Vec<_>, Vec<_>) = self
             .cards
             .iter()
             .rev()
             .map(|n| {
-                // App-name / meta line — turned into a brand-blue accent moment
-                // (Yu OS Glass forbids dead gray meta text).
-                let app_name = text::caption(if n.app_name.len() > 24 {
-                    Cow::from(format!(
-                        "{:.26}...",
-                        n.app_name.lines().next().unwrap_or_default()
-                    ))
-                } else {
-                    Cow::from(&n.app_name)
-                })
-                .width(Length::Fill)
-                .class(cosmic::theme::Text::Custom(|t| {
-                    cosmic::iced::widget::text::Style {
-                        color: Some(t.cosmic().accent_color().into()),
-                    }
-                }));
+                let sender = n.app_name.lines().next().unwrap_or_default();
+                let app_name =
+                    text::caption(if let Some((end, _)) = sender.char_indices().nth(28) {
+                        format!("{}…", &sender[..end])
+                    } else {
+                        sender.to_owned()
+                    })
+                    .size(11)
+                    .width(Length::Fill)
+                    .class(cosmic::theme::Text::Custom(|t| {
+                        cosmic::iced::widget::text::Style {
+                            color: Some(t.cosmic().accent_color().into()),
+                        }
+                    }));
 
-                // Quiet glass close control; emphasis comes on hover via theme.
                 let close_notif = button::custom(
                     icon::from_name("window-close-symbolic")
-                        .size(16)
+                        .size(12)
                         .symbolic(true),
                 )
+                .padding([2, 5])
                 .on_press(Message::Dismissed(n.id))
                 .class(cosmic::theme::Button::Text);
 
-                // Header: leading app icon anchor · accent app-name · close.
-                let header = if let Some(icon) = n.notification_icon() {
-                    row![icon.size(20), app_name, close_notif]
-                        .spacing(spacing.space_xs)
-                        .align_y(Alignment::Center)
-                } else {
-                    row![app_name, close_notif]
-                        .spacing(spacing.space_xs)
-                        .align_y(Alignment::Center)
-                };
-
-                // Content: prominent semibold title (summary) over muted body.
-                let content = column![
-                    text::heading(n.summary.lines().next().unwrap_or_default()).width(Length::Fill),
-                    Element::from(
-                        rich_text(if crate::subscriptions::managed::enabled() {
-                            crate::subscriptions::managed::body_spans(n)
-                        } else {
-                            html_to_spans(&n.body)
-                        })
-                        .size(12.0)
-                    )
-                    .map(|_: ()| Message::Ignore)
+                let mut content = column![
+                    row![app_name, close_notif].align_y(Alignment::Center),
+                    text::body(n.summary.lines().next().unwrap_or_default())
+                        .font(cosmic::font::semibold())
+                        .size(13)
+                        .width(Length::Fill),
                 ]
-                .spacing(spacing.space_xxxs)
+                .spacing(2)
                 .width(Length::Fill);
+                if !n.body.is_empty() {
+                    content = content.push(
+                        Element::from(
+                            rich_text(if managed {
+                                crate::subscriptions::managed::body_spans(n)
+                            } else {
+                                html_to_spans(&n.body)
+                            })
+                            .size(13),
+                        )
+                        .map(|_: ()| Message::Ignore),
+                    );
+                }
+                if !managed {
+                    // Managed presentations only authorize the default card action.
+                    for (action, label) in &n.actions {
+                        if !matches!(action, ActionId::Default) && !label.is_empty() {
+                            content = content.push(
+                                button::custom(text::body(label.as_str()).size(12))
+                                    .padding([3, 8])
+                                    .on_press(Message::ActivateAction(n.id, action.clone()))
+                                    .class(cosmic::theme::Button::Standard),
+                            );
+                        }
+                    }
+                }
 
-                // Frosted Yu OS Glass toast card: radius_l, blue hairline, soft
-                // shadow, generous padding.
-                let e = Element::from(
-                    container(
-                        column![header, content]
-                            .spacing(spacing.space_xs)
-                            .width(Length::Fill),
-                    )
-                    .padding(spacing.space_m)
+                let mut layout = row![].spacing(10).align_y(Alignment::Center);
+                if let Some(icon) = n.notification_icon() {
+                    layout = layout.push(
+                        container(icon.size(22))
+                            .center_x(32)
+                            .center_y(32)
+                            .class(crate::glass::icon_class()),
+                    );
+                }
+                let toast = container(layout.push(content))
+                    .padding(Padding {
+                        top: 9.0,
+                        right: 11.0,
+                        bottom: 10.0,
+                        left: 12.0,
+                    })
                     .width(Length::Fill)
-                    .class(crate::glass::card_class()),
-                );
-                (n.id, e)
+                    .class(crate::glass::card_class());
+                (n.id, Element::from(toast))
             })
             .take(self.config.max_notifications as usize)
             .unzip();
@@ -732,12 +747,12 @@ impl cosmic::Application for YuOsNotifications {
             None,
             true,
         )
-        .width(Length::Fixed(300.));
+        .width(Length::Fixed(TOAST_WIDTH as f32));
 
         autosize::autosize(card_list, self.autosize_id.clone())
-            .min_width(200.)
-            .min_height(100.)
-            .max_width(300.)
+            .min_width(TOAST_WIDTH as f32)
+            .min_height(1.)
+            .max_width(TOAST_WIDTH as f32)
             .max_height(1920.)
             .into()
     }

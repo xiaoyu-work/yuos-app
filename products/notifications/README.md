@@ -12,6 +12,13 @@ through its single desktop delivery consumer. MCP submits bounded intent using
 the versioned SDK and fixed `/usr/local/bin/yu`; it does not open a session bus,
 call another App or maintain a second notification store.
 
+The Web UI shares a sidebar and compose/receipt layout across both authenticated
+entries, in English or Chinese according to the browser locale. `notify` shows
+its own source history and send form; `yuos-notifications` shows only post
+receipts from the current page, native post options and exact-ID dismissal.
+Each entry shows its own latest backend response. Window controls and the
+popup-mute preference remain on their existing system surfaces.
+
 ## Native MCP 0.2 compatibility
 
 - `notify.post` retains summary/body, sender label, theme icon, timeout and

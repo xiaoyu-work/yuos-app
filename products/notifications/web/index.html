@@ -1,35 +1,132 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Notifications</title><link rel="stylesheet" href="shared/ui.css"></head><body>
-<header><div><h1>Notifications</h1><p data-app-label>App-owned notification production with OS-owned delivery</p></div></header>
-<main class="stack"><p id="scope" class="muted small"></p>
-<p id="notice" class="notice" role="status" aria-live="polite"></p><p id="outcome" class="notice" aria-live="polite"></p>
-<div class="split"><section class="card stack"><div class="row"><h2 id="list-title">Notifications</h2>
-<button id="refresh" type="button">Refresh source history</button></div><p id="total" class="muted small"></p>
-<div class="toolbar"><label id="limit-label">Fetch limit<input id="limit" type="number" value="20" min="1" max="100" step="1"></label>
-<label>Filter loaded entries<input id="filter" placeholder="Find text or a durable ID"></label></div>
-<label id="unread-label"><span><input id="unread" type="checkbox"> Show only entries explicitly reported unread</span></label>
-<p id="list-state" class="muted small"></p><div id="notifications" class="stack"></div></section>
-<section class="card stack"><h2 id="compose-title">Compose notification</h2>
-<form id="send"><label id="message-label">Message<textarea id="message" rows="6"></textarea></label>
-<label id="urgent-label"><span><input id="urgent" type="checkbox"> Urgent (warning severity, still respects DND)</span></label>
-<label id="summary-label" hidden>Headline<input id="summary" autocomplete="off"></label>
-<label id="body-label" hidden>Optional body<textarea id="body" rows="6"></textarea></label>
-<details id="post-options" hidden><summary>Native post options</summary><div class="stack">
-<label>Display sender label (not source identity)<input id="sender" value="Yu OS Agent"></label>
-<label>Icon-theme name, not a path or URL<input id="icon" value="com.yuos.Notifications" maxlength="128" pattern="[A-Za-z0-9._\-]*"></label>
-<label>Popup timeout (milliseconds: -1 default, 0 no expiry)<input id="expiry" type="number" value="-1" min="-1" max="2147483647" step="1"></label>
-<label><span><input id="transient" type="checkbox"> Omit the desktop history copy (OS durable activity is retained)</span></label>
-<label>Optional owner/App replay key (15-minute deduplication)<input id="dedupe" maxlength="128" pattern="[A-Za-z0-9._:\-\/@+]*" autocomplete="off"></label>
-</div></details><p id="compose-help" class="muted small"></p><p id="characters" class="muted small"></p>
-<button id="send-button" class="primary" type="submit">Send notification</button></form>
-<section class="stack"><h3>Latest confirmed send receipt</h3><div id="receipt" class="prose">No send confirmed.</div>
-<p class="small muted">A returned durable ID is not proof of desktop delivery, display, reading or acknowledgement. There are no DND, read or acknowledgement controls in these entries.</p></section>
-<form id="close-form" hidden><h3>Dismiss a previously returned native post</h3>
-<label>Same-owner, same-App durable ID<input id="close-id" placeholder="notif-..." pattern="notif-[A-Fa-f0-9]{32}" required autocomplete="off"></label>
-<p class="small muted">Native post IDs only. Numeric desktop handles and records from the separate notify entry are unsupported.
-The OS checks source and ownership, not the sender label.</p><button type="submit">Review dismissal</button></form>
-</section></div>
-<details class="card"><summary>Latest backend response</summary><div id="raw"></div></details>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Notifications</title>
+  <link rel="stylesheet" href="notifications.css">
+</head>
+<body>
+<svg hidden xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3.5 13.5 6 5.5h12l2.5 8V18a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 18zM3.5 13.5h5l1 2h5l1-2h5"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m9 9 6 6m0-6-6 6"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="M8.5 4.5C6.5 4.5 6 5.5 6 7v2.5c0 1-.8 2.5-2 2.5 1.2 0 2 1.5 2 2.5V17c0 1.5.5 2.5 2.5 2.5m7-15C17.5 4.5 18 5.5 18 7v2.5c0 1 .8 2.5 2 2.5-1.2 0-2 1.5-2 2.5V17c0 1.5-.5 2.5-2.5 2.5"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A7.5 7.5 0 0 1 9.5 4.5a7.5 7.5 0 1 0 10 10"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4.5v4.2h-4.2"/></symbol>
+  <symbol id="i-compose" viewBox="0 0 24 24"><path d="M12 4.5H6A1.5 1.5 0 0 0 4.5 6v12A1.5 1.5 0 0 0 6 19.5h12a1.5 1.5 0 0 0 1.5-1.5v-6m-3-8.5 4 4L12 16H8v-4z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/></symbol>
+  <symbol id="i-inspector" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M14.5 5v14"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5 19 6v5.5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5m0-8.7h.01"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 4 21 19.5H3zM12 10v4.5m0 2.5h.01"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M20.5 3.5 10 14M20.5 3.5 14 20.5l-4-6.5-6.5-4z"/></symbol>
+</svg>
+<p id="connecting" class="empty" role="status" data-text="connecting">Connecting to the App Host…</p>
+<main id="workspace" hidden>
+  <aside class="sidebar">
+    <div class="brand"><svg aria-hidden="true"><use href="#i-bell"/></svg><span data-text="app"></span></div>
+    <nav aria-labelledby="title">
+      <div class="source"><span data-text="notify"></span><code title="notify">notify</code></div>
+      <button type="button" data-view="history"><svg aria-hidden="true"><use href="#i-clock"/></svg><span data-text="history"></span><span id="history-count" class="count"></span></button>
+      <div class="source"><span data-text="native"></span><code title="yuos-notifications">yuos-notifications</code></div>
+      <button type="button" data-view="posted"><svg aria-hidden="true"><use href="#i-inbox"/></svg><span data-text="posted"></span><span id="posted-count" class="count"></span></button>
+      <button type="button" data-view="dismiss"><svg aria-hidden="true"><use href="#i-close"/></svg><span data-text="dismiss"></span></button>
+      <div class="source" data-text="diagnostics"></div>
+      <button type="button" data-view="diagnostics"><svg aria-hidden="true"><use href="#i-code"/></svg><span data-text="raw"></span></button>
+    </nav>
+    <div class="side-foot">
+      <div><svg aria-hidden="true"><use href="#i-moon"/></svg><span data-text="mute"></span></div>
+      <p data-text="muteHint"></p>
+    </div>
+  </aside>
+  <section class="main">
+    <header class="toolbar">
+      <div class="title"><h1 id="title"></h1><span id="total"></span></div>
+      <div class="tools">
+        <div id="history-tools" hidden>
+          <div class="segments">
+            <button type="button" id="all" aria-pressed="true" data-text="all"></button>
+            <button type="button" id="unread" aria-pressed="false" data-text="unread"></button>
+          </div>
+          <label class="limit"><span data-text="fetch"></span><input id="limit" type="number" value="20" min="1" max="100" step="1"></label>
+          <button id="refresh" class="tool" type="button" data-label="refresh"><svg aria-hidden="true"><use href="#i-refresh"/></svg></button>
+        </div>
+        <button id="compose" class="tool" type="button" data-label="compose"><svg aria-hidden="true"><use href="#i-compose"/></svg></button>
+        <label id="search" class="search"><svg aria-hidden="true"><use href="#i-search"/></svg><input id="filter" type="search" autocomplete="off" data-label="filter" data-placeholder="filter"></label>
+        <button id="inspector-toggle" class="tool" type="button" aria-controls="inspector" aria-expanded="true" data-label="inspector"><svg aria-hidden="true"><use href="#i-inspector"/></svg></button>
+      </div>
+    </header>
+    <div class="scope"><svg aria-hidden="true"><use href="#i-shield"/></svg><span id="scope"></span></div>
+    <p id="notice" class="notice" role="status" hidden></p>
+    <div class="panels">
+      <div class="content">
+        <section id="list">
+          <table>
+            <thead><tr><th scope="col" data-text="notification"></th><th id="time-heading" scope="col" data-text="time"></th><th scope="col" data-text="state"></th><th scope="col" data-text="id"></th><th id="actions-heading" scope="col" data-text="actions"></th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+          <p id="empty" class="empty"></p>
+        </section>
+        <section id="dismiss-page" class="pane" hidden>
+          <form id="close-form" class="stack">
+            <h2 data-text="dismissTitle"></h2>
+            <p class="hint" data-text="dismissHelp"></p>
+            <label class="field"><span data-text="id"></span><input id="close-id" class="mono" placeholder="notif-…" pattern="notif-[A-Fa-f0-9]{32}" required autocomplete="off"></label>
+            <button id="review" type="submit" data-text="review"></button>
+          </form>
+        </section>
+        <section id="raw-page" hidden>
+          <p id="raw-empty" class="empty" data-text="noResponse"></p>
+          <pre id="raw" hidden></pre>
+        </section>
+      </div>
+      <aside class="inspector" id="inspector">
+        <form class="stack" id="send">
+          <h2 id="compose-title"></h2>
+          <label id="message-label" class="field"><span data-text="message"></span><textarea id="message" rows="4" data-placeholder="messageHint"></textarea></label>
+          <label id="urgent-label" class="check"><input id="urgent" type="checkbox"><span><span data-text="urgent"></span><small data-text="urgentHint"></small></span></label>
+          <label id="summary-label" class="field"><span data-text="headline"></span><input id="summary" autocomplete="off"></label>
+          <label id="body-label" class="field"><span data-text="body"></span><textarea id="body" rows="3"></textarea></label>
+          <p id="characters" class="meter"></p>
+          <details id="post-options">
+            <summary data-text="options"></summary>
+            <div class="stack">
+              <label class="field"><span data-text="sender"></span><input id="sender" value="Yu OS Agent"></label>
+              <label class="field"><span data-text="icon"></span><input id="icon" value="com.yuos.Notifications" maxlength="128" pattern="[A-Za-z0-9._\-]*"></label>
+              <label class="field"><span data-text="expiry"></span><input id="expiry" type="number" value="-1" min="-1" max="2147483647" step="1"></label>
+              <label class="check"><input id="transient" type="checkbox"><span><span data-text="transient"></span><small data-text="transientHint"></small></span></label>
+              <label class="field"><span data-text="dedupe"></span><input id="dedupe" maxlength="128" pattern="[A-Za-z0-9._:\-\/@+]*" autocomplete="off"></label>
+            </div>
+          </details>
+          <button id="send-button" class="primary" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg><span></span></button>
+        </form>
+        <section class="receipt stack">
+          <h2 data-text="latestReceipt"></h2>
+          <p id="receipt" data-text="noReceipt"></p>
+          <p class="hint" data-text="receiptHint"></p>
+        </section>
+      </aside>
+    </div>
+    <footer><div><svg aria-hidden="true"><use href="#i-info"/></svg><span id="outcome" aria-live="polite"></span></div><span id="list-state" aria-live="polite"></span></footer>
+  </section>
 </main>
-<script src="shared/client.js"></script><script src="shared/ui.js"></script><script src="app.js"></script></body></html>
+<dialog id="confirm" aria-labelledby="confirm-title">
+  <form id="confirm-form" class="stack">
+    <h2 id="confirm-title" data-text="confirmTitle"></h2>
+    <label class="field"><span data-text="id"></span><input id="confirm-id" class="mono" readonly></label>
+    <p class="hint" data-text="confirmHint"></p>
+    <p id="confirm-notice" class="notice" role="status" hidden></p>
+    <div class="dialog-actions">
+      <button id="cancel" type="button" data-text="cancel" autofocus></button>
+      <button id="confirm-button" class="primary" type="submit" data-text="confirm"></button>
+    </div>
+  </form>
+</dialog>
+<script src="shared/client.js"></script>
+<script src="shared/ui.js"></script>
+<script src="strings.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
