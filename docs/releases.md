@@ -447,7 +447,12 @@ Common safe HTTP/IDNA helpers require Debian `python3-idna (>= 3.3)` and
 separate IDNA implementation or install it dynamically.
 
 Apps depend on `yuos-app-runtime-v1 (>= 0.1.0)`, with additional permission, capture,
-media-player and notification service interfaces where required. Native runtime
+media-player and notification service interfaces where required. Only packages
+that call the OS permission-management interface (`yu __app-permissions`), which
+is currently Settings Desktop, depend on `yuos-app-permissions-v1`; ordinary
+desktop packages do not, and their own capability checks remain enforced by the
+runtime. No App package depends on the Yu Agent: an absent Agent only makes the
+optional Ask Yu OS action report its explicit launch error. Native runtime
 library dependencies are computed from the actual installed ELF binaries with
 `dpkg-shlibdeps`. Python/system package mappings remain explicit in the release
 configuration.

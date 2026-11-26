@@ -232,8 +232,8 @@ MCP cannot submit those direct Settings choices. The existing MCP restoration
 request remains pending until it is reviewed through the OS. Its policy
 receipt only removes a deny gate; it cannot be redeemed as execution authority.
 
-Installed Desktop requires the OS `yuos-app-permissions-v1` service provided
-by Agent. Source development against an older service fails visibly, without
+Installed Desktop requires the OS `yuos-app-permissions-v1` service; it is the
+only package that declares this dependency. Source development against an older service fails visibly, without
 raw socket/file authority or a silent success fallback. No live device/user
 state or independent manager grants are migrated.
 

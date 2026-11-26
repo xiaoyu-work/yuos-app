@@ -159,8 +159,7 @@ def dependencies(entry, release_version):
                 library_interface(dependency["library"]),
             ])
     if variant == "desktop":
-        result.extend(["yuos-app-permissions-v1",
-                       *settings["desktop_dependencies"].get(name, [])])
+        result.extend(settings["desktop_dependencies"].get(name, []))
         if any(item["variant"] == "agent" for item in packages_for(selection)):
             result.append(f"{package_name(name, kind)} (= {release_version})")
     else:
