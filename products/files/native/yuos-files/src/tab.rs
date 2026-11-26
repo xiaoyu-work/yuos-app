@@ -2352,15 +2352,28 @@ impl Item {
             )))
     }
 
-    /// Text widget for a filename in list view: word-or-glyph wrapping, middle-ellipsized to 1 line.
+    /// Text widget for a filename in list view: single-line, slender light font, middle-ellipsized.
     fn list_display_name<'a>(
         name: impl Into<Cow<'a, str>> + 'a,
     ) -> widget::Text<'a, cosmic::Theme, cosmic::Renderer> {
-        widget::text::body(name)
-            .wrapping(text::Wrapping::WordOrGlyph)
+        widget::text::text(name)
+            .size(12.5)
+            .font(font::light())
+            .wrapping(text::Wrapping::None)
             .ellipsize(text::Ellipsize::Middle(text::EllipsizeHeightLimit::Lines(
                 1,
             )))
+    }
+
+    fn list_folder_svg_icon(selected: bool, size: u16) -> widget::Icon {
+        const FOLDER_COLOR_SVG: &[u8] = br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.5 3.6C1.5 2.94 2.04 2.4 2.7 2.4H6.1L7.5 3.9H13.3C13.96 3.9 14.5 4.44 14.5 5.1V12.4C14.5 13.06 13.96 13.6 13.3 13.6H2.7C2.04 13.6 1.5 13.06 1.5 12.4V3.6Z" fill="#bae6fd" stroke="#0284c7" stroke-width="1.15" stroke-linejoin="round"/><path d="M1.5 5.6H14.5V12.4C14.5 13.06 13.96 13.6 13.3 13.6H2.7C2.04 13.6 1.5 13.06 1.5 12.4V5.6Z" fill="#38bdf8" fill-opacity="0.45"/></svg>"##;
+        const FOLDER_SELECTED_SVG: &[u8] = br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.5 3.6C1.5 2.94 2.04 2.4 2.7 2.4H6.1L7.5 3.9H13.3C13.96 3.9 14.5 4.44 14.5 5.1V12.4C14.5 13.06 13.96 13.6 13.3 13.6H2.7C2.04 13.6 1.5 13.06 1.5 12.4V3.6Z" fill="#ffffff" fill-opacity="0.24" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="round"/></svg>"##;
+        let bytes = if selected {
+            FOLDER_SELECTED_SVG
+        } else {
+            FOLDER_COLOR_SVG
+        };
+        widget::icon::icon(widget::icon::from_svg_bytes(bytes)).size(size)
     }
 
     pub fn path_opt(&self) -> Option<&PathBuf> {
@@ -5101,9 +5114,9 @@ impl Tab {
         w += f32::from(space_s);
 
         //TODO: allow resizing?
-        let modified_width = 136.0;
-        let size_width = 82.0;
-        let kind_width = 136.0;
+        let modified_width = 164.0;
+        let size_width = 86.0;
+        let kind_width = 126.0;
         let condensed = size.width < 340.0;
         let show_kind = size.width >= 560.0;
 
@@ -5114,7 +5127,12 @@ impl Tab {
                 .spacing(space_xxxs)
                 .padding([0, 12])
                 .width(width);
-            row = row.push(widget::text::caption(name));
+            row = row.push(
+                widget::text::text(name)
+                    .size(11.5)
+                    .font(font::light())
+                    .wrapping(text::Wrapping::None),
+            );
             row = row.push(widget::space::horizontal());
             match (sort_name == msg, sort_direction) {
                 (true, true) => {
@@ -5158,11 +5176,16 @@ impl Tab {
         if show_kind {
             header_cells.push(col_sep());
             header_cells.push(
-                widget::container(widget::text::caption("Kind"))
-                    .padding([0, 12])
-                    .width(Length::Fixed(kind_width))
-                    .align_y(Alignment::Center)
-                    .into(),
+                widget::container(
+                    widget::text::text("Kind")
+                        .size(11.5)
+                        .font(font::light())
+                        .wrapping(text::Wrapping::None),
+                )
+                .padding([0, 12])
+                .width(Length::Fixed(kind_width))
+                .align_y(Alignment::Center)
+                .into(),
             );
         }
 
@@ -5827,9 +5850,9 @@ impl Tab {
 
         let size = self.size_opt.get().unwrap_or_else(|| Size::new(0.0, 0.0));
         //TODO: allow resizing?
-        let modified_width = 136.0;
-        let size_width = 82.0;
-        let kind_width = 136.0;
+        let modified_width = 164.0;
+        let size_width = 86.0;
+        let kind_width = 126.0;
         let condensed = size.width < 340.0;
         let show_kind = size.width >= 560.0;
         let is_search = matches!(self.location, Location::Search(..));
@@ -5954,89 +5977,131 @@ impl Tab {
                         },
                     };
 
+                    let modified_text = modified_text.replace(['\n', '\r'], " ");
                     let kind_text = item_kind_label(item);
                     let even = count % 2 == 0;
+                    let is_dir_item = item.metadata.is_dir();
+
+                    let cell_text = |s: String| {
+                        widget::text::text(s)
+                            .size(11.5)
+                            .font(font::light())
+                            .wrapping(text::Wrapping::None)
+                            .ellipsize(text::Ellipsize::End(text::EllipsizeHeightLimit::Lines(1)))
+                    };
+
+                    let row_icon = if is_dir_item {
+                        Item::list_folder_svg_icon(item.selected, icon_size)
+                    } else {
+                        widget::icon::icon(item.icon_handle_list.clone())
+                            .content_fit(ContentFit::Contain)
+                            .size(icon_size)
+                    };
 
                     let row = if condensed {
                         widget::row::with_children([
-                            widget::icon::icon(item.icon_handle_list_condensed.clone())
-                                .content_fit(ContentFit::Contain)
-                                .size(icon_size)
-                                .into(),
+                            row_icon.into(),
                             Item::list_display_name(item.display_name.clone())
                                 .width(Length::Fill)
                                 .into(),
                         ])
                         .height(Length::Fixed(f32::from(row_height)))
                         .align_y(Alignment::Center)
+                        .padding([0, 12])
                         .spacing(space_xxs)
                     } else if is_search {
-                        let mut cells: Vec<Element<'_, Message>> = vec![
-                            widget::icon::icon(item.icon_handle_list_condensed.clone())
-                                .content_fit(ContentFit::Contain)
-                                .size(icon_size)
-                                .into(),
-                            widget::column::with_children([
-                                Item::list_display_name(item.display_name.clone()).into(),
-                                widget::text::caption(match item.path_opt() {
-                                    Some(path) => path.display().to_string(),
-                                    None => String::new(),
-                                })
-                                .into(),
-                            ])
-                            .width(Length::Fill)
-                            .into(),
-                            widget::container(widget::text::caption(modified_text.clone()))
-                                .padding([0, 12])
-                                .width(Length::Fixed(modified_width))
-                                .into(),
-                            widget::container(widget::text::caption(size_text.clone()))
-                                .padding([0, 12])
-                                .width(Length::Fixed(size_width))
-                                .into(),
-                        ];
-                        if show_kind {
-                            cells.push(
-                                widget::container(widget::text::caption(kind_text))
-                                    .padding([0, 12])
-                                    .width(Length::Fixed(kind_width))
+                        let name_col = widget::container(
+                            widget::row::with_children([
+                                row_icon.into(),
+                                widget::column::with_children([
+                                    Item::list_display_name(item.display_name.clone()).into(),
+                                    cell_text(match item.path_opt() {
+                                        Some(path) => path.display().to_string(),
+                                        None => String::new(),
+                                    })
                                     .into(),
-                            );
-                        }
-                        widget::row::with_children(cells)
-                            .height(Length::Fixed(f32::from(row_height)))
-                            .align_y(Alignment::Center)
-                            .spacing(space_xxs)
-                    } else {
-                        let mut cells: Vec<Element<'_, Message>> = vec![
-                            widget::icon::icon(item.icon_handle_list.clone())
-                                .content_fit(ContentFit::Contain)
-                                .size(icon_size)
-                                .into(),
-                            Item::list_display_name(item.display_name.clone())
+                                ])
                                 .width(Length::Fill)
                                 .into(),
-                            widget::container(widget::text::caption(modified_text.clone()))
+                            ])
+                            .align_y(Alignment::Center)
+                            .spacing(8),
+                        )
+                        .padding([0, 12])
+                        .width(Length::Fill);
+
+                        let mut cells: Vec<Element<'_, Message>> = vec![
+                            name_col.into(),
+                            widget::space::horizontal().width(Length::Fixed(1.0)).into(),
+                            widget::container(cell_text(modified_text.clone()))
                                 .padding([0, 12])
                                 .width(Length::Fixed(modified_width))
+                                .align_y(Alignment::Center)
                                 .into(),
-                            widget::container(widget::text::caption(size_text.clone()))
+                            widget::space::horizontal().width(Length::Fixed(1.0)).into(),
+                            widget::container(cell_text(size_text.clone()))
                                 .padding([0, 12])
                                 .width(Length::Fixed(size_width))
+                                .align_y(Alignment::Center)
                                 .into(),
                         ];
                         if show_kind {
+                            cells.push(widget::space::horizontal().width(Length::Fixed(1.0)).into());
                             cells.push(
-                                widget::container(widget::text::caption(kind_text))
+                                widget::container(cell_text(kind_text.to_string()))
                                     .padding([0, 12])
                                     .width(Length::Fixed(kind_width))
+                                    .align_y(Alignment::Center)
                                     .into(),
                             );
                         }
                         widget::row::with_children(cells)
                             .height(Length::Fixed(f32::from(row_height)))
                             .align_y(Alignment::Center)
-                            .spacing(space_xxs)
+                            .spacing(0)
+                    } else {
+                        let name_cell = widget::container(
+                            widget::row::with_children([
+                                row_icon.into(),
+                                Item::list_display_name(item.display_name.clone())
+                                    .width(Length::Fill)
+                                    .into(),
+                            ])
+                            .align_y(Alignment::Center)
+                            .spacing(8),
+                        )
+                        .padding([0, 12])
+                        .width(Length::Fill);
+
+                        let mut cells: Vec<Element<'_, Message>> = vec![
+                            name_cell.into(),
+                            widget::space::horizontal().width(Length::Fixed(1.0)).into(),
+                            widget::container(cell_text(modified_text.clone()))
+                                .padding([0, 12])
+                                .width(Length::Fixed(modified_width))
+                                .align_y(Alignment::Center)
+                                .into(),
+                            widget::space::horizontal().width(Length::Fixed(1.0)).into(),
+                            widget::container(cell_text(size_text.clone()))
+                                .padding([0, 12])
+                                .width(Length::Fixed(size_width))
+                                .align_y(Alignment::Center)
+                                .into(),
+                        ];
+                        if show_kind {
+                            cells.push(widget::space::horizontal().width(Length::Fixed(1.0)).into());
+                            cells.push(
+                                widget::container(cell_text(kind_text.to_string()))
+                                    .padding([0, 12])
+                                    .width(Length::Fixed(kind_width))
+                                    .align_y(Alignment::Center)
+                                    .into(),
+                            );
+                        }
+                        widget::row::with_children(cells)
+                            .height(Length::Fixed(f32::from(row_height)))
+                            .align_y(Alignment::Center)
+                            .spacing(0)
                     };
 
                     let button = |row| {
@@ -6044,7 +6109,7 @@ impl Tab {
                             widget::button::custom(row)
                                 .width(Length::Fill)
                                 .id(item.button_id.clone())
-                                .padding([0, 12])
+                                .padding(0)
                                 .class(list_row_style(
                                     item.selected,
                                     item.highlighted,

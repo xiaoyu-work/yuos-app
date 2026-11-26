@@ -405,8 +405,33 @@ fn sidebar_item_style(theme: &Theme, active: bool, hovered: bool) -> button::Sty
         } else {
             Color::from_rgb8(0x25, 0x30, 0x41)
         });
-        style.icon_color = Some(Color::from_rgb8(0x2b, 0x88, 0xff));
+        style.icon_color = None;
     }
+    style
+}
+
+pub fn sidebar_chevron_button(active: bool) -> theme::Button {
+    theme::Button::Custom {
+        active: Box::new(move |_focused, theme| sidebar_chevron_style(theme, active)),
+        hovered: Box::new(move |_focused, theme| sidebar_chevron_style(theme, active)),
+        pressed: Box::new(move |_focused, theme| sidebar_chevron_style(theme, active)),
+        disabled: Box::new(move |theme| sidebar_chevron_style(theme, active)),
+    }
+}
+
+fn sidebar_chevron_style(theme: &Theme, active: bool) -> button::Style {
+    let is_dark = theme.cosmic().is_dark;
+    let mut style = button::Style::new();
+    style.border_radius = 4.0.into();
+    let fg = if active {
+        Color::WHITE
+    } else if is_dark {
+        Color::from_rgb8(0x98, 0xa4, 0xb5)
+    } else {
+        Color::from_rgb8(0x64, 0x74, 0x8b)
+    };
+    style.text_color = Some(fg);
+    style.icon_color = Some(fg);
     style
 }
 

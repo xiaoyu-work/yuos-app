@@ -2691,8 +2691,68 @@ impl App {
     }
 
     fn yu_agent_icon(size: u16) -> widget::Icon {
-        const YU_AGENT_SVG: &[u8] = br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M11.5 3.8L3.2 19.8M15 9.6L9.5 19.8M18.8 13.5L15.4 19.8" stroke="#19202b" stroke-width="2.5" stroke-linecap="round"/><circle cx="19.8" cy="19.1" r="2.5" fill="#005cfe"/></svg>"##;
+        const YU_AGENT_SVG: &[u8] = br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M11.5 3.8L3.2 19.8M15 9.6L9.5 19.8M18.8 13.5L15.4 19.8" stroke="#19202b" stroke-width="2.2" stroke-linecap="round"/><circle cx="19.8" cy="19.1" r="2.5" fill="#005cfe"/></svg>"##;
         icon::icon(icon::from_svg_bytes(YU_AGENT_SVG)).size(size)
+    }
+
+    fn toolbar_svg_icon(kind: &str, size: u16) -> widget::Icon {
+        let bytes: &[u8] = match kind {
+            "sidebar-toggle" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.8" y="2.4" width="12.4" height="11.2" rx="2.0" stroke="#465264" stroke-width="1.2"/><line x1="6.0" y1="2.6" x2="6.0" y2="13.4" stroke="#465264" stroke-width="1.15"/><line x1="3.3" y1="5.2" x2="4.7" y2="5.2" stroke="#465264" stroke-width="1.1" stroke-linecap="round"/><line x1="3.3" y1="7.4" x2="4.7" y2="7.4" stroke="#465264" stroke-width="1.1" stroke-linecap="round"/></svg>"##,
+            "folder-new" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.8 4.0C1.8 3.34 2.34 2.8 3.0 2.8H6.0L7.4 4.3H13.0C13.66 4.3 14.2 4.84 14.2 5.5V12.2C14.2 12.86 13.66 13.4 13.0 13.4H3.0C2.34 13.4 1.8 12.86 1.8 12.2V4.0Z" stroke="#465264" stroke-width="1.2" stroke-linejoin="round"/><path d="M8.0 6.7V10.9M5.9 8.8H10.1" stroke="#465264" stroke-width="1.2" stroke-linecap="round"/></svg>"##,
+            "tab-new" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.0" y="2.4" width="12.0" height="11.2" rx="2.0" stroke="#465264" stroke-width="1.2"/><path d="M8.0 5.4V10.6M5.4 8.0H10.6" stroke="#465264" stroke-width="1.2" stroke-linecap="round"/></svg>"##,
+            "view-list" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="2.5" y1="4.2" x2="13.5" y2="4.2" stroke="#465264" stroke-width="1.25" stroke-linecap="round"/><line x1="2.5" y1="8.0" x2="13.5" y2="8.0" stroke="#465264" stroke-width="1.25" stroke-linecap="round"/><line x1="2.5" y1="11.8" x2="13.5" y2="11.8" stroke="#465264" stroke-width="1.25" stroke-linecap="round"/></svg>"##,
+            "view-grid" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.3" y="2.3" width="4.6" height="4.6" rx="1.0" stroke="#465264" stroke-width="1.2"/><rect x="9.1" y="2.3" width="4.6" height="4.6" rx="1.0" stroke="#465264" stroke-width="1.2"/><rect x="2.3" y="9.1" width="4.6" height="4.6" rx="1.0" stroke="#465264" stroke-width="1.2"/><rect x="9.1" y="9.1" width="4.6" height="4.6" rx="1.0" stroke="#465264" stroke-width="1.2"/></svg>"##,
+            "sort" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5.2 3.2V12.8M5.2 3.2L3.1 5.3M5.2 3.2L7.3 5.3M10.8 12.8V3.2M10.8 12.8L8.7 10.7M10.8 12.8L12.9 10.7" stroke="#465264" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
+            "paste" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3.2" y="3.2" width="9.6" height="10.6" rx="1.6" stroke="#465264" stroke-width="1.2"/><path d="M6.0 3.2V2.5C6.0 2.1 6.3 1.8 6.7 1.8H9.3C9.7 1.8 10.0 2.1 10.0 2.5V3.2" stroke="#465264" stroke-width="1.2"/></svg>"##,
+            "trash" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.2 4.4H12.8M6.0 4.4V3.1C6.0 2.66 6.36 2.3 6.8 2.3H9.2C9.64 2.3 10.0 2.66 10.0 3.1V4.4M4.3 4.4L4.9 12.8C4.94 13.36 5.4 13.8 5.96 13.8H10.04C10.6 13.8 11.06 13.36 11.1 12.8L11.7 4.4" stroke="#465264" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
+            "rename" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10.8 2.6L13.4 5.2L5.6 13.0H3.0V10.4L10.8 2.6Z" stroke="#465264" stroke-width="1.2" stroke-linejoin="round"/></svg>"##,
+            "compress" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8.0 2.1L13.4 5.1V10.9L8.0 13.9L2.6 10.9V5.1L8.0 2.1Z" stroke="#465264" stroke-width="1.2" stroke-linejoin="round"/><path d="M2.8 5.2L8.0 8.1L13.2 5.2M8.0 8.1V13.8" stroke="#465264" stroke-width="1.15"/></svg>"##,
+            "preview" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.6 8.0C2.9 5.2 5.2 3.8 8.0 3.8C10.8 3.8 13.1 5.2 14.4 8.0C13.1 10.8 10.8 12.2 8.0 12.2C5.2 12.2 2.9 10.8 1.6 8.0Z" stroke="#465264" stroke-width="1.2" stroke-linejoin="round"/><circle cx="8.0" cy="8.0" r="2.0" stroke="#465264" stroke-width="1.2"/></svg>"##,
+            "cut" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="4.5" cy="11.5" r="1.9" stroke="#465264" stroke-width="1.2"/><circle cx="11.5" cy="11.5" r="1.9" stroke="#465264" stroke-width="1.2"/><path d="M5.9 10.1L12.5 3.2M10.1 10.1L3.5 3.2" stroke="#465264" stroke-width="1.2" stroke-linecap="round"/></svg>"##,
+            "copy" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="5.2" y="5.2" width="8.2" height="8.6" rx="1.5" stroke="#465264" stroke-width="1.2"/><path d="M3.6 10.8H3.2C2.54 10.8 2.0 10.26 2.0 9.6V3.4C2.0 2.74 2.54 2.2 3.2 2.2H9.2C9.86 2.2 10.4 2.74 10.4 3.4V3.8" stroke="#465264" stroke-width="1.2" stroke-linecap="round"/></svg>"##,
+            "terminal" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.8" y="2.6" width="12.4" height="10.8" rx="2.0" stroke="#465264" stroke-width="1.2"/><path d="M4.5 6.0L6.9 8.0L4.5 10.0M7.8 10.2H11.2" stroke="#465264" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
+            _ => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="#465264" stroke-width="1.2"/></svg>"##,
+        };
+        icon::icon(icon::from_svg_bytes(bytes)).size(size)
+    }
+
+    fn sidebar_svg_icon(kind: &str, active: bool, size: u16) -> widget::Icon {
+        let bytes: &[u8] = if active {
+            match kind {
+                "recents" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.1" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.3"/><path d="M8 4.6V8.2L10.4 9.6" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
+                "home" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.6 7.4L8 2.7L13.4 7.4V13.1C13.4 13.65 12.95 14.1 12.4 14.1H3.6C3.05 14.1 2.6 13.65 2.6 13.1V7.4Z" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.3" stroke-linejoin="round"/><path d="M6.3 14.1V9.8H9.7V14.1" stroke="#ffffff" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
+                "desktop" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.8" y="2.5" width="12.4" height="8.6" rx="1.6" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.3"/><path d="M5.5 13.6H10.5M8 11.1V13.6" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round"/></svg>"##,
+                "documents" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 2.2H9.6L12.5 5.1V13.2C12.5 13.75 12.05 14.2 11.5 14.2H3.5C2.95 14.2 2.5 13.75 2.5 13.2V3.2C2.5 2.65 2.95 2.2 3.5 2.2Z" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.25" stroke-linejoin="round"/><path d="M9.4 2.3V5.2H12.3M4.8 8H10.2M4.8 10.4H8.6" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
+                "downloads" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.1" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.3"/><path d="M8 4.8V10.4M5.6 8.3L8 10.7L10.4 8.3" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
+                "music" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6.2 11.8V4.2L12.8 2.8V10.4" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4.5" cy="11.8" r="1.9" fill="#ffffff" fill-opacity="0.3" stroke="#ffffff" stroke-width="1.2"/><circle cx="11.1" cy="10.4" r="1.9" fill="#ffffff" fill-opacity="0.3" stroke="#ffffff" stroke-width="1.2"/></svg>"##,
+                "pictures" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.1" y="2.5" width="11.8" height="11" rx="1.8" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.25"/><circle cx="5.4" cy="5.7" r="1.2" fill="#ffffff"/><path d="M2.5 11.6L6.1 8.2L8.9 10.8L11.1 8.9L13.5 11.6" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
+                "videos" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.8" y="3.0" width="12.4" height="10.0" rx="1.8" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.25"/><path d="M6.6 5.8L10.4 8.0L6.6 10.2V5.8Z" fill="#ffffff"/></svg>"##,
+                "developer" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.8 4.2C1.8 3.54 2.34 3 3 3H6.1L7.5 4.5H13C13.66 4.5 14.2 5.04 14.2 5.7V12.2C14.2 12.86 13.66 13.4 13 13.4H3C2.34 13.4 1.8 12.86 1.8 12.2V4.2Z" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.25" stroke-linejoin="round"/><path d="M6.5 7.4L4.9 9.0L6.5 10.6M9.5 7.4L11.1 9.0L9.5 10.6" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
+                "disk" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.0" y="3.5" width="12.0" height="9.0" rx="1.8" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.25"/><line x1="2.2" y1="9.2" x2="13.8" y2="9.2" stroke="#ffffff" stroke-width="1.1"/><circle cx="11.4" cy="10.8" r="1.0" fill="#ffffff"/><line x1="4.2" y1="10.8" x2="7.2" y2="10.8" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/></svg>"##,
+                "network" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.1" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.25"/><ellipse cx="8" cy="8" rx="2.8" ry="6.1" stroke="#ffffff" stroke-width="1.15"/><line x1="2.1" y1="8" x2="13.9" y2="8" stroke="#ffffff" stroke-width="1.15"/></svg>"##,
+                "trash" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.2 4.4H12.8M6.0 4.4V3.1C6.0 2.66 6.36 2.3 6.8 2.3H9.2C9.64 2.3 10.0 2.66 10.0 3.1V4.4M4.3 4.4L4.9 12.8C4.94 13.36 5.4 13.8 5.96 13.8H10.04C10.6 13.8 11.06 13.36 11.1 12.8L11.7 4.4" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
+                _ => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.8 4.0C1.8 3.34 2.34 2.8 3.0 2.8H6.1L7.5 4.3H13.0C13.66 4.3 14.2 4.84 14.2 5.5V12.2C14.2 12.86 13.66 13.4 13.0 13.4H3.0C2.34 13.4 1.8 12.86 1.8 12.2V4.0Z" fill="#ffffff" fill-opacity="0.25" stroke="#ffffff" stroke-width="1.25" stroke-linejoin="round"/></svg>"##,
+            }
+        } else {
+            match kind {
+                "recents" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.1" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.3"/><path d="M8 4.6V8.2L10.4 9.6" stroke="#d97706" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
+                "home" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.6 7.4L8 2.7L13.4 7.4V13.1C13.4 13.65 12.95 14.1 12.4 14.1H3.6C3.05 14.1 2.6 13.65 2.6 13.1V7.4Z" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.25" stroke-linejoin="round"/><path d="M6.3 14.1V9.8H9.7V14.1" stroke="#0284c7" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
+                "desktop" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.8" y="2.5" width="12.4" height="8.6" rx="1.6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.25"/><path d="M5.5 13.6H10.5M8 11.1V13.6" stroke="#4f46e5" stroke-width="1.25" stroke-linecap="round"/></svg>"##,
+                "documents" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 2.2H9.6L12.5 5.1V13.2C12.5 13.75 12.05 14.2 11.5 14.2H3.5C2.95 14.2 2.5 13.75 2.5 13.2V3.2C2.5 2.65 2.95 2.2 3.5 2.2Z" fill="#ffe4e6" stroke="#e11d48" stroke-width="1.25" stroke-linejoin="round"/><path d="M9.4 2.3V5.2H12.3" stroke="#e11d48" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.8 8H10.2M4.8 10.4H8.6" stroke="#f43f5e" stroke-width="1.15" stroke-linecap="round"/></svg>"##,
+                "downloads" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.1" fill="#d1fae5" stroke="#10b981" stroke-width="1.25"/><path d="M8 4.8V10.4M5.6 8.3L8 10.7L10.4 8.3" stroke="#059669" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
+                "music" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6.2 11.8V4.2L12.8 2.8V10.4" stroke="#db2777" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4.5" cy="11.8" r="1.9" fill="#fbcfe8" stroke="#db2777" stroke-width="1.2"/><circle cx="11.1" cy="10.4" r="1.9" fill="#fbcfe8" stroke="#db2777" stroke-width="1.2"/></svg>"##,
+                "pictures" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.1" y="2.5" width="11.8" height="11" rx="1.8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.25"/><circle cx="5.4" cy="5.7" r="1.2" fill="#f59e0b"/><path d="M2.5 11.6L6.1 8.2L8.9 10.8L11.1 8.9L13.5 11.6" stroke="#7c3aed" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
+                "videos" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.8" y="3.0" width="12.4" height="10.0" rx="1.8" fill="#ffedd5" stroke="#ea580c" stroke-width="1.25"/><path d="M6.6 5.8L10.4 8.0L6.6 10.2V5.8Z" fill="#ea580c"/></svg>"##,
+                "developer" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.8 4.2C1.8 3.54 2.34 3 3 3H6.1L7.5 4.5H13C13.66 4.5 14.2 5.04 14.2 5.7V12.2C14.2 12.86 13.66 13.4 13 13.4H3C2.34 13.4 1.8 12.86 1.8 12.2V4.2Z" fill="#ccfbf1" stroke="#0d9488" stroke-width="1.25" stroke-linejoin="round"/><path d="M6.5 7.4L4.9 9.0L6.5 10.6M9.5 7.4L11.1 9.0L9.5 10.6" stroke="#0f766e" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
+                "accounting" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.8 4.0C1.8 3.34 2.34 2.8 3.0 2.8H6.1L7.5 4.3H13.0C13.66 4.3 14.2 4.84 14.2 5.5V12.2C14.2 12.86 13.66 13.4 13.0 13.4H3.0C2.34 13.4 1.8 12.86 1.8 12.2V4.0Z" fill="#fef3c7" stroke="#d97706" stroke-width="1.2" stroke-linejoin="round"/></svg>"##,
+                "design" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.8 4.0C1.8 3.34 2.34 2.8 3.0 2.8H6.1L7.5 4.3H13.0C13.66 4.3 14.2 4.84 14.2 5.5V12.2C14.2 12.86 13.66 13.4 13.0 13.4H3.0C2.34 13.4 1.8 12.86 1.8 12.2V4.0Z" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.2" stroke-linejoin="round"/></svg>"##,
+                "disk" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.0" y="3.5" width="12.0" height="9.0" rx="1.8" fill="#e2e8f0" stroke="#475569" stroke-width="1.25"/><line x1="2.2" y1="9.2" x2="13.8" y2="9.2" stroke="#64748b" stroke-width="1.1"/><circle cx="11.4" cy="10.8" r="1.0" fill="#10b981"/><line x1="4.2" y1="10.8" x2="7.2" y2="10.8" stroke="#64748b" stroke-width="1.2" stroke-linecap="round"/></svg>"##,
+                "network" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.1" fill="#cffafe" stroke="#0891b2" stroke-width="1.25"/><ellipse cx="8" cy="8" rx="2.8" ry="6.1" stroke="#0891b2" stroke-width="1.15"/><line x1="2.1" y1="8" x2="13.9" y2="8" stroke="#0891b2" stroke-width="1.15"/></svg>"##,
+                "trash" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.2 4.4H12.8M6.0 4.4V3.1C6.0 2.66 6.36 2.3 6.8 2.3H9.2C9.64 2.3 10.0 2.66 10.0 3.1V4.4M4.3 4.4L4.9 12.8C4.94 13.36 5.4 13.8 5.96 13.8H10.04C10.6 13.8 11.06 13.36 11.1 12.8L11.7 4.4" fill="#f1f5f9" stroke="#64748b" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.8 6.8V11.3M9.2 6.8V11.3" stroke="#94a3b8" stroke-width="1.15" stroke-linecap="round"/></svg>"##,
+                _ => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.8 4.0C1.8 3.34 2.34 2.8 3.0 2.8H6.1L7.5 4.3H13.0C13.66 4.3 14.2 4.84 14.2 5.5V12.2C14.2 12.86 13.66 13.4 13.0 13.4H3.0C2.34 13.4 1.8 12.86 1.8 12.2V4.0Z" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="1.2" stroke-linejoin="round"/></svg>"##,
+            }
+        };
+        icon::icon(icon::from_svg_bytes(bytes)).size(size)
     }
 
     fn finder_sidebar(&self) -> Element<'_, Message> {
@@ -2702,26 +2762,20 @@ impl App {
             .map(|tab| tab.location.clone());
         let active_path = active_loc.as_ref().and_then(|l| l.path_opt()).cloned();
 
-        let toggle_btn = widget::button::custom(
-            icon::from_name("view-sidebar-symbolic").size(16).icon(),
-        )
-        .padding([5, 7])
-        .class(crate::glass::toolbar_icon_button(false))
-        .on_press(Message::SidebarToggleMenu);
+        let toggle_btn = widget::button::custom(Self::toolbar_svg_icon("sidebar-toggle", 16))
+            .padding([5, 7])
+            .class(crate::glass::toolbar_icon_button(false))
+            .on_press(Message::SidebarToggleMenu);
 
-        let new_folder_btn = widget::button::custom(
-            icon::from_name("folder-new-symbolic").size(15).icon(),
-        )
-        .padding([5, 6])
-        .class(crate::glass::toolbar_icon_button(false))
-        .on_press(Message::NewItem(None, true));
+        let new_folder_btn = widget::button::custom(Self::toolbar_svg_icon("folder-new", 15))
+            .padding([5, 6])
+            .class(crate::glass::toolbar_icon_button(false))
+            .on_press(Message::NewItem(None, true));
 
-        let new_tab_btn = widget::button::custom(
-            icon::from_name("tab-new-symbolic").size(15).icon(),
-        )
-        .padding([5, 6])
-        .class(crate::glass::toolbar_icon_button(false))
-        .on_press(Message::TabNew);
+        let new_tab_btn = widget::button::custom(Self::toolbar_svg_icon("tab-new", 15))
+            .padding([5, 6])
+            .class(crate::glass::toolbar_icon_button(false))
+            .on_press(Message::TabNew);
 
         let header = widget::container(
             widget::row::with_children([
@@ -2743,13 +2797,17 @@ impl App {
         let mut list = widget::column::with_capacity(24).spacing(2).padding([8, 8]);
 
         list = list.push(
-            widget::container(widget::text::caption("▾ ★ Favourites"))
-                .padding([6, 8, 4, 8]),
+            widget::container(
+                widget::text::text("▾  Favourites")
+                    .size(11.0)
+                    .font(cosmic::font::light()),
+            )
+            .padding([6, 8, 4, 8]),
         );
 
         let nav_row = |indent: u16,
                        chev: Option<(bool, PathBuf)>,
-                       icon_name: &'static str,
+                       icon_kind: &'static str,
                        label: String,
                        target: Location,
                        active: bool,
@@ -2757,37 +2815,43 @@ impl App {
          -> Element<'_, Message> {
             let mut row = widget::row::with_capacity(5)
                 .align_y(Alignment::Center)
-                .spacing(6);
+                .spacing(7);
             if indent > 0 {
                 row = row.push(widget::space::horizontal().width(Length::Fixed(f32::from(indent))));
             }
             if let Some((expanded, p)) = chev {
                 let chev_label = if expanded { "▾" } else { "›" };
                 row = row.push(
-                    widget::button::custom(widget::text::caption(chev_label))
-                        .padding([0, 2])
-                        .class(theme::Button::Text)
-                        .on_press(Message::SidebarToggleExpand(p)),
+                    widget::button::custom(
+                        widget::text::text(chev_label)
+                            .size(11.0)
+                            .font(cosmic::font::light()),
+                    )
+                    .padding([0, 2])
+                    .class(crate::glass::sidebar_chevron_button(active))
+                    .on_press(Message::SidebarToggleExpand(p)),
                 );
             } else {
                 row = row.push(widget::space::horizontal().width(Length::Fixed(12.0)));
             }
-            row = row.push(icon::from_name(icon_name).size(15).icon());
+            row = row.push(Self::sidebar_svg_icon(icon_kind, active, 15));
             row = row.push(
-                widget::text::body(label)
+                widget::text::text(label)
+                    .size(12.5)
+                    .font(cosmic::font::light())
                     .wrapping(cosmic::iced::core::text::Wrapping::None)
                     .width(Length::Fill),
             );
             if let Some(dot_color) = tag_color {
-                let dot = widget::container(widget::space::horizontal().width(Length::Fixed(8.0)))
-                    .width(Length::Fixed(8.0))
-                    .height(Length::Fixed(8.0))
+                let dot = widget::container(widget::space::horizontal().width(Length::Fixed(7.0)))
+                    .width(Length::Fixed(7.0))
+                    .height(Length::Fixed(7.0))
                     .style(move |_| widget::container::Style {
                         background: Some(cosmic::iced::Background::Color(dot_color)),
                         border: cosmic::iced::Border {
                             color: cosmic::iced::Color::TRANSPARENT,
                             width: 0.0,
-                            radius: 4.0.into(),
+                            radius: 3.5.into(),
                         },
                         ..Default::default()
                     });
@@ -2807,7 +2871,7 @@ impl App {
         list = list.push(nav_row(
             0,
             None,
-            "document-open-recent-symbolic",
+            "recents",
             fl!("recents"),
             Location::Recents,
             recents_active,
@@ -2821,7 +2885,7 @@ impl App {
         list = list.push(nav_row(
             0,
             Some((home_expanded, home.clone())),
-            "user-home-symbolic",
+            "home",
             fl!("home"),
             Location::Path(home.clone()),
             home_active,
@@ -2873,12 +2937,14 @@ impl App {
                 let child_expanded = self.sidebar_expanded.contains(&child);
                 let child_active = active_path.as_ref() == Some(&child);
                 let child_ico = match child_name.as_str() {
-                    "Desktop" => "user-desktop-symbolic",
-                    "Downloads" => "folder-download-symbolic",
-                    "Music" => "folder-music-symbolic",
-                    "Pictures" => "folder-pictures-symbolic",
-                    "Videos" | "Movies" => "folder-videos-symbolic",
-                    _ => "folder-symbolic",
+                    "Desktop" => "desktop",
+                    "Documents" => "documents",
+                    "Downloads" => "downloads",
+                    "Music" => "music",
+                    "Pictures" => "pictures",
+                    "Videos" | "Movies" => "videos",
+                    "Developer" => "developer",
+                    _ => "folder",
                 };
                 let tag = match child_name.as_str() {
                     "Documents" => Some(cosmic::iced::Color::from_rgb8(0xff, 0x5f, 0x57)),
@@ -2914,10 +2980,15 @@ impl App {
                             .map(|n| n.to_string_lossy().into_owned())
                             .unwrap_or_default();
                         let gactive = active_path.as_ref() == Some(&gchild);
+                        let gico = match gname.as_str() {
+                            "Accounting" => "accounting",
+                            "Design" => "design",
+                            _ => "folder",
+                        };
                         list = list.push(nav_row(
                             28,
                             None,
-                            "folder-symbolic",
+                            gico,
                             gname,
                             Location::Path(gchild),
                             gactive,
@@ -2929,8 +3000,12 @@ impl App {
         }
 
         list = list.push(
-            widget::container(widget::text::caption("▾ Locations"))
-                .padding([12, 8, 4, 8]),
+            widget::container(
+                widget::text::text("▾  Locations")
+                    .size(11.0)
+                    .font(cosmic::font::light()),
+            )
+            .padding([12, 8, 4, 8]),
         );
 
         let root_path = PathBuf::from("/");
@@ -2938,7 +3013,7 @@ impl App {
         list = list.push(nav_row(
             0,
             None,
-            "drive-harddisk-symbolic",
+            "disk",
             "Yu OS Disk".to_string(),
             Location::Path(root_path),
             root_active,
@@ -2949,7 +3024,7 @@ impl App {
         list = list.push(nav_row(
             0,
             None,
-            "network-workgroup-symbolic",
+            "network",
             fl!("networks"),
             Location::Network("network:///".to_string(), fl!("networks"), None),
             net_active,
@@ -2960,7 +3035,7 @@ impl App {
         list = list.push(nav_row(
             0,
             None,
-            "user-trash-symbolic",
+            "trash",
             fl!("trash"),
             Location::Trash,
             trash_active,
@@ -3013,7 +3088,7 @@ impl App {
 
         if !self.core.nav_bar_active() {
             row = row.push(
-                widget::button::custom(icon::from_name("view-sidebar-symbolic").size(16).icon())
+                widget::button::custom(Self::toolbar_svg_icon("sidebar-toggle", 16))
                     .padding([5, 7])
                     .class(crate::glass::toolbar_icon_button(false))
                     .on_press(Message::SidebarToggleMenu),
@@ -3042,25 +3117,29 @@ impl App {
         }
 
         let title_drag = crate::mouse_area::MouseArea::new(
-            widget::container(widget::text::heading(folder_title))
-                .padding([0, 6])
-                .width(Length::Fill)
-                .height(Length::Fill)
-                .align_y(Alignment::Center),
+            widget::container(
+                widget::text::text(folder_title)
+                    .size(13.5)
+                    .font(cosmic::font::light()),
+            )
+            .padding([0, 6])
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .align_y(Alignment::Center),
         )
         .on_drag(|_| Message::WindowDrag)
         .on_double_click(|_| Message::WindowToggleMaximize);
 
-        let new_folder = widget::button::custom(icon::from_name("folder-new-symbolic").size(16).icon())
+        let new_folder = widget::button::custom(Self::toolbar_svg_icon("folder-new", 16))
             .padding([5, 6])
             .class(crate::glass::toolbar_icon_button(false))
             .on_press(Message::NewItem(None, true));
 
-        let list_btn = widget::button::custom(icon::from_name("view-list-symbolic").size(15).icon())
+        let list_btn = widget::button::custom(Self::toolbar_svg_icon("view-list", 15))
             .padding([4, 6])
             .class(crate::glass::toolbar_icon_button(matches!(view, tab::View::List)))
             .on_press(Message::TabView(None, tab::View::List));
-        let grid_btn = widget::button::custom(icon::from_name("view-grid-symbolic").size(15).icon())
+        let grid_btn = widget::button::custom(Self::toolbar_svg_icon("view-grid", 15))
             .padding([4, 6])
             .class(crate::glass::toolbar_icon_button(matches!(view, tab::View::Grid)))
             .on_press(Message::TabView(None, tab::View::Grid));
@@ -3070,15 +3149,13 @@ impl App {
         .padding(2)
         .class(theme::Container::custom(crate::glass::view_switcher_group));
 
-        let sort_btn = widget::button::custom(
-            icon::from_name("view-sort-ascending-symbolic").size(15).icon(),
-        )
-        .padding([5, 6])
-        .class(crate::glass::toolbar_icon_button(false))
-        .on_press(Message::TabMessage(
-            None,
-            tab::Message::ToggleSort(HeadingOptions::Name),
-        ));
+        let sort_btn = widget::button::custom(Self::toolbar_svg_icon("sort", 15))
+            .padding([5, 6])
+            .class(crate::glass::toolbar_icon_button(false))
+            .on_press(Message::TabMessage(
+                None,
+                tab::Message::ToggleSort(HeadingOptions::Name),
+            ));
 
         let search_term = self.search_get();
         let search_input = widget::text_input::search_input(
@@ -3147,8 +3224,8 @@ impl App {
         let has_selection = self.selected_paths(None).next().is_some();
         let can_paste = self.clipboard_has_content();
 
-        let act_btn = |icon_name: &'static str, enabled: bool, msg: Message| -> Element<'_, Message> {
-            let mut b = widget::button::custom(icon::from_name(icon_name).size(15).icon())
+        let act_btn = |icon_kind: &'static str, enabled: bool, msg: Message| -> Element<'_, Message> {
+            let mut b = widget::button::custom(Self::toolbar_svg_icon(icon_kind, 15))
                 .padding([4, 6])
                 .class(crate::glass::toolbar_icon_button(false));
             if enabled {
@@ -3171,19 +3248,24 @@ impl App {
             .class(crate::glass::toolbar_icon_button(self.ai_drawer_open))
             .on_press(Message::ToggleAiDrawer);
 
+        let term_btn = widget::button::custom(Self::toolbar_svg_icon("terminal", 15))
+            .padding([4, 6])
+            .class(crate::glass::toolbar_icon_button(false))
+            .on_press(Message::OpenTerminal(None));
+
         let row = widget::row::with_children([
-            act_btn("folder-new-symbolic", true, Message::NewItem(None, true)),
-            act_btn("edit-paste-symbolic", can_paste, Message::Paste(None)),
+            act_btn("folder-new", true, Message::NewItem(None, true)),
+            act_btn("paste", can_paste, Message::Paste(None)),
             sep(),
-            act_btn("user-trash-symbolic", has_selection, Message::Delete(None)),
-            act_btn("edit-symbolic", has_selection, Message::Rename(None)),
-            act_btn("package-x-generic-symbolic", has_selection, Message::Compress(None)),
-            act_btn("view-reveal-symbolic", has_selection, Message::Preview(None)),
+            act_btn("trash", has_selection, Message::Delete(None)),
+            act_btn("rename", has_selection, Message::Rename(None)),
+            act_btn("compress", has_selection, Message::Compress(None)),
+            act_btn("preview", has_selection, Message::Preview(None)),
             sep(),
-            act_btn("edit-cut-symbolic", has_selection, Message::Cut(None)),
-            act_btn("edit-copy-symbolic", has_selection, Message::Copy(None)),
+            act_btn("cut", has_selection, Message::Cut(None)),
+            act_btn("copy", has_selection, Message::Copy(None)),
             widget::space::horizontal().width(Length::Fill).into(),
-            act_btn("utilities-terminal-symbolic", true, Message::OpenTerminal(None)),
+            term_btn.into(),
             sep(),
             ai_btn.into(),
         ])
@@ -3213,7 +3295,11 @@ impl App {
         let header = widget::container(
             widget::row::with_children([
                 Self::yu_agent_icon(16).into(),
-                widget::text::heading("Yu Agent").width(Length::Fill).into(),
+                widget::text::text("Yu Agent")
+                    .size(13.0)
+                    .font(cosmic::font::light())
+                    .width(Length::Fill)
+                    .into(),
                 widget::button::custom(icon::from_name("window-close-symbolic").size(14).icon())
                     .padding([4, 5])
                     .class(crate::glass::toolbar_icon_button(false))
@@ -3235,8 +3321,11 @@ impl App {
         pills = pills.push(
             widget::container(
                 widget::row::with_children([
-                    icon::from_name("folder-symbolic").size(12).icon().into(),
-                    widget::text::caption(folder_name.clone()).into(),
+                    Self::sidebar_svg_icon("folder", false, 12).into(),
+                    widget::text::text(folder_name.clone())
+                        .size(11.5)
+                        .font(cosmic::font::light())
+                        .into(),
                 ])
                 .spacing(4)
                 .align_y(Alignment::Center),
@@ -3248,11 +3337,11 @@ impl App {
             pills = pills.push(
                 widget::container(
                     widget::row::with_children([
-                        icon::from_name("text-x-generic-symbolic")
-                            .size(12)
-                            .icon()
+                        Self::sidebar_svg_icon("documents", false, 12).into(),
+                        widget::text::text(sel.clone())
+                            .size(11.5)
+                            .font(cosmic::font::light())
                             .into(),
-                        widget::text::caption(sel.clone()).into(),
                     ])
                     .spacing(4)
                     .align_y(Alignment::Center),
@@ -3267,11 +3356,15 @@ impl App {
             .class(theme::Container::custom(crate::glass::ai_context_bar_surface));
 
         let chip = |label: &'static str, msg: Message| -> Element<'_, Message> {
-            widget::button::custom(widget::text::caption(label))
-                .padding([4, 8])
-                .class(crate::glass::ai_chip_button())
-                .on_press(msg)
-                .into()
+            widget::button::custom(
+                widget::text::text(label)
+                    .size(11.5)
+                    .font(cosmic::font::light()),
+            )
+            .padding([4, 8])
+            .class(crate::glass::ai_chip_button())
+            .on_press(msg)
+            .into()
         };
 
         let chips = widget::column::with_children([
@@ -3297,11 +3390,15 @@ impl App {
 
         let user_bubble = widget::row::with_children([
             widget::space::horizontal().width(Length::Fixed(24.0)).into(),
-            widget::container(widget::text::caption(user_prompt))
-                .padding([7, 10])
-                .width(Length::Fill)
-                .class(theme::Container::custom(crate::glass::ai_user_bubble))
-                .into(),
+            widget::container(
+                widget::text::text(user_prompt)
+                    .size(11.5)
+                    .font(cosmic::font::light()),
+            )
+            .padding([7, 10])
+            .width(Length::Fill)
+            .class(theme::Container::custom(crate::glass::ai_user_bubble))
+            .into(),
         ]);
 
         let folder_summary = {
@@ -3349,10 +3446,14 @@ impl App {
             _ => folder_summary,
         };
 
-        let agent_card = widget::container(widget::text::caption(agent_text))
-            .padding([9, 11])
-            .width(Length::Fill)
-            .class(theme::Container::custom(crate::glass::ai_agent_card));
+        let agent_card = widget::container(
+            widget::text::text(agent_text)
+                .size(11.5)
+                .font(cosmic::font::light()),
+        )
+        .padding([9, 11])
+        .width(Length::Fill)
+        .class(theme::Container::custom(crate::glass::ai_agent_card));
 
         let messages_col = widget::column::with_children([
             chips.into(),
@@ -3439,7 +3540,10 @@ impl App {
                 Some(bytes) => format!("{counts}, {} available", tab::format_size(bytes)),
                 None => counts,
             };
-            widget::text::caption(label).into()
+            widget::text::text(label)
+                .size(11.5)
+                .font(cosmic::font::light())
+                .into()
         } else {
             widget::space::horizontal().into()
         };
@@ -3500,11 +3604,7 @@ impl App {
         let last_index = segments.len().saturating_sub(1);
         for (idx, segment) in segments.into_iter().enumerate() {
             let is_home_seg = segment == home;
-            let ico_name = if is_home_seg {
-                "user-home-symbolic"
-            } else {
-                "folder-symbolic"
-            };
+            let ico_kind = if is_home_seg { "home" } else { "folder" };
             let label = if segment.parent().is_none() {
                 "/".to_string()
             } else {
@@ -3513,18 +3613,33 @@ impl App {
                     .map(|n| n.to_string_lossy().into_owned())
                     .unwrap_or_else(|| segment.to_string_lossy().into_owned())
             };
-            children.push(icon::from_name(ico_name).size(13).icon().into());
+            children.push(Self::sidebar_svg_icon(ico_kind, false, 13).into());
             if idx == last_index {
-                children.push(widget::text::caption(label).into());
+                children.push(
+                    widget::text::text(label)
+                        .size(11.5)
+                        .font(cosmic::font::light())
+                        .into(),
+                );
             } else {
                 let target = location.with_path(segment);
                 children.push(
-                    widget::button::link(label)
-                        .on_press(Message::TabMessage(None, tab::Message::Location(target)))
-                        .padding(0)
+                    widget::button::custom(
+                        widget::text::text(label)
+                            .size(11.5)
+                            .font(cosmic::font::light()),
+                    )
+                    .on_press(Message::TabMessage(None, tab::Message::Location(target)))
+                    .padding([1, 3])
+                    .class(crate::glass::sidebar_chevron_button(false))
+                    .into(),
+                );
+                children.push(
+                    widget::text::text("›")
+                        .size(11.5)
+                        .font(cosmic::font::light())
                         .into(),
                 );
-                children.push(widget::text::caption("›").into());
             }
         }
 
@@ -6498,6 +6613,14 @@ impl Application for App {
                             let _ = has_direct_selection(&tab_path, selection_paths.as_deref());
                             self.home_dashboard_tabs.remove(&entity);
                             self.activate_nav_model_location(&tab_path);
+                            self.ai_last_prompt = None;
+                            self.ai_last_response = None;
+                            if matches!(
+                                self.ai_assist_status,
+                                AiAssistStatus::Ready(_) | AiAssistStatus::Error(_)
+                            ) {
+                                self.ai_assist_status = AiAssistStatus::Idle;
+                            }
 
                             self.tab_model.text_set(entity, tab_title);
                             // clear the prefix selection buffer when changing location
