@@ -32,21 +32,20 @@ pub(crate) fn load() -> Result<Catalog, String> {
 
 impl App {
     pub(crate) fn source_check_button(&self) -> Element<'_, Message> {
-        let mut check = widget::button::standard(if self.refreshing_sources {
-            fl!("checking-for-updates")
-        } else {
-            fl!("check-for-updates")
-        });
-        if !self.refreshing_sources && self.pending_operations.is_empty() {
-            check = check.on_press(Message::CheckUpdates);
-        }
-        check.into()
+        crate::glass::pill_button(
+            if self.refreshing_sources {
+                fl!("checking-for-updates")
+            } else {
+                fl!("check-for-updates")
+            },
+            crate::glass::Pill::Plain,
+            (!self.refreshing_sources && self.pending_operations.is_empty())
+                .then_some(Message::CheckUpdates),
+        )
     }
 
     pub(crate) fn yuos_apps_view(&self, updates: bool) -> Element<'_, Message> {
-        let mut column = widget::column::with_capacity(4)
-            .spacing(12)
-            .width(Length::Fill);
+        let mut column = widget::column::with_capacity(4).width(Length::Fill);
         if let Some(result) = &self.yuos_catalog {
             match result {
                 Ok(catalog) => {
@@ -97,14 +96,26 @@ impl App {
                         };
                         let mut row = widget::row::with_capacity(2)
                             .spacing(12)
+                            .padding([10, 0])
                             .align_y(cosmic::iced::Alignment::Center);
                         row = row.push(
                             widget::column::with_capacity(3)
-                                .spacing(3)
+                                .spacing(2)
                                 .width(Length::Fill)
-                                .push(widget::text::heading(app.name.as_str()))
-                                .push(widget::text::body(app.description.as_str()))
-                                .push(widget::text::caption(status)),
+                                .push(
+                                    widget::text::body(app.name.as_str())
+                                        .font(cosmic::font::semibold()),
+                                )
+                                .push(
+                                    widget::text::body(app.description.as_str())
+                                        .size(12)
+                                        .class(crate::glass::secondary_text()),
+                                )
+                                .push(
+                                    widget::text::body(status)
+                                        .size(12)
+                                        .class(crate::glass::tertiary_text()),
+                                ),
                         );
                         if app.installed.is_none() || app.update {
                             let info = Arc::new(AppInfo {
@@ -125,16 +136,18 @@ impl App {
                             } else {
                                 (fl!("install"), OperationKind::Install)
                             };
-                            row = row.push(widget::button::standard(label).on_press(
-                                Message::Operation(
+                            row = row.push(crate::glass::pill_button(
+                                label,
+                                crate::glass::Pill::Accent,
+                                Some(Message::Operation(
                                     kind,
                                     BackendName::Packagekit,
                                     AppId::new(&app.id),
                                     info,
-                                ),
+                                )),
                             ));
                         }
-                        column = column.push(row);
+                        column = column.push(row).push(crate::glass::hairline());
                     }
                 }
                 Err(error) => {

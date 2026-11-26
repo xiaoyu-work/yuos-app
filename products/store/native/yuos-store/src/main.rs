@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 use cosmic::{
-    Application, ApplicationExt, Element, action,
+    Application, ApplicationExt, Apply, Element, action,
     app::{Core, CosmicFlags, Settings, Task, context_drawer},
     cosmic_config::{self, CosmicConfigEntry},
     cosmic_theme, executor,
@@ -42,7 +42,7 @@ mod app_id;
 
 mod argparse;
 
-use app_info::{AppIcon, AppInfo, AppKind, AppProvide, AppUrl};
+use app_info::{AppIcon, AppInfo, AppKind, AppProvide};
 mod app_info;
 
 use appstream_cache::AppstreamCache;
@@ -96,6 +96,8 @@ mod nav;
 
 use search::{CachedExploreResults, SearchResult};
 mod search;
+
+mod shell;
 
 mod view;
 
@@ -357,7 +359,14 @@ pub enum Message {
     UpdateAll,
     Updates((BackendName, Vec<(BackendName, Package)>)),
     WindowClose,
+    WindowDrag,
+    WindowMinimize,
     WindowNew,
+    WindowToggleMaximize,
+    MenuToggle,
+    MenuClose,
+    MenuAction(Box<Message>),
+    NavSelect(NavPage),
     SelectPlacement(cosmic::widget::segmented_button::Entity),
     PlaceApplet(AppId),
 }
@@ -448,6 +457,7 @@ pub struct App {
     pub repos_changing: Vec<(BackendName, String, bool)>,
     pub scrollable_id: widget::Id,
     pub scroll_views: HashMap<ScrollContext, scrollable::Viewport>,
+    pub menu_open: bool,
     pub search_active: bool,
     pub search_id: widget::Id,
     pub search_input: String,
@@ -2130,6 +2140,7 @@ impl Application for App {
             // XX must be a named id or responsive widget will discard the state
             scrollable_id: widget::Id::new("store-scrollable"),
             scroll_views: HashMap::new(),
+            menu_open: false,
             search_active: false,
             search_id: widget::Id::unique(),
             search_input: String::new(),
@@ -2188,7 +2199,11 @@ impl Application for App {
         }
 
         match app.mode {
-            Mode::Normal => {}
+            Mode::Normal => {
+                app.core.window.show_headerbar = false;
+                app.core.window.content_container = false;
+                app.core.window.show_window_menu = false;
+            }
             Mode::GStreamer { .. } => {
                 app.core.window.use_template = false;
             }
@@ -2199,10 +2214,7 @@ impl Application for App {
     }
 
     fn nav_model(&self) -> Option<&widget::nav_bar::Model> {
-        match self.mode {
-            Mode::GStreamer { .. } => None,
-            _ => Some(&self.nav_model),
-        }
+        None
     }
 
     #[cfg(feature = "single-instance")]
@@ -2251,6 +2263,7 @@ impl Application for App {
         // Note: Don't clear category_results here to avoid flicker - new results will replace
         self.explore_page_opt = None;
         self.search_active = false;
+        self.search_input.clear();
         self.search_results = None;
         self.selected_opt = None;
         self.nav_model.activate(id);
@@ -2431,137 +2444,11 @@ impl Application for App {
     }
 
     fn footer(&self) -> Option<Element<'_, Message>> {
-        if self.progress_operations.is_empty() {
-            return None;
-        }
-
-        let cosmic_theme::Spacing {
-            space_xxs,
-            space_xs,
-            space_s,
-            ..
-        } = theme::active().cosmic().spacing;
-
-        let mut title = String::new();
-        let mut total_progress = 0.0;
-        let mut count = 0;
-        for (_id, (op, progress)) in self.pending_operations.iter() {
-            if title.is_empty() {
-                title = op.pending_text((*progress * 100.0) as i32);
-            }
-            total_progress += progress;
-            count += 1;
-        }
-        let running = count;
-        let finished = count - running;
-        total_progress /= count as f32;
-        if running > 1 {
-            if finished > 0 {
-                title = fl!(
-                    "operations-running-finished",
-                    running = running,
-                    finished = finished,
-                    percent = (total_progress as i32)
-                );
-            } else {
-                title = fl!(
-                    "operations-running",
-                    running = running,
-                    percent = (total_progress as i32)
-                );
-            }
-        }
-
-        //TODO: get height from theme?
-        let progress_bar_height = Length::Fixed(4.0);
-        let progress_bar = widget::determinate_linear(total_progress)
-            .width(Length::Fill)
-            .girth(progress_bar_height);
-
-        let container = widget::layer_container(widget::column::with_children(vec![
-            progress_bar.into(),
-            widget::space::vertical().height(space_xs).into(),
-            widget::text::body(title).into(),
-            widget::space::vertical().height(space_s).into(),
-            widget::row::with_children(vec![
-                widget::button::link(fl!("details"))
-                    .on_press(Message::ToggleContextPage(ContextPage::Operations))
-                    .padding(0)
-                    .trailing_icon(true)
-                    .into(),
-                widget::space::horizontal().into(),
-                widget::button::standard(fl!("dismiss"))
-                    .on_press(Message::PendingDismiss)
-                    .into(),
-            ])
-            .align_y(Alignment::Center)
-            .into(),
-        ]))
-        .padding([space_xxs, space_xs])
-        .layer(cosmic_theme::Layer::Primary);
-
-        Some(container.into())
-    }
-
-    fn header_start(&self) -> Vec<Element<'_, Message>> {
         match self.mode {
-            Mode::Normal => vec![if self.search_active {
-                widget::text_input::search_input("", &self.search_input)
-                    .width(Length::Fixed(240.0))
-                    .id(self.search_id.clone())
-                    .on_clear(Message::SearchClear)
-                    .on_input(Message::SearchInput)
-                    .on_submit(Message::SearchSubmit)
-                    .into()
-            } else {
-                widget::button::icon(widget::icon::from_name("system-search-symbolic"))
-                    .on_press(Message::SearchActivate)
-                    .padding(8)
-                    .into()
-            }],
-            Mode::GStreamer { .. } => Vec::new(),
+            Mode::Normal => None,
+            Mode::GStreamer { .. } => self.operations_summary(),
         }
     }
-
-    fn header_end(&self) -> Vec<Element<'_, Message>> {
-        match self.mode {
-            Mode::Normal => {
-                let ask_yu = widget::tooltip(
-                    widget::button::icon(widget::icon::from_name("face-smile-symbolic"))
-                        .on_press(Message::AskYu),
-                    widget::text(fl!("ask-yu")),
-                    widget::tooltip::Position::Bottom,
-                );
-
-                let manage_repositories = widget::tooltip(
-                    widget::button::icon(widget::icon::from_name("application-menu-symbolic"))
-                        .on_press(Message::ToggleContextPage(ContextPage::Repositories)),
-                    widget::text(fl!("manage-repositories")),
-                    widget::tooltip::Position::Bottom,
-                );
-
-                let mut widgets = Vec::new();
-
-                if self.fetching_backends
-                    || self.update_apps_scheduled
-                    || self.update_apps_in_progress
-                    || self.explore_results_handle.is_some()
-                    || !self.pending_backend_updates.is_empty()
-                    || !self.pending_operations.is_empty()
-                    || !self.waiting_installed.is_empty()
-                    || !self.waiting_updates.is_empty()
-                {
-                    widgets.push(cosmic::widget::indeterminate_circular().size(20.0).into());
-                }
-
-                widgets.push(ask_yu.into());
-                widgets.push(manage_repositories.into());
-                widgets
-            }
-            Mode::GStreamer { .. } => Vec::new(),
-        }
-    }
-
     /// Creates a view after each update.
     fn view(&self) -> Element<'_, Self::Message> {
         let cosmic_theme::Spacing {
@@ -2572,21 +2459,41 @@ impl Application for App {
         } = theme::active().cosmic().spacing;
 
         let content: Element<_> = match &self.mode {
-            Mode::Normal => widget::responsive(move |mut size| {
-                size.width = size.width.min(MAX_GRID_WIDTH);
-                widget::id_container(
-                    widget::scrollable(
-                        widget::container(
-                            widget::container(self.view_responsive(size)).max_width(MAX_GRID_WIDTH),
+            Mode::Normal => {
+                let pages = widget::responsive(move |mut size| {
+                    size.width = size.width.min(MAX_GRID_WIDTH);
+                    widget::id_container(
+                        widget::scrollable(
+                            widget::container(
+                                widget::container(self.view_responsive(size))
+                                    .max_width(MAX_GRID_WIDTH),
+                            )
+                            .align_x(Alignment::Center),
                         )
-                        .align_x(Alignment::Center),
+                        .on_scroll(Message::ScrollView),
+                        self.scrollable_id.clone(),
                     )
-                    .on_scroll(Message::ScrollView),
-                    self.scrollable_id.clone(),
-                )
+                    .into()
+                });
+                widget::row::with_children(vec![
+                    self.finder_sidebar(),
+                    cosmic::iced::widget::rule::vertical(1)
+                        .class(glass::rule())
+                        .into(),
+                    widget::column::with_children(vec![
+                        self.finder_toolbar(),
+                        glass::hairline(),
+                        pages.into(),
+                    ])
+                    .width(Length::Fill)
+                    .into(),
+                ])
+                .apply(widget::container)
+                .width(Length::Fill)
+                .height(Length::Fill)
+                .class(theme::Container::custom(glass::content))
                 .into()
-            })
-            .into(),
+            }
             Mode::GStreamer {
                 codec,
                 selected,

@@ -676,9 +676,13 @@ impl App {
                 if input != self.search_input {
                     self.selected_opt = None;
                     self.search_input = input;
+                    self.search_active = !self.search_input.is_empty();
                     // This performs live search
                     if !self.search_input.is_empty() {
                         return self.search();
+                    }
+                    if self.search_results.take().is_some() {
+                        return self.update_scroll();
                     }
                 }
             }
@@ -1017,6 +1021,40 @@ impl App {
                         window::close(window_id),
                         Task::perform(async move { action::app(Message::MaybeExit) }, |x| x),
                     ]);
+                }
+            }
+            Message::WindowDrag => {
+                if let Some(window_id) = self.core.main_window_id() {
+                    return window::drag(window_id);
+                }
+            }
+            Message::WindowMinimize => {
+                if let Some(window_id) = self.core.main_window_id() {
+                    return window::minimize(window_id, true);
+                }
+            }
+            Message::WindowToggleMaximize => {
+                if let Some(window_id) = self.core.main_window_id() {
+                    return window::toggle_maximize(window_id);
+                }
+            }
+            Message::MenuToggle => {
+                self.menu_open = !self.menu_open;
+            }
+            Message::MenuClose => {
+                self.menu_open = false;
+            }
+            Message::MenuAction(message) => {
+                self.menu_open = false;
+                return self.handle_update(*message);
+            }
+            Message::NavSelect(nav_page) => {
+                let id = self
+                    .nav_model
+                    .iter()
+                    .find(|id| self.nav_model.data::<NavPage>(*id) == Some(&nav_page));
+                if let Some(id) = id {
+                    return cosmic::Application::on_nav_select(self, id);
                 }
             }
             Message::WindowNew => {

@@ -5,17 +5,13 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Instant;
 
-use cosmic::{
-    Element, cosmic_theme,
-    iced::{Alignment, Length},
-    widget,
-};
+use cosmic::{Element, cosmic_theme, widget};
 
 use crate::app_id::AppId;
 use crate::app_info::AppInfo;
 use crate::backend::{BackendName, Backends};
 use crate::explore::ExplorePage;
-use crate::{ICON_SIZE_SEARCH, MAX_RESULTS, Message};
+use crate::{MAX_RESULTS, Message};
 
 pub struct GridMetrics {
     pub cols: usize,
@@ -230,16 +226,21 @@ pub fn apply_icons_to_results(
 }
 
 impl SearchResult {
-    pub fn grid_metrics(spacing: &cosmic_theme::Spacing, width: usize) -> GridMetrics {
-        GridMetrics::new(width, 240 + 2 * spacing.space_s as usize, spacing.space_xxs)
+    pub fn grid_metrics(_spacing: &cosmic_theme::Spacing, width: usize) -> GridMetrics {
+        GridMetrics::new(width, 260, 28)
     }
 
-    pub fn grid_view<'a, F: Fn(usize) -> Message + 'a>(
+    pub fn grid_view<'a, F, A>(
         results: &'a [Self],
         spacing: cosmic_theme::Spacing,
         width: usize,
         callback: F,
-    ) -> Element<'a, Message> {
+        action: A,
+    ) -> Element<'a, Message>
+    where
+        F: Fn(usize) -> Message + 'a,
+        A: Fn(&'a Self) -> Option<Element<'a, Message>>,
+    {
         let GridMetrics {
             cols,
             item_width,
@@ -254,49 +255,27 @@ impl SearchResult {
                 col = 0;
             }
             grid = grid.push(
-                widget::mouse_area(result.card_view(&spacing, item_width))
+                widget::mouse_area(result.card_view(&spacing, item_width, action(result)))
                     .on_press(callback(result_i)),
             );
             col += 1;
         }
-        grid.column_spacing(column_spacing)
-            .row_spacing(column_spacing)
-            .into()
+        grid.column_spacing(column_spacing).row_spacing(0).into()
     }
 
     pub fn card_view<'a>(
         &'a self,
-        spacing: &cosmic_theme::Spacing,
+        _spacing: &cosmic_theme::Spacing,
         width: usize,
+        action: Option<Element<'a, Message>>,
     ) -> Element<'a, Message> {
-        widget::container(
-            widget::row::with_children(vec![
-                match &self.icon_opt {
-                    Some(icon) => widget::icon::icon(icon.clone())
-                        .size(ICON_SIZE_SEARCH)
-                        .into(),
-                    None => widget::space::horizontal()
-                        .width(Length::Fixed(ICON_SIZE_SEARCH as f32))
-                        .into(),
-                },
-                widget::column::with_children(vec![
-                    widget::text::body(&self.info.name)
-                        .height(Length::Fixed(20.0))
-                        .into(),
-                    widget::text::caption(&self.info.summary)
-                        .height(Length::Fixed(28.0))
-                        .into(),
-                ])
-                .into(),
-            ])
-            .align_y(Alignment::Center)
-            .spacing(spacing.space_s),
+        crate::view::app_row(
+            &self.info.name,
+            &self.info.summary,
+            self.icon_opt.as_ref(),
+            42,
+            action.into_iter().collect(),
+            width,
         )
-        .align_y(Alignment::Center)
-        .width(Length::Fixed(width as f32))
-        .height(Length::Fixed(48.0 + (spacing.space_xxs as f32) * 2.0))
-        .padding([spacing.space_xxs, spacing.space_s])
-        .class(crate::glass::card_class())
-        .into()
     }
 }
