@@ -1,20 +1,81 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Launcher</title><link rel="stylesheet" href="shared/ui.css"></head><body>
-<header><div><h1>Launcher</h1><p data-app-label>Desktop application discovery and controlled OS launch</p></div></header>
-<main class="stack"><form id="search" class="card"><label>Find an installed desktop application<input id="query" placeholder="Name, category or keyword" maxlength="512"></label>
-<div class="toolbar"><button type="submit" class="primary">Search</button><button type="button" id="all">All applications</button>
-<button id="recent" type="button">Recent launches</button><label>Search limit<input id="limit" type="number" min="1" max="50" step="1" value="10" required></label></div>
-<details><summary>All-app visibility options</summary><label><span><input id="hidden" type="checkbox"> Include hidden desktop entries</span></label>
-<label id="no-display-option"><span><input id="no-display" type="checkbox"> Include entries marked NoDisplay</span></label>
-<p class="small muted">These options apply to All applications, not ranked search or recent history.</p></details></form>
-<p id="notice" class="notice" role="status" aria-live="polite"></p><p id="outcome" class="notice" aria-live="polite"></p>
-<div class="split"><section class="card stack"><div class="row"><h2 id="list-title">Applications</h2><span id="count" class="pill"></span></div>
-<div id="apps" class="list"></div></section><section class="card stack"><h2 id="selected-name" class="prose">Select an application</h2>
-<p id="selected-id" class="code"></p><p id="description" class="prose"></p><dl id="metadata" class="detail-grid"></dl>
-<div class="toolbar"><button id="launch" type="button" class="primary" disabled>Review launch</button>
-<button id="running" type="button" hidden>Check running processes</button></div>
-<p class="muted small">Selecting never launches. Launch sends the exact desktop AppID and optional file/URI targets to the OS desktop service,
-not another App's business or MCP interface. Permission and session checks remain authoritative.</p><p id="running-state" class="prose"></p></section></div>
-<details class="card"><summary>Latest backend response</summary><div id="raw"></div></details>
-</main><script src="shared/client.js"></script><script src="shared/ui.js"></script><script src="app.js"></script></body></html>
+<title>Launcher</title><link rel="stylesheet" href="launcher.css"></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="6" cy="12" r=".9" fill="currentColor"/><circle cx="12" cy="12" r=".9" fill="currentColor"/><circle cx="18" cy="12" r=".9" fill="currentColor"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M7 7l10 10M17 7 7 17"/></symbol>
+<symbol id="i-launch" viewBox="0 0 24 24"><path d="M8 16 17 7M10 7h7v7"/></symbol>
+<symbol id="i-pulse" viewBox="0 0 24 24"><path d="M3 12h4l2.5-5 4 10 2.5-5H21"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m9 7-5 5 5 5M15 7l5 5-5 5"/></symbol>
+<symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 4 21 19H3z"/><path d="M12 10v4M12 16.6v.1"/></symbol>
+</svg>
+<main class="stage">
+<section id="panel" class="panel glass" aria-label="Launcher">
+  <header class="head">
+    <span id="search-mode" class="lead"><svg class="i"><use href="#i-search"/></svg></span>
+    <span id="mode-token" class="token" hidden></span>
+    <label id="query-field" class="query blank"><span id="qwrap" class="qwrap" data-value=""><input id="query" size="1" maxlength="512" autocomplete="off" spellcheck="false" data-t-placeholder="placeholder"></span><span id="completion" class="comp"></span></label>
+    <span id="launch-head" hidden></span>
+    <span class="sp"></span>
+    <button id="clear" class="clr" type="button" data-t-label="clear" hidden><svg class="i"><use href="#i-x"/></svg></button>
+    <button id="more" class="ib" type="button" aria-haspopup="menu" aria-expanded="false" data-t-label="options"><svg class="i"><use href="#i-more"/></svg></button>
+  </header>
+  <nav id="chips" class="chips">
+    <button id="all" class="chip" type="button"><svg class="i"><use href="#i-grid"/></svg><span data-t="all"></span><span id="all-count" class="n"></span></button>
+    <button id="recent" class="chip" type="button"><svg class="i"><use href="#i-clock"/></svg><span data-t="recent"></span></button>
+    <span id="categories" class="chips-cats"></span>
+    <span id="limit-hint" class="lim"></span>
+  </nav>
+  <div id="body" class="body">
+    <div id="results" class="results" role="listbox"></div>
+    <aside id="preview" class="prev" hidden>
+      <div class="ph"><span id="preview-icon"></span><div><div id="selected-name" class="nm"></div><div id="selected-id" class="id"></div></div></div>
+      <p id="description" class="desc"></p>
+      <dl id="metadata" class="md"></dl>
+      <div class="acts">
+        <button id="launch" class="btn pri" type="button"><svg class="i"><use href="#i-launch"/></svg><span data-t="launchDots"></span><kbd>↩</kbd></button>
+        <button id="running" class="btn" type="button" hidden><svg class="i"><use href="#i-pulse"/></svg><span data-t="check"></span><kbd>Ctrl P</kbd></button>
+      </div>
+      <div id="running-state" class="run"></div>
+      <p class="disc" data-t="disclaimer"></p>
+    </aside>
+  </div>
+  <form id="launch-form" class="form" hidden>
+    <div class="fields">
+      <p class="lead-text" data-t="launchLead"></p>
+      <label class="fl" for="launch-app-id" data-t="appId"></label><input id="launch-app-id" class="fi" readonly>
+      <div id="uri-field"><label class="fl" for="launch-uri" data-t="uri"></label><textarea id="launch-uri" class="fi" data-t-placeholder="emptyTargets"></textarea></div>
+      <div id="path-field"><label class="fl" for="launch-path" data-t="path"></label><textarea id="launch-path" class="fi" data-t-placeholder="emptyTargets"></textarea></div>
+      <div id="extras-field"><label class="fl" for="launch-extras" data-t="extras"></label><textarea id="launch-extras" class="fi" data-t-placeholder="emptyTargets"></textarea></div>
+      <p class="warn"><svg class="i"><use href="#i-warn"/></svg><span data-t="retry"></span></p>
+      <p id="launch-notice" class="note error"></p>
+    </div>
+    <div class="fbtns">
+      <button id="launch-cancel" class="btn" type="button"><span data-t="cancel"></span><kbd>esc</kbd></button>
+      <button id="launch-submit" class="btn pri" type="submit"><span data-t="launchVia"></span><kbd>Ctrl ↩</kbd></button>
+    </div>
+  </form>
+  <div id="raw-panel" class="raw" hidden><div class="lbl" data-t="rawTitle"></div><div id="raw"></div></div>
+  <footer class="foot">
+    <span id="status"></span>
+    <span id="notice" class="note" role="status" aria-live="polite"></span>
+    <span id="outcome" class="note" aria-live="polite"></span>
+    <span id="keys" class="keys"></span>
+    <button id="raw-toggle" class="tg" type="button" aria-pressed="false"><svg class="i"><use href="#i-code"/></svg><span data-t="rawTitle"></span></button>
+  </footer>
+  <div id="menu" class="menu glass" role="menu" hidden>
+    <div class="mh" data-t="visibility"></div>
+    <button id="hidden" class="mi" type="button" role="menuitemcheckbox" aria-checked="false"><span class="ck"></span><span data-t="includeHidden"></span></button>
+    <button id="no-display" class="mi" type="button" role="menuitemcheckbox" aria-checked="false"><span class="ck"></span><span data-t="includeNoDisplay"></span></button>
+    <p class="mnote" data-t="visibilityNote"></p>
+    <div class="msep"></div>
+    <div class="mi"><span class="ck"></span><label for="limit" data-t="limit"></label><span class="step"><button id="limit-down" type="button" aria-label="−">−</button><input id="limit" type="number" min="1" max="50" step="1" value="10"><button id="limit-up" type="button" aria-label="+">+</button></span></div>
+    <div class="msep"></div>
+    <button id="raw-option" class="mi" type="button" role="menuitemcheckbox" aria-checked="false"><span class="ck"></span><span data-t="showRaw"></span></button>
+  </div>
+</section>
+</main>
+<script src="shared/client.js"></script><script src="shared/ui.js"></script><script src="app.js"></script></body></html>
