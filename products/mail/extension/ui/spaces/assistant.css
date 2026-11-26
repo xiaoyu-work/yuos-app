@@ -62,7 +62,3 @@ html, body { block-size: 100%; }
   max-block-size: 35vh;
 }
 
-.assistant-page .usage-line:not(:empty) {
-  margin: 0;
-  padding: 0 var(--assistant-gutter) 6px;
-}

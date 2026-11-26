@@ -60,6 +60,9 @@ mail, using system-installed Noto fonts when available. Thunderbird's own font
 preferences are not locked. AutoConfig loads the package-owned stylesheet from
 `distribution/`, not from a URL, and does not lower the AutoConfig sandbox.
 It is not a theme extension or part of the Web App.
+Without an account, the window opens directly on Thunderbird's own account
+setup page, with its explanatory text and illustration hidden; closing that
+page returns to the native window.
 On Thunderbird versions other than 140 the custom overlay is not loaded.
 The standard UI remains available by setting `yuos.mail.chrome.enabled` to
 `false` in Thunderbird's Config Editor and restarting. Administrators using

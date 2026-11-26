@@ -47,4 +47,3 @@ label.opt-row { cursor: pointer; }
 }
 .save-bar h1 { margin: 0; margin-inline-end: auto; }
 
-#status-line { white-space: pre-wrap; overflow-wrap: anywhere; }

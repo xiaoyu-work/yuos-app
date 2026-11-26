@@ -62,7 +62,6 @@ async function runSmartReply() {
   const meta = document.getElementById("reply-meta");
   showBusy(out);
   meta.textContent = "";
-  document.getElementById("reply-usage").textContent = "";
 
   const details = await getComposeDetails(composeTab.id);
   if (!details) {
@@ -114,7 +113,6 @@ async function runSmartReply() {
   if (!res || !res.ok) { showError(out, res?.error || "AI call failed", res?.detail); return; }
   lastSuggestions = res.result;
   renderSuggestions(out, res.result);
-  renderUsage("reply-usage", res.result);
 }
 
 function renderSuggestions(out, r) {
@@ -160,7 +158,6 @@ async function runSmartCompose() {
 
   const out = document.getElementById("compose-out");
   showBusy(out);
-  document.getElementById("compose-usage").textContent = "";
 
   const intent = document.getElementById("compose-intent").value.trim();
   if (!intent) {
@@ -191,7 +188,6 @@ async function runSmartCompose() {
   if (!res || !res.ok) { showError(out, res?.error || "AI call failed", res?.detail); return; }
   lastCompose = res.result;
   renderCompose(out, res.result);
-  renderUsage("compose-usage", res.result);
 }
 
 function renderCompose(out, r) {
@@ -231,13 +227,6 @@ async function copyComposeBody() {
 // ---------------------------------------------------------------------------
 // Shared
 // ---------------------------------------------------------------------------
-
-function renderUsage(elId, r) {
-  const usage = r.usage || {};
-  const budget = r.budget || {};
-  document.getElementById(elId).textContent =
-    `${r.provider || "?"} / ${r.model || "?"}  •  in=${usage.input_tokens ?? "?"} out=${usage.output_tokens ?? "?"} units=${usage.units ?? "?"}  •  budget ${budget.units_used ?? "?"}/${budget.units_cap ?? "?"}`;
-}
 
 function flashBtnSuccess(btn) {
   if (!btn) return;

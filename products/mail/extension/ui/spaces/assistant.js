@@ -30,12 +30,7 @@ async function refresh() {
   const history = await loadHistory();
   const mc = document.getElementById("messages");
   mc.innerHTML = "";
-  if (history.length === 0) {
-    mc.appendChild(el("div", { class: "msg system", text: browser.i18n.getMessage("assistant_welcome") ||
-      "Hi! Ask me about your inbox. I can summarize threads, find emails, draft replies." }));
-  } else {
-    for (const m of history) renderMessage(m);
-  }
+  for (const m of history) renderMessage(m);
   scrollBottom();
 }
 
@@ -81,7 +76,6 @@ async function onSend() {
 
   if (!res || !res.ok) {
     showError(mc, res?.error || "AI call failed", res?.detail);
-    renderUsage(null);
     return;
   }
 
@@ -89,22 +83,12 @@ async function onSend() {
   history.push({ role: "assistant", content: reply, ts: Date.now() });
   await saveHistory(history);
   renderMessage(history[history.length - 1]);
-  renderUsage(res.result);
   scrollBottom();
 }
 
 async function clearHistory() {
   await browser.storage.local.remove(HISTORY_KEY);
   await refresh();
-}
-
-function renderUsage(r) {
-  const u = document.getElementById("usage");
-  if (!r) { u.textContent = ""; return; }
-  const usage = r.usage || {};
-  const budget = r.budget || {};
-  u.textContent =
-    `${r.provider || "?"} / ${r.model || "?"}  •  in=${usage.input_tokens ?? "?"} out=${usage.output_tokens ?? "?"} units=${usage.units ?? "?"}  •  budget ${budget.units_used ?? "?"}/${budget.units_cap ?? "?"}`;
 }
 
 function scrollBottom() {

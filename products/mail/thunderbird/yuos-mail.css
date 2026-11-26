@@ -21,6 +21,11 @@
     min-width: 16em;
   }
 
+  /* Without an account the window is the account setup page. */
+  :root[yu-no-account] :is(#tabs-toolbar, #status-bar) {
+    display: none !important;
+  }
+
   @media (prefers-contrast: no-preference) and (forced-colors: none) {
     :root:not([lwtheme], [customizingUnifiedToolbar]) unified-toolbar {
       background-color: light-dark(#e7eef9, #202630) !important;
@@ -55,6 +60,10 @@
 }
 
 @-moz-document url("about:3pane"), url("chrome://messenger/content/messenger/about3Pane.xhtml") {
+  :root[yu-no-account] :is(#placeholderNoMessages, #threadPaneHeaderBar) {
+    display: none !important;
+  }
+
   #paneLayout.layout-vertical:not([style*="--folderPaneSplitter-width"]) {
     --folderPaneSplitter-width: clamp(10em, 17vw, 16em) !important;
   }
@@ -177,6 +186,12 @@
 
     :root:not([lwt-tree]) #folderPaneWriteMessage:not(:disabled):active {
       background-color: #0a4175 !important;
+    }
+
+    :root:not([lwt-tree]) #folderPaneWriteMessage:disabled {
+      color: GrayText !important;
+      background-color: light-dark(#eef1f5, #2a313b) !important;
+      border-color: transparent !important;
     }
 
     :root:not([lwt-tree]) #threadTree[rows="thread-card"] {
@@ -314,6 +329,85 @@
     :root:not([lwtheme]) #button-send :is(.toolbarbutton-icon, .toolbarbutton-text) {
       color: white !important;
       fill: white !important;
+    }
+  }
+}
+
+@-moz-document url("about:accountsetup"), url("chrome://messenger/content/accountcreation/accountSetup.xhtml") {
+  :root {
+    --yu-mail-rule: light-dark(#dce3ed, #343e4c);
+    font: 13px "Noto Sans", system-ui, sans-serif !important;
+  }
+
+  :root:lang(zh-CN) {
+    font-family: "Noto Sans CJK SC", system-ui, sans-serif !important;
+  }
+
+  body {
+    background-color: var(--layout-background-0, Canvas) !important;
+  }
+
+  :is(#accountSetupDescription, #accountSetupDescriptionSecondary, .second-column,
+    #manualConfigDescription, #footDescription, #linkedServicesDescription,
+    #realnameInfo, #emailInfo, #passwordInfo, #usernameExInfo) {
+    display: none !important;
+  }
+
+  header {
+    margin: 40px 48px 20px !important;
+  }
+
+  .title {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+  }
+
+  .main-container {
+    margin: 0 48px 32px !important;
+  }
+
+  .first-column {
+    max-width: 380px !important;
+  }
+
+  #form label {
+    font-size: 13px;
+  }
+
+  :is(input.input-field, select, #form input:not([type="checkbox"], [type="radio"])) {
+    min-height: 30px;
+    border: 1px solid var(--yu-mail-rule) !important;
+    border-radius: 4px !important;
+    font: inherit !important;
+  }
+
+  :is(input.input-field, select):focus-visible {
+    outline: 2px solid #0f60ab !important;
+    outline-offset: -1px !important;
+  }
+
+  button {
+    min-height: 30px;
+    border-radius: 4px !important;
+    font: inherit !important;
+  }
+
+  @media (prefers-contrast: no-preference) and (forced-colors: none) {
+    button.primary:not(:disabled) {
+      color: white !important;
+      background-color: #0f60ab !important;
+      border-color: transparent !important;
+    }
+
+    button.primary:not(:disabled):hover {
+      background-color: #0b518f !important;
+    }
+
+    button.primary:disabled {
+      color: GrayText !important;
+      background-color: light-dark(#eef1f5, #2a313b) !important;
+      border-color: var(--yu-mail-rule) !important;
     }
   }
 }

@@ -41,7 +41,6 @@ async function run() {
   const meta = document.getElementById("meta");
   showBusy(out);
   meta.textContent = "";
-  document.getElementById("usage").textContent = "";
 
   const id = await pickMessageId();
   if (id == null) {
@@ -83,7 +82,6 @@ async function run() {
 
   lastResult = res.result;
   renderSummary(out, res.result);
-  renderUsage(res.result);
 }
 
 function detectLang(_settings) {
@@ -148,15 +146,6 @@ function sentimentBadge(sentiment) {
   };
   const cfg = map[sentiment] || map.neutral;
   return el("span", { class: `tag ${cfg.cls}`, text: cfg.text });
-}
-
-function renderUsage(r) {
-  const usage = r.usage || {};
-  const budget = r.budget || {};
-  const used = budget.units_used ?? "?";
-  const cap = budget.units_cap ?? "?";
-  document.getElementById("usage").textContent =
-    `${r.provider || "?"} / ${r.model || "?"}  •  in=${usage.input_tokens ?? "?"} out=${usage.output_tokens ?? "?"} units=${usage.units ?? "?"}  •  budget ${used}/${cap}`;
 }
 
 async function onCopy() {

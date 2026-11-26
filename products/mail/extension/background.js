@@ -437,13 +437,6 @@ browser.runtime.onMessage.addListener((msg, _sender) => {
         || "Click the Yu AI button in the compose toolbar to open Smart Reply.");
       return Promise.resolve({ ok: true });
 
-    case "nativeStatus":
-      return Promise.resolve({
-        ok: true,
-        status: (YuOsNative.getStatus && YuOsNative.getStatus().status) || "unknown",
-        hostName: "os.yuos.mail_ai",
-      });
-
     case "refreshSpaces":
       // Settings change may have toggled assistant visibility. We can
       // only add — there's no API to remove a Space once created, so

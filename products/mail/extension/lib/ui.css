@@ -202,10 +202,3 @@ hr {
   justify-content: flex-end;
 }
 
-.usage-line:not(:empty) {
-  margin-block-start: 8px;
-  font-size: 11px;
-  color: var(--yuos-muted);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  overflow-wrap: anywhere;
-}

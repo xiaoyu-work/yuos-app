@@ -178,7 +178,6 @@
     return () => listeners.delete(fn);
   }
 
-  function getStatus() { return lastStatus; }
 
-  self.YuOsNative = { connect, call, onStatus, getStatus, setMailboxHandler };
+  self.YuOsNative = { connect, call, onStatus, setMailboxHandler };
 })();

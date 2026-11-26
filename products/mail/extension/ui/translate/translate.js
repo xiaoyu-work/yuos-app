@@ -58,7 +58,6 @@ async function run() {
   await YuOsUI.setSettings({ translate: { defaultTarget: target } });
 
   showBusy(out);
-  document.getElementById("usage").textContent = "";
 
   const res = await aiCall("translate", { text: source, target });
   clearBusy(out);
@@ -68,7 +67,6 @@ async function run() {
   }
   lastTranslation = res.result;
   renderTranslation(out, res.result);
-  renderUsage(res.result);
 }
 
 function renderTranslation(out, r) {
@@ -86,9 +84,3 @@ async function copy(text) {
   try { await copyToClipboard(text || ""); } catch (_) {}
 }
 
-function renderUsage(r) {
-  const usage = r.usage || {};
-  const budget = r.budget || {};
-  document.getElementById("usage").textContent =
-    `${r.provider || "?"} / ${r.model || "?"}  •  in=${usage.input_tokens ?? "?"} out=${usage.output_tokens ?? "?"} units=${usage.units ?? "?"}  •  budget ${budget.units_used ?? "?"}/${budget.units_cap ?? "?"}`;
-}

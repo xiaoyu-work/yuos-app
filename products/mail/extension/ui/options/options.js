@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   localiseDom();
   await loadSettings();
   document.getElementById("btn-save").addEventListener("click", save);
-  await refreshStatus();
 });
 
 async function loadSettings() {
@@ -51,16 +50,3 @@ async function save() {
   try { await browser.runtime.sendMessage({ kind: "refreshSpaces" }); } catch (_) {}
 }
 
-async function refreshStatus() {
-  const line = document.getElementById("status-line");
-  try {
-    const r = await browser.runtime.sendMessage({ kind: "nativeStatus" });
-    if (r && r.ok) {
-      line.textContent = `Native host: ${r.status}  •  manifest: ${r.hostName || "(unknown)"}`;
-    } else {
-      line.textContent = "Native host: not yet probed.";
-    }
-  } catch (_) {
-    line.textContent = "Native host: unavailable.";
-  }
-}
