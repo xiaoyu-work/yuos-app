@@ -116,12 +116,8 @@ pub fn desktop() -> Result<(), Box<dyn std::error::Error>> {
     let (config_handler, config) = Config::load();
     let (state_handler, state) = State::load();
 
-    if let Ok(mut tk) = cosmic::config::COSMIC_TK.write() {
-        tk.interface_font.weight = cosmic::iced::font::Weight::Light;
-    }
-
     let mut settings = Settings::default();
-    settings = settings.default_font(cosmic::font::light());
+    settings = settings.default_font(cosmic::font::default());
     settings = settings.default_text_size(12.5);
     settings = settings.theme(config.app_theme.theme());
     settings = settings.size_limits(Limits::NONE.min_width(360.0).min_height(180.0));
@@ -195,12 +191,8 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    if let Ok(mut tk) = cosmic::config::COSMIC_TK.write() {
-        tk.interface_font.weight = cosmic::iced::font::Weight::Light;
-    }
-
     let mut settings = Settings::default();
-    settings = settings.default_font(cosmic::font::light());
+    settings = settings.default_font(cosmic::font::default());
     settings = settings.default_text_size(12.5);
     settings = settings.theme(config.app_theme.theme());
     settings = settings.size_limits(Limits::NONE.min_width(360.0).min_height(180.0));

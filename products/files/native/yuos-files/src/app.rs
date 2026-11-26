@@ -2697,21 +2697,31 @@ impl App {
 
     fn toolbar_svg_icon(kind: &str, size: u16) -> widget::Icon {
         let bytes: &[u8] = match kind {
-            "sidebar-toggle" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.8" y="2.4" width="12.4" height="11.2" rx="2.0" stroke="#465264" stroke-width="1.2"/><line x1="6.0" y1="2.6" x2="6.0" y2="13.4" stroke="#465264" stroke-width="1.15"/><line x1="3.3" y1="5.2" x2="4.7" y2="5.2" stroke="#465264" stroke-width="1.1" stroke-linecap="round"/><line x1="3.3" y1="7.4" x2="4.7" y2="7.4" stroke="#465264" stroke-width="1.1" stroke-linecap="round"/></svg>"##,
-            "folder-new" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.8 4.0C1.8 3.34 2.34 2.8 3.0 2.8H6.0L7.4 4.3H13.0C13.66 4.3 14.2 4.84 14.2 5.5V12.2C14.2 12.86 13.66 13.4 13.0 13.4H3.0C2.34 13.4 1.8 12.86 1.8 12.2V4.0Z" stroke="#465264" stroke-width="1.2" stroke-linejoin="round"/><path d="M8.0 6.7V10.9M5.9 8.8H10.1" stroke="#465264" stroke-width="1.2" stroke-linecap="round"/></svg>"##,
-            "tab-new" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.0" y="2.4" width="12.0" height="11.2" rx="2.0" stroke="#465264" stroke-width="1.2"/><path d="M8.0 5.4V10.6M5.4 8.0H10.6" stroke="#465264" stroke-width="1.2" stroke-linecap="round"/></svg>"##,
-            "view-list" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="2.5" y1="4.2" x2="13.5" y2="4.2" stroke="#465264" stroke-width="1.25" stroke-linecap="round"/><line x1="2.5" y1="8.0" x2="13.5" y2="8.0" stroke="#465264" stroke-width="1.25" stroke-linecap="round"/><line x1="2.5" y1="11.8" x2="13.5" y2="11.8" stroke="#465264" stroke-width="1.25" stroke-linecap="round"/></svg>"##,
-            "view-grid" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.3" y="2.3" width="4.6" height="4.6" rx="1.0" stroke="#465264" stroke-width="1.2"/><rect x="9.1" y="2.3" width="4.6" height="4.6" rx="1.0" stroke="#465264" stroke-width="1.2"/><rect x="2.3" y="9.1" width="4.6" height="4.6" rx="1.0" stroke="#465264" stroke-width="1.2"/><rect x="9.1" y="9.1" width="4.6" height="4.6" rx="1.0" stroke="#465264" stroke-width="1.2"/></svg>"##,
-            "sort" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5.2 3.2V12.8M5.2 3.2L3.1 5.3M5.2 3.2L7.3 5.3M10.8 12.8V3.2M10.8 12.8L8.7 10.7M10.8 12.8L12.9 10.7" stroke="#465264" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
-            "paste" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3.2" y="3.2" width="9.6" height="10.6" rx="1.6" stroke="#465264" stroke-width="1.2"/><path d="M6.0 3.2V2.5C6.0 2.1 6.3 1.8 6.7 1.8H9.3C9.7 1.8 10.0 2.1 10.0 2.5V3.2" stroke="#465264" stroke-width="1.2"/></svg>"##,
-            "trash" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.2 4.4H12.8M6.0 4.4V3.1C6.0 2.66 6.36 2.3 6.8 2.3H9.2C9.64 2.3 10.0 2.66 10.0 3.1V4.4M4.3 4.4L4.9 12.8C4.94 13.36 5.4 13.8 5.96 13.8H10.04C10.6 13.8 11.06 13.36 11.1 12.8L11.7 4.4" stroke="#465264" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
-            "rename" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10.8 2.6L13.4 5.2L5.6 13.0H3.0V10.4L10.8 2.6Z" stroke="#465264" stroke-width="1.2" stroke-linejoin="round"/></svg>"##,
-            "compress" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8.0 2.1L13.4 5.1V10.9L8.0 13.9L2.6 10.9V5.1L8.0 2.1Z" stroke="#465264" stroke-width="1.2" stroke-linejoin="round"/><path d="M2.8 5.2L8.0 8.1L13.2 5.2M8.0 8.1V13.8" stroke="#465264" stroke-width="1.15"/></svg>"##,
-            "preview" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.6 8.0C2.9 5.2 5.2 3.8 8.0 3.8C10.8 3.8 13.1 5.2 14.4 8.0C13.1 10.8 10.8 12.2 8.0 12.2C5.2 12.2 2.9 10.8 1.6 8.0Z" stroke="#465264" stroke-width="1.2" stroke-linejoin="round"/><circle cx="8.0" cy="8.0" r="2.0" stroke="#465264" stroke-width="1.2"/></svg>"##,
-            "cut" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="4.5" cy="11.5" r="1.9" stroke="#465264" stroke-width="1.2"/><circle cx="11.5" cy="11.5" r="1.9" stroke="#465264" stroke-width="1.2"/><path d="M5.9 10.1L12.5 3.2M10.1 10.1L3.5 3.2" stroke="#465264" stroke-width="1.2" stroke-linecap="round"/></svg>"##,
-            "copy" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="5.2" y="5.2" width="8.2" height="8.6" rx="1.5" stroke="#465264" stroke-width="1.2"/><path d="M3.6 10.8H3.2C2.54 10.8 2.0 10.26 2.0 9.6V3.4C2.0 2.74 2.54 2.2 3.2 2.2H9.2C9.86 2.2 10.4 2.74 10.4 3.4V3.8" stroke="#465264" stroke-width="1.2" stroke-linecap="round"/></svg>"##,
-            "terminal" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.8" y="2.6" width="12.4" height="10.8" rx="2.0" stroke="#465264" stroke-width="1.2"/><path d="M4.5 6.0L6.9 8.0L4.5 10.0M7.8 10.2H11.2" stroke="#465264" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
-            _ => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="#465264" stroke-width="1.2"/></svg>"##,
+            "sidebar-toggle" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><line x1="9" y1="4" x2="9" y2="20"/></svg>"##,
+            "folder-new" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="12" y1="10" x2="12" y2="16"/><line x1="9" y1="13" x2="15" y2="13"/></svg>"##,
+            "tab-new" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>"##,
+            "nav-back" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>"##,
+            "nav-forward" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>"##,
+            "nav-up" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>"##,
+            "view-list" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.85" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>"##,
+            "view-list-active" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#005cfe" stroke-width="2.0" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>"##,
+            "view-grid" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.8" stroke-linejoin="round"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></svg>"##,
+            "view-grid-active" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#005cfe" stroke-width="1.95" stroke-linejoin="round"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></svg>"##,
+            "sort" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M7 4L4 7M7 4l3 3M17 20V4M17 20l-3-3M17 20l3-3"/></svg>"##,
+            "search" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7688" stroke-width="2.0" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.2" y2="16.2"/></svg>"##,
+            "win-min" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="1" y="1" width="22" height="22" stroke="none"/><path d="M5 12L19 12.01" stroke="#525f73" stroke-width="2.2" stroke-linecap="round"/></svg>"##,
+            "win-max" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#525f73" stroke-width="1.9" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>"##,
+            "win-close" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#525f73" stroke-width="2.0" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>"##,
+            "send-up" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>"##,
+            "paste" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="16" rx="2"/><path d="M9 5V3.8A1.8 1.8 0 0 1 10.8 2h2.4A1.8 1.8 0 0 1 15 3.8V5"/></svg>"##,
+            "trash" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>"##,
+            "rename" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>"##,
+            "compress" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V6a2 2 0 0 1 2-2h10"/></svg>"##,
+            "preview" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>"##,
+            "cut" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/></svg>"##,
+            "copy" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>"##,
+            "terminal" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#465264" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>"##,
+            _ => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="7" stroke="#465264" stroke-width="1.8"/></svg>"##,
         };
         icon::icon(icon::from_svg_bytes(bytes)).size(size)
     }
@@ -2719,37 +2729,35 @@ impl App {
     fn sidebar_svg_icon(kind: &str, active: bool, size: u16) -> widget::Icon {
         let bytes: &[u8] = if active {
             match kind {
-                "recents" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.1" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.3"/><path d="M8 4.6V8.2L10.4 9.6" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
-                "home" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.6 7.4L8 2.7L13.4 7.4V13.1C13.4 13.65 12.95 14.1 12.4 14.1H3.6C3.05 14.1 2.6 13.65 2.6 13.1V7.4Z" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.3" stroke-linejoin="round"/><path d="M6.3 14.1V9.8H9.7V14.1" stroke="#ffffff" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
-                "desktop" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.8" y="2.5" width="12.4" height="8.6" rx="1.6" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.3"/><path d="M5.5 13.6H10.5M8 11.1V13.6" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round"/></svg>"##,
-                "documents" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 2.2H9.6L12.5 5.1V13.2C12.5 13.75 12.05 14.2 11.5 14.2H3.5C2.95 14.2 2.5 13.75 2.5 13.2V3.2C2.5 2.65 2.95 2.2 3.5 2.2Z" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.25" stroke-linejoin="round"/><path d="M9.4 2.3V5.2H12.3M4.8 8H10.2M4.8 10.4H8.6" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
-                "downloads" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.1" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.3"/><path d="M8 4.8V10.4M5.6 8.3L8 10.7L10.4 8.3" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
-                "music" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6.2 11.8V4.2L12.8 2.8V10.4" stroke="#ffffff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4.5" cy="11.8" r="1.9" fill="#ffffff" fill-opacity="0.3" stroke="#ffffff" stroke-width="1.2"/><circle cx="11.1" cy="10.4" r="1.9" fill="#ffffff" fill-opacity="0.3" stroke="#ffffff" stroke-width="1.2"/></svg>"##,
-                "pictures" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.1" y="2.5" width="11.8" height="11" rx="1.8" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.25"/><circle cx="5.4" cy="5.7" r="1.2" fill="#ffffff"/><path d="M2.5 11.6L6.1 8.2L8.9 10.8L11.1 8.9L13.5 11.6" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
-                "videos" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.8" y="3.0" width="12.4" height="10.0" rx="1.8" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.25"/><path d="M6.6 5.8L10.4 8.0L6.6 10.2V5.8Z" fill="#ffffff"/></svg>"##,
-                "developer" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.8 4.2C1.8 3.54 2.34 3 3 3H6.1L7.5 4.5H13C13.66 4.5 14.2 5.04 14.2 5.7V12.2C14.2 12.86 13.66 13.4 13 13.4H3C2.34 13.4 1.8 12.86 1.8 12.2V4.2Z" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.25" stroke-linejoin="round"/><path d="M6.5 7.4L4.9 9.0L6.5 10.6M9.5 7.4L11.1 9.0L9.5 10.6" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
-                "disk" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.0" y="3.5" width="12.0" height="9.0" rx="1.8" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.25"/><line x1="2.2" y1="9.2" x2="13.8" y2="9.2" stroke="#ffffff" stroke-width="1.1"/><circle cx="11.4" cy="10.8" r="1.0" fill="#ffffff"/><line x1="4.2" y1="10.8" x2="7.2" y2="10.8" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/></svg>"##,
-                "network" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.1" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.25"/><ellipse cx="8" cy="8" rx="2.8" ry="6.1" stroke="#ffffff" stroke-width="1.15"/><line x1="2.1" y1="8" x2="13.9" y2="8" stroke="#ffffff" stroke-width="1.15"/></svg>"##,
-                "trash" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.2 4.4H12.8M6.0 4.4V3.1C6.0 2.66 6.36 2.3 6.8 2.3H9.2C9.64 2.3 10.0 2.66 10.0 3.1V4.4M4.3 4.4L4.9 12.8C4.94 13.36 5.4 13.8 5.96 13.8H10.04C10.6 13.8 11.06 13.36 11.1 12.8L11.7 4.4" fill="#ffffff" fill-opacity="0.22" stroke="#ffffff" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
-                _ => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.8 4.0C1.8 3.34 2.34 2.8 3.0 2.8H6.1L7.5 4.3H13.0C13.66 4.3 14.2 4.84 14.2 5.5V12.2C14.2 12.86 13.66 13.4 13.0 13.4H3.0C2.34 13.4 1.8 12.86 1.8 12.2V4.0Z" fill="#ffffff" fill-opacity="0.25" stroke="#ffffff" stroke-width="1.25" stroke-linejoin="round"/></svg>"##,
+                "recents" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>"##,
+                "home" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 20v-9.5z"/><path d="M9 21.5V14h6v7.5"/></svg>"##,
+                "desktop" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="3.5" width="19" height="13" rx="2"/><line x1="8" y1="20.5" x2="16" y2="20.5"/><line x1="12" y1="16.5" x2="12" y2="20.5"/></svg>"##,
+                "downloads" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v8.5M8.5 12.8L12 16.3l3.5-3.5"/></svg>"##,
+                "music" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>"##,
+                "pictures" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.8" fill="#ffffff"/><path d="M21 15l-5-5L5 21"/></svg>"##,
+                "videos" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.0" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><polygon points="10 8.5 16 12 10 15.5 10 8.5" fill="#ffffff"/></svg>"##,
+                "disk" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><line x1="3" y1="14" x2="21" y2="14"/><circle cx="17" cy="16.5" r="1" fill="#ffffff"/></svg>"##,
+                "network" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.0"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><line x1="3" y1="12" x2="21" y2="12"/></svg>"##,
+                "trash" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>"##,
+                _ => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="#ffffff"/></svg>"##,
             }
         } else {
             match kind {
-                "recents" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.1" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.3"/><path d="M8 4.6V8.2L10.4 9.6" stroke="#d97706" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
-                "home" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2.6 7.4L8 2.7L13.4 7.4V13.1C13.4 13.65 12.95 14.1 12.4 14.1H3.6C3.05 14.1 2.6 13.65 2.6 13.1V7.4Z" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.25" stroke-linejoin="round"/><path d="M6.3 14.1V9.8H9.7V14.1" stroke="#0284c7" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
-                "desktop" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.8" y="2.5" width="12.4" height="8.6" rx="1.6" fill="#e0e7ff" stroke="#6366f1" stroke-width="1.25"/><path d="M5.5 13.6H10.5M8 11.1V13.6" stroke="#4f46e5" stroke-width="1.25" stroke-linecap="round"/></svg>"##,
-                "documents" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 2.2H9.6L12.5 5.1V13.2C12.5 13.75 12.05 14.2 11.5 14.2H3.5C2.95 14.2 2.5 13.75 2.5 13.2V3.2C2.5 2.65 2.95 2.2 3.5 2.2Z" fill="#ffe4e6" stroke="#e11d48" stroke-width="1.25" stroke-linejoin="round"/><path d="M9.4 2.3V5.2H12.3" stroke="#e11d48" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.8 8H10.2M4.8 10.4H8.6" stroke="#f43f5e" stroke-width="1.15" stroke-linecap="round"/></svg>"##,
-                "downloads" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.1" fill="#d1fae5" stroke="#10b981" stroke-width="1.25"/><path d="M8 4.8V10.4M5.6 8.3L8 10.7L10.4 8.3" stroke="#059669" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
-                "music" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6.2 11.8V4.2L12.8 2.8V10.4" stroke="#db2777" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4.5" cy="11.8" r="1.9" fill="#fbcfe8" stroke="#db2777" stroke-width="1.2"/><circle cx="11.1" cy="10.4" r="1.9" fill="#fbcfe8" stroke="#db2777" stroke-width="1.2"/></svg>"##,
-                "pictures" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.1" y="2.5" width="11.8" height="11" rx="1.8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.25"/><circle cx="5.4" cy="5.7" r="1.2" fill="#f59e0b"/><path d="M2.5 11.6L6.1 8.2L8.9 10.8L11.1 8.9L13.5 11.6" stroke="#7c3aed" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
-                "videos" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.8" y="3.0" width="12.4" height="10.0" rx="1.8" fill="#ffedd5" stroke="#ea580c" stroke-width="1.25"/><path d="M6.6 5.8L10.4 8.0L6.6 10.2V5.8Z" fill="#ea580c"/></svg>"##,
-                "developer" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.8 4.2C1.8 3.54 2.34 3 3 3H6.1L7.5 4.5H13C13.66 4.5 14.2 5.04 14.2 5.7V12.2C14.2 12.86 13.66 13.4 13 13.4H3C2.34 13.4 1.8 12.86 1.8 12.2V4.2Z" fill="#ccfbf1" stroke="#0d9488" stroke-width="1.25" stroke-linejoin="round"/><path d="M6.5 7.4L4.9 9.0L6.5 10.6M9.5 7.4L11.1 9.0L9.5 10.6" stroke="#0f766e" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"/></svg>"##,
-                "accounting" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.8 4.0C1.8 3.34 2.34 2.8 3.0 2.8H6.1L7.5 4.3H13.0C13.66 4.3 14.2 4.84 14.2 5.5V12.2C14.2 12.86 13.66 13.4 13.0 13.4H3.0C2.34 13.4 1.8 12.86 1.8 12.2V4.0Z" fill="#fef3c7" stroke="#d97706" stroke-width="1.2" stroke-linejoin="round"/></svg>"##,
-                "design" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.8 4.0C1.8 3.34 2.34 2.8 3.0 2.8H6.1L7.5 4.3H13.0C13.66 4.3 14.2 4.84 14.2 5.5V12.2C14.2 12.86 13.66 13.4 13.0 13.4H3.0C2.34 13.4 1.8 12.86 1.8 12.2V4.0Z" fill="#f3e8ff" stroke="#9333ea" stroke-width="1.2" stroke-linejoin="round"/></svg>"##,
-                "disk" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2.0" y="3.5" width="12.0" height="9.0" rx="1.8" fill="#e2e8f0" stroke="#475569" stroke-width="1.25"/><line x1="2.2" y1="9.2" x2="13.8" y2="9.2" stroke="#64748b" stroke-width="1.1"/><circle cx="11.4" cy="10.8" r="1.0" fill="#10b981"/><line x1="4.2" y1="10.8" x2="7.2" y2="10.8" stroke="#64748b" stroke-width="1.2" stroke-linecap="round"/></svg>"##,
-                "network" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.1" fill="#cffafe" stroke="#0891b2" stroke-width="1.25"/><ellipse cx="8" cy="8" rx="2.8" ry="6.1" stroke="#0891b2" stroke-width="1.15"/><line x1="2.1" y1="8" x2="13.9" y2="8" stroke="#0891b2" stroke-width="1.15"/></svg>"##,
-                "trash" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.2 4.4H12.8M6.0 4.4V3.1C6.0 2.66 6.36 2.3 6.8 2.3H9.2C9.64 2.3 10.0 2.66 10.0 3.1V4.4M4.3 4.4L4.9 12.8C4.94 13.36 5.4 13.8 5.96 13.8H10.04C10.6 13.8 11.06 13.36 11.1 12.8L11.7 4.4" fill="#f1f5f9" stroke="#64748b" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.8 6.8V11.3M9.2 6.8V11.3" stroke="#94a3b8" stroke-width="1.15" stroke-linecap="round"/></svg>"##,
-                _ => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.8 4.0C1.8 3.34 2.34 2.8 3.0 2.8H6.1L7.5 4.3H13.0C13.66 4.3 14.2 4.84 14.2 5.5V12.2C14.2 12.86 13.66 13.4 13.0 13.4H3.0C2.34 13.4 1.8 12.86 1.8 12.2V4.0Z" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="1.2" stroke-linejoin="round"/></svg>"##,
+                "recents" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>"##,
+                "home" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 20v-9.5z"/><path d="M9 21.5V14h6v7.5"/></svg>"##,
+                "desktop" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="3.5" width="19" height="13" rx="2"/><line x1="8" y1="20.5" x2="16" y2="20.5"/><line x1="12" y1="16.5" x2="12" y2="20.5"/></svg>"##,
+                "documents" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="#2b88ff"/></svg>"##,
+                "accounting" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="#f59e0b"/></svg>"##,
+                "design" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="#8b5cf6"/></svg>"##,
+                "downloads" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v8.5M8.5 12.8L12 16.3l3.5-3.5"/></svg>"##,
+                "music" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>"##,
+                "pictures" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2.5"/><circle cx="8.5" cy="8.5" r="1.8" fill="#f59e0b" stroke="none"/><path d="M21 15l-5-5L5 21"/></svg>"##,
+                "videos" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2.0" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><polygon points="10 8.5 16 12 10 15.5 10 8.5" fill="#f97316" stroke="none"/></svg>"##,
+                "developer" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="#0d9488"/></svg>"##,
+                "disk" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><line x1="3" y1="14" x2="21" y2="14"/><circle cx="17" cy="16.5" r="1.3" fill="#10b981" stroke="none"/></svg>"##,
+                "network" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2.0"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><line x1="3" y1="12" x2="21" y2="12"/></svg>"##,
+                "trash" => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>"##,
+                _ => br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="#2b88ff"/></svg>"##,
             }
         };
         icon::icon(icon::from_svg_bytes(bytes)).size(size)
@@ -2790,19 +2798,23 @@ impl App {
         .height(Length::Fixed(44.0))
         .width(Length::Fill)
         .align_y(Alignment::Center)
-        .padding([0, 10]);
+        .padding([0, 6]);
 
         let header_rule = cosmic::iced::widget::rule::horizontal(1).class(crate::glass::sidebar_rule());
 
-        let mut list = widget::column::with_capacity(24).spacing(2).padding([8, 8]);
+        let mut list = widget::column::with_capacity(24)
+            .spacing(2)
+            .padding([6, 6])
+            .width(Length::Fill);
 
         list = list.push(
             widget::container(
-                widget::text::text("▾  Favourites")
+                widget::text::text("Favourites")
                     .size(11.0)
-                    .font(cosmic::font::light()),
+                    .font(cosmic::font::semibold())
+                    .class(theme::Text::Color(cosmic::iced::Color::from_rgb8(0x73, 0x80, 0x94))),
             )
-            .padding([6, 8, 4, 8]),
+            .padding([4, 6, 3, 6]),
         );
 
         let nav_row = |indent: u16,
@@ -2810,57 +2822,59 @@ impl App {
                        icon_kind: &'static str,
                        label: String,
                        target: Location,
-                       active: bool,
-                       tag_color: Option<cosmic::iced::Color>|
+                       active: bool|
          -> Element<'_, Message> {
-            let mut row = widget::row::with_capacity(5)
+            let mut row = widget::row::with_capacity(4)
+                .height(Length::Fill)
+                .width(Length::Fill)
                 .align_y(Alignment::Center)
-                .spacing(7);
+                .spacing(6);
             if indent > 0 {
                 row = row.push(widget::space::horizontal().width(Length::Fixed(f32::from(indent))));
             }
+            row = row.push(Self::sidebar_svg_icon(icon_kind, active, 15));
+            let label_fg = if active {
+                cosmic::iced::Color::WHITE
+            } else {
+                cosmic::iced::Color::from_rgb8(0x25, 0x30, 0x41)
+            };
+            row = row.push(
+                widget::text::text(label)
+                    .size(12.5)
+                    .line_height(cosmic::iced::widget::text::LineHeight::Absolute(16.0.into()))
+                    .font(if active {
+                        cosmic::font::semibold()
+                    } else {
+                        cosmic::font::default()
+                    })
+                    .class(theme::Text::Color(label_fg))
+                    .wrapping(cosmic::iced::core::text::Wrapping::None)
+                    .width(Length::Fill),
+            );
             if let Some((expanded, p)) = chev {
+                let chev_fg = if active {
+                    cosmic::iced::Color::WHITE
+                } else {
+                    cosmic::iced::Color::from_rgb8(0x7c, 0x89, 0x9c)
+                };
                 let chev_label = if expanded { "▾" } else { "›" };
                 row = row.push(
                     widget::button::custom(
                         widget::text::text(chev_label)
                             .size(11.0)
-                            .font(cosmic::font::light()),
+                            .line_height(cosmic::iced::widget::text::LineHeight::Absolute(14.0.into()))
+                            .font(cosmic::font::semibold())
+                            .class(theme::Text::Color(chev_fg)),
                     )
                     .padding([0, 2])
                     .class(crate::glass::sidebar_chevron_button(active))
                     .on_press(Message::SidebarToggleExpand(p)),
                 );
-            } else {
-                row = row.push(widget::space::horizontal().width(Length::Fixed(12.0)));
-            }
-            row = row.push(Self::sidebar_svg_icon(icon_kind, active, 15));
-            row = row.push(
-                widget::text::text(label)
-                    .size(12.5)
-                    .font(cosmic::font::light())
-                    .wrapping(cosmic::iced::core::text::Wrapping::None)
-                    .width(Length::Fill),
-            );
-            if let Some(dot_color) = tag_color {
-                let dot = widget::container(widget::space::horizontal().width(Length::Fixed(7.0)))
-                    .width(Length::Fixed(7.0))
-                    .height(Length::Fixed(7.0))
-                    .style(move |_| widget::container::Style {
-                        background: Some(cosmic::iced::Background::Color(dot_color)),
-                        border: cosmic::iced::Border {
-                            color: cosmic::iced::Color::TRANSPARENT,
-                            width: 0.0,
-                            radius: 3.5.into(),
-                        },
-                        ..Default::default()
-                    });
-                row = row.push(dot);
             }
             widget::button::custom(row)
                 .width(Length::Fill)
-                .height(Length::Fixed(27.0))
-                .padding([0, 8])
+                .height(Length::Fixed(26.0))
+                .padding([0, 6])
                 .class(crate::glass::sidebar_item_button(active))
                 .on_press(Message::TabMessage(None, tab::Message::Location(target)))
                 .into()
@@ -2875,7 +2889,6 @@ impl App {
             fl!("recents"),
             Location::Recents,
             recents_active,
-            None,
         ));
 
         // Home + tree children
@@ -2889,7 +2902,6 @@ impl App {
             fl!("home"),
             Location::Path(home.clone()),
             home_active,
-            None,
         ));
 
         if home_expanded {
@@ -2946,21 +2958,13 @@ impl App {
                     "Developer" => "developer",
                     _ => "folder",
                 };
-                let tag = match child_name.as_str() {
-                    "Documents" => Some(cosmic::iced::Color::from_rgb8(0xff, 0x5f, 0x57)),
-                    "Developer" | "Downloads" => {
-                        Some(cosmic::iced::Color::from_rgb8(0x00, 0x7a, 0xff))
-                    }
-                    _ => None,
-                };
                 list = list.push(nav_row(
-                    14,
+                    10,
                     has_grandchildren.then(|| (child_expanded, child.clone())),
                     child_ico,
                     child_name,
                     Location::Path(child.clone()),
                     child_active,
-                    tag,
                 ));
                 if child_expanded && let Ok(g_entries) = fs::read_dir(&child) {
                     let mut grandchildren: Vec<PathBuf> = g_entries
@@ -2986,13 +2990,12 @@ impl App {
                             _ => "folder",
                         };
                         list = list.push(nav_row(
-                            28,
+                            20,
                             None,
                             gico,
                             gname,
                             Location::Path(gchild),
                             gactive,
-                            None,
                         ));
                     }
                 }
@@ -3001,11 +3004,12 @@ impl App {
 
         list = list.push(
             widget::container(
-                widget::text::text("▾  Locations")
+                widget::text::text("Locations")
                     .size(11.0)
-                    .font(cosmic::font::light()),
+                    .font(cosmic::font::semibold())
+                    .class(theme::Text::Color(cosmic::iced::Color::from_rgb8(0x73, 0x80, 0x94))),
             )
-            .padding([12, 8, 4, 8]),
+            .padding([10, 6, 3, 6]),
         );
 
         let root_path = PathBuf::from("/");
@@ -3017,7 +3021,6 @@ impl App {
             "Yu OS Disk".to_string(),
             Location::Path(root_path),
             root_active,
-            None,
         ));
 
         let net_active = matches!(active_loc, Some(Location::Network(..)));
@@ -3028,7 +3031,6 @@ impl App {
             fl!("networks"),
             Location::Network("network:///".to_string(), fl!("networks"), None),
             net_active,
-            None,
         ));
 
         let trash_active = matches!(active_loc, Some(Location::Trash));
@@ -3039,19 +3041,21 @@ impl App {
             fl!("trash"),
             Location::Trash,
             trash_active,
-            None,
         ));
 
         let sidebar_col = widget::column::with_children([
             header.into(),
             header_rule.into(),
-            widget::scrollable(list).height(Length::Fill).into(),
+            cosmic::iced::widget::scrollable(list)
+                .width(Length::Fill)
+                .height(Length::Fill)
+                .into(),
         ])
-        .width(Length::Fixed(218.0))
+        .width(Length::Fixed(180.0))
         .height(Length::Fill);
 
         let sidebar_box = widget::container(sidebar_col)
-            .width(Length::Fixed(218.0))
+            .width(Length::Fixed(180.0))
             .height(Length::Fill)
             .class(theme::Container::custom(crate::glass::sidebar_surface));
 
@@ -3095,21 +3099,21 @@ impl App {
             );
         }
 
-        let mut back = widget::button::custom(icon::from_name("go-previous-symbolic").size(16).icon())
+        let mut back = widget::button::custom(Self::toolbar_svg_icon("nav-back", 15))
             .padding([5, 6])
             .class(crate::glass::toolbar_icon_button(false));
         if can_back {
             back = back.on_press(Message::TabMessage(None, tab::Message::GoPrevious));
         }
 
-        let mut forward = widget::button::custom(icon::from_name("go-next-symbolic").size(16).icon())
+        let mut forward = widget::button::custom(Self::toolbar_svg_icon("nav-forward", 15))
             .padding([5, 6])
             .class(crate::glass::toolbar_icon_button(false));
         if can_forward {
             forward = forward.on_press(Message::TabMessage(None, tab::Message::GoNext));
         }
 
-        let mut up_btn = widget::button::custom(icon::from_name("go-up-symbolic").size(16).icon())
+        let mut up_btn = widget::button::custom(Self::toolbar_svg_icon("nav-up", 15))
             .padding([5, 6])
             .class(crate::glass::toolbar_icon_button(false));
         if can_up {
@@ -3119,8 +3123,9 @@ impl App {
         let title_drag = crate::mouse_area::MouseArea::new(
             widget::container(
                 widget::text::text(folder_title)
-                    .size(13.5)
-                    .font(cosmic::font::light()),
+                    .size(14.0)
+                    .font(cosmic::font::semibold())
+                    .class(theme::Text::Color(cosmic::iced::Color::from_rgb8(0x1b, 0x24, 0x32))),
             )
             .padding([0, 6])
             .width(Length::Fill)
@@ -3135,14 +3140,22 @@ impl App {
             .class(crate::glass::toolbar_icon_button(false))
             .on_press(Message::NewItem(None, true));
 
-        let list_btn = widget::button::custom(Self::toolbar_svg_icon("view-list", 15))
-            .padding([4, 6])
-            .class(crate::glass::toolbar_icon_button(matches!(view, tab::View::List)))
-            .on_press(Message::TabView(None, tab::View::List));
-        let grid_btn = widget::button::custom(Self::toolbar_svg_icon("view-grid", 15))
-            .padding([4, 6])
-            .class(crate::glass::toolbar_icon_button(matches!(view, tab::View::Grid)))
-            .on_press(Message::TabView(None, tab::View::Grid));
+        let is_list = matches!(view, tab::View::List);
+        let is_grid = matches!(view, tab::View::Grid);
+        let list_btn = widget::button::custom(Self::toolbar_svg_icon(
+            if is_list { "view-list-active" } else { "view-list" },
+            15,
+        ))
+        .padding([4, 6])
+        .class(crate::glass::view_switcher_button(is_list))
+        .on_press(Message::TabView(None, tab::View::List));
+        let grid_btn = widget::button::custom(Self::toolbar_svg_icon(
+            if is_grid { "view-grid-active" } else { "view-grid" },
+            15,
+        ))
+        .padding([4, 6])
+        .class(crate::glass::view_switcher_button(is_grid))
+        .on_press(Message::TabView(None, tab::View::Grid));
         let view_group = widget::container(
             widget::row::with_children([list_btn.into(), grid_btn.into()]).spacing(2),
         )
@@ -3158,14 +3171,35 @@ impl App {
             ));
 
         let search_term = self.search_get();
-        let search_input = widget::text_input::search_input(
+        let search_inner = widget::text_input(
             fl!("finder-toolbar-search"),
             search_term.unwrap_or(""),
         )
-        .width(Length::Fixed(196.0))
+        .size(12.5)
+        .style(theme::TextInput::EditableText)
+        .width(Length::Fill)
         .id(self.search_id.clone())
-        .on_clear(Message::SearchClear)
         .on_input(Message::SearchInput);
+
+        let mut search_row = widget::row::with_capacity(3)
+            .align_y(Alignment::Center)
+            .spacing(6)
+            .push(Self::toolbar_svg_icon("search", 13))
+            .push(search_inner);
+        if search_term.is_some_and(|s| !s.is_empty()) {
+            search_row = search_row.push(
+                widget::button::custom(Self::toolbar_svg_icon("win-close", 11))
+                    .padding(2)
+                    .class(crate::glass::toolbar_icon_button(false))
+                    .on_press(Message::SearchClear),
+            );
+        }
+        let search_input = widget::container(search_row)
+            .width(Length::Fixed(196.0))
+            .height(Length::Fixed(28.0))
+            .align_y(Alignment::Center)
+            .padding([0, 9])
+            .class(theme::Container::custom(crate::glass::search_box_surface));
 
         let sep = widget::container(
             cosmic::iced::widget::rule::vertical(1).class(crate::glass::divider_rule()),
@@ -3173,26 +3207,20 @@ impl App {
         .height(Length::Fixed(18.0))
         .padding([0, 4]);
 
-        let min_btn = widget::button::custom(
-            icon::from_name("window-minimize-symbolic").size(14).icon(),
-        )
-        .padding([5, 6])
-        .class(crate::glass::toolbar_icon_button(false))
-        .on_press(Message::WindowMinimize);
+        let min_btn = widget::button::custom(Self::toolbar_svg_icon("win-min", 13))
+            .padding([5, 6])
+            .class(crate::glass::toolbar_icon_button(false))
+            .on_press(Message::WindowMinimize);
 
-        let max_btn = widget::button::custom(
-            icon::from_name("window-maximize-symbolic").size(14).icon(),
-        )
-        .padding([5, 6])
-        .class(crate::glass::toolbar_icon_button(false))
-        .on_press(Message::WindowToggleMaximize);
+        let max_btn = widget::button::custom(Self::toolbar_svg_icon("win-max", 13))
+            .padding([5, 6])
+            .class(crate::glass::toolbar_icon_button(false))
+            .on_press(Message::WindowToggleMaximize);
 
-        let close_btn = widget::button::custom(
-            icon::from_name("window-close-symbolic").size(14).icon(),
-        )
-        .padding([5, 6])
-        .class(crate::glass::toolbar_icon_button(false))
-        .on_press(Message::WindowClose);
+        let close_btn = widget::button::custom(Self::toolbar_svg_icon("win-close", 13))
+            .padding([5, 6])
+            .class(crate::glass::toolbar_icon_button(false))
+            .on_press(Message::WindowClose);
 
         row = row
             .push(back)
@@ -3292,15 +3320,17 @@ impl App {
             .next()
             .and_then(|p| p.file_name().map(|n| n.to_string_lossy().into_owned()));
 
+        // Minimal borderless header (no horizontal divider line below!)
         let header = widget::container(
             widget::row::with_children([
-                Self::yu_agent_icon(16).into(),
+                Self::yu_agent_icon(15).into(),
                 widget::text::text("Yu Agent")
-                    .size(13.0)
-                    .font(cosmic::font::light())
+                    .size(12.5)
+                    .font(cosmic::font::semibold())
+                    .class(theme::Text::Color(cosmic::iced::Color::from_rgb8(0x18, 0x22, 0x32)))
                     .width(Length::Fill)
                     .into(),
-                widget::button::custom(icon::from_name("window-close-symbolic").size(14).icon())
+                widget::button::custom(Self::toolbar_svg_icon("win-close", 12))
                     .padding([4, 5])
                     .class(crate::glass::toolbar_icon_button(false))
                     .on_press(Message::ToggleAiDrawer)
@@ -3309,97 +3339,10 @@ impl App {
             .align_y(Alignment::Center)
             .spacing(7),
         )
-        .height(Length::Fixed(36.0))
+        .height(Length::Fixed(38.0))
         .align_y(Alignment::Center)
-        .padding([0, 10])
-        .width(Length::Fill)
-        .class(theme::Container::custom(crate::glass::ai_header_surface));
-
-        let mut pills = widget::row::with_capacity(2)
-            .spacing(6)
-            .align_y(Alignment::Center);
-        pills = pills.push(
-            widget::container(
-                widget::row::with_children([
-                    Self::sidebar_svg_icon("folder", false, 12).into(),
-                    widget::text::text(folder_name.clone())
-                        .size(11.5)
-                        .font(cosmic::font::light())
-                        .into(),
-                ])
-                .spacing(4)
-                .align_y(Alignment::Center),
-            )
-            .padding([2, 8])
-            .class(theme::Container::custom(crate::glass::ai_pill_surface)),
-        );
-        if let Some(ref sel) = selected_file {
-            pills = pills.push(
-                widget::container(
-                    widget::row::with_children([
-                        Self::sidebar_svg_icon("documents", false, 12).into(),
-                        widget::text::text(sel.clone())
-                            .size(11.5)
-                            .font(cosmic::font::light())
-                            .into(),
-                    ])
-                    .spacing(4)
-                    .align_y(Alignment::Center),
-                )
-                .padding([2, 8])
-                .class(theme::Container::custom(crate::glass::ai_pill_surface)),
-            );
-        }
-        let ctx_bar = widget::container(pills)
-            .padding([8, 10])
-            .width(Length::Fill)
-            .class(theme::Container::custom(crate::glass::ai_context_bar_surface));
-
-        let chip = |label: &'static str, msg: Message| -> Element<'_, Message> {
-            widget::button::custom(
-                widget::text::text(label)
-                    .size(11.5)
-                    .font(cosmic::font::light()),
-            )
-            .padding([4, 8])
-            .class(crate::glass::ai_chip_button())
-            .on_press(msg)
-            .into()
-        };
-
-        let chips = widget::column::with_children([
-            widget::row::with_children([
-                chip("Summarize", Message::AiSummarize(None)),
-                chip("Explain", Message::AiExplain(None)),
-            ])
-            .spacing(5)
-            .into(),
-            widget::row::with_children([
-                chip("Find Similar", Message::AiAssistFindSimilar),
-                chip("Open in Yu Agent", Message::AskYu),
-            ])
-            .spacing(5)
-            .into(),
-        ])
-        .spacing(5);
-
-        let user_prompt = self
-            .ai_last_prompt
-            .clone()
-            .unwrap_or_else(|| format!("Analyze folder \"{folder_name}\""));
-
-        let user_bubble = widget::row::with_children([
-            widget::space::horizontal().width(Length::Fixed(24.0)).into(),
-            widget::container(
-                widget::text::text(user_prompt)
-                    .size(11.5)
-                    .font(cosmic::font::light()),
-            )
-            .padding([7, 10])
-            .width(Length::Fill)
-            .class(theme::Container::custom(crate::glass::ai_user_bubble))
-            .into(),
-        ]);
+        .padding([4, 12, 0, 14])
+        .width(Length::Fill);
 
         let folder_summary = {
             let items_opt = tab_opt.and_then(|t| t.items_opt());
@@ -3409,22 +3352,22 @@ impl App {
                 .unwrap_or(0);
             let files = total.saturating_sub(dirs);
             let mut summary = format!(
-                "Scanned \"{folder_name}\": {total} items ({dirs} folders, {files} files)."
+                "{folder_name} contains {total} items ({dirs} folders, {files} files)."
             );
             if let Some(ref sel) = selected_file {
                 summary.push_str(&format!(
-                    "\n\nSelected: {sel}\nUse the quick actions above to summarize, explain, or find related files."
+                    "\n\nCurrently focused on \"{sel}\". Ask a question below or pick a quick action."
                 ));
             } else {
                 summary.push_str(
-                    "\n\nSelect any file to generate a summary, explain its contents, or find similar items.",
+                    "\n\nSelect any item in the list or ask a question below.",
                 );
             }
             summary
         };
 
         let agent_text = match (&self.ai_last_response, &self.ai_assist_status) {
-            (_, AiAssistStatus::Loading) => "Analyzing files and index…".to_string(),
+            (_, AiAssistStatus::Loading) => "Thinking…".to_string(),
             (Some(Ok(text)), _) => text.clone(),
             (Some(Err(err)), _) => format!("Note: {err}"),
             (_, AiAssistStatus::Error(err)) => format!("Search note: {err}"),
@@ -3446,68 +3389,169 @@ impl App {
             _ => folder_summary,
         };
 
-        let agent_card = widget::container(
+        let mut thread_items: Vec<Element<'_, Message>> = Vec::with_capacity(4);
+
+        if let Some(ref prompt) = self.ai_last_prompt {
+            let user_bubble = widget::row::with_children([
+                widget::space::horizontal().width(Length::Fill).into(),
+                widget::container(
+                    widget::text::text(prompt.clone())
+                        .size(12.0)
+                        .font(cosmic::font::default())
+                        .class(theme::Text::Color(cosmic::iced::Color::from_rgb8(0x17, 0x25, 0x3b))),
+                )
+                .padding([7, 12])
+                .width(Length::Shrink)
+                .class(theme::Container::custom(crate::glass::ai_user_bubble))
+                .into(),
+            ]);
+            thread_items.push(user_bubble.into());
+        }
+
+        // Clean borderless AI response block (no boxy border!)
+        let agent_block = widget::column::with_children([
             widget::text::text(agent_text)
-                .size(11.5)
-                .font(cosmic::font::light()),
-        )
-        .padding([9, 11])
-        .width(Length::Fill)
-        .class(theme::Container::custom(crate::glass::ai_agent_card));
-
-        let messages_col = widget::column::with_children([
-            chips.into(),
-            user_bubble.into(),
-            agent_card.into(),
+                .size(12.0)
+                .line_height(cosmic::iced::widget::text::LineHeight::Absolute(18.0.into()))
+                .font(cosmic::font::default())
+                .class(theme::Text::Color(cosmic::iced::Color::from_rgb8(0x25, 0x30, 0x41)))
+                .into(),
         ])
-        .spacing(10)
-        .padding(12)
-        .width(Length::Fill);
+        .spacing(6)
+        .padding([4, 2]);
+        thread_items.push(agent_block.into());
 
-        let composer_input = widget::text_input(
-            "Ask about this folder or file…",
+        // Soft rounded pill suggestion chips
+        let chip = |label: &'static str, msg: Message| -> Element<'_, Message> {
+            widget::button::custom(
+                widget::text::text(label)
+                    .size(11.0)
+                    .font(cosmic::font::default())
+                    .class(theme::Text::Color(cosmic::iced::Color::from_rgb8(0x33, 0x41, 0x55))),
+            )
+            .padding([5, 11])
+            .class(crate::glass::ai_chip_button())
+            .on_press(msg)
+            .into()
+        };
+
+        let chips = widget::column::with_children([
+            widget::row::with_children([
+                chip("Summarize", Message::AiSummarize(None)),
+                chip("Explain", Message::AiExplain(None)),
+                chip("Find Similar", Message::AiAssistFindSimilar),
+            ])
+            .spacing(6)
+            .into(),
+            widget::row::with_children([
+                chip("Open in Yu Agent ↗", Message::AskYu),
+            ])
+            .spacing(6)
+            .into(),
+        ])
+        .spacing(6)
+        .padding([4, 0]);
+        thread_items.push(chips.into());
+
+        let messages_col = widget::column::with_children(thread_items)
+            .spacing(12)
+            .padding([8, 14])
+            .width(Length::Fill);
+
+        // Unified floating Composer Card at the bottom (with @context pills inside the card, NO horizontal lines!)
+        let mut pills = widget::row::with_capacity(2)
+            .spacing(5)
+            .align_y(Alignment::Center);
+        pills = pills.push(
+            widget::container(
+                widget::row::with_children([
+                    Self::sidebar_svg_icon("documents", false, 11).into(),
+                    widget::text::text(folder_name.clone())
+                        .size(11.0)
+                        .font(cosmic::font::default())
+                        .class(theme::Text::Color(cosmic::iced::Color::from_rgb8(0x47, 0x55, 0x69)))
+                        .into(),
+                ])
+                .spacing(4)
+                .align_y(Alignment::Center),
+            )
+            .padding([2, 7])
+            .class(theme::Container::custom(crate::glass::ai_pill_surface)),
+        );
+        if let Some(ref sel) = selected_file {
+            let short_sel = if sel.chars().count() > 19 {
+                let prefix: String = sel.chars().take(17).collect();
+                format!("{prefix}…")
+            } else {
+                sel.clone()
+            };
+            pills = pills.push(
+                widget::container(
+                    widget::row::with_children([
+                        Self::sidebar_svg_icon("accounting", false, 11).into(),
+                        widget::text::text(short_sel)
+                            .size(11.0)
+                            .font(cosmic::font::default())
+                            .class(theme::Text::Color(cosmic::iced::Color::from_rgb8(0x47, 0x55, 0x69)))
+                            .wrapping(cosmic::iced::core::text::Wrapping::None)
+                            .into(),
+                    ])
+                    .spacing(4)
+                    .align_y(Alignment::Center),
+                )
+                .padding([2, 7])
+                .class(theme::Container::custom(crate::glass::ai_pill_surface)),
+            );
+        }
+
+        let composer_inner = widget::text_input(
+            "Ask Yu Agent…",
             &self.ai_assist_input,
         )
+        .size(12.0)
+        .style(theme::TextInput::EditableText)
         .on_input(Message::AiAssistInput)
         .on_submit(|_| Message::AiAssistSubmit)
         .width(Length::Fill);
 
-        let send_btn = widget::button::custom(icon::from_name("go-up-symbolic").size(14).icon())
-            .width(Length::Fixed(28.0))
-            .height(Length::Fixed(28.0))
+        let send_btn = widget::button::custom(Self::toolbar_svg_icon("send-up", 13))
+            .width(Length::Fixed(26.0))
+            .height(Length::Fixed(26.0))
             .padding(6)
             .class(crate::glass::ai_send_button())
             .on_press(Message::AiAssistSubmit);
 
-        let composer = widget::container(
-            widget::row::with_children([composer_input.into(), send_btn.into()])
-                .spacing(6)
-                .align_y(Alignment::Center),
+        let composer_card = widget::container(
+            widget::column::with_children([
+                pills.into(),
+                widget::row::with_children([composer_inner.into(), send_btn.into()])
+                    .spacing(6)
+                    .align_y(Alignment::Center)
+                    .into(),
+            ])
+            .spacing(6),
         )
         .padding([8, 10])
         .width(Length::Fill)
-        .class(theme::Container::custom(crate::glass::ai_context_bar_surface));
+        .class(theme::Container::custom(crate::glass::ai_composer_card));
+
+        let composer_wrap = widget::container(composer_card)
+            .padding([4, 12, 12, 12])
+            .width(Length::Fill);
 
         let drawer_col = widget::column::with_children([
             header.into(),
-            cosmic::iced::widget::rule::horizontal(1)
-                .class(crate::glass::divider_rule())
+            cosmic::iced::widget::scrollable(messages_col)
+                .width(Length::Fill)
+                .height(Length::Fill)
                 .into(),
-            ctx_bar.into(),
-            cosmic::iced::widget::rule::horizontal(1)
-                .class(crate::glass::divider_rule())
-                .into(),
-            widget::scrollable(messages_col).height(Length::Fill).into(),
-            cosmic::iced::widget::rule::horizontal(1)
-                .class(crate::glass::divider_rule())
-                .into(),
-            composer.into(),
+            composer_wrap.into(),
         ])
-        .width(Length::Fixed(300.0))
+        .width(Length::Fixed(292.0))
         .height(Length::Fill);
 
         let drawer_box = widget::container(drawer_col)
-            .width(Length::Fixed(300.0))
+            .width(Length::Fixed(292.0))
             .height(Length::Fill)
             .class(theme::Container::custom(crate::glass::ai_drawer_surface));
 
@@ -3542,7 +3586,8 @@ impl App {
             };
             widget::text::text(label)
                 .size(11.5)
-                .font(cosmic::font::light())
+                .font(cosmic::font::default())
+                .class(theme::Text::Color(cosmic::iced::Color::from_rgb8(0x55, 0x62, 0x75)))
                 .into()
         } else {
             widget::space::horizontal().into()
@@ -3618,7 +3663,8 @@ impl App {
                 children.push(
                     widget::text::text(label)
                         .size(11.5)
-                        .font(cosmic::font::light())
+                        .font(cosmic::font::default())
+                        .class(theme::Text::Color(cosmic::iced::Color::from_rgb8(0x55, 0x62, 0x75)))
                         .into(),
                 );
             } else {
@@ -3627,7 +3673,8 @@ impl App {
                     widget::button::custom(
                         widget::text::text(label)
                             .size(11.5)
-                            .font(cosmic::font::light()),
+                            .font(cosmic::font::default())
+                            .class(theme::Text::Color(cosmic::iced::Color::from_rgb8(0x55, 0x62, 0x75))),
                     )
                     .on_press(Message::TabMessage(None, tab::Message::Location(target)))
                     .padding([1, 3])
@@ -3637,7 +3684,8 @@ impl App {
                 children.push(
                     widget::text::text("›")
                         .size(11.5)
-                        .font(cosmic::font::light())
+                        .font(cosmic::font::default())
+                        .class(theme::Text::Color(cosmic::iced::Color::from_rgb8(0x98, 0xa3, 0xb4)))
                         .into(),
                 );
             }

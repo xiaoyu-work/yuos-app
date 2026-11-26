@@ -2352,13 +2352,32 @@ impl Item {
             )))
     }
 
-    /// Text widget for a filename in list view: single-line, slender light font, middle-ellipsized.
+    /// Text widget for a filename in list view: single-line, explicit white on selection.
     fn list_display_name<'a>(
         name: impl Into<Cow<'a, str>> + 'a,
     ) -> widget::Text<'a, cosmic::Theme, cosmic::Renderer> {
         widget::text::text(name)
             .size(12.5)
-            .font(font::light())
+            .font(font::default())
+            .wrapping(text::Wrapping::None)
+            .ellipsize(text::Ellipsize::Middle(text::EllipsizeHeightLimit::Lines(
+                1,
+            )))
+    }
+
+    fn list_display_name_styled<'a>(
+        name: impl Into<Cow<'a, str>> + 'a,
+        selected: bool,
+    ) -> widget::Text<'a, cosmic::Theme, cosmic::Renderer> {
+        let color = if selected {
+            Color::WHITE
+        } else {
+            Color::from_rgb8(0x1f, 0x29, 0x37)
+        };
+        widget::text::text(name)
+            .size(12.5)
+            .font(if selected { font::semibold() } else { font::default() })
+            .class(theme::Text::Color(color))
             .wrapping(text::Wrapping::None)
             .ellipsize(text::Ellipsize::Middle(text::EllipsizeHeightLimit::Lines(
                 1,
@@ -2366,8 +2385,8 @@ impl Item {
     }
 
     fn list_folder_svg_icon(selected: bool, size: u16) -> widget::Icon {
-        const FOLDER_COLOR_SVG: &[u8] = br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.5 3.6C1.5 2.94 2.04 2.4 2.7 2.4H6.1L7.5 3.9H13.3C13.96 3.9 14.5 4.44 14.5 5.1V12.4C14.5 13.06 13.96 13.6 13.3 13.6H2.7C2.04 13.6 1.5 13.06 1.5 12.4V3.6Z" fill="#bae6fd" stroke="#0284c7" stroke-width="1.15" stroke-linejoin="round"/><path d="M1.5 5.6H14.5V12.4C14.5 13.06 13.96 13.6 13.3 13.6H2.7C2.04 13.6 1.5 13.06 1.5 12.4V5.6Z" fill="#38bdf8" fill-opacity="0.45"/></svg>"##;
-        const FOLDER_SELECTED_SVG: &[u8] = br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1.5 3.6C1.5 2.94 2.04 2.4 2.7 2.4H6.1L7.5 3.9H13.3C13.96 3.9 14.5 4.44 14.5 5.1V12.4C14.5 13.06 13.96 13.6 13.3 13.6H2.7C2.04 13.6 1.5 13.06 1.5 12.4V3.6Z" fill="#ffffff" fill-opacity="0.24" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="round"/></svg>"##;
+        const FOLDER_COLOR_SVG: &[u8] = br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="#2b88ff"/></svg>"##;
+        const FOLDER_SELECTED_SVG: &[u8] = br##"<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="#ffffff"/></svg>"##;
         let bytes = if selected {
             FOLDER_SELECTED_SVG
         } else {
@@ -5130,16 +5149,25 @@ impl Tab {
             row = row.push(
                 widget::text::text(name)
                     .size(11.5)
-                    .font(font::light())
+                    .font(font::semibold())
+                    .class(theme::Text::Color(Color::from_rgb8(0x54, 0x60, 0x72)))
                     .wrapping(text::Wrapping::None),
             );
             row = row.push(widget::space::horizontal());
             match (sort_name == msg, sort_direction) {
                 (true, true) => {
-                    row = row.push(widget::icon::from_name("pan-up-symbolic").size(12));
+                    row = row.push(
+                        widget::text::text("▴")
+                            .size(11.0)
+                            .class(theme::Text::Color(Color::from_rgb8(0x7c, 0x89, 0x9c))),
+                    );
                 }
                 (true, false) => {
-                    row = row.push(widget::icon::from_name("pan-down-symbolic").size(12));
+                    row = row.push(
+                        widget::text::text("▾")
+                            .size(11.0)
+                            .class(theme::Text::Color(Color::from_rgb8(0x7c, 0x89, 0x9c))),
+                    );
                 }
                 _ => {}
             }
@@ -5179,7 +5207,8 @@ impl Tab {
                 widget::container(
                     widget::text::text("Kind")
                         .size(11.5)
-                        .font(font::light())
+                        .font(font::semibold())
+                        .class(theme::Text::Color(Color::from_rgb8(0x54, 0x60, 0x72)))
                         .wrapping(text::Wrapping::None),
                 )
                 .padding([0, 12])
@@ -5981,17 +6010,25 @@ impl Tab {
                     let kind_text = item_kind_label(item);
                     let even = count % 2 == 0;
                     let is_dir_item = item.metadata.is_dir();
+                    let row_selected = item.selected;
 
-                    let cell_text = |s: String| {
+                    let meta_color = if row_selected {
+                        Color::from_rgba(1.0, 1.0, 1.0, 0.92)
+                    } else {
+                        Color::from_rgb8(0x5e, 0x6a, 0x7d)
+                    };
+
+                    let cell_text = move |s: String| {
                         widget::text::text(s)
-                            .size(11.5)
-                            .font(font::light())
+                            .size(12.0)
+                            .font(font::default())
+                            .class(theme::Text::Color(meta_color))
                             .wrapping(text::Wrapping::None)
                             .ellipsize(text::Ellipsize::End(text::EllipsizeHeightLimit::Lines(1)))
                     };
 
                     let row_icon = if is_dir_item {
-                        Item::list_folder_svg_icon(item.selected, icon_size)
+                        Item::list_folder_svg_icon(row_selected, icon_size)
                     } else {
                         widget::icon::icon(item.icon_handle_list.clone())
                             .content_fit(ContentFit::Contain)
@@ -6001,7 +6038,7 @@ impl Tab {
                     let row = if condensed {
                         widget::row::with_children([
                             row_icon.into(),
-                            Item::list_display_name(item.display_name.clone())
+                            Item::list_display_name_styled(item.display_name.clone(), row_selected)
                                 .width(Length::Fill)
                                 .into(),
                         ])
@@ -6014,7 +6051,11 @@ impl Tab {
                             widget::row::with_children([
                                 row_icon.into(),
                                 widget::column::with_children([
-                                    Item::list_display_name(item.display_name.clone()).into(),
+                                    Item::list_display_name_styled(
+                                        item.display_name.clone(),
+                                        row_selected,
+                                    )
+                                    .into(),
                                     cell_text(match item.path_opt() {
                                         Some(path) => path.display().to_string(),
                                         None => String::new(),
@@ -6063,9 +6104,12 @@ impl Tab {
                         let name_cell = widget::container(
                             widget::row::with_children([
                                 row_icon.into(),
-                                Item::list_display_name(item.display_name.clone())
-                                    .width(Length::Fill)
-                                    .into(),
+                                Item::list_display_name_styled(
+                                    item.display_name.clone(),
+                                    row_selected,
+                                )
+                                .width(Length::Fill)
+                                .into(),
                             ])
                             .align_y(Alignment::Center)
                             .spacing(8),

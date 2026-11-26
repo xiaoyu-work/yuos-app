@@ -195,9 +195,9 @@ pub fn bottom_bar_surface(theme: &Theme) -> container::Style {
 pub fn ai_drawer_surface(theme: &Theme) -> container::Style {
     let is_dark = theme.cosmic().is_dark;
     let bg = if is_dark {
-        Color::from_rgb8(0x16, 0x1b, 0x24)
+        Color::from_rgb8(0x14, 0x19, 0x22)
     } else {
-        Color::from_rgb8(0xf9, 0xfb, 0xfe)
+        Color::from_rgb8(0xf6, 0xf8, 0xfc)
     };
     let fg = if is_dark {
         Color::from_rgb8(0xee, 0xf2, 0xf7)
@@ -214,37 +214,18 @@ pub fn ai_drawer_surface(theme: &Theme) -> container::Style {
     }
 }
 
-pub fn ai_header_surface(theme: &Theme) -> container::Style {
-    let is_dark = theme.cosmic().is_dark;
-    let bg = if is_dark {
-        Color::from_rgb8(0x1b, 0x21, 0x2c)
-    } else {
-        Color::from_rgb8(0xf3, 0xf7, 0xfc)
-    };
-    let fg = if is_dark {
-        Color::from_rgb8(0xee, 0xf2, 0xf7)
-    } else {
-        Color::from_rgb8(0x18, 0x22, 0x32)
-    };
+pub fn ai_header_surface(_theme: &Theme) -> container::Style {
     container::Style {
-        icon_color: Some(fg),
-        text_color: Some(fg),
-        background: Some(Background::Color(bg)),
+        background: None,
         border: Border::default(),
         snap: true,
         ..Default::default()
     }
 }
 
-pub fn ai_context_bar_surface(theme: &Theme) -> container::Style {
-    let is_dark = theme.cosmic().is_dark;
-    let bg = if is_dark {
-        Color::from_rgb8(0x14, 0x19, 0x22)
-    } else {
-        Color::WHITE
-    };
+pub fn ai_context_bar_surface(_theme: &Theme) -> container::Style {
     container::Style {
-        background: Some(Background::Color(bg)),
+        background: None,
         border: Border::default(),
         snap: true,
         ..Default::default()
@@ -255,15 +236,15 @@ pub fn ai_pill_surface(theme: &Theme) -> container::Style {
     let is_dark = theme.cosmic().is_dark;
     let (bg, border_col, fg) = if is_dark {
         (
-            Color::from_rgba8(0x00, 0x5c, 0xfe, 0.22),
-            Color::from_rgba8(0x00, 0x5c, 0xfe, 0.45),
+            Color::from_rgba(1.0, 1.0, 1.0, 0.06),
+            Color::from_rgba(1.0, 1.0, 1.0, 0.10),
             Color::from_rgb8(0xd8, 0xe7, 0xff),
         )
     } else {
         (
-            Color::from_rgb8(0xea, 0xf2, 0xff),
-            Color::from_rgb8(0xcf, 0xe0, 0xff),
-            Color::from_rgb8(0x27, 0x40, 0x60),
+            Color::from_rgb8(0xf1, 0xf5, 0xf9),
+            Color::from_rgb8(0xe2, 0xe8, 0xf0),
+            Color::from_rgb8(0x33, 0x41, 0x55),
         )
     };
     container::Style {
@@ -273,51 +254,68 @@ pub fn ai_pill_surface(theme: &Theme) -> container::Style {
         border: Border {
             color: border_col,
             width: 1.0,
-            radius: 999.0.into(),
+            radius: 6.0.into(),
         },
         snap: true,
         ..Default::default()
     }
 }
 
-pub fn ai_user_bubble(_theme: &Theme) -> container::Style {
+pub fn ai_user_bubble(theme: &Theme) -> container::Style {
+    let is_dark = theme.cosmic().is_dark;
+    let (bg, fg) = if is_dark {
+        (
+            Color::from_rgb8(0x1e, 0x29, 0x3b),
+            Color::from_rgb8(0xf1, 0xf5, 0xf9),
+        )
+    } else {
+        (
+            Color::from_rgb8(0xe8, 0xf0, 0xfe),
+            Color::from_rgb8(0x17, 0x25, 0x3b),
+        )
+    };
     container::Style {
-        icon_color: Some(Color::WHITE),
-        text_color: Some(Color::WHITE),
-        background: Some(Background::Color(Color::from_rgb8(0x00, 0x5c, 0xfe))),
+        icon_color: Some(fg),
+        text_color: Some(fg),
+        background: Some(Background::Color(bg)),
         border: Border {
             color: Color::TRANSPARENT,
             width: 0.0,
-            radius: 10.0.into(),
+            radius: 14.0.into(),
         },
         snap: true,
         ..Default::default()
     }
 }
 
-pub fn ai_agent_card(theme: &Theme) -> container::Style {
+pub fn ai_agent_card(_theme: &Theme) -> container::Style {
+    container::Style {
+        background: None,
+        border: Border::default(),
+        snap: true,
+        ..Default::default()
+    }
+}
+
+pub fn ai_composer_card(theme: &Theme) -> container::Style {
     let is_dark = theme.cosmic().is_dark;
-    let (bg, border_col, fg) = if is_dark {
+    let (bg, border_col) = if is_dark {
         (
-            Color::from_rgb8(0x1e, 0x25, 0x32),
-            Color::from_rgb8(0x2d, 0x36, 0x46),
-            Color::from_rgb8(0xee, 0xf2, 0xf7),
+            Color::from_rgb8(0x1b, 0x22, 0x30),
+            Color::from_rgb8(0x2d, 0x37, 0x48),
         )
     } else {
         (
             Color::WHITE,
-            Color::from_rgb8(0xe3, 0xe8, 0xf0),
-            Color::from_rgb8(0x1e, 0x29, 0x3b),
+            Color::from_rgb8(0xdc, 0xe4, 0xf0),
         )
     };
     container::Style {
-        icon_color: Some(fg),
-        text_color: Some(fg),
         background: Some(Background::Color(bg)),
         border: Border {
             color: border_col,
             width: 1.0,
-            radius: 10.0.into(),
+            radius: 12.0.into(),
         },
         snap: true,
         ..Default::default()
@@ -343,6 +341,93 @@ pub fn view_switcher_group(theme: &Theme) -> container::Style {
             color: border_col,
             width: 1.0,
             radius: 7.0.into(),
+        },
+        snap: true,
+        ..Default::default()
+    }
+}
+
+pub fn view_switcher_button(active: bool) -> theme::Button {
+    theme::Button::Custom {
+        active: Box::new(move |_focused, theme| view_switcher_btn_style(theme, active, false)),
+        hovered: Box::new(move |_focused, theme| view_switcher_btn_style(theme, active, true)),
+        pressed: Box::new(move |_focused, theme| view_switcher_btn_style(theme, active, true)),
+        disabled: Box::new(move |theme| view_switcher_btn_style(theme, active, false)),
+    }
+}
+
+fn view_switcher_btn_style(theme: &Theme, active: bool, hovered: bool) -> button::Style {
+    let is_dark = theme.cosmic().is_dark;
+    let mut style = button::Style::new();
+    style.border_radius = 5.0.into();
+    if active {
+        style.background = Some(Background::Color(if is_dark {
+            Color::from_rgb8(0x28, 0x32, 0x44)
+        } else {
+            Color::WHITE
+        }));
+        style.border_width = 1.0;
+        style.border_color = if is_dark {
+            Color::from_rgba(1.0, 1.0, 1.0, 0.12)
+        } else {
+            Color::from_rgba8(15, 26, 46, 0.08)
+        };
+        style.icon_color = Some(Color::from_rgb8(0x00, 0x5c, 0xfe));
+        style.text_color = Some(Color::from_rgb8(0x00, 0x5c, 0xfe));
+    } else if hovered {
+        style.background = Some(Background::Color(if is_dark {
+            Color::from_rgba(1.0, 1.0, 1.0, 0.06)
+        } else {
+            Color::from_rgba8(25, 39, 64, 0.06)
+        }));
+    }
+    style
+}
+
+pub fn search_box_surface(theme: &Theme) -> container::Style {
+    let is_dark = theme.cosmic().is_dark;
+    let (bg, border_col) = if is_dark {
+        (
+            Color::from_rgb8(0x1b, 0x22, 0x30),
+            Color::from_rgb8(0x31, 0x3c, 0x4f),
+        )
+    } else {
+        (
+            Color::WHITE,
+            Color::from_rgb8(0xd5, 0xdd, 0xe9),
+        )
+    };
+    container::Style {
+        background: Some(Background::Color(bg)),
+        border: Border {
+            color: border_col,
+            width: 1.0,
+            radius: 7.0.into(),
+        },
+        snap: true,
+        ..Default::default()
+    }
+}
+
+pub fn ai_input_box_surface(theme: &Theme) -> container::Style {
+    let is_dark = theme.cosmic().is_dark;
+    let (bg, border_col) = if is_dark {
+        (
+            Color::from_rgb8(0x1b, 0x22, 0x30),
+            Color::from_rgb8(0x31, 0x3c, 0x4f),
+        )
+    } else {
+        (
+            Color::from_rgb8(0xfb, 0xfc, 0xfe),
+            Color::from_rgb8(0xcf, 0xd8, 0xe6),
+        )
+    };
+    container::Style {
+        background: Some(Background::Color(bg)),
+        border: Border {
+            color: border_col,
+            width: 1.0,
+            radius: 8.0.into(),
         },
         snap: true,
         ..Default::default()
@@ -494,13 +579,13 @@ pub fn ai_chip_button() -> theme::Button {
 fn ai_chip_style(theme: &Theme, hovered: bool) -> button::Style {
     let is_dark = theme.cosmic().is_dark;
     let mut style = button::Style::new();
-    style.border_radius = 6.0.into();
+    style.border_radius = 999.0.into();
     style.border_width = 1.0;
     if hovered {
         style.background = Some(Background::Color(if is_dark {
             Color::from_rgba8(0x00, 0x5c, 0xfe, 0.18)
         } else {
-            Color::from_rgb8(0xf2, 0xf7, 0xff)
+            Color::from_rgb8(0xea, 0xf2, 0xff)
         }));
         style.border_color = Color::from_rgb8(0x00, 0x5c, 0xfe);
         style.text_color = Some(Color::from_rgb8(0x00, 0x5c, 0xfe));
@@ -513,7 +598,7 @@ fn ai_chip_style(theme: &Theme, hovered: bool) -> button::Style {
         style.border_color = if is_dark {
             Color::from_rgb8(0x2d, 0x36, 0x46)
         } else {
-            Color::from_rgb8(0xd7, 0xe0, 0xec)
+            Color::from_rgb8(0xe2, 0xe8, 0xf0)
         };
         style.text_color = Some(if is_dark {
             Color::from_rgb8(0xd0, 0xd8, 0xe6)
@@ -531,7 +616,7 @@ pub fn ai_send_button() -> theme::Button {
             s.background = Some(Background::Color(Color::from_rgb8(0x00, 0x5c, 0xfe)));
             s.icon_color = Some(Color::WHITE);
             s.text_color = Some(Color::WHITE);
-            s.border_radius = 7.0.into();
+            s.border_radius = 13.0.into();
             s
         }),
         hovered: Box::new(|_focused, _theme| {
@@ -539,7 +624,7 @@ pub fn ai_send_button() -> theme::Button {
             s.background = Some(Background::Color(Color::from_rgb8(0x00, 0x4e, 0xd8)));
             s.icon_color = Some(Color::WHITE);
             s.text_color = Some(Color::WHITE);
-            s.border_radius = 7.0.into();
+            s.border_radius = 13.0.into();
             s
         }),
         pressed: Box::new(|_focused, _theme| {
@@ -547,7 +632,7 @@ pub fn ai_send_button() -> theme::Button {
             s.background = Some(Background::Color(Color::from_rgb8(0x00, 0x44, 0xbd)));
             s.icon_color = Some(Color::WHITE);
             s.text_color = Some(Color::WHITE);
-            s.border_radius = 7.0.into();
+            s.border_radius = 13.0.into();
             s
         }),
         disabled: Box::new(|_theme| {
@@ -555,7 +640,7 @@ pub fn ai_send_button() -> theme::Button {
             s.background = Some(Background::Color(Color::from_rgba8(0x00, 0x5c, 0xfe, 0.45)));
             s.icon_color = Some(Color::WHITE);
             s.text_color = Some(Color::WHITE);
-            s.border_radius = 7.0.into();
+            s.border_radius = 13.0.into();
             s
         }),
     }
