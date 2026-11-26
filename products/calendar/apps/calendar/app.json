@@ -1314,6 +1314,75 @@
     },
     "tools": [
       {
+        "name": "calendar.import_invite",
+        "summary": {
+          "en": "Apply an Email-confirmed invitation response or cancellation to the local calendar without sending RSVP"
+        },
+        "args": [
+          {
+            "name": "ics",
+            "kind": "text",
+            "required": true
+          },
+          {
+            "name": "response",
+            "kind": "name",
+            "choices": [
+              "accept",
+              "tentative",
+              "decline"
+            ]
+          }
+        ],
+        "needs": [
+          {
+            "verb": "data.db.write",
+            "scope": {
+              "kind": "fixed",
+              "scope": {
+                "kind": "name",
+                "value": "calendar"
+              }
+            },
+            "why": {
+              "en": "Apply the confirmed invitation and its idempotent receipt to the owner's local calendar."
+            }
+          }
+        ],
+        "effects": [
+          {
+            "kind": "create",
+            "label": {
+              "en": "Record an invitation receipt and create an accepted or tentative local event"
+            },
+            "recovery": "unknown"
+          },
+          {
+            "kind": "update",
+            "label": {
+              "en": "Apply a newer revision to the same imported invitation"
+            },
+            "recovery": "unknown"
+          },
+          {
+            "kind": "delete",
+            "label": {
+              "en": "Remove the matching imported event when declining or cancelling"
+            },
+            "recovery": "unknown"
+          }
+        ],
+        "app_access": {
+          "callers": [
+            "email"
+          ],
+          "assertions": [
+            "source_mailbox",
+            "organizer"
+          ]
+        }
+      },
+      {
         "name": "calendar.invite",
         "summary": {
           "en": "Create a provider meeting and explicitly request attendee invitations"

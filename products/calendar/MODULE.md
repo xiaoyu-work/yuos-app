@@ -101,12 +101,12 @@ Times require offsets; Outlook receives explicit UTC date/time values.
 Local event CRUD is unchanged and does not pretend to deliver invitations.
 Returned notification fields report requested delivery, not guest receipt.
 
-## Importing an email invitation (provider logic only)
+## Importing an email invitation
 
-The private `import_invite(ics, response=None, *, source, verified_organizer)`
-entrypoint applies a confirmed action to the current owner's local Calendar.
-It requires the existing `data.db.write:Name(calendar)` permission. The future
-`calendar/import_invite` Gateway tool takes `ics` and `response`
+The MCP-only `calendar.import_invite` tool reuses
+`import_invite(ics, response=None, *, source, verified_organizer)` to apply an
+Email-confirmed action to the current owner's local Calendar.
+It requires the existing `data.db.write:Name(calendar)` permission and takes `ics` and `response`
 (`accept`, `tentative`, or `decline` for `METHOD:REQUEST`; omitted for
 `METHOD:CANCEL`). Success returns only `event_id` and `status` (`accepted`,
 `tentative`, `declined`, or `cancelled`). A decline or cancellation retains the
@@ -127,11 +127,21 @@ retains its revision so stale invitations cannot recreate it. Business errors
 use `invalid_invitation`, `invite_not_applicable`, `stale_invitation`, or
 `invitation_conflict`.
 
-The entrypoint is **not exposed** through the current MCP manifest, desktop UI,
-or CLI. Gateway activation needs the App-only route, protected confirmation,
-the verified Email publisher key, and trusted source-mailbox and organizer
-bindings outside the tool arguments. Neither the iCalendar fields nor an
-App ID alone can establish those bindings.
+The tool declares `app_access.callers: ["email"]` and accepts the
+`source_mailbox` and `organizer` assertions. Its handler requires both statements
+and an authenticated `app` caller with ID `email`, so Agent/CLI callers cannot
+import invitations. These are claims made by the signed Email App, not facts
+verified by the OS. Email must confirm the user's action and establish the
+source mailbox and organizer before calling. The handler compares the organizer
+assertion against the iCalendar organizer; the arguments contain no authority
+or caller bindings. Calendar does not add a CLI operation or a desktop entry
+for this tool.
+
+The shipped Framework App-call contract binds the caller to its signed package
+and authorizes the target from its own needs, without inheriting Mail grants.
+Built-in App calls do not show an additional OS prompt. Actual end-to-end use
+requires the matching SDK/runtime, Mail's `app_calls` declaration and confirmed
+invitation action, and signed packages with these manifests installed.
 
 From the repository root:
 
