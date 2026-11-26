@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
   <defs>
-    <linearGradient id="ye_body" x1="44" y1="32" x2="212" y2="224" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#38BDF8"/>
-      <stop offset="1" stop-color="#0284C7"/>
+    <linearGradient id="ye_light" x1="44" y1="32" x2="212" y2="224" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF6EE"/>
+      <stop offset="1" stop-color="#FCE3CD"/>
     </linearGradient>
   </defs>
-  <path d="M44 56C44 42.745 54.745 32 68 32H154L212 90V200C212 213.255 201.255 224 188 224H68C54.745 224 44 213.255 44 200V56Z" fill="url(#ye_body)"/>
+  <path d="M44 56C44 42.745 54.745 32 68 32H154L212 90V200C212 213.255 201.255 224 188 224H68C54.745 224 44 213.255 44 200V56Z" fill="url(#ye_light)" stroke="#F4C299" stroke-width="4"/>
   <path d="M154 32L212 90H174C162.954 90 154 81.046 154 70V32Z" fill="#FF7849"/>
-  <rect x="74" y="108" width="64" height="14" rx="7" fill="#FDE047"/>
-  <rect x="74" y="142" width="108" height="14" rx="7" fill="#FFFFFF"/>
-  <rect x="74" y="174" width="84" height="14" rx="7" fill="#BAE6FD"/>
+  <rect x="74" y="108" width="64" height="14" rx="7" fill="#FF7849"/>
+  <rect x="74" y="142" width="108" height="14" rx="7" fill="#334155"/>
+  <rect x="74" y="174" width="84" height="14" rx="7" fill="#64748B"/>
 </svg>
