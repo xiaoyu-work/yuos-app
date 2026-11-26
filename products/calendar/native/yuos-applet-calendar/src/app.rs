@@ -190,7 +190,7 @@ impl cosmic::Application for CalendarApplet {
         let button = self
             .core
             .applet
-            .icon_button("com.yuos.PanelCalendarButton-symbolic")
+            .icon_button("com.yuos.Calendar")
             .on_press_down(Message::TogglePopup);
         self.core
             .applet

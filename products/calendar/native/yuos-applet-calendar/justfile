@@ -24,4 +24,4 @@ install:
     metadata="$(python3 -B "${YUOS_NATIVE_DESKTOP_METADATA:?use tools/native_build.py}" '{{ target }}' '{{ appid }}')"
     install -Dm0755 {{ targetdir }}/{{ target }}/{{ name }} {{ bindir }}/{{ name }}
     install -Dm0644 "$metadata" {{ sharedir }}/applications/{{ appid }}.desktop
-    install -Dm0644 data/icons/scalable/actions/{{ appid }}-symbolic.svg {{ sharedir }}/icons/hicolor/scalable/actions/{{ appid }}-symbolic.svg
+    install -Dm0644 data/icons/scalable/apps/com.yuos.Calendar.svg {{ sharedir }}/icons/hicolor/scalable/apps/com.yuos.Calendar.svg

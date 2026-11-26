@@ -8,7 +8,7 @@
   "summary": {
     "en": "Native calendar and local agenda panel applet."
   },
-  "icon": "com.yuos.PanelCalendarButton-symbolic",
+  "icon": "com.yuos.Calendar",
   "runtime": "binary",
   "entry": "bin/yuos-applet-calendar",
   "mcp": {
@@ -107,7 +107,7 @@
     "name": {
       "en": "Calendar"
     },
-    "icon": "com.yuos.PanelCalendarButton-symbolic",
+    "icon": "com.yuos.Calendar",
     "categories": [
       "Utility"
     ],
