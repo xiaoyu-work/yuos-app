@@ -321,6 +321,10 @@
   #msgComposeContext > :is([command="cmd_paste"], [command="cmd_pasteNoFormatting"]) { list-style-image: url("chrome://yuos-mail/content/paste.svg") !important; }
   #msgComposeContext > [command="cmd_delete"] { list-style-image: url("chrome://yuos-mail/content/trash.svg") !important; }
   #msgComposeContext > [command="cmd_selectAll"] { list-style-image: url("chrome://yuos-mail/content/selall.svg") !important; }
+  #context-openAttachment { list-style-image: var(--yu-open-b) !important; }
+  #context-saveAttachment { list-style-image: var(--yu-save-b) !important; }
+  #context-detachAttachment { list-style-image: var(--yu-detach-b) !important; }
+  #context-deleteAttachment { list-style-image: var(--yu-trash-b) !important; }
   #mailContext-copy { list-style-image: var(--yu-copy-b) !important; }
   #mailContext-selectall { list-style-image: var(--yu-selall-b) !important; }
   #mailContext-searchTheWeb { list-style-image: var(--yu-search-b) !important; }
