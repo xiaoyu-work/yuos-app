@@ -12,9 +12,9 @@
   "tab_smart_reply":           { "message": "智能回复" },
   "tab_smart_compose":         { "message": "智能写信" },
 
-  "ctx_summarize":             { "message": "用 Yu AI 总结" },
-  "ctx_translate":             { "message": "用 Yu AI 翻译" },
-  "ctx_smart_reply":           { "message": "用 Yu AI 起草回复" },
+  "ctx_summarize":             { "message": "总结" },
+  "ctx_translate":             { "message": "翻译" },
+  "ctx_smart_reply":           { "message": "智能回复" },
 
   "label_summary":             { "message": "摘要" },
   "label_key_points":          { "message": "要点" },

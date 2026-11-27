@@ -132,21 +132,21 @@ async function rebuildMenus() {
   if (s.features.summarize) {
     browser.menus.create({
       id: MENU_IDS.summarize,
-      title: browser.i18n.getMessage("ctx_summarize") || "Summarize with Yu AI",
+      title: browser.i18n.getMessage("ctx_summarize") || "Summarize",
       contexts: ["message_list", "message_display_action_menu"],
     });
   }
   if (s.features.translate) {
     browser.menus.create({
       id: MENU_IDS.translate,
-      title: browser.i18n.getMessage("ctx_translate") || "Translate with Yu AI",
+      title: browser.i18n.getMessage("ctx_translate") || "Translate",
       contexts: ["message_list", "message_display_action_menu", "selection"],
     });
   }
   if (s.features.smartReply) {
     browser.menus.create({
       id: MENU_IDS.reply,
-      title: browser.i18n.getMessage("ctx_smart_reply") || "Smart Reply with Yu AI",
+      title: browser.i18n.getMessage("ctx_smart_reply") || "Smart reply",
       contexts: ["message_list", "message_display_action_menu"],
     });
   }

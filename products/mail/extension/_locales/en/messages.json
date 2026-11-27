@@ -12,9 +12,9 @@
   "tab_smart_reply":           { "message": "Smart Reply" },
   "tab_smart_compose":         { "message": "Smart Compose" },
 
-  "ctx_summarize":             { "message": "Summarize with Yu AI" },
-  "ctx_translate":             { "message": "Translate with Yu AI" },
-  "ctx_smart_reply":           { "message": "Smart Reply with Yu AI" },
+  "ctx_summarize":             { "message": "Summarize" },
+  "ctx_translate":             { "message": "Translate" },
+  "ctx_smart_reply":           { "message": "Smart reply" },
 
   "label_summary":             { "message": "Summary" },
   "label_key_points":          { "message": "Key points" },
