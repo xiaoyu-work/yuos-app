@@ -315,6 +315,12 @@
     margin: 0 -4px 0 auto;
     background: var(--yu-check-b);
   }
+  #msgComposeContext > [command="cmd_undo"] { list-style-image: url("chrome://yuos-mail/content/undo.svg") !important; }
+  #msgComposeContext > [command="cmd_cut"] { list-style-image: url("chrome://yuos-mail/content/cut.svg") !important; }
+  #msgComposeContext > [command="cmd_copy"] { list-style-image: url("chrome://yuos-mail/content/copy.svg") !important; }
+  #msgComposeContext > :is([command="cmd_paste"], [command="cmd_pasteNoFormatting"]) { list-style-image: url("chrome://yuos-mail/content/paste.svg") !important; }
+  #msgComposeContext > [command="cmd_delete"] { list-style-image: url("chrome://yuos-mail/content/trash.svg") !important; }
+  #msgComposeContext > [command="cmd_selectAll"] { list-style-image: url("chrome://yuos-mail/content/selall.svg") !important; }
   #mailContext-copy { list-style-image: var(--yu-copy-b) !important; }
   #mailContext-selectall { list-style-image: var(--yu-selall-b) !important; }
   #mailContext-searchTheWeb { list-style-image: var(--yu-search-b) !important; }
