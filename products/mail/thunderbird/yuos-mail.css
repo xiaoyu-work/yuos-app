@@ -64,6 +64,13 @@
     --yu-paste-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2357606a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='10' height='11' rx='1.5'/%3E%3Cpath d='M6 2h4v2.5H6z'/%3E%3C/svg%3E");
     --yu-undo-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2357606a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5.5 3.5 2.5 6.5l3 3M2.5 6.5H10a3.5 3.5 0 0 1 0 7H7'/%3E%3C/svg%3E");
     --yu-selall-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2357606a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 5V2.5H5M11 2.5h2.5V5M13.5 11v2.5H11M5 13.5H2.5V11M6 8l1.5 1.5L10.5 6'/%3E%3C/svg%3E");
+
+    --yu-al-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2357606a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 4h11M2.5 8h7M2.5 12h11'/%3E%3C/svg%3E");
+    --yu-menu-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2357606a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 4h11M2.5 8h11M2.5 12h11'/%3E%3C/svg%3E");
+    --yu-min-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2357606a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8h8'/%3E%3C/svg%3E");
+    --yu-thread-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%230b63c4' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 3.5h10M5.5 8H13M8 12.5h5'/%3E%3C/svg%3E");
+    --yu-al-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%230b63c4' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 4h11M2.5 8h7M2.5 12h11'/%3E%3C/svg%3E");
+    --yu-menu-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%230b63c4' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 4h11M2.5 8h11M2.5 12h11'/%3E%3C/svg%3E");
   }
   menupopup {
     --panel-background: #fff !important;
@@ -144,6 +151,151 @@
     border-top: 1px solid var(--yu-rule-soft) !important;
     margin: 0 !important;
   }
+  #appMenu-popup {
+    --panel-background: #fff !important;
+    --panel-color: var(--yu-text) !important;
+    --panel-border-color: var(--yu-rule) !important;
+    --panel-border-radius: 8px !important;
+    --panel-padding: 0 !important;
+    --panel-shadow: 0 8px 30px rgba(0, 0, 0, .12) !important;
+    --panel-separator-margin: 5px 4px !important;
+    --panel-separator-color: var(--yu-rule-soft) !important;
+    font: 13px/18px var(--yu-font) !important;
+  }
+  #appMenu-popup panelview {
+    width: 258px !important;
+    min-width: 258px !important;
+    max-width: 258px !important;
+  }
+  #appMenu-popup .panel-subview-body {
+    padding: 6px !important;
+  }
+  #appMenu-popup toolbarseparator {
+    margin: 5px 4px !important;
+    border-color: var(--yu-rule-soft) !important;
+  }
+  #appMenu-popup .panel-subview-body > .subviewbutton {
+    appearance: none !important;
+    min-height: 30px !important;
+    height: 30px !important;
+    padding: 0 10px !important;
+    margin: 0 !important;
+    border-radius: 6px !important;
+    color: var(--yu-text) !important;
+    background: transparent !important;
+    font: 13px/18px var(--yu-font) !important;
+  }
+  #appMenu-popup .panel-subview-body > .subviewbutton:not(.toolbaritem-combined-buttons):hover {
+    background: var(--yu-hover) !important;
+  }
+  #appMenu-popup .subviewbutton > .toolbarbutton-icon {
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 10px 0 0 !important;
+    -moz-context-properties: none !important;
+  }
+  #appMenu-popup .subviewbutton > .toolbarbutton-text {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-weight: 400 !important;
+  }
+  #appMenu-popup .subviewbutton[shortcut]::after {
+    display: none !important;
+  }
+  #appMenu-popup .subviewbutton-nav::after {
+    content: var(--yu-chev-m) !important;
+    display: flex !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 -4px 0 auto !important;
+    padding: 0 !important;
+    -moz-context-properties: none !important;
+  }
+  #appMenu-mainView .toolbaritem-combined-buttons > img {
+    display: none !important;
+  }
+  #appMenu-mainView .toolbaritem-combined-buttons > .toolbarbutton-text {
+    flex: 1 !important;
+  }
+  #appMenu-mainView .panel-subview-body > .toolbaritem-combined-buttons.subviewbutton {
+    column-gap: 2px !important;
+    padding: 0 6px 0 10px !important;
+  }
+  #appMenu-mainView .toolbaritem-combined-buttons > .subviewbutton {
+    appearance: none !important;
+    width: 24px !important;
+    min-width: 24px !important;
+    height: 24px !important;
+    min-height: 24px !important;
+    padding: 4px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+    outline: none !important;
+    background: transparent !important;
+    flex: none !important;
+    justify-content: center !important;
+  }
+  #appMenu-mainView .toolbaritem-combined-buttons > .subviewbutton > .toolbarbutton-icon {
+    margin: 0 !important;
+  }
+  #appMenu-mainView .toolbaritem-combined-buttons > .subviewbutton-iconic > .toolbarbutton-text {
+    display: none !important;
+  }
+  #appMenu-mainView .toolbaritem-combined-buttons > .subviewbutton[checked="true"] {
+    background: var(--yu-sel) !important;
+  }
+  #appMenu-mainView #appMenu-fontSizeReset-button {
+    width: 40px !important;
+    min-width: 40px !important;
+    padding: 0 !important;
+  }
+  #appMenu-fontSizeReset-button > .toolbarbutton-icon {
+    display: none !important;
+  }
+  #appMenu-fontSizeReset-button > .toolbarbutton-text {
+    display: block !important;
+    width: 40px !important;
+    min-width: 40px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    text-align: center !important;
+    font: 12px/18px var(--yu-font) !important;
+    color: var(--yu-muted) !important;
+  }
+  #appMenu-popup panelview:not(#appMenu-mainView) .subviewbutton > .toolbarbutton-icon {
+    display: none !important;
+  }
+  #appMenu-popup .panel-header {
+    min-height: 30px !important;
+    padding: 6px 6px 0 !important;
+  }
+  #appMenu-popup .panel-header > h1 {
+    font: 600 13px/18px var(--yu-font) !important;
+    color: var(--yu-text) !important;
+  }
+  #appMenu-popup .panel-header + toolbarseparator {
+    margin: 5px 10px 0 !important;
+  }
+  #appmenu_new, #appmenu_accountmgr { list-style-image: var(--yu-user-b) !important; }
+  #appmenu_create { list-style-image: var(--yu-plus-b) !important; }
+  #appmenu_open { list-style-image: var(--yu-draft-b) !important; }
+  #appmenu_View { list-style-image: var(--yu-eye-b) !important; }
+  #appmenu_preferences { list-style-image: var(--yu-gear-b) !important; }
+  #appmenu_addons { list-style-image: var(--yu-addon-b) !important; }
+  #appmenu_toolsMenu { list-style-image: var(--yu-tools-b) !important; }
+  #appmenu_help { list-style-image: var(--yu-help-b) !important; }
+  #appmenu-quit { list-style-image: var(--yu-quit-b) !important; }
+  #appmenu_uiDensityCompact { list-style-image: var(--yu-thread-b) !important; }
+  #appmenu_uiDensityNormal { list-style-image: var(--yu-al-b) !important; }
+  #appmenu_uiDensityTouch { list-style-image: var(--yu-menu-b) !important; }
+  #appmenu_uiDensityCompact[checked="true"] { list-style-image: var(--yu-thread-a) !important; }
+  #appmenu_uiDensityNormal[checked="true"] { list-style-image: var(--yu-al-a) !important; }
+  #appmenu_uiDensityTouch[checked="true"] { list-style-image: var(--yu-menu-a) !important; }
+  #appMenu-fontSizeReduce-button { list-style-image: var(--yu-min-b) !important; }
+  #appMenu-fontSizeEnlarge-button { list-style-image: var(--yu-plus-b) !important; }
   menuitem[type="checkbox"][checked="true"]:not(.yu-menu) > .menu-icon {
     list-style-image: var(--yu-check-b) !important;
   }
