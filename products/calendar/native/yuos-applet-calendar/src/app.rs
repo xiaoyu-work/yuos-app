@@ -71,7 +71,7 @@ impl cosmic::Application for CalendarApplet {
         let panel = panel_settings(&core.applet);
         core.set_main_window_id(Some(panel.id));
         core.window.show_headerbar = false;
-        core.window.sharp_corners = true;
+        core.window.sharp_corners = false;
         core.window.show_maximize = false;
         core.window.show_minimize = false;
         core.window.use_template = false;
