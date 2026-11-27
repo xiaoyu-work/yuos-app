@@ -535,6 +535,8 @@ pub struct Manifest {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub desktop: Option<Desktop>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub app_calls: Option<Vec<String>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dependencies: Option<serde_json::Value>,
 }
 
@@ -742,6 +744,19 @@ pub struct Mcptool {
     pub needs: Option<Vec<serde_json::Value>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub effects: Option<Vec<Operationeffect>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub app_access: Option<Mcpappaccess>,
+}
+
+/// mcpAppAccess
+/// Opt-in for controlled App→App calls to this tool. The tool still runs only
+/// with authority derived from its own needs; nothing is inherited from the
+/// caller.
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct Mcpappaccess {
+    pub callers: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub assertions: Option<Vec<String>>,
 }
 
 /// desktop
@@ -805,6 +820,8 @@ pub struct McpCallContext {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub task_id: Option<String>,
     pub caller: McpPrincipal,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub assertions: Option<serde_json::Value>,
 }
 
 /// McpPrincipal
@@ -1233,6 +1250,19 @@ fn validate_wire_schema(
         }
     }
     if let Some(object) = value.as_object() {
+        if let Some(maximum) = rule.get("maxProperties").and_then(serde_json::Value::as_u64) {
+            if object.len() as u64 > maximum {
+                return Err(wire_error(WIRE_MAX_LENGTH, schema_name, path, format!("at most {maximum} properties")));
+            }
+        }
+        if let Some(names_rule) = rule.get("propertyNames").filter(|v| v.is_object()) {
+            let mut names: Vec<&String> = object.keys().collect();
+            names.sort();
+            for name in names {
+                let field_path = format!("{path}.{name}");
+                validate_wire_schema(names_rule, root, &serde_json::Value::String(name.clone()), schema_name, &field_path)?;
+            }
+        }
         if let Some(required) = rule.get("required").and_then(serde_json::Value::as_array) {
             for field in required {
                 let field = field.as_str().unwrap_or_default();
@@ -1242,7 +1272,9 @@ fn validate_wire_schema(
                 }
             }
         }
-        if let Some(properties) = rule.get("properties").and_then(serde_json::Value::as_object) {
+        let empty = serde_json::Map::new();
+        let properties = rule.get("properties").and_then(serde_json::Value::as_object).unwrap_or(&empty);
+        {
             let mut names: Vec<&String> = properties.keys().collect();
             names.sort();
             for name in names {
@@ -1500,7 +1532,7 @@ pub fn normalize_gui_file_write_integers(value: &mut serde_json::Value) {
     normalize_wire_integers(&schema, &schema, value);
 }
 
-const _WIRE_SCHEMA_MCP_CALL_CONTEXT: &str = r###"{"$defs":{"McpPrincipal":{"additionalProperties":false,"properties":{"id":{"maxLength":256,"minLength":1,"pattern":"^[A-Za-z0-9][A-Za-z0-9._:@/+%-]*$","type":"string","x-full-match":true},"kind":{"enum":["system-agent","cli"],"type":"string"},"owner_uid":{"maximum":4294967295,"minimum":0,"type":"integer"}},"required":["kind","id","owner_uid"],"type":"object"}},"$id":"https://yuos.dev/wire/v1/mcp_call_context.schema.json","$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"description":"Authenticated call identity and lineage injected by the Yu OS MCP Gateway over the private App-host transport. Caller-supplied MCP arguments must never populate this object.","properties":{"call_id":{"maxLength":128,"minLength":1,"pattern":"^[A-Za-z0-9][A-Za-z0-9._:-]*$","type":"string","x-full-match":true},"caller":{"$ref":"#/$defs/McpPrincipal"},"deadline_unix_ms":{"maximum":9007199254740991,"minimum":1,"type":"integer"},"session_id":{"maxLength":128,"minLength":1,"pattern":"^[A-Za-z0-9][A-Za-z0-9._:@/+%-]*$","type":"string","x-full-match":true},"task_id":{"maxLength":128,"minLength":1,"pattern":"^[A-Za-z0-9][A-Za-z0-9._:@/+%-]*$","type":"string","x-full-match":true},"trace_id":{"maxLength":128,"minLength":1,"pattern":"^[A-Za-z0-9][A-Za-z0-9._:-]*$","type":"string","x-full-match":true},"wire_version":{"const":1,"maximum":1,"minimum":1,"type":"integer"}},"required":["wire_version","call_id","trace_id","caller"],"title":"MCP call context","type":"object"}"###;
+const _WIRE_SCHEMA_MCP_CALL_CONTEXT: &str = r###"{"$defs":{"McpPrincipal":{"additionalProperties":false,"properties":{"id":{"maxLength":256,"minLength":1,"pattern":"^[A-Za-z0-9][A-Za-z0-9._:@/+%-]*$","type":"string","x-full-match":true},"kind":{"enum":["system-agent","cli","app"],"type":"string"},"owner_uid":{"maximum":4294967295,"minimum":0,"type":"integer"}},"required":["kind","id","owner_uid"],"type":"object"}},"$id":"https://yuos.dev/wire/v1/mcp_call_context.schema.json","$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"description":"Authenticated call identity and lineage injected by the Yu OS MCP Gateway over the private App-host transport. Caller-supplied MCP arguments must never populate this object.","properties":{"assertions":{"additionalProperties":{"maxLength":512,"type":"string","x-max-utf8-bytes":512},"description":"Statements by a verified caller App (caller.kind `app`) whose names the target tool listed in `app_access.assertions`. The OS bounds them but does not check their truth.","maxProperties":8,"propertyNames":{"pattern":"^[a-z][a-z0-9_]{0,63}$","x-full-match":true},"type":"object"},"call_id":{"maxLength":128,"minLength":1,"pattern":"^[A-Za-z0-9][A-Za-z0-9._:-]*$","type":"string","x-full-match":true},"caller":{"$ref":"#/$defs/McpPrincipal"},"deadline_unix_ms":{"maximum":9007199254740991,"minimum":1,"type":"integer"},"session_id":{"maxLength":128,"minLength":1,"pattern":"^[A-Za-z0-9][A-Za-z0-9._:@/+%-]*$","type":"string","x-full-match":true},"task_id":{"maxLength":128,"minLength":1,"pattern":"^[A-Za-z0-9][A-Za-z0-9._:@/+%-]*$","type":"string","x-full-match":true},"trace_id":{"maxLength":128,"minLength":1,"pattern":"^[A-Za-z0-9][A-Za-z0-9._:-]*$","type":"string","x-full-match":true},"wire_version":{"const":1,"maximum":1,"minimum":1,"type":"integer"}},"required":["wire_version","call_id","trace_id","caller"],"title":"MCP call context","type":"object"}"###;
 pub fn validate_mcp_call_context(value: &serde_json::Value) -> Result<(), WireDecodeError> {
     let schema: serde_json::Value = serde_json::from_str(_WIRE_SCHEMA_MCP_CALL_CONTEXT)
         .expect("generated wire schema must be valid JSON");

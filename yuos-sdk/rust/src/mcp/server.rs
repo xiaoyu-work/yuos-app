@@ -838,6 +838,18 @@ fn parse_call_context(
         code: ERR_INVALID_PARAMS,
         message: format!("invalid authenticated call context: {error}"),
     })?;
+    if raw_context
+        .get("assertions")
+        .and_then(Value::as_object)
+        .is_some_and(|assertions| !assertions.is_empty())
+        && raw_context.pointer("/caller/kind").and_then(Value::as_str) != Some("app")
+    {
+        return Err(RpcError {
+            code: ERR_INVALID_PARAMS,
+            message: "invalid authenticated call context: caller assertions are only accepted from Apps"
+                .into(),
+        });
+    }
     let mut normalized = raw_context.clone();
     normalize_mcp_call_context_integers(&mut normalized);
     let authenticated = serde_json::from_value(normalized).map_err(|error| RpcError {

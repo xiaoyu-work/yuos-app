@@ -194,6 +194,100 @@ fn reject_unknown_fields(
     Ok(())
 }
 
+fn validate_app_calls(
+    entries: Option<&Value>,
+    app_id: &str,
+    id_pattern: &Regex,
+    tool_pattern: &Regex,
+) -> Result<(), AppError> {
+    let entries = match entries {
+        None => return Ok(()),
+        Some(Value::Array(entries)) => entries,
+        Some(_) => return Err(AppError::Manifest("`app_calls` must be an array".into())),
+    };
+    let mut seen = HashSet::new();
+    for entry in entries {
+        let text = entry.as_str().unwrap_or_default();
+        let Some((app, _)) = text
+            .split_once('/')
+            .filter(|(app, tool)| id_pattern.is_match(app) && tool_pattern.is_match(tool))
+        else {
+            return Err(AppError::Manifest(format!(
+                "`app_calls` entry `{entry}` must be `<app-id>/<tool>`"
+            )));
+        };
+        if app == app_id {
+            return Err(AppError::Manifest(format!(
+                "`app_calls` entry `{text}` targets this App"
+            )));
+        }
+        if !seen.insert(text) {
+            return Err(AppError::Manifest(format!(
+                "`app_calls` entry `{text}` declared twice"
+            )));
+        }
+    }
+    Ok(())
+}
+
+fn validate_app_access(
+    access: &Value,
+    tool: &str,
+    app_id: &str,
+    id_pattern: &Regex,
+) -> Result<(), AppError> {
+    let access = access
+        .as_object()
+        .ok_or_else(|| AppError::Manifest(format!("tool `{tool}` app_access must be an object")))?;
+    reject_unknown_fields(
+        access,
+        &format!("tool `{tool}` app_access"),
+        &["callers", "assertions"],
+    )?;
+    let callers = access
+        .get("callers")
+        .and_then(Value::as_array)
+        .filter(|callers| !callers.is_empty())
+        .ok_or_else(|| {
+            AppError::Manifest(format!("tool `{tool}` app_access.callers must not be empty"))
+        })?;
+    if callers.iter().any(|caller| caller == "*") {
+        if callers.len() != 1 {
+            return Err(AppError::Manifest(format!(
+                "tool `{tool}` app_access.callers `*` must be the only entry"
+            )));
+        }
+    } else if let Some(caller) = callers.iter().find(|caller| {
+        caller
+            .as_str()
+            .is_none_or(|caller| !id_pattern.is_match(caller) || caller == app_id)
+    }) {
+        return Err(AppError::Manifest(format!(
+            "tool `{tool}` app_access caller `{caller}` is invalid"
+        )));
+    }
+    let assertion_pattern =
+        Regex::new(r"^[a-z][a-z0-9_]{0,63}$").expect("static assertion regex must compile");
+    let valid = match access.get("assertions") {
+        None => true,
+        Some(Value::Array(names)) => {
+            names.len() <= MAX_APP_CALL_ASSERTIONS
+                && names.iter().all(|name| {
+                    name.as_str().is_some_and(|name| assertion_pattern.is_match(name))
+                })
+        }
+        Some(_) => false,
+    };
+    if !valid {
+        return Err(AppError::Manifest(format!(
+            "tool `{tool}` app_access.assertions must be at most {MAX_APP_CALL_ASSERTIONS} names matching [a-z][a-z0-9_]*"
+        )));
+    }
+    Ok(())
+}
+
+const MAX_APP_CALL_ASSERTIONS: usize = 8;
+
 fn parse(manifest: Value) -> Result<Manifest, AppError> {
     crate::manifest::validate_owner_path_bindings(&manifest).map_err(AppError::Manifest)?;
     let object = manifest
@@ -217,6 +311,7 @@ fn parse(manifest: Value) -> Result<Manifest, AppError> {
             "mcp",
             "desktop",
             "dependencies",
+            "app_calls",
         ],
     )?;
     if !object
@@ -284,6 +379,7 @@ fn parse(manifest: Value) -> Result<Manifest, AppError> {
     }
     let tool_pattern =
         Regex::new(r"^[a-z][a-z0-9._-]*$").expect("static tool name regex must compile");
+    validate_app_calls(object.get("app_calls"), id, &id_pattern, &tool_pattern)?;
     let mut names = HashSet::new();
     let mut tools = Vec::with_capacity(raw_tools.len());
     for (index, raw_tool) in raw_tools.iter().enumerate() {
@@ -293,7 +389,7 @@ fn parse(manifest: Value) -> Result<Manifest, AppError> {
         reject_unknown_fields(
             tool,
             &format!("`mcp.tools[{index}]`"),
-            &["name", "summary", "args", "needs", "effects"],
+            &["name", "summary", "args", "needs", "effects", "app_access"],
         )?;
         let name = tool
             .get("name")
@@ -308,6 +404,9 @@ fn parse(manifest: Value) -> Result<Manifest, AppError> {
             return Err(AppError::Manifest(format!(
                 "tool `{name}` is declared twice"
             )));
+        }
+        if let Some(access) = tool.get("app_access") {
+            validate_app_access(access, name, id, &id_pattern)?;
         }
         let summary =
             localized_english(tool.get("summary"), &format!("mcp.tools[{index}].summary"))?;

@@ -27,7 +27,7 @@ async fn removed_cross_app_contract_is_rejected_before_handlers() {
     let task = tokio::spawn(protocol_only_app().serve(server));
     let base = context("removed");
     let mut cases = Vec::new();
-    for kind in ["app", "app-agent"] {
+    for kind in ["app-agent"] {
         let mut value = base.clone();
         value["caller"]["kind"] = json!(kind);
         cases.push((value, "WIRE_ENUM"));

@@ -26,8 +26,24 @@ Product MCP --+                                             |
                                                   AI gate, when requested
 ```
 
-Applications do not call one another. One product can have multiple entry
-points without duplicating its account state or inheriting a union of grants.
+Applications call one another only through the OS Gateway's mutually declared
+`app_calls`/`app_access` contract. One product can have multiple entry points
+without duplicating its account state or inheriting a union of grants.
+
+The checked-in Python and Rust SDK contract is synchronized from Yu-OS commit
+`5e6dc053c1102ebf1d7b7e129a1a151e9bb727e1`. This source synchronization does
+not publish an SDK version or change package dependency pins.
+Callers declare exact `<app-id>/<tool>` entries in top-level `app_calls` and
+use `yuos_sdk.app_calls.call(app_id, tool, arguments, assertions=...)` or the
+OS CLI bridge `yu __app_call`. Providers opt in per `mcp.tools[].app_access`,
+with `callers` and optional assertion names. Python handlers read
+`context.assertions`; Rust handlers use `context.assertion(name)`.
+Only authenticated `app` callers may supply assertions: at most eight string
+values of at most 512 characters, with keys matching
+`^[a-z][a-z0-9_]{0,63}$`. These are verified callers' claims, not OS-verified
+facts. Providers use only their own declared needs; callers confer no grants.
+The installed OS must implement this Gateway contract. Synchronizing the SDK
+does not activate any Calendar or Mail tool or bypass protected confirmation.
 
 Every retained operation and MCP tool declares expected effect metadata for
 non-executing Activity previews. CLI/MCP pairs share the same declarations;

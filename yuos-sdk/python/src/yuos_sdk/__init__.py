@@ -42,6 +42,7 @@ public SDK surface.
 from . import (
     ai,
     app,
+    app_calls,
     browser_bridge,
     channels,
     egress,
@@ -64,6 +65,7 @@ from . import (
 __all__ = [
     "ai",
     "app",
+    "app_calls",
     "browser_bridge",
     "channels",
     "egress",

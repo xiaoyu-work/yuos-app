@@ -316,7 +316,6 @@ class ManifestBindingTests(unittest.TestCase):
 class AuthenticatedContextTests(unittest.TestCase):
     def test_removed_app_identity_and_cross_call_metadata_are_rejected(self) -> None:
         for field, value in (
-            ("kind", "app"),
             ("kind", "app-agent"),
             ("app_id", "caller"),
         ):

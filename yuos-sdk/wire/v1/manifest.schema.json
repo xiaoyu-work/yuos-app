@@ -30,6 +30,13 @@
       "additionalProperties": { "$ref": "#/$defs/objectType" }
     },
     "desktop": { "$ref": "#/$defs/desktop", "description": "Optional desktop GUI surface. Declaring it makes the app a launchable GUI; the installer generates a .desktop entry whose Exec routes through `yu app <id> --gui` so the GUI process is kernel-spawned and shares the app's identity, caps, consent, and audit." },
+    "app_calls": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*/[a-z][a-z0-9._-]*$", "maxLength": 256 },
+      "description": "Exact `<app-id>/<tool>` MCP tools this App calls through the App Gateway. The target must also list this App in that tool's `app_access`; either side alone grants nothing. Shown in installation review."
+    },
     "dependencies": { "type": "object", "additionalProperties": true, "description": "Free-form dependency declarations (e.g. {\"binaries\": [...]}) consumed by the bridge's resolver." }
   },
   "allOf": [
@@ -474,8 +481,27 @@
           "maxItems": 16,
           "items": { "$ref": "#/$defs/operationEffect" },
           "description": "Optional App-declared effect metadata, not authority or confirmed outcomes. Missing effects means unknown effects, never purity or read-only behavior."
-        }
+        },
+        "app_access": { "$ref": "#/$defs/mcpAppAccess" }
       }
+    },
+    "mcpAppAccess": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["callers"],
+          "description": "Opt-in for controlled App→App calls to this tool. The tool still runs only with authority derived from its own needs; nothing is inherited from the caller.",
+          "properties": {
+            "callers": {
+              "type": "array", "minItems": 1, "maxItems": 64, "uniqueItems": true,
+              "items": { "type": "string", "pattern": "^([a-z0-9][a-z0-9_-]*|\\*)$" },
+              "description": "App ids allowed to call this tool, or exactly [\"*\"] for any installed App that declares the call."
+            },
+            "assertions": {
+              "type": "array", "maxItems": 8, "uniqueItems": true,
+              "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$" },
+              "description": "Names of caller-App statements accepted in the call context. They are the verified caller's claims, not facts checked by the OS."
+            }
+          }
     },
     "desktop": {
       "type": "object",

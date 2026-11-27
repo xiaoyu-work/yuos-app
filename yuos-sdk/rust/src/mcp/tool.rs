@@ -166,6 +166,16 @@ impl CallContext {
         self.authenticated.task_id.as_deref()
     }
 
+    /// A string statement by the verified caller App, present only when
+    /// the tool's `app_access.assertions` lists `name`.
+    pub fn assertion(&self, name: &str) -> Option<&str> {
+        self.authenticated
+            .assertions
+            .as_ref()
+            .and_then(|map| map.get(name))
+            .and_then(serde_json::Value::as_str)
+    }
+
     /// The authenticated Unix-millisecond deadline exactly as supplied on the
     /// wire.
     pub fn deadline_unix_ms(&self) -> Option<u64> {

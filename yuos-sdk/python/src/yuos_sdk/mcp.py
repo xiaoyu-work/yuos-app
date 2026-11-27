@@ -146,6 +146,7 @@ class CallContext:
     deadline_unix_ms: Optional[int] = None
     session_id: Optional[str] = None
     task_id: Optional[str] = None
+    assertions: Dict[str, str] = field(default_factory=dict)
     _cancelled: threading.Event = field(
         default_factory=threading.Event,
         repr=False,
@@ -776,12 +777,18 @@ class App:
                 f"invalid authenticated call context: {error}",
             ) from error
         caller = raw_context["caller"]
+        if raw_context.get("assertions") and caller["kind"] != "app":
+            raise _RpcError(
+                ERR_INVALID_PARAMS,
+                "invalid authenticated call context: caller assertions are only accepted from Apps",
+            )
         return CallContext(
             call_id=raw_context["call_id"],
             trace_id=raw_context["trace_id"],
             deadline_unix_ms=raw_context.get("deadline_unix_ms"),
             session_id=raw_context.get("session_id"),
             task_id=raw_context.get("task_id"),
+            assertions=dict(raw_context.get("assertions") or {}),
             caller=McpPrincipal(
                 kind=caller["kind"],
                 id=caller["id"],
@@ -878,6 +885,7 @@ def _load_manifest_service(path: pathlib.Path) -> tuple[str, str, List[_Tool]]:
             "mcp",
             "desktop",
             "dependencies",
+            "app_calls",
         },
         "App manifest",
     )
@@ -892,6 +900,7 @@ def _load_manifest_service(path: pathlib.Path) -> tuple[str, str, List[_Tool]]:
         raise ManifestError("App manifest has no valid `version`")
     if not isinstance(service, dict):
         raise ManifestError("App manifest has no `mcp` service")
+    _validate_app_calls(manifest.get("app_calls", []), app_id)
     _localized_english(manifest.get("name"), "name")
     _reject_unknown_fields(
         service,
@@ -928,7 +937,7 @@ def _load_manifest_service(path: pathlib.Path) -> tuple[str, str, List[_Tool]]:
             raise ManifestError(f"`mcp.tools[{index}]` must be an object")
         _reject_unknown_fields(
             raw_tool,
-            {"name", "summary", "args", "needs", "effects"},
+            {"name", "summary", "args", "needs", "effects", "app_access"},
             f"`mcp.tools[{index}]`",
         )
         name = raw_tool.get("name")
@@ -940,6 +949,8 @@ def _load_manifest_service(path: pathlib.Path) -> tuple[str, str, List[_Tool]]:
         if name in names:
             raise ManifestError(f"tool `{name}` is declared twice")
         names.add(name)
+        if "app_access" in raw_tool:
+            _validate_app_access(raw_tool["app_access"], name, app_id)
         summary = _localized_english(
             raw_tool.get("summary"),
             f"mcp.tools[{index}].summary",
@@ -956,6 +967,61 @@ def _load_manifest_service(path: pathlib.Path) -> tuple[str, str, List[_Tool]]:
             )
         )
     return app_id, version, tools
+
+
+_ASSERTION_NAME_PATTERN = re.compile(r"[a-z][a-z0-9_]{0,63}")
+_MAX_APP_CALL_ASSERTIONS = 8
+
+
+def _validate_app_calls(entries: Any, app_id: str) -> None:
+    if not isinstance(entries, list):
+        raise ManifestError("`app_calls` must be an array")
+    seen: set[str] = set()
+    for entry in entries:
+        app, _, tool = entry.partition("/") if isinstance(entry, str) else ("", "", "")
+        if (
+            _APP_ID_PATTERN.fullmatch(app) is None
+            or _TOOL_NAME_PATTERN.fullmatch(tool) is None
+        ):
+            raise ManifestError(f"`app_calls` entry `{entry}` must be `<app-id>/<tool>`")
+        if app == app_id:
+            raise ManifestError(f"`app_calls` entry `{entry}` targets this App")
+        if entry in seen:
+            raise ManifestError(f"`app_calls` entry `{entry}` declared twice")
+        seen.add(entry)
+
+
+def _validate_app_access(access: Any, tool: str, app_id: str) -> None:
+    if not isinstance(access, dict):
+        raise ManifestError(f"tool `{tool}` app_access must be an object")
+    _reject_unknown_fields(access, {"callers", "assertions"}, f"tool `{tool}` app_access")
+    callers = access.get("callers")
+    if not isinstance(callers, list) or not callers:
+        raise ManifestError(f"tool `{tool}` app_access.callers must not be empty")
+    if "*" in callers:
+        if len(callers) != 1:
+            raise ManifestError(f"tool `{tool}` app_access.callers `*` must be the only entry")
+    else:
+        for caller in callers:
+            if (
+                not isinstance(caller, str)
+                or _APP_ID_PATTERN.fullmatch(caller) is None
+                or caller == app_id
+            ):
+                raise ManifestError(f"tool `{tool}` app_access caller `{caller}` is invalid")
+    assertions = access.get("assertions", [])
+    if (
+        not isinstance(assertions, list)
+        or len(assertions) > _MAX_APP_CALL_ASSERTIONS
+        or not all(
+            isinstance(name, str) and _ASSERTION_NAME_PATTERN.fullmatch(name)
+            for name in assertions
+        )
+    ):
+        raise ManifestError(
+            f"tool `{tool}` app_access.assertions must be at most "
+            f"{_MAX_APP_CALL_ASSERTIONS} names matching [a-z][a-z0-9_]*"
+        )
 
 
 def _localized_english(value: Any, field_name: str) -> str:

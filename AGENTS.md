@@ -9,8 +9,9 @@ source group's `MODULE.md` before changing its boundary.
 - Keep shared-capability facades under `capabilities/<group>/`, with
   `kind: "shared-capability-client"` in `package.json`. They are not business
   products, new installed identities, or privileged SDK/provider implementations.
-- Apps never invoke other Apps. The system Agent orchestrates cross-product
-  work. Use the versioned SDK/runtime for controlled OS and AI access.
+- Apps invoke other Apps only through the OS Gateway's mutually declared
+  `app_calls`/`app_access` contract. The system Agent retains cross-product
+  orchestration. Use the versioned SDK/runtime for controlled OS and AI access.
 - Every App uses one authenticated manifest/Host/capability/sandbox model.
   Origin, language, UI and delivery format never confer runtime privilege.
   Identity binds authenticated ownership/session/audit, not business-name
