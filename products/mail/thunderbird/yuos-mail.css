@@ -18,10 +18,6 @@
     --yu-mail-rule: var(--yu-rule);
     font-family: var(--yu-font) !important;
   }
-
-  :root:lang(zh-CN) {
-    --yu-font: "Noto Sans CJK SC", "Noto Sans", sans-serif;
-  }
 }
 
 @-moz-document url("chrome://messenger/content/messenger.xhtml") {
@@ -554,7 +550,7 @@
   #threadTree[rows="thread-card"] .card-container .thread-card-row {
     display: flex !important;
     justify-content: space-between;
-    align-items: baseline !important;
+    align-items: flex-start !important;
     gap: 8px !important;
     line-height: normal !important;
   }
@@ -570,8 +566,6 @@
     font: 400 12px var(--yu-font) !important;
     color: var(--yu-muted) !important;
     opacity: 1 !important;
-    position: relative;
-    inset-block-start: -1px;
   }
 
   #threadTree[rows="thread-card"] .card-container .thread-card-dynamic-row {
@@ -810,6 +804,7 @@
     block-size: 24.5px !important;
     color: var(--yu-text) !important;
   }
+  :root:lang(zh-CN) #expandedsubjectBox { line-height: 26px !important; block-size: 26px !important; }
 
   #expandedfromRow {
     grid-area: from;
@@ -907,6 +902,8 @@
     background: #fff !important;
   }
 
+  :root:lang(zh-CN) #attachmentView { margin-block-start: -1px !important; }
+
   #attachmentBar {
     padding: 10px 12px !important;
     margin: 0 !important;
@@ -984,6 +981,12 @@
     background: #fff !important;
     color: var(--yu-text) !important;
     font: 13px var(--yu-font) !important;
+  }
+
+  /* CJK fallback metrics make the design's subject line box 1px taller than an input's. */
+  :root[yu-zh] #msgSubject {
+    position: relative !important;
+    top: 1px !important;
   }
 
   :is(#composeToolbar2, #FormatToolbar) .toolbarbutton-icon {
