@@ -3,32 +3,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Yu OS Agent</title>
+  <title>Helium AI</title>
   <style>
     :root {
       color-scheme: light dark;
       font: 14px/1.5 system-ui, sans-serif;
-      --surface: #f7f7f5;
+      --surface: #f8fafc;
       --card: #fff;
-      --ink: #212320;
-      --muted: #595e55;
-      --line: #dadbd5;
-      --accent: #216249;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --accent: #0284c7;
       --accent-ink: #fff;
-      --bubble: #e7ebe3;
-      --warning: #8a430c;
+      --bubble: #e0f2fe;
+      --warning: #b45309;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --surface: #232521;
-        --card: #2b2e28;
-        --ink: #edf0e9;
-        --muted: #b9c1b4;
-        --line: #494e44;
-        --accent: #b0ddc3;
-        --accent-ink: #1e3428;
-        --bubble: #373f35;
-        --warning: #ffd0a4;
+        --surface: #0f172a;
+        --card: #1e293b;
+        --ink: #f1f5f9;
+        --muted: #94a3b8;
+        --line: #334155;
+        --accent: #38bdf8;
+        --accent-ink: #0f172a;
+        --bubble: #1e3a8a;
+        --warning: #fbbf24;
       }
     }
     *, *::before, *::after { box-sizing: border-box; }
@@ -55,7 +55,7 @@
       width: 32px;
       height: 32px;
       border-radius: 9px;
-      background: var(--accent);
+      background: linear-gradient(135deg, #38bdf8, #0284c7 52%, #1d4ed8);
       color: var(--accent-ink);
       font-weight: 750;
     }
@@ -78,7 +78,7 @@
       background: var(--bubble);
     }
     .message.assistant::before {
-      content: "Yu OS Agent";
+      content: "Helium AI";
       display: block;
       margin-bottom: 4px;
       color: var(--accent);

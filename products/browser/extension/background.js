@@ -28,18 +28,6 @@ let stableTimer = null;
 let seenRoundTrip = false;
 let paused = true;
 let browserStateGeneration = 0;
-const iconOffscreen = new OffscreenCanvas(32, 32);
-const iconContext = iconOffscreen.getContext("2d");
-iconContext.fillStyle = "#216249";
-iconContext.beginPath();
-iconContext.roundRect(0, 0, 32, 32, 9);
-iconContext.fill();
-iconContext.strokeStyle = "white";
-iconContext.lineWidth = 3;
-iconContext.lineCap = "round";
-iconContext.beginPath();
-iconContext.arc(16, 16, 7, Math.PI / 4, 7 * Math.PI / 4);
-iconContext.stroke();
 
 chrome.tabs.onActivated.addListener(() => {
   browserStateGeneration++;
@@ -411,9 +399,7 @@ function configureSidePanel() {
   void chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch((error) => {
     console.warn("[yuos-agent] cannot configure the side panel:", error);
   });
-  void chrome.action.setIcon({
-    imageData: iconContext.getImageData(0, 0, 32, 32),
-  }).catch(() => {});
+  void chrome.action.setIcon({ path: "icon.png" }).catch(() => {});
 }
 
 configureSidePanel();
