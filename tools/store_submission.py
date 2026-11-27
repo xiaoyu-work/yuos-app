@@ -826,7 +826,8 @@ def review_deb(deb_path: Path) -> dict:
 
         manifest = snapshots.read_metadata(app_root / "app.json")
         _validate_manifest_schema(manifest, app_id)
-        if pkg_version.split("-")[0] != manifest["version"] and pkg_version != manifest["version"]:
+        base_pkg_version = re.split(r"(?:\.dev[0-9]+|-)", pkg_version)[0]
+        if base_pkg_version != manifest["version"] and pkg_version != manifest["version"]:
             raise ValueError(
                 f"DEBIAN/control Version {pkg_version!r} does not match manifest version {manifest['version']!r}"
             )

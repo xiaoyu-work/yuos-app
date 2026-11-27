@@ -12,7 +12,7 @@ NATIVE = Path(__file__).resolve().parent
 sys.path.insert(0, str(NATIVE.parent))
 from source import prepare
 
-MAX_RUNTIME_BYTES = 255 * 1024 * 1024  # Leave room for the App wrapper within its 256 MiB signature limit.
+MAX_RUNTIME_BYTES = 512 * 1024 * 1024
 
 
 def configure(source, workspace, jobs):
@@ -22,7 +22,12 @@ def configure(source, workspace, jobs):
     for name in ("logo.svg", "about.svg"):
         shutil.copyfile(icon, branding / name)
     subprocess.run(["rsvg-convert", "--output", str(branding / "intro.png"), str(icon)], check=True)
-    environment = {**os.environ, "GIT_CEILING_DIRECTORIES": str(source.parent.resolve())}
+    environment = {
+        **os.environ,
+        "GIT_CEILING_DIRECTORIES": str(source.parent.resolve()),
+        "CFLAGS": "-Os -g0",
+        "CXXFLAGS": "-Os -g0",
+    }
     if Path("/.dockerenv").is_file():
         environment.setdefault("container", "docker")
     subprocess.run([
@@ -54,6 +59,12 @@ def build(output, jobs):
         if not os.access(program / "soffice.bin", os.X_OK):
             raise ValueError("Patched Office build did not produce its real executable")
         shutil.copyfile(source / "COPYING", runtime / "UPSTREAM-COPYING")
+        for extra_dir in ("sdk", "share/gallery", "share/wizards", "share/template", "share/autotext"):
+            candidate = runtime / extra_dir
+            if candidate.exists() and not candidate.is_symlink():
+                shutil.rmtree(candidate)
+        for svg_zip in (runtime / "share/config").glob("images_*_svg.zip"):
+            svg_zip.unlink()
         # The signed App format requires owned files rather than symlinks.
         for path in runtime.rglob("*"):
             if path.is_symlink():

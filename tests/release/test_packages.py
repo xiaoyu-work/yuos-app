@@ -15,7 +15,7 @@ def contents(package):
         return {member.name.removeprefix("./"): member for member in archive.getmembers()}
 
 
-@pytest.mark.parametrize("value", ["1.2.3", "0.1.0-1", "2.0.0~rc2-3"])
+@pytest.mark.parametrize("value", ["1.2.3", "0.1.0.dev2026112701", "0.1.0-1", "2.0.0~rc2-3"])
 def test_debian_release_version_accepts_an_explicit_bounded_grammar(value):
     assert version(value) == value
 

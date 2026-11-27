@@ -5,11 +5,13 @@ on:
     inputs:
       select:
         description: "Comma-separated products, capability:<name>, support, sets; or all"
-        required: true
+        required: false
+        default: "all"
         type: string
       version:
-        description: "MAJOR.MINOR.PATCH[~rcN][-REVISION]; independently versioned selection"
-        required: true
+        description: "MAJOR.MINOR.PATCH.devYYYYMMDDNN (leave empty to auto-compute like SDK)"
+        required: false
+        default: ""
         type: string
       initialize:
         description: "First publication only; refuses an existing or lost APT channel"
@@ -29,10 +31,12 @@ on:
   workflow_call:
     inputs:
       select:
-        required: true
+        required: false
+        default: "all"
         type: string
       version:
-        required: true
+        required: false
+        default: ""
         type: string
       initialize:
         default: false
@@ -54,6 +58,7 @@ on:
         required: true
 
 permissions:
+  actions: read
   contents: read
 
 concurrency:
@@ -68,15 +73,31 @@ jobs:
       matrix: ${{ steps.plan.outputs.matrix }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
       - id: plan
         env:
-          SELECTION: ${{ inputs.select }}
+          GH_TOKEN: ${{ github.token }}
+          SELECTION: ${{ inputs.select || 'all' }}
           RELEASE_VERSION: ${{ inputs.version }}
           INCLUDE_FIXTURES: ${{ inputs.fixtures }}
         run: |
+          set -euo pipefail
+          version="$RELEASE_VERSION"
+          if [ -z "$version" ] || [ "$version" = "auto" ]; then
+            build_day="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" --jq '.created_at[:10]')"
+            day="${build_day//-/}"
+            base="0.1.0"
+            seq=1
+            while [ -n "$(git ls-remote --tags origin "refs/tags/yuos-*-v$(printf '%s.dev%s%02d' "$base" "$day" "$seq")")" ]; do
+              seq=$((seq + 1))
+            done
+            version="$(printf '%s.dev%s%02d' "$base" "$day" "$seq")"
+          fi
+          echo "Computed App release version: $version"
           args=()
           if [ "$INCLUDE_FIXTURES" = true ]; then args+=(--fixtures); fi
-          matrix=$(python3 tools/release.py plan --select "$SELECTION" --version "$RELEASE_VERSION" "${args[@]}")
+          matrix=$(python3 tools/release.py plan --select "$SELECTION" --version "$version" "${args[@]}")
           printf 'matrix=%s\n' "$matrix" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:

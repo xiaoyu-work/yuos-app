@@ -43,9 +43,11 @@ def config():
 def version(value):
     if not isinstance(value, str) or not re.fullmatch(
         r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)"
-        r"(?:~(?:alpha|beta|rc)[1-9][0-9]*)?(?:-[1-9][0-9]*)?", value,
+        r"(?:\.dev[0-9]{8}(?:0[1-9]|[1-9][0-9]+)|~(?:alpha|beta|rc)[1-9][0-9]*)?(?:-[1-9][0-9]*)?", value,
     ) or len(value) > 80:
-        raise ValueError("Version must be MAJOR.MINOR.PATCH[~alphaN|~betaN|~rcN][-REVISION]")
+        raise ValueError(
+            "Version must be MAJOR.MINOR.PATCH[.devYYYYMMDDNN|~alphaN|~betaN|~rcN][-REVISION]"
+        )
     run(["dpkg", "--validate-version", value])
     return value
 
