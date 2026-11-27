@@ -68,6 +68,14 @@ The standard UI remains available by setting `yuos.mail.chrome.enabled` to
 `false` in Thunderbird's Config Editor and restarting. Administrators using
 a different site AutoConfig should keep their own configuration.
 
+The contact editor groups common fields and exposes empty optional sections
+through one Add field menu, invoking Thunderbird's existing field controls.
+Existing optional values remain visible, and only the form content scrolls;
+the address-book selector, Cancel and Save stay in the footer. Attachment
+renaming retains the native prompt and commands with styling scoped to that
+prompt, not password, certificate or other warning dialogs. Card density uses
+Thunderbird's density preference with matching row metrics and padding.
+
 The signed Email Web entry in `web/` presents Thunderbird's existing accounts
 and folders in a three-pane mailbox with its own search, command bar, list
 and reading area. New mail and replies use the same draft review tools.

@@ -152,6 +152,9 @@
     margin: 0 !important;
   }
   #appMenu-popup {
+    background: transparent !important;
+    --arrowpanel-background: #fff !important;
+    --panel-shadow-margin: 0px !important;
     --panel-background: #fff !important;
     --panel-color: var(--yu-text) !important;
     --panel-border-color: var(--yu-rule) !important;
@@ -163,11 +166,14 @@
     font: 13px/18px var(--yu-font) !important;
   }
   #appMenu-popup panelview {
+    background: #fff !important;
+    align-self: flex-start !important;
     width: 258px !important;
     min-width: 258px !important;
     max-width: 258px !important;
   }
   #appMenu-popup .panel-subview-body {
+    flex: none !important;
     padding: 6px !important;
   }
   #appMenu-popup toolbarseparator {
@@ -265,7 +271,10 @@
     font: 12px/18px var(--yu-font) !important;
     color: var(--yu-muted) !important;
   }
-  #appMenu-popup panelview:not(#appMenu-mainView) .subviewbutton > .toolbarbutton-icon {
+  #appMenu-popup .panel-viewcontainer, #appMenu-popup .panel-viewstack {
+    min-height: 0 !important;
+  }
+  #appMenu-popup panelview:not(#appMenu-mainView) .panel-subview-body .subviewbutton > .toolbarbutton-icon {
     display: none !important;
   }
   #appMenu-popup .panel-header {
@@ -275,6 +284,28 @@
   #appMenu-popup .panel-header > h1 {
     font: 600 13px/18px var(--yu-font) !important;
     color: var(--yu-text) !important;
+  }
+  #appMenu-popup .subviewbutton-back {
+    appearance: none !important;
+    inline-size: 30px !important;
+    block-size: 30px !important;
+    margin: 0 !important;
+    padding: 7px !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    list-style-image: url("chrome://yuos-mail/content/p-back.svg") !important;
+    -moz-context-properties: stroke !important;
+    stroke: var(--yu-icon) !important;
+  }
+  #appMenu-popup .subviewbutton-back:hover {
+    background: var(--yu-hover) !important;
+  }
+  #appMenu-popup .subviewbutton-back > .toolbarbutton-icon {
+    display: block !important;
+    margin: 0 !important;
+    -moz-context-properties: stroke !important;
+    stroke: var(--yu-icon) !important;
   }
   #appMenu-popup .panel-header + toolbarseparator {
     margin: 5px 10px 0 !important;
@@ -913,7 +944,7 @@
     display: block !important;
     block-size: 100% !important;
     margin: 0 !important;
-    padding: 10px 16px !important;
+    padding: var(--yu-card-padding, 10px) 16px !important;
     border: 0 !important;
     border-block-start: 1px solid var(--yu-rule-soft) !important;
     border-radius: 0 !important;
@@ -939,7 +970,7 @@
     content: "" !important;
     position: absolute !important;
     inset-inline-start: 6px !important;
-    inset-block-start: 16px !important;
+    inset-block-start: calc(var(--yu-card-padding, 10px) + 6px) !important;
     inline-size: 6px !important;
     block-size: 6px !important;
     border-radius: 50% !important;
@@ -1271,6 +1302,10 @@
   }
 
   #expandedfromBox .recipient-multi-line-address {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    word-break: normal !important;
     font: 400 12px var(--yu-font) !important;
     color: var(--yu-muted) !important;
     line-height: normal !important;
@@ -1387,6 +1422,105 @@
 }
 
 @-moz-document url("chrome://messenger/content/messengercompose/messengercompose.xhtml") {
+  #composeAttachmentContext_openItem { list-style-image: url("chrome://yuos-mail/content/p-folder.svg") !important; }
+  #composeAttachmentContext_renameItem { list-style-image: url("chrome://yuos-mail/content/p-pen.svg") !important; }
+  #composeAttachmentContext_reorderItem { list-style-image: url("chrome://yuos-mail/content/p-sort.svg") !important; }
+  #composeAttachmentContext_deleteItem { list-style-image: url("chrome://yuos-mail/content/p-trash.svg") !important; }
+  #composeAttachmentContext_convertCloudMenu { list-style-image: var(--yu-clip-b) !important; }
+  #composeAttachmentContext_cancelUploadItem { list-style-image: url("chrome://yuos-mail/content/x.svg") !important; }
+  #composeAttachmentContext_selectAllItem { list-style-image: url("chrome://yuos-mail/content/selall.svg") !important; }
+  #msgComposeAttachmentItemContext .menu-icon {
+    -moz-context-properties: stroke !important;
+    stroke: var(--yu-icon) !important;
+  }
+  #attachmentArea {
+    background: #fff !important;
+    color: var(--yu-text) !important;
+    font: 13px/20px var(--yu-font) !important;
+    border-block-start: 1px solid var(--yu-rule) !important;
+  }
+  #attachmentArea > summary {
+    min-block-size: 32px !important;
+    padding: 4px 16px !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+  #attachmentBucket {
+    box-sizing: border-box !important;
+    min-block-size: 48px !important;
+    padding: 0 16px 8px !important;
+    gap: 8px !important;
+    background: #fff !important;
+    border: 0 !important;
+  }
+  #attachmentBucket .attachmentItem {
+    box-sizing: border-box !important;
+    min-block-size: 32px !important;
+    padding: 5px 10px !important;
+    border: 1px solid var(--yu-rule) !important;
+    border-radius: 6px !important;
+    color: var(--yu-text) !important;
+    background: #fff !important;
+    font: 13px/20px var(--yu-font) !important;
+  }
+  #attachmentBucket .attachmentItem:hover {
+    background: var(--yu-hover) !important;
+  }
+  #attachmentBucket .attachmentItem[selected="true"] {
+    background: var(--yu-sel) !important;
+    border-color: #b7d1ef !important;
+    color: var(--yu-blue) !important;
+  }
+  #attachmentBucket .attachmentcell-icon {
+    inline-size: 16px !important;
+    block-size: 16px !important;
+    margin-inline-end: 6px !important;
+  }
+  #attachmentBucketSize, #attachmentBucket .attachmentcell-size {
+    padding: 0 !important;
+    background: transparent !important;
+    color: var(--yu-muted) !important;
+    font: 12px/20px var(--yu-font) !important;
+  }
+  #attachmentBucket .attachmentcell-size {
+    margin-inline-start: 8px !important;
+  }
+  #attachmentNotificationBox {
+    margin: 0 !important;
+    border: 0 !important;
+    border-block-start: 1px solid #eadca8 !important;
+    border-radius: 0 !important;
+    background: #fff9e8 !important;
+    color: var(--yu-text) !important;
+    font: 13px/20px var(--yu-font) !important;
+    box-shadow: none !important;
+    --message-bar-background-color: #fff9e8;
+    --message-bar-text-color: #1f2328;
+  }
+  #attachmentNotificationBox button,
+  #attachmentNotificationBox toolbarbutton {
+    appearance: none !important;
+    min-block-size: 28px !important;
+    margin: 0 4px !important;
+    padding: 0 10px !important;
+    border: 1px solid #eadca8 !important;
+    border-radius: 6px !important;
+    background: #fff !important;
+    color: var(--yu-text) !important;
+    font: 13px var(--yu-font) !important;
+  }
+  .container:has(#attachmentReminderText) {
+    background: #fff9e8 !important;
+    color: #1f2328 !important;
+    font: 13px/20px var(--yu-font) !important;
+    padding: 6px 12px !important;
+  }
+  #attachmentNotificationBox .toolbarbutton-menubutton-button {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
   :root {
     --yu-field-rule: #eef0f3;
     background: #fff !important;
@@ -1394,6 +1528,79 @@
     font: 13px var(--yu-font) !important;
   }
 
+}
+
+@-moz-document url("chrome://global/content/commonDialog.xhtml") {
+    :root[yu-rename-attachment] {
+      font: 13px/20px "Noto Sans", "Noto Sans CJK SC", sans-serif !important;
+      color: #1f2328 !important;
+      background: #fff !important;
+    }
+    :root[yu-rename-attachment] #commonDialog {
+      padding: 20px 24px !important;
+      border: 1px solid #e6e8eb !important;
+      border-radius: 6px !important;
+      background: #fff !important;
+    }
+    :root[yu-rename-attachment] #dialogGrid {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 16px !important;
+      min-inline-size: 320px !important;
+    }
+    :root[yu-rename-attachment] #infoRow {
+      display: none !important;
+    }
+    :root[yu-rename-attachment] #loginContainer {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 6px !important;
+    }
+    :root[yu-rename-attachment] #yu-rename-title {
+      font: 600 16px/22px "Noto Sans", "Noto Sans CJK SC", sans-serif !important;
+      margin: 0 !important;
+    }
+    :root[yu-rename-attachment] #loginLabel {
+      font: inherit !important;
+      margin: 0 !important;
+    }
+    :root[yu-rename-attachment] input {
+      margin: 0 !important;
+      inline-size: 100% !important;
+      box-sizing: border-box !important;
+      min-block-size: 32px !important;
+      padding: 0 10px !important;
+      border: 1px solid #e6e8eb !important;
+      border-radius: 6px !important;
+      background: #fff !important;
+      font: inherit !important;
+    }
+    .dialog-button-box[yu-rename-actions] {
+      padding: 16px 0 0 !important;
+      background: #fff !important;
+    }
+    button[yu-rename-action] {
+      appearance: none !important;
+      min-block-size: 32px !important;
+      margin: 0 0 0 8px !important;
+      padding: 0 14px !important;
+      border: 1px solid #e6e8eb !important;
+      border-radius: 6px !important;
+      background: #fff !important;
+      color: #1f2328 !important;
+      font: 13px/20px "Noto Sans", "Noto Sans CJK SC", sans-serif !important;
+      box-shadow: none !important;
+    }
+    button[yu-rename-action="accept"] {
+      background: #0b63c4 !important;
+      border-color: #0b63c4 !important;
+      color: #fff !important;
+    }
+  }
+
+@-moz-document url("chrome://messenger/content/messengercompose/messengercompose.xhtml") {
   /* CJK fallback metrics make the design's subject line box 1px taller than an input's. */
   :root[yu-zh] #msgSubject {
     position: relative !important;
@@ -2502,6 +2709,262 @@
   }
   #search-button {
     display: none !important;
+  }
+}
+
+@-moz-document url("about:addressbook") {
+  #detailsPane {
+    min-block-size: 0 !important;
+    min-inline-size: 0 !important;
+    grid-template-rows: minmax(0, 1fr) auto !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    --ab-contact-photo-size: 56px;
+  }
+  .contact-details-scroll {
+    min-block-size: 0 !important;
+    padding: 20px 24px 32px !important;
+    scrollbar-gutter: stable;
+  }
+  .contact-header:not([hidden]) {
+    grid-template: "photo headings" minmax(56px, auto) / 56px minmax(0, 1fr) !important;
+    gap: 16px !important;
+    margin-block-end: 20px !important;
+  }
+  #photoButton {
+    display: block !important;
+    inline-size: 56px !important;
+    block-size: 56px !important;
+    min-block-size: 56px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+  }
+  .contact-photo {
+    display: block !important;
+    background-color: #eef4fc !important;
+    stroke: #8b949e !important;
+  }
+  .contact-heading-name {
+    font: 600 16px/22px var(--yu-font) !important;
+  }
+  .contact-heading-email, .contact-heading-nickname {
+    font: 12px/20px var(--yu-font) !important;
+    color: var(--yu-muted) !important;
+  }
+  vcard-edit {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)) !important;
+    grid-template-rows: none !important;
+    gap: 20px 24px !important;
+  }
+  #addr-book-edit-n, #addr-book-edit-email {
+    grid-column: 1 / -1 !important;
+  }
+  .addr-book-edit-display-nickname {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)) !important;
+    gap: 12px 16px !important;
+  }
+  vcard-n {
+    gap: 8px !important;
+    margin-block-end: 12px !important;
+  }
+  vcard-n input {
+    min-inline-size: 0 !important;
+  }
+  #n-list-component-firstname, #n-list-component-middlename:not(.hasButton), #n-list-component-lastname {
+    flex: 1 1 180px !important;
+    min-inline-size: 0 !important;
+  }
+  vcard-fn, vcard-nickname {
+    margin: 0 !important;
+    gap: 6px !important;
+  }
+  vcard-edit label[for] {
+    font-weight: 400 !important;
+    margin-block-end: 6px !important;
+  }
+  vcard-edit legend {
+    margin-block-end: 8px !important;
+  }
+  vcard-edit select {
+    appearance: none !important;
+    box-sizing: border-box !important;
+    block-size: 32px !important;
+    border: 1px solid var(--yu-rule) !important;
+    border-radius: 6px !important;
+    padding: 0 28px 0 10px !important;
+    background: #fff url("chrome://yuos-mail/content/p-down.svg") right 8px center / 12px no-repeat !important;
+    -moz-context-properties: stroke;
+    stroke: #57606a;
+    color: var(--yu-text) !important;
+    font: 13px var(--yu-font) !important;
+  }
+  vcard-edit table {
+    border-spacing: 0 !important;
+  }
+  #addr-book-edit-email td:not(:last-child) {
+    padding-inline-end: 8px !important;
+  }
+  #addr-book-edit-email th {
+    padding-block-end: 6px !important;
+  }
+  .n-list-component button,
+  vcard-edit .addr-book-edit-fieldset-button {
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    color: var(--yu-blue) !important;
+    background: transparent !important;
+    border: 0 !important;
+    padding-inline: 8px !important;
+    font-weight: 400 !important;
+  }
+  vcard-edit .addr-book-edit-fieldset-button:not([hidden]) {
+    display: inline-flex !important;
+  }
+  vcard-edit :is(.only-icon, .remove-property-button) {
+    flex: none !important;
+    inline-size: 32px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  vcard-edit .addr-book-edit-fieldset-button::before {
+    content: "" !important;
+    flex: none !important;
+    inline-size: 16px !important;
+    block-size: 16px !important;
+    background: url("chrome://yuos-mail/content/p-plus.svg") center / 16px no-repeat !important;
+    -moz-context-properties: stroke !important;
+    stroke: currentColor !important;
+  }
+  vcard-edit .remove-property-button::before {
+    background-image: url("chrome://yuos-mail/content/x.svg") !important;
+  }
+  #detailsFooter {
+    max-inline-size: none !important;
+    padding: 12px 24px !important;
+    border-block-start: 1px solid var(--yu-rule) !important;
+    background: #fff !important;
+  }
+  .button-block, .button-block > div {
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+  }
+  #detailsFooter > div:last-child {
+    display: grid !important;
+    grid-template-columns: max-content minmax(0, 1fr) max-content max-content !important;
+    flex: 0 1 420px !important;
+    min-inline-size: 0 !important;
+    align-items: center !important;
+  }
+  #detailsFooter label { grid-column: 1; }
+  #addContactBookList { grid-column: 2; min-inline-size: 0 !important; }
+  #cancelEditButton { grid-column: 3; }
+  #saveEditButton { grid-column: 4; }
+  #detailsBody {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 16px !important;
+  }
+  #detailsBody > section {
+    padding: 0 0 16px !important;
+    border: 0 !important;
+    border-block-end: 1px solid var(--yu-rule) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    font: 13px/20px var(--yu-font) !important;
+  }
+  #detailsWriteButton::before { content: url("chrome://yuos-mail/content/p-pen.svg") !important; }
+  #detailsSearchButton::before { content: url("chrome://yuos-mail/content/p-search.svg") !important; }
+  vcard-edit > fieldset[yu-empty],
+  vcard-n .n-list-component.hasButton {
+    display: none !important;
+  }
+  vcard-edit > fieldset {
+    order: 3;
+  }
+  #addr-book-edit-n { order: 0; }
+  #addr-book-edit-email { order: 1; }
+  #addr-book-edit-tel { order: 2; grid-column: 1 / -1 !important; }
+  #saveEditButton {
+    background: var(--yu-blue) !important;
+    border-color: var(--yu-blue) !important;
+    color: #fff !important;
+  }
+  #yu-contact-add-field {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-block-start: 16px !important;
+    padding: 0 8px !important;
+    border: 0 !important;
+    color: var(--yu-blue) !important;
+    background: transparent !important;
+  }
+  #yu-contact-add-field::before {
+    content: url("chrome://yuos-mail/content/p-plus.svg");
+    inline-size: 16px;
+    block-size: 16px;
+    -moz-context-properties: stroke;
+    stroke: currentColor;
+  }
+  #yu-contact-fields {
+    --panel-background: #fff !important;
+    --panel-color: #1f2328 !important;
+    --panel-border-color: #e6e8eb !important;
+    --panel-border-radius: 6px !important;
+    --panel-padding: 6px !important;
+    --panel-shadow-margin: 0px !important;
+    min-inline-size: 200px !important;
+  }
+  #yu-contact-fields menuitem {
+    appearance: none !important;
+    min-block-size: 30px !important;
+    margin: 0 !important;
+    padding: 0 10px !important;
+    border-radius: 6px !important;
+    font: 13px/20px var(--yu-font) !important;
+  }
+  #yu-contact-fields menuitem[_moz-menuactive] {
+    background: #f2f4f7 !important;
+  }
+}
+
+@-moz-document url-prefix("chrome://messenger/content/am-") {
+  input[type="number"] {
+    inline-size: 112px !important;
+    min-inline-size: 112px !important;
+    padding-inline: 10px 0 !important;
+    margin-inline: 8px !important;
+  }
+  input[type="number"]::-moz-number-spin-box {
+    appearance: none !important;
+    inline-size: 24px !important;
+    margin-inline-start: 8px !important;
+    border-inline-start: 1px solid var(--yu-rule) !important;
+  }
+  input[type="number"]::-moz-number-spin-up,
+  input[type="number"]::-moz-number-spin-down {
+    appearance: none !important;
+    inline-size: 24px !important;
+    block-size: 14px !important;
+    border: 0 !important;
+    background: #fff url("chrome://yuos-mail/content/p-down.svg") center / 12px no-repeat !important;
+    -moz-context-properties: stroke !important;
+    stroke: #57606a !important;
+  }
+  input[type="number"]::-moz-number-spin-up {
+    transform: rotate(180deg);
+  }
+  input[type="number"]::-moz-number-spin-up:hover,
+  input[type="number"]::-moz-number-spin-down:hover {
+    background-color: #f2f4f7 !important;
+  }
+  #containerBox > .secDesc {
+    margin-block-end: 12px !important;
+  }
+  hbox:has(> #browseForLocalFolder) {
+    gap: 8px !important;
   }
 }
 
