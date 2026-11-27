@@ -387,6 +387,37 @@
     gap: 16px;
   }
 
+  #yu-back {
+    display: none !important;
+    appearance: none !important;
+    box-sizing: border-box !important;
+    block-size: 32px !important;
+    margin: 0 !important;
+    padding: 0 0 0 28px !important;
+    inline-size: 66px !important;
+    min-inline-size: 0 !important;
+    text-align: start !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: #f2f4f7 url("chrome://yuos-mail/content/p-back.svg") 8px center / 16px no-repeat !important;
+    -moz-context-properties: stroke !important;
+    stroke: var(--yu-text) !important;
+    color: var(--yu-text) !important;
+    font: 13px var(--yu-font) !important;
+  }
+
+  #yu-back:hover {
+    background-color: var(--yu-rule) !important;
+  }
+
+  :root[yu-page] #yu-back {
+    display: block !important;
+  }
+
+  :root[yu-page] #unifiedToolbarContent {
+    visibility: hidden;
+  }
+
   #unifiedToolbarContent {
     flex: 1 1 auto !important;
     padding: 0 !important;
@@ -1906,5 +1937,764 @@
       background-color: light-dark(#eef1f5, #2a313b) !important;
       border-color: var(--yu-mail-rule) !important;
     }
+  }
+}
+
+@-moz-document url("about:preferences"), url("about:accountsettings"), url("about:addressbook"),
+               url-prefix("chrome://messenger/content/am-") {
+  :root {
+    --yu-font: "Noto Sans", "Noto Sans CJK SC", sans-serif;
+    --yu-text: #1f2328;
+    --yu-muted: #8b949e;
+    --yu-blue: #0b63c4;
+    --yu-rule: #e6e8eb;
+    font: 13px var(--yu-font) !important;
+    color: var(--yu-text) !important;
+    background: #fff !important;
+    --in-content-page-background: #fff;
+    --sidebar-background-color: #f7f8fa;
+    --focus-outline-color: var(--yu-blue);
+  }
+  body, label, description, legend, h1, h2, input, textarea, button, menulist, .checkbox-label, .button-text {
+    font-family: var(--yu-font) !important;
+  }
+  label, description, .checkbox-label, .tip-caption {
+    font-size: 13px !important;
+    line-height: 18px !important;
+    margin-block: 0 !important;
+  }
+  .tip-caption, .tip-caption.indent {
+    font-size: 12px !important;
+    color: var(--yu-muted) !important;
+  }
+  h1, .dialogheader-title {
+    font: 600 15px/32px var(--yu-font) !important;
+    margin: 0 !important;
+  }
+  legend, h2 {
+    font: 600 13px/18px var(--yu-font) !important;
+    margin: 0 !important;
+  }
+  button, .button, menulist, toolbarbutton.button {
+    appearance: none !important;
+    box-sizing: border-box !important;
+    block-size: 32px !important;
+    min-block-size: 32px !important;
+    min-inline-size: 0 !important;
+    margin: 0 !important;
+    padding: 0 14px !important;
+    border: 1px solid var(--yu-rule) !important;
+    border-radius: 6px !important;
+    background: #fff !important;
+    color: var(--yu-text) !important;
+    font: 13px var(--yu-font) !important;
+    box-shadow: none !important;
+  }
+  button:not([disabled]):hover, .button:not([disabled]):hover, menulist:not([disabled]):hover {
+    background: #f2f4f7 !important;
+  }
+  button[disabled], .button:disabled {
+    color: var(--yu-muted) !important;
+    opacity: 1 !important;
+  }
+  .button-primary, .button.button-primary {
+    background: var(--yu-blue) !important;
+    border-color: var(--yu-blue) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+  }
+  .button-primary:not([disabled]):hover {
+    background: #0a57ad !important;
+  }
+  .button-box, .button-text {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  button .button-icon, .button.icon-button {
+    -moz-context-properties: stroke, fill !important;
+  }
+  input:not([type="checkbox"], [type="radio"], [type="color"]), search-textbox, textarea {
+    appearance: none !important;
+    box-sizing: border-box !important;
+    min-block-size: 32px !important;
+    margin: 0 !important;
+    padding: 0 10px !important;
+    border: 1px solid var(--yu-rule) !important;
+    border-radius: 6px !important;
+    background-color: #fff !important;
+    color: var(--yu-text) !important;
+    font: 13px var(--yu-font) !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+  input:not([type="checkbox"], [type="radio"], [type="color"]) {
+    block-size: 32px !important;
+  }
+  input::placeholder, textarea::placeholder {
+    color: var(--yu-muted) !important;
+    opacity: 1 !important;
+  }
+  input:focus-visible, textarea:focus-visible {
+    border-color: var(--yu-blue) !important;
+  }
+  input[disabled], input[readonly] {
+    color: var(--yu-muted) !important;
+    opacity: 1 !important;
+  }
+  checkbox, radio {
+    margin: 0 !important;
+    padding: 0 !important;
+    min-block-size: 28px !important;
+    gap: 0 !important;
+  }
+  .checkbox-check {
+    appearance: none !important;
+    inline-size: 16px !important;
+    block-size: 16px !important;
+    margin: 0 8px 0 0 !important;
+    border: 1px solid #c9ced4 !important;
+    border-radius: 4px !important;
+    background: #fff !important;
+    box-sizing: border-box !important;
+  }
+  checkbox[checked] > .checkbox-check {
+    border-color: var(--yu-blue) !important;
+    background: var(--yu-blue) url("chrome://global/skin/icons/check.svg") center / 12px no-repeat !important;
+    -moz-context-properties: fill;
+    fill: #fff;
+  }
+  .checkbox-label-box {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .checkbox-label {
+    margin: 0 !important;
+  }
+  fieldset {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+  separator, separator.thin {
+    block-size: 0 !important;
+    min-block-size: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Shared sidebar rows */
+  .yu-row, richlistitem.category, .sidebar-footer-link, #accounttree li > .container, #books li > .container {
+    box-sizing: border-box !important;
+    block-size: 32px !important;
+    min-block-size: 32px !important;
+    margin: 0 !important;
+    padding: 0 10px !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    gap: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    color: var(--yu-text) !important;
+    background: transparent !important;
+    font: 13px var(--yu-font) !important;
+    outline: none !important;
+    -moz-context-properties: stroke !important;
+    stroke: #3b4148 !important;
+  }
+  richlistitem.category:hover, .sidebar-footer-link:hover, #accounttree li > .container:hover, #books li > .container:hover {
+    background: #f2f4f7 !important;
+  }
+  richlistitem.category[selected], #accounttree li.selected > .container, #books li.selected > .container {
+    background: #dce9f9 !important;
+    color: var(--yu-blue) !important;
+    font-weight: 600 !important;
+    stroke: var(--yu-blue) !important;
+  }
+  .category-icon, .sidebar-footer-icon, #accounttree .icon, #books .bookRow-icon {
+    inline-size: 16px !important;
+    block-size: 16px !important;
+    min-inline-size: 16px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background-size: 16px 16px !important;
+    background-position: center !important;
+    -moz-context-properties: stroke !important;
+    stroke: inherit !important;
+    fill: none !important;
+  }
+  .category-name, .sidebar-footer-label, #accounttree .name, #books .bookRow-name {
+    margin: 0 !important;
+    padding: 0 !important;
+    font: inherit !important;
+    line-height: 18px !important;
+    color: inherit !important;
+    white-space: nowrap !important;
+  }
+}
+
+@-moz-document url("about:preferences") {
+  #pref-category-box {
+    box-sizing: border-box !important;
+    inline-size: 200px !important;
+    min-inline-size: 200px !important;
+    max-inline-size: 200px !important;
+    padding: 12px 8px !important;
+    background: #f7f8fa !important;
+    border-inline-end: 1px solid var(--yu-rule) !important;
+  }
+  #categories {
+    margin: 0 !important;
+    padding: 0 !important;
+    inline-size: auto !important;
+    background: transparent !important;
+    border: 0 !important;
+    gap: 0 !important;
+  }
+  .sidebar-footer-list {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #category-general .category-icon { content: url("chrome://yuos-mail/content/p-gear.svg") !important; }
+  #category-appearance .category-icon { content: url("chrome://yuos-mail/content/p-brush.svg") !important; }
+  #category-compose .category-icon { content: url("chrome://yuos-mail/content/p-pen.svg") !important; }
+  #category-privacy .category-icon { content: url("chrome://yuos-mail/content/p-lock.svg") !important; }
+  #category-chat .category-icon { content: url("chrome://yuos-mail/content/p-chat.svg") !important; }
+  #category-qrexport .category-icon { content: url("chrome://yuos-mail/content/p-phone.svg") !important; }
+  #accountButton .sidebar-footer-icon { content: url("chrome://yuos-mail/content/p-user.svg") !important; }
+  #addonsButton .sidebar-footer-icon { content: url("chrome://yuos-mail/content/p-puzzle.svg") !important; }
+  #preferencesContainer {
+    padding: 0 32px !important;
+  }
+  .paneDeckContainer {
+    max-inline-size: 744px !important;
+    margin: 0 !important;
+  }
+  .sticky-container {
+    block-size: 0 !important;
+    min-block-size: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    z-index: 2;
+    background: transparent !important;
+  }
+  #searchInput {
+    inline-size: 240px !important;
+    block-size: 32px !important;
+    margin: 20px 0 0 auto !important;
+    padding: 0 12px 0 36px !important;
+    border: 0 !important;
+    border-radius: 8px !important;
+    background: #f2f4f7 url("chrome://yuos-mail/content/p-search.svg") 12px center / 16px no-repeat !important;
+    -moz-context-properties: stroke;
+    stroke: var(--yu-muted);
+  }
+  #paneDeck > .subcategory {
+    margin: 20px 0 0 !important;
+    padding: 0 !important;
+    min-block-size: 32px !important;
+    border: 0 !important;
+  }
+  #paneDeck > div, #paneDeck fieldset {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #paneDeck legend {
+    display: block !important;
+    line-height: 20px !important;
+    margin: 20px 0 8px !important;
+  }
+  #paneDeck .input-container, #paneDeck hbox {
+    gap: 8px;
+    margin: 0 !important;
+  }
+  .label-experiment {
+    font: 600 11px/17px var(--yu-font) !important;
+    color: var(--yu-blue) !important;
+    background: #eef4fc !important;
+    border-radius: 4px !important;
+    padding: 1px 6px !important;
+    margin: 20px 0 8px 0 !important;
+    text-transform: none !important;
+  }
+  .tip-caption.indent {
+    margin: 0 0 4px 24px !important;
+  }
+  input[inputmode="search"] {
+    appearance: none !important;
+    border: 0 !important;
+    outline: 0 !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .textbox-search-sign, .textbox-search-icons {
+    display: none !important;
+  }
+  #paneDeck hbox:has(> checkbox) + hbox.input-container {
+    margin-block-start: 6px !important;
+  }
+  #defaultWebSearch .menulist-icon {
+    display: none !important;
+  }
+  .button-icon:not([src]) {
+    display: none !important;
+  }
+}
+
+@-moz-document url("about:accountsettings") {
+  #accountTreeBox {
+    box-sizing: border-box !important;
+    inline-size: 240px !important;
+    min-inline-size: 240px !important;
+    padding: 12px 8px !important;
+    background: #f7f8fa !important;
+    border-inline-end: 1px solid var(--yu-rule) !important;
+  }
+  #accountTreeHeaderBar {
+    block-size: auto !important;
+    margin: 0 0 8px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+  #accountTreeCreateAccount {
+    inline-size: 100% !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    background-image: none !important;
+  }
+  #accounttree {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+  #accounttree ul {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #accounttree ul .container {
+    padding-inline-start: 36px !important;
+  }
+  #accounttree .twisty {
+    inline-size: 16px !important;
+    min-inline-size: 16px !important;
+    margin: 0 -6px 0 0 !important;
+    padding: 0 !important;
+  }
+  #accounttree li.serverType-smtp > .container .twisty {
+    margin: 0 !important;
+  }
+  #accounttree .twisty-icon {
+    content: url("chrome://yuos-mail/content/p-down.svg") !important;
+    inline-size: 16px !important;
+    block-size: 16px !important;
+    -moz-context-properties: stroke !important;
+    stroke: var(--yu-muted) !important;
+  }
+  #accounttree li.selected > .container .twisty-icon {
+    stroke: var(--yu-blue) !important;
+  }
+  #accounttree .default-icon {
+    display: none !important;
+  }
+  #accounttree li[class*="serverType-imap"] > .container .icon,
+  #accounttree li[class*="serverType-pop3"] > .container .icon {
+    background-image: url("chrome://yuos-mail/content/p-mail.svg") !important;
+  }
+  #accounttree li.serverType-none > .container .icon {
+    background-image: url("chrome://yuos-mail/content/p-folder.svg") !important;
+  }
+  #accounttree li.serverType-smtp > .container .icon {
+    background-image: url("chrome://yuos-mail/content/p-server.svg") !important;
+  }
+  #accountTreeBox .sidebar-footer-list {
+    margin-top: auto !important;
+    padding: 0 !important;
+  }
+  #prefsButton .sidebar-footer-icon { content: url("chrome://yuos-mail/content/p-gear.svg") !important; }
+  #addonsButton .sidebar-footer-icon { content: url("chrome://yuos-mail/content/p-puzzle.svg") !important; }
+}
+
+@-moz-document url-prefix("chrome://messenger/content/am-") {
+  #containerBox {
+    max-inline-size: 808px !important;
+    margin: 0 !important;
+    padding: 20px 32px !important;
+  }
+  .dialogheader {
+    margin: 0 0 8px !important;
+    padding: 0 !important;
+    min-block-size: 32px !important;
+    align-items: center !important;
+    gap: 8px;
+  }
+  #deleteAccount {
+    color: #cf222e !important;
+    -moz-context-properties: stroke !important;
+    stroke: #cf222e !important;
+  }
+  #deleteAccount .button-icon {
+    content: url("chrome://yuos-mail/content/p-trash.svg") !important;
+    margin-inline-end: 6px !important;
+  }
+  .identity-table th {
+    inline-size: 120px !important;
+    text-align: start !important;
+    padding: 0 !important;
+  }
+  .identity-table {
+    border-spacing: 0 6px !important;
+    margin: 0 !important;
+  }
+  .identity-table td {
+    padding: 0 0 0 8px !important;
+  }
+  fieldset legend {
+    margin: 20px 0 8px !important;
+  }
+  fieldset > description {
+    color: #57606a !important;
+    margin-block-end: 8px !important;
+  }
+  .signatureBox {
+    block-size: 88px !important;
+    margin: 6px 0 0 128px !important;
+    padding: 8px 10px !important;
+  }
+}
+
+@-moz-document url("about:addressbook") {
+  #booksPane {
+    box-sizing: border-box !important;
+    inline-size: 200px !important;
+    min-inline-size: 200px !important;
+    padding: 12px 8px !important;
+    background: #f7f8fa !important;
+    border-inline-end: 1px solid var(--yu-rule) !important;
+  }
+  #booksSplitter, #sharedSplitter {
+    display: none !important;
+  }
+  #booksPaneHeaderBar {
+    block-size: auto !important;
+    margin: 0 0 8px !important;
+    padding: 0 !important;
+    gap: 4px !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+  #booksPaneCreateContact {
+    order: -1;
+    flex: 1 !important;
+    justify-content: center !important;
+  }
+  #booksPaneCreateBook, #booksPaneCreateList {
+    inline-size: 32px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background-color: transparent !important;
+    -moz-context-properties: stroke !important;
+    stroke: #57606a !important;
+  }
+  #booksPaneCreateBook { --icon: url("chrome://yuos-mail/content/p-book.svg"); background: var(--icon) center / 16px no-repeat !important; }
+  #booksPaneCreateList { --icon: url("chrome://yuos-mail/content/p-group.svg"); background: var(--icon) center / 16px no-repeat !important; }
+  #booksPaneCreateBook::before, #booksPaneCreateList::before { display: none !important; }
+  #books {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+  #books .twisty {
+    display: none !important;
+  }
+  #allAddressBooks > .container .bookRow-icon {
+    background-image: url("chrome://yuos-mail/content/p-books.svg") !important;
+  }
+  #books li:not(#allAddressBooks) > .container .bookRow-icon {
+    background-image: url("chrome://yuos-mail/content/p-book.svg") !important;
+  }
+  .books-pane-bottom {
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+  }
+  #booksPaneImport {
+    inline-size: 100% !important;
+    justify-content: flex-start !important;
+    padding: 0 10px !important;
+    gap: 10px !important;
+    border: 0 !important;
+    background-color: transparent !important;
+  }
+  #cardCount {
+    font-size: 12px !important;
+    color: var(--yu-muted) !important;
+    padding: 8px 10px 0 18px !important;
+    margin: 8px -8px 0 !important;
+    border-block-start: 1px solid var(--yu-rule) !important;
+    background: transparent !important;
+  }
+  #cardsPane {
+    inline-size: 360px !important;
+    min-inline-size: 360px !important;
+    border-inline-end: 1px solid var(--yu-rule) !important;
+  }
+  #cardsPaneHeader {
+    box-sizing: border-box !important;
+    block-size: 52px !important;
+    margin: 0 !important;
+    padding: 0 12px 0 16px !important;
+    gap: 8px !important;
+    align-items: center !important;
+    border-block-end: 1px solid var(--yu-rule) !important;
+  }
+  #searchInput {
+    flex: 1 !important;
+    block-size: 32px !important;
+    --search-bar-border-color: transparent;
+    --search-bar-background: #f2f4f7;
+    --search-bar-focus-background: #f2f4f7;
+    border-radius: 8px !important;
+  }
+  #displayButton {
+    inline-size: 32px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background-color: transparent !important;
+  }
+  #placeholderEmptyBook {
+    font: 600 15px var(--yu-font) !important;
+    color: #57606a !important;
+  }
+  #placeholderCreateContact {
+    border: 0 !important;
+    background-color: transparent !important;
+    color: var(--yu-blue) !important;
+  }
+  body {
+    grid-template-columns: 200px 0 360px 0 1fr !important;
+  }
+  #cardsPaneHeader {
+    min-block-size: 52px !important;
+    flex-shrink: 0 !important;
+  }
+  slot.show {
+    opacity: 1 !important;
+  }
+  #placeholderEmptyBook::before {
+    background: url("chrome://yuos-mail/content/p-group.svg") center / 24px no-repeat !important;
+    -moz-context-properties: stroke !important;
+    stroke: #8b949e !important;
+    fill: none !important;
+  }
+  input[type="search"] {
+    appearance: none !important;
+    border: 0 !important;
+    outline: 0 !important;
+    background: transparent !important;
+    padding-inline: 36px 8px !important;
+  }
+  form > div[aria-hidden="true"] {
+    padding-inline-start: 36px !important;
+  }
+  #placeholderEmptyBook {
+    margin: 4px 0 4px !important;
+  }
+  #search-button {
+    display: none !important;
+  }
+}
+
+@-moz-document url("about:preferences"), url("about:accountsettings"), url("about:addressbook"),
+               url-prefix("chrome://messenger/content/am-") {
+  .button.icon-button:not([hidden]) {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    background-image: none !important;
+  }
+  .button.icon-button::before {
+    content: none;
+    inline-size: 16px;
+    block-size: 16px;
+    -moz-context-properties: stroke;
+    stroke: currentColor;
+  }
+  #accountTreeCreateAccount::before, #booksPaneCreateContact::before, #placeholderCreateContact::before {
+    content: url("chrome://yuos-mail/content/p-plus.svg") !important;
+  }
+  #booksPaneImport::before {
+    content: url("chrome://yuos-mail/content/p-imp.svg") !important;
+    stroke: #3b4148 !important;
+  }
+  #resetColor::before {
+    content: url("chrome://yuos-mail/content/p-reset.svg") !important;
+    stroke: #57606a !important;
+  }
+  #resetColor, #displayButton {
+    inline-size: 32px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background-color: transparent !important;
+  }
+  .button-icon {
+    inline-size: 16px !important;
+    block-size: 16px !important;
+  }
+}
+
+@-moz-document url-prefix("chrome://messenger/content/am-") {
+  #containerBox > .input-container, .input-container-column {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #containerBox > .input-container > .input-container-column > label {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #containerBox > .input-container > .flex-grow > label {
+    min-inline-size: 120px !important;
+  }
+  .input-container-column > .input-container {
+    margin: 0 !important;
+    gap: 8px !important;
+  }
+  #serverColor {
+    inline-size: 48px !important;
+    block-size: 32px !important;
+    padding: 7px 9px !important;
+    border: 1px solid var(--yu-rule) !important;
+    border-radius: 6px !important;
+    background: #fff !important;
+  }
+  .identity-table th label {
+    min-inline-size: 120px !important;
+    margin: 0 !important;
+  }
+  hbox.indent {
+    margin-inline-start: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+@-moz-document url("about:addressbook") {
+  #searchInput {
+    --search-padding: 36px;
+    --search-bar-background: #f2f4f7;
+    --search-bar-focus-background: #f2f4f7;
+    --search-bar-border-color: transparent;
+    --search-field-placeholder: var(--yu-muted);
+    background: #f2f4f7 url("chrome://yuos-mail/content/p-search.svg") 12px center / 16px no-repeat !important;
+    -moz-context-properties: stroke;
+    stroke: var(--yu-muted);
+    font: 13px var(--yu-font) !important;
+  }
+  #searchInput > [slot="search-button"], #searchInput > img {
+    display: none !important;
+  }
+  #displayButton::before {
+    content: url("chrome://yuos-mail/content/p-sort.svg") !important;
+    stroke: #57606a !important;
+  }
+  #books li, #books ul {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #booksPaneImport {
+    justify-content: flex-start !important;
+  }
+}
+@-moz-document url-prefix("chrome://messenger/content/am-") {
+  #containerBox > .input-container {
+    block-size: 32px !important;
+    min-block-size: 32px !important;
+  }
+  #containerBox legend {
+    line-height: 20px !important;
+  }
+  #containerBox fieldset > description, #containerBox label {
+    line-height: 20px !important;
+  }
+  .identity-table {
+    border-spacing: 0 6px !important;
+    margin-block-start: -6px !important;
+  }
+  #server\.prettyName {
+    flex: 1 !important;
+    inline-size: auto !important;
+  }
+  .input-container-column.flex-grow {
+    flex: 1 !important;
+  }
+  textarea.signatureBox {
+    margin-block-start: 0 !important;
+  }
+  hbox:has(> #identity\.signature), hbox:has(> #identity\.attachVCard),
+  hbox:has(> #identity\.catchAll), hbox:has(> #identity\.smtpServerKey),
+  hbox:has(> #identity\.manageIdentitiesbutton) {
+    margin-block-start: 6px !important;
+    gap: 8px !important;
+  }
+  hbox:has(> #identity\.signature) {
+    margin-inline-start: 0 !important;
+  }
+}
+
+@-moz-document url("about:preferences"), url("about:accountsettings"), url("about:addressbook"),
+               url-prefix("chrome://messenger/content/am-") {
+  .button-icon:not([src]) {
+    display: none !important;
+  }
+}
+
+@-moz-document url("about:accountsettings") {
+  #accounttree {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  #accounttree::before {
+    display: none !important;
+  }
+  #accountTreeBox .sidebar-footer-list {
+    margin-block-end: 0 !important;
+  }
+}
+
+@-moz-document url-prefix("chrome://messenger/content/am-") {
+  #deleteAccount .button-icon {
+    display: inline-block !important;
+  }
+}
+@-moz-document url("about:preferences") {
+  #label-box > image {
+    display: none !important;
+  }
+}
+
+@-moz-document url("about:preferences"), url("about:accountsettings"), url("about:addressbook") {
+  .sidebar-panel-scroll::before, .sidebar-panel-scroll::after {
+    display: none !important;
+  }
+}
+@-moz-document url("about:addressbook") {
+  #books .bookRow-name {
+    overflow: visible !important;
+    text-overflow: clip !important;
+  }
+  #booksPaneCreateContact {
+    padding: 0 8px !important;
+  }
+  #booksPaneCreateContact::before, #placeholderCreateContact::before {
+    flex-shrink: 0 !important;
+  }
+}
+
+@-moz-document url("about:preferences") {
+  #label-box {
+    margin-inline-end: 4px !important;
   }
 }
