@@ -120,6 +120,7 @@ ensureAssistantSpace();
 // ---------------------------------------------------------------------------
 
 const MENU_IDS = {
+  root: "yuos_mail_ai",
   summarize: "yuos_mail_ai_summarize",
   translate: "yuos_mail_ai_translate",
   reply: "yuos_mail_ai_smart_reply",
@@ -129,26 +130,37 @@ async function rebuildMenus() {
   try { await browser.menus.removeAll(); } catch (_) {}
 
   const s = await getSettings();
+  const items = [];
   if (s.features.summarize) {
-    browser.menus.create({
+    items.push({
       id: MENU_IDS.summarize,
       title: browser.i18n.getMessage("ctx_summarize") || "Summarize",
       contexts: ["message_list", "message_display_action_menu"],
     });
   }
   if (s.features.translate) {
-    browser.menus.create({
+    items.push({
       id: MENU_IDS.translate,
       title: browser.i18n.getMessage("ctx_translate") || "Translate",
       contexts: ["message_list", "message_display_action_menu", "selection"],
     });
   }
   if (s.features.smartReply) {
-    browser.menus.create({
+    items.push({
       id: MENU_IDS.reply,
       title: browser.i18n.getMessage("ctx_smart_reply") || "Smart reply",
       contexts: ["message_list", "message_display_action_menu"],
     });
+  }
+  if (!items.length) return;
+  // One "Yu AI" submenu in every context, even when a single action applies.
+  browser.menus.create({
+    id: MENU_IDS.root,
+    title: "Yu AI",
+    contexts: [...new Set(items.flatMap(item => item.contexts))],
+  });
+  for (const item of items) {
+    browser.menus.create({ ...item, parentId: MENU_IDS.root });
   }
 }
 rebuildMenus();

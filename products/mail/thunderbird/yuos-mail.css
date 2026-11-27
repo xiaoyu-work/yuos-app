@@ -315,6 +315,9 @@
     margin: 0 -4px 0 auto;
     background: var(--yu-check-b);
   }
+  #mailContext-copy { list-style-image: var(--yu-copy-b) !important; }
+  #mailContext-selectall { list-style-image: var(--yu-selall-b) !important; }
+  #mailContext-searchTheWeb { list-style-image: var(--yu-search-b) !important; }
   #mailContext-replySender { list-style-image: var(--yu-reply-b) !important; }
   #mailContext-replyAll, #mailContext-replyList, #mailContext-replyNewsgroup { list-style-image: var(--yu-replyall-b) !important; }
   #mailContext-forwardRedirect { list-style-image: var(--yu-fwd-b) !important; }
