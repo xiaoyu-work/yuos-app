@@ -2855,6 +2855,10 @@
   #addr-book-edit-email td:not(:last-child) {
     padding-inline-end: 8px !important;
   }
+  #vcard-email input[type="email"] {
+    min-inline-size: 0 !important;
+    inline-size: 100% !important;
+  }
   #addr-book-edit-email th {
     padding-block-end: 6px !important;
   }
@@ -2899,6 +2903,12 @@
   .button-block, .button-block > div {
     gap: 8px !important;
     flex-wrap: wrap !important;
+  }
+  #detailsFooter, #detailsFooter > div {
+    flex-wrap: nowrap !important;
+  }
+  #detailsFooter > div:first-child {
+    flex-shrink: 0 !important;
   }
   #detailsFooter > div:last-child {
     display: grid !important;
@@ -3209,6 +3219,35 @@
   }
   #booksPaneCreateContact::before, #placeholderCreateContact::before {
     flex-shrink: 0 !important;
+  }
+  @media (max-width: 1100px) {
+    body {
+      grid-template-columns: minmax(140px, 18%) 0 minmax(180px, 30%) 0 minmax(0, 1fr) !important;
+    }
+    #booksPane, #cardsPane {
+      inline-size: auto !important;
+      min-inline-size: 0 !important;
+    }
+    #booksPaneHeaderBar {
+      flex-wrap: wrap !important;
+    }
+    #booksPaneCreateContact {
+      flex-basis: 100% !important;
+    }
+    #books .bookRow-name {
+      min-inline-size: 0 !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+    #cardsPaneHeader {
+      padding-inline: 8px !important;
+      gap: 4px !important;
+    }
+    #searchInput {
+      inline-size: 0 !important;
+      min-inline-size: 0 !important;
+    }
   }
 }
 
