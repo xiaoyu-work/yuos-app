@@ -2646,6 +2646,21 @@
     min-inline-size: 360px !important;
     border-inline-end: 1px solid var(--yu-rule) !important;
   }
+  #cards tr[is="ab-card-row"] .card-container {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+  #cards tr[is="ab-card-row"].selected {
+    background: #dce9f9 !important;
+    color: var(--yu-blue) !important;
+  }
+  #cards tr[is="ab-card-row"]:hover:not(.selected) {
+    background: #f2f4f7 !important;
+  }
+  #cards tr[is="ab-card-row"].selected .ab-card-second-line {
+    color: var(--yu-muted) !important;
+  }
   #cardsPaneHeader {
     box-sizing: border-box !important;
     block-size: 52px !important;
@@ -2758,8 +2773,42 @@
     grid-template-rows: none !important;
     gap: 20px 24px !important;
   }
-  #addr-book-edit-n, #addr-book-edit-email {
+  #addr-book-edit-n, #addr-book-edit-email, #addr-book-edit-address {
     grid-column: 1 / -1 !important;
+  }
+  vcard-adr {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 32px !important;
+    gap: 8px !important;
+    align-items: start !important;
+    margin-block-end: 8px !important;
+  }
+  vcard-adr > fieldset {
+    min-inline-size: 0 !important;
+    grid-template-columns: max-content minmax(0, 1fr) !important;
+    gap: 12px 8px !important;
+  }
+  vcard-adr vcard-type {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    padding-block-start: 26px !important;
+  }
+  vcard-adr .vcard-adr-inputs {
+    min-inline-size: 0 !important;
+    grid-column: 2 !important;
+  }
+  vcard-adr :is(input, textarea) {
+    inline-size: 100% !important;
+    min-inline-size: 0 !important;
+    margin: 0 !important;
+  }
+  vcard-edit vcard-adr > .remove-property-button {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: start !important;
+    margin-block-start: 26px !important;
+    gap: 0 !important;
+    font-size: 0 !important;
   }
   .addr-book-edit-display-nickname {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)) !important;
@@ -2873,6 +2922,13 @@
     border-radius: 0 !important;
     background: transparent !important;
     font: 13px/20px var(--yu-font) !important;
+  }
+  #emailAddresses a:any-link {
+    color: var(--yu-blue) !important;
+    text-decoration: none !important;
+  }
+  #emailAddresses a:any-link:hover {
+    text-decoration: underline !important;
   }
   #detailsWriteButton::before { content: url("chrome://yuos-mail/content/p-pen.svg") !important; }
   #detailsSearchButton::before { content: url("chrome://yuos-mail/content/p-search.svg") !important; }
