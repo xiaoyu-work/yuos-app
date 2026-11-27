@@ -31,7 +31,7 @@
   }
 
   #spacesToolbar, #spacesPinnedButton, #spacesToolbarReveal, #status-bar,
-  :root[yu-no-account] #tabs-toolbar {
+  #tabs-toolbar {
     display: none !important;
   }
 
@@ -477,6 +477,58 @@
   #threadPaneHeaderBar .list-header-bar-container-end,
   #threadPaneHeaderBar ~ #quickFilterBar:not([yu-open]) {
     display: none !important;
+  }
+
+  #threadPaneHeaderBar :is(.yu-results, .yu-clear-search),
+  :root[yu-search] #threadPaneFolderName {
+    display: none !important;
+  }
+
+  :root[yu-search] #threadPaneHeaderBar .list-header-bar-container-start {
+    flex: 1 1 auto;
+  }
+
+  :root[yu-search] #threadPaneHeaderBar .yu-results {
+    display: block !important;
+  }
+
+  :root[yu-search] #threadPaneHeaderBar .yu-count::before {
+    content: "· ";
+  }
+
+  :root[yu-search] #threadPaneHeaderBar .yu-clear-search {
+    display: block !important;
+    appearance: none !important;
+    align-self: center;
+    margin: 0 -6px 0 auto !important;
+    padding: 0 !important;
+    min-inline-size: 0 !important;
+    min-block-size: 0 !important;
+    inline-size: 28px !important;
+    block-size: 28px !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: transparent url("chrome://yuos-mail/content/x.svg") center / 16px no-repeat !important;
+    -moz-context-properties: stroke;
+    stroke: var(--yu-icon);
+  }
+
+  :root[yu-search] #threadPaneHeaderBar .yu-clear-search:hover {
+    background-color: var(--yu-hover) !important;
+  }
+
+  #placeholderNoMessages {
+    font: 400 13px var(--yu-font) !important;
+    color: var(--yu-muted) !important;
+  }
+
+  #placeholderNoMessages::before {
+    display: none !important;
+  }
+  #threadTree .yu-hit {
+    background: var(--yu-sel);
+    border-radius: 2px;
+    color: inherit;
   }
 
   #threadTree[rows="thread-card"] {
