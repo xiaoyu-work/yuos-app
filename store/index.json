@@ -1,0 +1,199 @@
+{
+  "apps": [
+    {
+      "app_id": "docs",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-21de07f5557065922ca141f74d43f59bbf6b9ad5f4c5748fc03a9e15fd864290.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "21de07f5557065922ca141f74d43f59bbf6b9ad5f4c5748fc03a9e15fd864290",
+        "size": 14718
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "7bb048708b7813bdf59b15f738080b6fd209b0c9496008a43b3c529329321df5"
+      },
+      "display": {
+        "description": "Local document full-text search across your files (PDF, Office, mail, source code, ...) using Recoll / Xapian.",
+        "name": "Documents",
+        "source_kind": "product",
+        "source_name": "files"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "ea00dc3b796e72731403d2bb0b3ccdec7f5d558c398e5c5e5879405154d1ce00",
+        "size": 6196
+      },
+      "provenance": {
+        "content_digest": "sha256:685cd91b0817172a07cd3c89bd3e7aa8903fed012e0ab780d79baf5527985246",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "f7b4b41474b7ea64780e4ddcdcd0e8acaeb5a7cb001c8a92dc74f48a79c72beb"
+      },
+      "release_tag": "yuos-app-files-v0.1.0.dev2026112701",
+      "release_version": "0.1.0.dev2026112701",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "fa6891b0d8e7206682ec9c67a0e3ff53e7393bf114531f4f99466915f2b7429d"
+      }
+    },
+    {
+      "app_id": "fs",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-7d6d49012c6081d6865ef5e577206c76cb31ff7267e334e64039153ee5f37910.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "7d6d49012c6081d6865ef5e577206c76cb31ff7267e334e64039153ee5f37910",
+        "size": 24346
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "7bb048708b7813bdf59b15f738080b6fd209b0c9496008a43b3c529329321df5"
+      },
+      "display": {
+        "description": "Agent-native file system with metadata and search.",
+        "name": "Files",
+        "source_kind": "product",
+        "source_name": "files"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "6298ea6cea9aa4d400aa4bcab7adfca2c905bf8b24a0e64c5aae02d9a67599c6",
+        "size": 28924
+      },
+      "provenance": {
+        "content_digest": "sha256:720eed668d6f0514df7f90486992db02d6216c0380615cc10f8ccf7f9ae2f5b6",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "efa4b7c39a04dee0d6777b2f87316812fe69ffdac46c5a07b30e80682dd99b84"
+      },
+      "release_tag": "yuos-app-files-v0.1.0.dev2026112701",
+      "release_version": "0.1.0.dev2026112701",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "587d28c44e55c2119b55051624592111b4c633d733fad15cfc8c7e0a6a40e53f"
+      }
+    },
+    {
+      "app_id": "yuos-files",
+      "app_version": "0.1.0",
+      "architecture": "amd64",
+      "artifact": {
+        "file": "yuos-app-snapshot-77cb4d1b5be3d51a5046b9ebeacd635e7225af9eda33f65271d9488d3d4b15ba.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "77cb4d1b5be3d51a5046b9ebeacd635e7225af9eda33f65271d9488d3d4b15ba",
+        "size": 32258821
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "31500afc0a67044e723e888c69bd8f0312e06d8c21aa0ad6301d2d3f55c5f8f3"
+      },
+      "display": {
+        "description": "Inspect, search, reveal, and understand files through the native file manager.",
+        "name": "Files",
+        "source_kind": "product",
+        "source_name": "files"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "4480e754ba07e8b0db33b9f3134bc9f1041008574e5580c7112b1373856bcced",
+        "size": 13405
+      },
+      "provenance": {
+        "content_digest": "sha256:12b1ff749914a3af830a496f1348fe6412745ec701189fffce41be65e48ee014",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "80f14ddaad34eb3611d3a35bf71ab07c4c5423345dec03446c52e7106d47e143"
+      },
+      "release_tag": "yuos-app-files-v0.1.0.dev2026112701",
+      "release_version": "0.1.0.dev2026112701",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "04c0442448d383c3808e447c63d6934322974ca5c0745195ebb8b2bcd0dd88f1"
+      }
+    },
+    {
+      "app_id": "yuos-files",
+      "app_version": "0.1.0",
+      "architecture": "arm64",
+      "artifact": {
+        "file": "yuos-app-snapshot-c68b64b9d7584d384f5392f64d8903d93d36facb316ec0264b5793494394c6b9.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "c68b64b9d7584d384f5392f64d8903d93d36facb316ec0264b5793494394c6b9",
+        "size": 30306540
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "367a0a02efbb0c060b0117188692206aab8218f721524cde16400333c76c08bc"
+      },
+      "display": {
+        "description": "Inspect, search, reveal, and understand files through the native file manager.",
+        "name": "Files",
+        "source_kind": "product",
+        "source_name": "files"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "4480e754ba07e8b0db33b9f3134bc9f1041008574e5580c7112b1373856bcced",
+        "size": 13405
+      },
+      "provenance": {
+        "content_digest": "sha256:6ed39f44f2b70f3ff4dc1cabc994f334ea91ba4b52bffaa2a64eb3b9f8deea82",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "0402db14a1365e7e3bea2cea79bb252eef3dc011f21fe8bc895dc6cef064ba58"
+      },
+      "release_tag": "yuos-app-files-v0.1.0.dev2026112701",
+      "release_version": "0.1.0.dev2026112701",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "04c0442448d383c3808e447c63d6934322974ca5c0745195ebb8b2bcd0dd88f1"
+      }
+    }
+  ],
+  "expires_at": "2026-12-11T08:45:31Z",
+  "generation": "1795769131",
+  "issued_at": "2026-11-27T08:45:31Z",
+  "packages": [
+    {
+      "apps": [
+        "docs",
+        "fs"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-files",
+      "sha256": "7bb048708b7813bdf59b15f738080b6fd209b0c9496008a43b3c529329321df5",
+      "size": 407968,
+      "version": "0.1.0.dev2026112701"
+    },
+    {
+      "apps": [
+        "yuos-files"
+      ],
+      "architecture": "amd64",
+      "package": "yuos-app-files-desktop",
+      "sha256": "31500afc0a67044e723e888c69bd8f0312e06d8c21aa0ad6301d2d3f55c5f8f3",
+      "size": 14684372,
+      "version": "0.1.0.dev2026112701"
+    },
+    {
+      "apps": [
+        "yuos-files"
+      ],
+      "architecture": "arm64",
+      "package": "yuos-app-files-desktop",
+      "sha256": "367a0a02efbb0c060b0117188692206aab8218f721524cde16400333c76c08bc",
+      "size": 13145432,
+      "version": "0.1.0.dev2026112701"
+    }
+  ],
+  "repository": "xiaoyu-work/yuos-app",
+  "runtime_abi": 1,
+  "schema": "yuos.app-store/v2"
+}

@@ -1,0 +1,147 @@
+{
+  "format": "yuos.app-apt/v1",
+  "indexes": {
+    "main/binary-amd64/by-hash/SHA256/101ca3723234694bda28c32230f9f141abd9f61f0562dc3341cccafc29c6253e": {
+      "sha256": "101ca3723234694bda28c32230f9f141abd9f61f0562dc3341cccafc29c6253e",
+      "sha512": "06e9c2c67362d4f563ea86d9e5324fe99109fd8a5aeee993d7e45c843be17652aac517f8926ebcdcc3a575298783a0ce81c5837359daa1f965ed7b803ec55cb9",
+      "size": 2282
+    },
+    "main/binary-amd64/by-hash/SHA256/686104eaf9c0f5c47114c22e786588a67c23cf16c983116fd2ea9a467ee46fce": {
+      "sha256": "686104eaf9c0f5c47114c22e786588a67c23cf16c983116fd2ea9a467ee46fce",
+      "sha512": "32a531e7a98303c1f5f64c27d9bf39bd647e0c6e815c2d954885e8cab8d91b427f322541e8037f5db15215d45b8ea67309f2dff79b41b394ff77c175f26a1a65",
+      "size": 951
+    },
+    "main/binary-amd64/by-hash/SHA256/b43548cedd06119ee68723f028a20c744915540524cb8d2a9965272ff4bcaefd": {
+      "sha256": "b43548cedd06119ee68723f028a20c744915540524cb8d2a9965272ff4bcaefd",
+      "sha512": "07e398106a3f45646a4474bb9fb8dfca55e6bc2c48d54b82d32859381d326404672b5705f5d972a46a6af9731906f8ec1535ef28fa8b2d6ad75205d1b8dae5ed",
+      "size": 1012
+    },
+    "main/binary-amd64/by-hash/SHA512/06e9c2c67362d4f563ea86d9e5324fe99109fd8a5aeee993d7e45c843be17652aac517f8926ebcdcc3a575298783a0ce81c5837359daa1f965ed7b803ec55cb9": {
+      "sha256": "101ca3723234694bda28c32230f9f141abd9f61f0562dc3341cccafc29c6253e",
+      "sha512": "06e9c2c67362d4f563ea86d9e5324fe99109fd8a5aeee993d7e45c843be17652aac517f8926ebcdcc3a575298783a0ce81c5837359daa1f965ed7b803ec55cb9",
+      "size": 2282
+    },
+    "main/binary-amd64/by-hash/SHA512/07e398106a3f45646a4474bb9fb8dfca55e6bc2c48d54b82d32859381d326404672b5705f5d972a46a6af9731906f8ec1535ef28fa8b2d6ad75205d1b8dae5ed": {
+      "sha256": "b43548cedd06119ee68723f028a20c744915540524cb8d2a9965272ff4bcaefd",
+      "sha512": "07e398106a3f45646a4474bb9fb8dfca55e6bc2c48d54b82d32859381d326404672b5705f5d972a46a6af9731906f8ec1535ef28fa8b2d6ad75205d1b8dae5ed",
+      "size": 1012
+    },
+    "main/binary-amd64/by-hash/SHA512/32a531e7a98303c1f5f64c27d9bf39bd647e0c6e815c2d954885e8cab8d91b427f322541e8037f5db15215d45b8ea67309f2dff79b41b394ff77c175f26a1a65": {
+      "sha256": "686104eaf9c0f5c47114c22e786588a67c23cf16c983116fd2ea9a467ee46fce",
+      "sha512": "32a531e7a98303c1f5f64c27d9bf39bd647e0c6e815c2d954885e8cab8d91b427f322541e8037f5db15215d45b8ea67309f2dff79b41b394ff77c175f26a1a65",
+      "size": 951
+    },
+    "main/binary-arm64/by-hash/SHA256/641afe829c3acd02cdaf22ecf6a1f53041f1e735ff429fad2a88c37f314f278f": {
+      "sha256": "641afe829c3acd02cdaf22ecf6a1f53041f1e735ff429fad2a88c37f314f278f",
+      "sha512": "5c7d9aa9f8fd2bbfac8fb9d68cc0e3f01c4df8667447085d99c12c3fa3800a10c9321c624df493e9461664c916c542b1527164c8ce3249b00e8bd288e25d96e7",
+      "size": 2282
+    },
+    "main/binary-arm64/by-hash/SHA256/87822aa5002042f811f65ab38a4f7bd9faf00f7b6af416dc2fbf2f98008c19b9": {
+      "sha256": "87822aa5002042f811f65ab38a4f7bd9faf00f7b6af416dc2fbf2f98008c19b9",
+      "sha512": "799903023dd19d3a57a00bac2b24b0f6e1643b8a36299d59ecb381485c85376fe8f2aa5ba8c2fc58027625a789d8d92465ae085386ac4e13473aacf1373f94e7",
+      "size": 1008
+    },
+    "main/binary-arm64/by-hash/SHA256/c070ddecda3a02a7b02d365e04c1d59f928cdd3c2ee2cf41796a00a4b1a93754": {
+      "sha256": "c070ddecda3a02a7b02d365e04c1d59f928cdd3c2ee2cf41796a00a4b1a93754",
+      "sha512": "8d3d38ae0926420ac0e79d3f767e44aefa6b9abc7cfe33e5b18c9e9fb56c6564a2aa54fc0426d2bc7838cf938323be6d04cd7c1786aec35a3d39b5a49a39c7d7",
+      "size": 954
+    },
+    "main/binary-arm64/by-hash/SHA512/5c7d9aa9f8fd2bbfac8fb9d68cc0e3f01c4df8667447085d99c12c3fa3800a10c9321c624df493e9461664c916c542b1527164c8ce3249b00e8bd288e25d96e7": {
+      "sha256": "641afe829c3acd02cdaf22ecf6a1f53041f1e735ff429fad2a88c37f314f278f",
+      "sha512": "5c7d9aa9f8fd2bbfac8fb9d68cc0e3f01c4df8667447085d99c12c3fa3800a10c9321c624df493e9461664c916c542b1527164c8ce3249b00e8bd288e25d96e7",
+      "size": 2282
+    },
+    "main/binary-arm64/by-hash/SHA512/799903023dd19d3a57a00bac2b24b0f6e1643b8a36299d59ecb381485c85376fe8f2aa5ba8c2fc58027625a789d8d92465ae085386ac4e13473aacf1373f94e7": {
+      "sha256": "87822aa5002042f811f65ab38a4f7bd9faf00f7b6af416dc2fbf2f98008c19b9",
+      "sha512": "799903023dd19d3a57a00bac2b24b0f6e1643b8a36299d59ecb381485c85376fe8f2aa5ba8c2fc58027625a789d8d92465ae085386ac4e13473aacf1373f94e7",
+      "size": 1008
+    },
+    "main/binary-arm64/by-hash/SHA512/8d3d38ae0926420ac0e79d3f767e44aefa6b9abc7cfe33e5b18c9e9fb56c6564a2aa54fc0426d2bc7838cf938323be6d04cd7c1786aec35a3d39b5a49a39c7d7": {
+      "sha256": "c070ddecda3a02a7b02d365e04c1d59f928cdd3c2ee2cf41796a00a4b1a93754",
+      "sha512": "8d3d38ae0926420ac0e79d3f767e44aefa6b9abc7cfe33e5b18c9e9fb56c6564a2aa54fc0426d2bc7838cf938323be6d04cd7c1786aec35a3d39b5a49a39c7d7",
+      "size": 954
+    }
+  },
+  "packages": [
+    {
+      "architecture": "all",
+      "control": {
+        "Architecture": "all",
+        "Depends": "coreutils, python3 (>= 3.11), python3-docx, python3-fitz, python3-lxml, python3-openpyxl, python3-pil, python3-typing-extensions (>= 4.9), python3-xlsxwriter, recollcmd, ripgrep, yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1",
+        "Description": "Yu OS Applications - files (agent)\n Independently updated application payload; authority remains in Yu OS.\n Installed App identities, grants and user data remain separate.",
+        "Homepage": "https://github.com/xiaoyu-work/yuos-app",
+        "Maintainer": "Yu OS Applications <noreply@github.com>",
+        "Package": "yuos-app-files",
+        "Priority": "optional",
+        "Provides": "yuos-app-python-yuos-files-v1",
+        "Section": "misc",
+        "Version": "0.1.0.dev2026112701",
+        "X-YuOS-App-Ids": "fs, docs",
+        "X-YuOS-Product": "files",
+        "X-YuOS-Runtime-ABI": "1",
+        "X-YuOS-Source-Kind": "product",
+        "X-YuOS-Source-Revision": "af29e74883f46f33bdbe13566cf11be621ba4c40",
+        "X-YuOS-Variant": "agent"
+      },
+      "filename": "pool/main/yuos-app-files/yuos-app-files_0.1.0.dev2026112701_all.deb",
+      "package": "yuos-app-files",
+      "sha256": "7bb048708b7813bdf59b15f738080b6fd209b0c9496008a43b3c529329321df5",
+      "sha512": "c573f96a13a5f98a6cd5f5cf754e6feebc1a51e82c8a48a9813fb47675fa71af510a0fc19e696090395146b46f2a2f69cdc88abe5eaed90745b97a9b6672578d",
+      "size": 407968,
+      "version": "0.1.0.dev2026112701"
+    },
+    {
+      "architecture": "amd64",
+      "control": {
+        "Architecture": "amd64",
+        "Depends": "libc6 (>= 2.39), libgcc-s1 (>= 4.2), libglib2.0-0t64 (>= 2.36.0), libxkbcommon0 (>= 0.5.0), python3 (>= 3.11), yuos-app-files (= 0.1.0.dev2026112701), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1",
+        "Description": "Yu OS Applications - files (desktop)\n Independently updated application payload; authority remains in Yu OS.\n Installed App identities, grants and user data remain separate.",
+        "Homepage": "https://github.com/xiaoyu-work/yuos-app",
+        "Maintainer": "Yu OS Applications <noreply@github.com>",
+        "Package": "yuos-app-files-desktop",
+        "Priority": "optional",
+        "Section": "misc",
+        "Version": "0.1.0.dev2026112701",
+        "X-YuOS-App-Ids": "yuos-files",
+        "X-YuOS-Product": "files",
+        "X-YuOS-Runtime-ABI": "1",
+        "X-YuOS-Source-Kind": "product",
+        "X-YuOS-Source-Revision": "af29e74883f46f33bdbe13566cf11be621ba4c40",
+        "X-YuOS-Variant": "desktop"
+      },
+      "filename": "pool/main/yuos-app-files-desktop/yuos-app-files-desktop_0.1.0.dev2026112701_amd64.deb",
+      "package": "yuos-app-files-desktop",
+      "sha256": "31500afc0a67044e723e888c69bd8f0312e06d8c21aa0ad6301d2d3f55c5f8f3",
+      "sha512": "13b26ce38af759d64682d4a22654de2d7d6faf8bc225fc6556031ae18921a1b3914f23d0f095f15131f4f2e8438e8bc40b6462fe6288cf79e89f55ae5e693bc2",
+      "size": 14684372,
+      "version": "0.1.0.dev2026112701"
+    },
+    {
+      "architecture": "arm64",
+      "control": {
+        "Architecture": "arm64",
+        "Depends": "libc6 (>= 2.39), libgcc-s1 (>= 4.2), libglib2.0-0t64 (>= 2.36.0), libxkbcommon0 (>= 0.5.0), python3 (>= 3.11), yuos-app-files (= 0.1.0.dev2026112701), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1",
+        "Description": "Yu OS Applications - files (desktop)\n Independently updated application payload; authority remains in Yu OS.\n Installed App identities, grants and user data remain separate.",
+        "Homepage": "https://github.com/xiaoyu-work/yuos-app",
+        "Maintainer": "Yu OS Applications <noreply@github.com>",
+        "Package": "yuos-app-files-desktop",
+        "Priority": "optional",
+        "Section": "misc",
+        "Version": "0.1.0.dev2026112701",
+        "X-YuOS-App-Ids": "yuos-files",
+        "X-YuOS-Product": "files",
+        "X-YuOS-Runtime-ABI": "1",
+        "X-YuOS-Source-Kind": "product",
+        "X-YuOS-Source-Revision": "af29e74883f46f33bdbe13566cf11be621ba4c40",
+        "X-YuOS-Variant": "desktop"
+      },
+      "filename": "pool/main/yuos-app-files-desktop/yuos-app-files-desktop_0.1.0.dev2026112701_arm64.deb",
+      "package": "yuos-app-files-desktop",
+      "sha256": "367a0a02efbb0c060b0117188692206aab8218f721524cde16400333c76c08bc",
+      "sha512": "1447bdc0a6312fef4366f1ab79983463cdef6fd64d3f939d61e4eed157679370a950e73595e1b0a9f92be780bec6d5fce265864af3ed5741f57219978ed4f0e2",
+      "size": 13145432,
+      "version": "0.1.0.dev2026112701"
+    }
+  ],
+  "repository": "xiaoyu-work/yuos-app"
+}

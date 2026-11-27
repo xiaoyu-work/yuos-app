@@ -1,0 +1,36 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Origin: Yu OS Applications
+Label: Yu OS Applications
+Suite: trixie
+Codename: trixie
+Date: Fri, 27 Nov 2026 08:45:38 GMT
+Valid-Until: Fri, 11 Dec 2026 08:45:38 GMT
+Architectures: amd64 arm64
+Components: main
+Acquire-By-Hash: yes
+Description: Independently released Yu OS applications
+SHA256:
+ c5c3f104118137f57971bbd3cf4962ce7a91f112f9566354ff922c6be216eb36 9456 catalog.json
+ 101ca3723234694bda28c32230f9f141abd9f61f0562dc3341cccafc29c6253e 2282 main/binary-amd64/Packages
+ 686104eaf9c0f5c47114c22e786588a67c23cf16c983116fd2ea9a467ee46fce 951 main/binary-amd64/Packages.gz
+ b43548cedd06119ee68723f028a20c744915540524cb8d2a9965272ff4bcaefd 1012 main/binary-amd64/Packages.xz
+ 641afe829c3acd02cdaf22ecf6a1f53041f1e735ff429fad2a88c37f314f278f 2282 main/binary-arm64/Packages
+ c070ddecda3a02a7b02d365e04c1d59f928cdd3c2ee2cf41796a00a4b1a93754 954 main/binary-arm64/Packages.gz
+ 87822aa5002042f811f65ab38a4f7bd9faf00f7b6af416dc2fbf2f98008c19b9 1008 main/binary-arm64/Packages.xz
+SHA512:
+ 7d7135265a2da9805f4fc8b67a02db7b4760bd96cd6f92f5923f7eb66fb65015a64d5e81d560b6701a987f63c2a51cf9ff76221aa2df39242a5a6df75e57f8ce 9456 catalog.json
+ 06e9c2c67362d4f563ea86d9e5324fe99109fd8a5aeee993d7e45c843be17652aac517f8926ebcdcc3a575298783a0ce81c5837359daa1f965ed7b803ec55cb9 2282 main/binary-amd64/Packages
+ 32a531e7a98303c1f5f64c27d9bf39bd647e0c6e815c2d954885e8cab8d91b427f322541e8037f5db15215d45b8ea67309f2dff79b41b394ff77c175f26a1a65 951 main/binary-amd64/Packages.gz
+ 07e398106a3f45646a4474bb9fb8dfca55e6bc2c48d54b82d32859381d326404672b5705f5d972a46a6af9731906f8ec1535ef28fa8b2d6ad75205d1b8dae5ed 1012 main/binary-amd64/Packages.xz
+ 5c7d9aa9f8fd2bbfac8fb9d68cc0e3f01c4df8667447085d99c12c3fa3800a10c9321c624df493e9461664c916c542b1527164c8ce3249b00e8bd288e25d96e7 2282 main/binary-arm64/Packages
+ 8d3d38ae0926420ac0e79d3f767e44aefa6b9abc7cfe33e5b18c9e9fb56c6564a2aa54fc0426d2bc7838cf938323be6d04cd7c1786aec35a3d39b5a49a39c7d7 954 main/binary-arm64/Packages.gz
+ 799903023dd19d3a57a00bac2b24b0f6e1643b8a36299d59ecb381485c85376fe8f2aa5ba8c2fc58027625a789d8d92465ae085386ac4e13473aacf1373f94e7 1008 main/binary-arm64/Packages.xz
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYKAB0WIQQpiUfdEPeqe4JstelV9mgdu0IXZQUCawlDNAAKCRBV9mgdu0IX
+ZQ18AP0VLWXuS6y1ZzUguCHfMpOcpRinm6qivz3EaLG+4DVQLgEAoF9JOrKmLZiv
+6a5hNXhOgnz3wrB4BKLHiuPAKXy/CwU=
+=971T
+-----END PGP SIGNATURE-----

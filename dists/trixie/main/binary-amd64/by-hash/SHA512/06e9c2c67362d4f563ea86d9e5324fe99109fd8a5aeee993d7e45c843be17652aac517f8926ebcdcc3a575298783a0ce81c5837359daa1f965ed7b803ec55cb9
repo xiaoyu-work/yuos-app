@@ -1,0 +1,45 @@
+Package: yuos-app-files
+Version: 0.1.0.dev2026112701
+Architecture: all
+Depends: coreutils, python3 (>= 3.11), python3-docx, python3-fitz, python3-lxml, python3-openpyxl, python3-pil, python3-typing-extensions (>= 4.9), python3-xlsxwriter, recollcmd, ripgrep, yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - files (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Provides: yuos-app-python-yuos-files-v1
+Section: misc
+X-YuOS-App-Ids: fs, docs
+X-YuOS-Product: files
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: af29e74883f46f33bdbe13566cf11be621ba4c40
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-files/yuos-app-files_0.1.0.dev2026112701_all.deb
+Size: 407968
+SHA256: 7bb048708b7813bdf59b15f738080b6fd209b0c9496008a43b3c529329321df5
+SHA512: c573f96a13a5f98a6cd5f5cf754e6feebc1a51e82c8a48a9813fb47675fa71af510a0fc19e696090395146b46f2a2f69cdc88abe5eaed90745b97a9b6672578d
+
+Package: yuos-app-files-desktop
+Version: 0.1.0.dev2026112701
+Architecture: amd64
+Depends: libc6 (>= 2.39), libgcc-s1 (>= 4.2), libglib2.0-0t64 (>= 2.36.0), libxkbcommon0 (>= 0.5.0), python3 (>= 3.11), yuos-app-files (= 0.1.0.dev2026112701), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - files (desktop)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: yuos-files
+X-YuOS-Product: files
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: af29e74883f46f33bdbe13566cf11be621ba4c40
+X-YuOS-Variant: desktop
+Filename: pool/main/yuos-app-files-desktop/yuos-app-files-desktop_0.1.0.dev2026112701_amd64.deb
+Size: 14684372
+SHA256: 31500afc0a67044e723e888c69bd8f0312e06d8c21aa0ad6301d2d3f55c5f8f3
+SHA512: 13b26ce38af759d64682d4a22654de2d7d6faf8bc225fc6556031ae18921a1b3914f23d0f095f15131f4f2e8438e8bc40b6462fe6288cf79e89f55ae5e693bc2
+
