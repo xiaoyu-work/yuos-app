@@ -341,6 +341,12 @@ impl MenuAction for NavMenuAction {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SplitterKind {
+    Sidebar,
+    AiDrawer,
+}
+
 /// Messages that are used specifically by our [`App`].
 #[derive(Clone, Debug)]
 pub enum Message {
@@ -361,6 +367,9 @@ pub enum Message {
     AiAssistFindSimilar,
     AskYu,
     ToggleAiDrawer,
+    SplitterStart(SplitterKind),
+    SplitterMove(f32),
+    SplitterRelease,
     SidebarToggleMenu,
     SidebarToggleExpand(PathBuf),
     WindowDrag,
@@ -892,6 +901,9 @@ pub struct App {
     ai_assist_input: String,
     ai_assist_status: AiAssistStatus,
     ai_drawer_open: bool,
+    sidebar_width: f32,
+    ai_drawer_width: f32,
+    active_splitter: Option<SplitterKind>,
     ai_last_prompt: Option<String>,
     ai_last_response: Option<Result<String, String>>,
     sidebar_expanded: FxHashSet<PathBuf>,
@@ -2849,6 +2861,9 @@ impl App {
                     })
                     .class(theme::Text::Color(label_fg))
                     .wrapping(cosmic::iced::core::text::Wrapping::None)
+                    .ellipsize(cosmic::iced::core::text::Ellipsize::End(
+                        cosmic::iced::core::text::EllipsizeHeightLimit::Lines(1),
+                    ))
                     .width(Length::Fill),
             );
             if let Some((expanded, p)) = chev {
@@ -3043,6 +3058,7 @@ impl App {
             trash_active,
         ));
 
+        let sb_width = self.sidebar_width;
         let sidebar_col = widget::column::with_children([
             header.into(),
             header_rule.into(),
@@ -3051,17 +3067,30 @@ impl App {
                 .height(Length::Fill)
                 .into(),
         ])
-        .width(Length::Fixed(180.0))
+        .width(Length::Fixed(sb_width))
         .height(Length::Fill);
 
         let sidebar_box = widget::container(sidebar_col)
-            .width(Length::Fixed(180.0))
+            .width(Length::Fixed(sb_width))
             .height(Length::Fill)
             .class(theme::Container::custom(crate::glass::sidebar_surface));
 
-        let v_rule = cosmic::iced::widget::rule::vertical(1).class(crate::glass::sidebar_rule());
+        let sb_dragging = self.active_splitter == Some(SplitterKind::Sidebar);
+        let v_rule = cosmic::iced::widget::rule::vertical(1).class(if sb_dragging {
+            crate::glass::splitter_active_rule()
+        } else {
+            crate::glass::sidebar_rule()
+        });
+        let sb_splitter = crate::mouse_area::MouseArea::new(
+            widget::container(v_rule)
+                .width(Length::Fixed(5.0))
+                .height(Length::Fill)
+                .align_x(Alignment::Center),
+        )
+        .interaction(cosmic::iced::core::mouse::Interaction::ResizingHorizontally)
+        .on_press(|_| Message::SplitterStart(SplitterKind::Sidebar));
 
-        widget::row::with_children([sidebar_box.into(), v_rule.into()])
+        widget::row::with_children([sidebar_box.into(), sb_splitter.into()])
             .height(Length::Fill)
             .into()
     }
@@ -3435,74 +3464,124 @@ impl App {
             .into()
         };
 
-        let chips = widget::column::with_children([
-            widget::row::with_children([
-                chip("Summarize", Message::AiSummarize(None)),
-                chip("Explain", Message::AiExplain(None)),
-                chip("Find Similar", Message::AiAssistFindSimilar),
+        let drawer_w = self.ai_drawer_width;
+        let chips: Element<'_, Message> = if drawer_w >= 360.0 {
+            widget::container(
+                widget::row::with_children([
+                    chip("Summarize", Message::AiSummarize(None)),
+                    chip("Explain", Message::AiExplain(None)),
+                    chip("Find Similar", Message::AiAssistFindSimilar),
+                    chip("Open in Yu Agent ↗", Message::AskYu),
+                ])
+                .spacing(6),
+            )
+            .padding([4, 0])
+            .into()
+        } else if drawer_w >= 272.0 {
+            widget::column::with_children([
+                widget::row::with_children([
+                    chip("Summarize", Message::AiSummarize(None)),
+                    chip("Explain", Message::AiExplain(None)),
+                    chip("Find Similar", Message::AiAssistFindSimilar),
+                ])
+                .spacing(6)
+                .into(),
+                widget::row::with_children([
+                    chip("Open in Yu Agent ↗", Message::AskYu),
+                ])
+                .spacing(6)
+                .into(),
             ])
             .spacing(6)
-            .into(),
-            widget::row::with_children([
-                chip("Open in Yu Agent ↗", Message::AskYu),
+            .padding([4, 0])
+            .into()
+        } else {
+            widget::column::with_children([
+                widget::row::with_children([
+                    chip("Summarize", Message::AiSummarize(None)),
+                    chip("Explain", Message::AiExplain(None)),
+                ])
+                .spacing(6)
+                .into(),
+                widget::row::with_children([
+                    chip("Find Similar", Message::AiAssistFindSimilar),
+                    chip("Open in Yu Agent ↗", Message::AskYu),
+                ])
+                .spacing(6)
+                .into(),
             ])
             .spacing(6)
-            .into(),
-        ])
-        .spacing(6)
-        .padding([4, 0]);
-        thread_items.push(chips.into());
+            .padding([4, 0])
+            .into()
+        };
+        thread_items.push(chips);
 
         let messages_col = widget::column::with_children(thread_items)
             .spacing(12)
             .padding([8, 14])
             .width(Length::Fill);
 
-        // Unified floating Composer Card at the bottom (with @context pills inside the card, NO horizontal lines!)
-        let mut pills = widget::row::with_capacity(2)
-            .spacing(5)
-            .align_y(Alignment::Center);
-        pills = pills.push(
-            widget::container(
+        // Unified floating Composer Card at the bottom (adaptive @context pills, NO horizontal lines!)
+        let folder_pill: Element<'_, Message> = widget::container(
+            widget::row::with_children([
+                Self::sidebar_svg_icon("documents", false, 11).into(),
+                widget::text::text(folder_name.clone())
+                    .size(11.0)
+                    .font(cosmic::font::default())
+                    .class(theme::Text::Color(cosmic::iced::Color::from_rgb8(0x47, 0x55, 0x69)))
+                    .wrapping(cosmic::iced::core::text::Wrapping::None)
+                    .ellipsize(cosmic::iced::core::text::Ellipsize::End(
+                        cosmic::iced::core::text::EllipsizeHeightLimit::Lines(1),
+                    ))
+                    .into(),
+            ])
+            .spacing(4)
+            .align_y(Alignment::Center),
+        )
+        .padding([2, 7])
+        .class(theme::Container::custom(crate::glass::ai_pill_surface))
+        .into();
+
+        let pills: Element<'_, Message> = if let Some(ref sel) = selected_file {
+            let folder_px = (folder_name.chars().count() as f32 * 6.5) + 34.0;
+            let avail_px = (drawer_w - 56.0 - folder_px).max(40.0);
+            let max_chars = ((avail_px / 6.3).floor() as usize).max(7);
+            let short_sel = if sel.chars().count() > max_chars {
+                let prefix: String = sel.chars().take(max_chars.saturating_sub(1)).collect();
+                format!("{prefix}…")
+            } else {
+                sel.clone()
+            };
+            let sel_pill: Element<'_, Message> = widget::container(
                 widget::row::with_children([
-                    Self::sidebar_svg_icon("documents", false, 11).into(),
-                    widget::text::text(folder_name.clone())
+                    Self::sidebar_svg_icon("accounting", false, 11).into(),
+                    widget::text::text(short_sel)
                         .size(11.0)
                         .font(cosmic::font::default())
                         .class(theme::Text::Color(cosmic::iced::Color::from_rgb8(0x47, 0x55, 0x69)))
+                        .wrapping(cosmic::iced::core::text::Wrapping::None)
                         .into(),
                 ])
                 .spacing(4)
                 .align_y(Alignment::Center),
             )
             .padding([2, 7])
-            .class(theme::Container::custom(crate::glass::ai_pill_surface)),
-        );
-        if let Some(ref sel) = selected_file {
-            let short_sel = if sel.chars().count() > 19 {
-                let prefix: String = sel.chars().take(17).collect();
-                format!("{prefix}…")
-            } else {
-                sel.clone()
-            };
-            pills = pills.push(
-                widget::container(
-                    widget::row::with_children([
-                        Self::sidebar_svg_icon("accounting", false, 11).into(),
-                        widget::text::text(short_sel)
-                            .size(11.0)
-                            .font(cosmic::font::default())
-                            .class(theme::Text::Color(cosmic::iced::Color::from_rgb8(0x47, 0x55, 0x69)))
-                            .wrapping(cosmic::iced::core::text::Wrapping::None)
-                            .into(),
-                    ])
+            .class(theme::Container::custom(crate::glass::ai_pill_surface))
+            .into();
+
+            if drawer_w < 245.0 {
+                widget::column::with_children([folder_pill, sel_pill])
                     .spacing(4)
-                    .align_y(Alignment::Center),
-                )
-                .padding([2, 7])
-                .class(theme::Container::custom(crate::glass::ai_pill_surface)),
-            );
-        }
+                    .into()
+            } else {
+                widget::row::with_children([folder_pill, sel_pill])
+                    .spacing(5)
+                    .align_y(Alignment::Center)
+                    .into()
+            }
+        } else {
+            folder_pill
+        };
 
         let composer_inner = widget::text_input(
             "Ask Yu Agent…",
@@ -3523,7 +3602,7 @@ impl App {
 
         let composer_card = widget::container(
             widget::column::with_children([
-                pills.into(),
+                pills,
                 widget::row::with_children([composer_inner.into(), send_btn.into()])
                     .spacing(6)
                     .align_y(Alignment::Center)
@@ -3547,16 +3626,30 @@ impl App {
                 .into(),
             composer_wrap.into(),
         ])
-        .width(Length::Fixed(292.0))
+        .width(Length::Fixed(drawer_w))
         .height(Length::Fill);
 
         let drawer_box = widget::container(drawer_col)
-            .width(Length::Fixed(292.0))
+            .width(Length::Fixed(drawer_w))
             .height(Length::Fill)
             .class(theme::Container::custom(crate::glass::ai_drawer_surface));
 
-        let v_rule = cosmic::iced::widget::rule::vertical(1).class(crate::glass::sidebar_rule());
-        widget::row::with_children([v_rule.into(), drawer_box.into()])
+        let ai_dragging = self.active_splitter == Some(SplitterKind::AiDrawer);
+        let v_rule = cosmic::iced::widget::rule::vertical(1).class(if ai_dragging {
+            crate::glass::splitter_active_rule()
+        } else {
+            crate::glass::sidebar_rule()
+        });
+        let ai_splitter = crate::mouse_area::MouseArea::new(
+            widget::container(v_rule)
+                .width(Length::Fixed(5.0))
+                .height(Length::Fill)
+                .align_x(Alignment::Center),
+        )
+        .interaction(cosmic::iced::core::mouse::Interaction::ResizingHorizontally)
+        .on_press(|_| Message::SplitterStart(SplitterKind::AiDrawer));
+
+        widget::row::with_children([ai_splitter.into(), drawer_box.into()])
             .height(Length::Fill)
             .into()
     }
@@ -4236,6 +4329,9 @@ impl Application for App {
             ai_assist_input: String::new(),
             ai_assist_status: AiAssistStatus::Idle,
             ai_drawer_open: false,
+            sidebar_width: 180.0,
+            ai_drawer_width: 292.0,
+            active_splitter: None,
             ai_last_prompt: None,
             ai_last_response: None,
             sidebar_expanded: {
@@ -4807,6 +4903,36 @@ impl Application for App {
             }
             Message::ToggleAiDrawer => {
                 self.ai_drawer_open = !self.ai_drawer_open;
+            }
+            Message::SplitterStart(kind) => {
+                self.active_splitter = Some(kind);
+            }
+            Message::SplitterRelease => {
+                self.active_splitter = None;
+            }
+            Message::SplitterMove(cursor_x) => {
+                let win_w = self.size.map(|s| s.width).unwrap_or(980.0).max(520.0);
+                match self.active_splitter {
+                    Some(SplitterKind::Sidebar) => {
+                        let ai_w = if self.ai_drawer_open {
+                            self.ai_drawer_width + 5.0
+                        } else {
+                            0.0
+                        };
+                        let max_sb = (win_w - ai_w - 280.0).clamp(148.0, 280.0);
+                        self.sidebar_width = cursor_x.clamp(148.0, max_sb);
+                    }
+                    Some(SplitterKind::AiDrawer) => {
+                        let sb_w = if self.core.nav_bar_active() {
+                            self.sidebar_width + 5.0
+                        } else {
+                            0.0
+                        };
+                        let max_ai = (win_w - sb_w - 280.0).clamp(216.0, 480.0);
+                        self.ai_drawer_width = (win_w - cursor_x).clamp(216.0, max_ai);
+                    }
+                    None => {}
+                }
             }
             Message::SidebarToggleMenu => {
                 self.core.nav_bar_toggle();
@@ -7512,6 +7638,21 @@ impl Application for App {
             Message::Size(window_id, size) => {
                 if self.core.main_window_id() == Some(window_id) {
                     self.size = Some(size);
+                    let win_w = size.width.max(520.0);
+                    let sb_w = if self.core.nav_bar_active() {
+                        self.sidebar_width + 5.0
+                    } else {
+                        0.0
+                    };
+                    let max_ai = (win_w - sb_w - 280.0).clamp(216.0, 480.0);
+                    self.ai_drawer_width = self.ai_drawer_width.clamp(216.0, max_ai);
+                    let ai_w = if self.ai_drawer_open {
+                        self.ai_drawer_width + 5.0
+                    } else {
+                        0.0
+                    };
+                    let max_sb = (win_w - ai_w - 280.0).clamp(148.0, 280.0);
+                    self.sidebar_width = self.sidebar_width.clamp(148.0, max_sb);
                 } else {
                     #[cfg(all(feature = "wayland", feature = "desktop-applet"))]
                     self.layer_sizes.insert(window_id, size);
@@ -8988,6 +9129,19 @@ impl Application for App {
                 }
                 _ => None,
             }),
+            if self.active_splitter.is_some() {
+                event::listen_with(|event, _status, _window_id| match event {
+                    Event::Mouse(mouse::Event::CursorMoved { position }) => {
+                        Some(Message::SplitterMove(position.x))
+                    }
+                    Event::Mouse(mouse::Event::ButtonReleased(mouse::Button::Left)) => {
+                        Some(Message::SplitterRelease)
+                    }
+                    _ => None,
+                })
+            } else {
+                Subscription::none()
+            },
             Config::subscription().map(|update| {
                 if !update.errors.is_empty() {
                     log::info!(

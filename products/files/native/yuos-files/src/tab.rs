@@ -274,11 +274,10 @@ fn list_row_appearance(
             Color::from_rgb8(0x1f, 0x29, 0x37)
         });
     } else {
-        let bg = match (is_dark, even) {
-            (false, true) => Color::WHITE,
-            (false, false) => Color::from_rgb8(0xf5, 0xf7, 0xfb),
-            (true, true) => Color::from_rgb8(0x12, 0x16, 0x1f),
-            (true, false) => Color::from_rgb8(0x16, 0x1b, 0x25),
+        let bg = if is_dark {
+            Color::from_rgb8(0x12, 0x16, 0x1f)
+        } else {
+            Color::WHITE
         };
         style.background = Some(bg.into());
         style.text_color = Some(if is_dark {
@@ -293,6 +292,22 @@ fn list_row_appearance(
 fn item_kind_label(item: &Item) -> String {
     if item.metadata.is_dir() {
         return "Folder".to_string();
+    }
+    if let Some(ext) = item
+        .display_name
+        .rsplit_once('.')
+        .map(|(_, e)| e.to_ascii_lowercase())
+    {
+        match ext.as_str() {
+            "md" | "markdown" => return "Markdown".to_string(),
+            "xlsx" | "xls" | "csv" => return "Spreadsheet".to_string(),
+            "docx" | "doc" => return "Document".to_string(),
+            "pptx" | "ppt" => return "Presentation".to_string(),
+            "fig" => return "Design file".to_string(),
+            "pdf" => return "PDF document".to_string(),
+            "txt" | "log" => return "Plain text".to_string(),
+            _ => {}
+        }
     }
     let essence = item.mime.essence_str();
     match essence {
@@ -5132,12 +5147,13 @@ impl Tab {
         row = row.push(widget::space::horizontal().width(Length::Fixed(space_s.into())));
         w += f32::from(space_s);
 
-        //TODO: allow resizing?
-        let modified_width = 164.0;
-        let size_width = 86.0;
-        let kind_width = 126.0;
-        let condensed = size.width < 340.0;
-        let show_kind = size.width >= 560.0;
+        // Responsive column widths synchronized with list_view()
+        let modified_width = if size.width >= 480.0 { 160.0 } else { 142.0 };
+        let size_width = 82.0;
+        let kind_width = 118.0;
+        let condensed = size.width < 270.0;
+        let show_size = size.width >= 390.0;
+        let show_kind = size.width >= 540.0;
 
         let (sort_name, sort_direction, _) = self.sort_options();
         let heading_item = |name: String, width: Length, msg: HeadingOptions| -> Element<'_, Message> {
@@ -5198,9 +5214,15 @@ impl Tab {
                     HeadingOptions::Modified,
                 )
             },
-            col_sep(),
-            heading_item(fl!("size"), Length::Fixed(size_width), HeadingOptions::Size),
         ];
+        if show_size {
+            header_cells.push(col_sep());
+            header_cells.push(heading_item(
+                fl!("size"),
+                Length::Fixed(size_width),
+                HeadingOptions::Size,
+            ));
+        }
         if show_kind {
             header_cells.push(col_sep());
             header_cells.push(
@@ -5878,12 +5900,13 @@ impl Tab {
         } = self.config;
 
         let size = self.size_opt.get().unwrap_or_else(|| Size::new(0.0, 0.0));
-        //TODO: allow resizing?
-        let modified_width = 164.0;
-        let size_width = 86.0;
-        let kind_width = 126.0;
-        let condensed = size.width < 340.0;
-        let show_kind = size.width >= 560.0;
+        // Responsive column widths synchronized with location_view()
+        let modified_width = if size.width >= 480.0 { 160.0 } else { 142.0 };
+        let size_width = 82.0;
+        let kind_width = 118.0;
+        let condensed = size.width < 270.0;
+        let show_size = size.width >= 390.0;
+        let show_kind = size.width >= 540.0;
         let is_search = matches!(self.location, Location::Search(..));
         let icon_size: u16 = 16;
         let row_height: u16 = 28;
@@ -6079,13 +6102,17 @@ impl Tab {
                                 .width(Length::Fixed(modified_width))
                                 .align_y(Alignment::Center)
                                 .into(),
-                            widget::space::horizontal().width(Length::Fixed(1.0)).into(),
-                            widget::container(cell_text(size_text.clone()))
-                                .padding([0, 12])
-                                .width(Length::Fixed(size_width))
-                                .align_y(Alignment::Center)
-                                .into(),
                         ];
+                        if show_size {
+                            cells.push(widget::space::horizontal().width(Length::Fixed(1.0)).into());
+                            cells.push(
+                                widget::container(cell_text(size_text.clone()))
+                                    .padding([0, 12])
+                                    .width(Length::Fixed(size_width))
+                                    .align_y(Alignment::Center)
+                                    .into(),
+                            );
+                        }
                         if show_kind {
                             cells.push(widget::space::horizontal().width(Length::Fixed(1.0)).into());
                             cells.push(
@@ -6125,13 +6152,17 @@ impl Tab {
                                 .width(Length::Fixed(modified_width))
                                 .align_y(Alignment::Center)
                                 .into(),
-                            widget::space::horizontal().width(Length::Fixed(1.0)).into(),
-                            widget::container(cell_text(size_text.clone()))
-                                .padding([0, 12])
-                                .width(Length::Fixed(size_width))
-                                .align_y(Alignment::Center)
-                                .into(),
                         ];
+                        if show_size {
+                            cells.push(widget::space::horizontal().width(Length::Fixed(1.0)).into());
+                            cells.push(
+                                widget::container(cell_text(size_text.clone()))
+                                    .padding([0, 12])
+                                    .width(Length::Fixed(size_width))
+                                    .align_y(Alignment::Center)
+                                    .into(),
+                            );
+                        }
                         if show_kind {
                             cells.push(widget::space::horizontal().width(Length::Fixed(1.0)).into());
                             cells.push(

@@ -460,6 +460,15 @@ pub fn sidebar_rule() -> theme::Rule {
     }))
 }
 
+pub fn splitter_active_rule() -> theme::Rule {
+    theme::Rule::Custom(Box::new(|_theme| cosmic::iced::widget::rule::Style {
+        color: Color::from_rgb8(0x00, 0x5c, 0xfe),
+        radius: 0.0.into(),
+        fill_mode: cosmic::iced::widget::rule::FillMode::Full,
+        snap: true,
+    }))
+}
+
 pub fn sidebar_item_button(active: bool) -> theme::Button {
     theme::Button::Custom {
         active: Box::new(move |_focused, theme| sidebar_item_style(theme, active, false)),

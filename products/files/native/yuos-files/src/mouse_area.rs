@@ -40,10 +40,18 @@ pub struct MouseArea<'a, Message> {
     on_scroll: Option<Box<dyn OnScroll<'a, Message>>>,
     on_enter: Option<Box<dyn OnEnterExit<'a, Message>>>,
     on_exit: Option<Box<dyn OnEnterExit<'a, Message>>>,
+    interaction: Option<mouse::Interaction>,
     show_drag_rect: bool,
 }
 
 impl<'a, Message> MouseArea<'a, Message> {
+    /// Override the mouse cursor interaction when hovering over this area.
+    #[must_use]
+    pub fn interaction(mut self, interaction: mouse::Interaction) -> Self {
+        self.interaction = Some(interaction);
+        self
+    }
+
     /// The message to emit when auto scroll changes.
     #[must_use]
     pub fn on_auto_scroll(mut self, message: impl OnAutoScroll<'a, Message>) -> Self {
@@ -311,6 +319,7 @@ impl<'a, Message> MouseArea<'a, Message> {
             on_enter: None,
             on_exit: None,
             on_scroll: None,
+            interaction: None,
             show_drag_rect: false,
         }
     }
@@ -408,6 +417,11 @@ where
         viewport: &Rectangle,
         renderer: &Renderer,
     ) -> mouse::Interaction {
+        if let Some(interaction) = self.interaction
+            && cursor.is_over(layout.bounds())
+        {
+            return interaction;
+        }
         self.content.as_widget().mouse_interaction(
             &tree.children[0],
             layout,
