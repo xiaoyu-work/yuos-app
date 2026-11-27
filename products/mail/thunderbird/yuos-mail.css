@@ -81,8 +81,10 @@
   menupopup:not(.yu-wide) {
     min-width: 240px !important;
   }
-  menupopup menupopup {
+  menupopup menupopup:not(.yu-wide) {
     min-width: 220px !important;
+    max-width: 220px !important;
+    margin: -7px 0 0 3px !important;
   }
   #mailContext-navigation, #mailContext-sep-navigation {
     display: none !important;
@@ -124,14 +126,14 @@
   .menu-accel, .menu-accel-container {
     display: none !important;
   }
-  menu > .menu-right {
-    list-style-image: var(--yu-chev-m) !important;
+  menupopup > menu::after {
+    content: var(--yu-chev-m) !important;
     width: 16px !important;
     height: 16px !important;
     margin: 0 -4px 0 auto !important;
+    padding: 0 !important;
     -moz-context-properties: none !important;
   }
-  menu > .menu-right > image { width: 16px; height: 16px; }
   menupopup > menuseparator {
     appearance: none !important;
     padding: 5px 4px !important;
