@@ -19,7 +19,10 @@ from test_packages import contents
 EXTENSION = Path("usr/share/yuos/extensions/yuos-agent-browser")
 LAUNCHER = Path("usr/lib/yuos/yuos-browser-host")
 HOST = Path("usr/lib/yuos/apps/browser-attached/native_host.py")
-RESOURCES = {"manifest.json", "background.js", "content.js", "popup.html", "popup.js", "README.md"}
+RESOURCES = {
+    "manifest.json", "background.js", "content.js",
+    "popup.html", "popup.js", "README.md", "icon.png",
+}
 HOST_COMMAND = '#!/bin/sh\nexec /usr/bin/python3 -I /usr/lib/yuos/browser-native-host.py "$@"\n'
 
 
