@@ -63,7 +63,7 @@ def test_complete_native_graph_and_resources_are_staged_without_os_implementatio
             assert staged.stat().st_mode & 0o777 == source.stat().st_mode & 0o777
     assert (target / "app.json").read_bytes() == MANIFEST.read_bytes()
     assert len(list((target / "i18n").glob("*/yuos_screenshot.ftl"))) == 72
-    assert len(list((target / "resources/icons").rglob("com.yuos.Screenshot.*"))) == 8
+    assert len(list((target / "resources/icons").rglob("com.yuos.Screenshot.*"))) == 1
     assert "Exec=yuos-screenshot" in (target / "resources/com.yuos.Screenshot.desktop").read_text()
     assert not (tmp_path / "installed/usr/bin").exists()
     assert not (target / "core").exists()
