@@ -10,7 +10,7 @@ import subprocess
 import tarfile
 import time
 
-from release import load_plan
+from release import build_record_name, load_plan
 from release_apt import compose, verify_repository
 from release_common import (
     REPO_SETTINGS_TOKEN, ROOT, command_environment, compare_versions, config, digest, identity, json_bytes,
@@ -94,15 +94,23 @@ def verify_artifacts(plan, directory):
             control.get("X-YuOS-Variant") != entry["variant"]
         ) or control.get("X-YuOS-App-Ids", "") != ", ".join(entry["apps"]):
             raise ValueError("Release artifact metadata does not match the tested plan")
-    jobs = {job["architecture"] for job in plan["matrix"]["include"]}
+    jobs = plan["matrix"]["include"]
     development = {}
-    if {path.name for path in directory.glob("build-record-*.json")} != {
-        f"build-record-{architecture}.json" for architecture in jobs
-    }:
+    expected_records = {
+        build_record_name(job["architecture"], job.get("selection")): job
+        for job in jobs
+    }
+    if {path.name for path in directory.glob("build-record-*.json")} != set(expected_records):
         raise ValueError("A matrix build record is missing")
-    for architecture in jobs:
-        report = json.loads((directory / f"build-record-{architecture}.json").read_text())
-        wanted = [record for record in records.values() if record["architecture"] == architecture]
+    for record_file, job in expected_records.items():
+        architecture = job["architecture"]
+        selection = job.get("selection")
+        report = json.loads((directory / record_file).read_text())
+        wanted = [
+            record for name, record in records.items()
+            if record["architecture"] == architecture
+            and (selection in (None, "", "all") or expected[name]["selection"] == selection)
+        ]
         if report.get("format") != "yuos.app-build/v1" or report.get("plan") != plan or (
             sorted(report["packages"], key=identity) != sorted(wanted, key=identity)
         ):
@@ -113,8 +121,8 @@ def verify_artifacts(plan, directory):
             development = report.get("development", {})
             if set(development) != (set(plan["selections"]) if plan["include_fixtures"] else set()):
                 raise ValueError("A selected development fixture archive is missing")
-            for selection, record in development.items():
-                if record.get("selection") != selection:
+            for item, record in development.items():
+                if record.get("selection") != item:
                     raise ValueError("Development archive selection mismatch")
                 verify_archive(directory / relative_path(record["filename"]), record, plan)
         elif report.get("development"):

@@ -135,7 +135,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     env:
-      CARGO_BUILD_JOBS: "2"
+      CARGO_BUILD_JOBS: "4"
       CARGO_PROFILE_DEV_DEBUG: "0"
     steps:
       - name: Bootstrap the declared Debian build container
@@ -149,7 +149,8 @@ jobs:
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - env:
           ARCHITECTURE: ${{ matrix.architecture }}
-        run: python3 tools/release_ci.py build --plan build/release-plan.json --architecture "$ARCHITECTURE"
+          SELECTION: ${{ matrix.selection || 'all' }}
+        run: python3 tools/release_ci.py build --plan build/release-plan.json --architecture "$ARCHITECTURE" --selection "$SELECTION"
       - if: matrix.architecture != 'all'
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -158,18 +159,20 @@ jobs:
         if: matrix.architecture != 'all'
         env:
           ARCHITECTURE: ${{ matrix.architecture }}
+          SELECTION: ${{ matrix.selection || 'all' }}
         run: |
           export TMPDIR="$PWD/build/ci-work"
-          python3 tools/release.py test --plan build/release-plan.json --architecture "$ARCHITECTURE"
+          python3 tools/release.py test --plan build/release-plan.json --architecture "$ARCHITECTURE" --selection "$SELECTION"
       - name: Build real installable App payloads
         env:
           ARCHITECTURE: ${{ matrix.architecture }}
+          SELECTION: ${{ matrix.selection || 'all' }}
         run: |
           export TMPDIR="$PWD/build/ci-work"
-          python3 tools/release.py build --plan build/release-plan.json --architecture "$ARCHITECTURE"
+          python3 tools/release.py build --plan build/release-plan.json --architecture "$ARCHITECTURE" --selection "$SELECTION"
       - uses: actions/upload-artifact@v4
         with:
-          name: app-debs-${{ matrix.architecture }}
+          name: app-debs-${{ matrix.architecture }}-${{ matrix.selection || 'all' }}
           path: |
             build/release/*.deb
             build/release/yuos-app-development-*.tar.xz

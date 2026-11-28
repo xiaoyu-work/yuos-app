@@ -62,7 +62,12 @@ def test_selected_python_products_do_not_schedule_unrelated_native_builds():
     assert [entry["package"] for entry in plan["packages"]] == ["yuos-cap-http"]
     plan = release.make_plan("files", "1.2.3")
     assert [job["architecture"] for job in plan["matrix"]["include"]] == ["all", "amd64", "arm64"]
+    assert [job.get("selection") for job in plan["matrix"]["include"]] == [None, "files", "files"]
     assert {entry["package"] for entry in plan["packages"]} == {"yuos-app-files", "yuos-app-files-desktop"}
+    full = release.make_plan("all", "1.2.3")
+    native = sorted({entry["selection"] for entry in full["packages"] if entry["architecture"] == "amd64"})
+    assert [job["selection"] for job in full["matrix"]["include"] if job["architecture"] == "amd64"] == native
+    assert [job["selection"] for job in full["matrix"]["include"] if job["architecture"] == "arm64"] == native
 
 
 @pytest.mark.parametrize("product", ["calendar", "clipboard", "launcher"])

@@ -114,8 +114,8 @@ def make_plan(selected, release_version, *, fixtures=False):
     jobs = [{"architecture": "all", "runner": "ubuntu-24.04",
              "toolchain": config()["rust_toolchain"]}]
     for architecture, runner in (("amd64", "ubuntu-24.04"), ("arm64", "ubuntu-24.04-arm")):
-        if any(entry["architecture"] == architecture for entry in entries):
-            jobs.append({"architecture": architecture, "runner": runner,
+        for selection in sorted({entry["selection"] for entry in entries if entry["architecture"] == architecture}):
+            jobs.append({"architecture": architecture, "selection": selection, "runner": runner,
                          "toolchain": config()["rust_toolchain"]})
     return {
         "format": "yuos.app-release-plan/v1", "version": release_version,
@@ -365,15 +365,26 @@ def normalize(root, epoch):
         os.utime(path, (epoch, epoch), follow_symlinks=False)
 
 
-def build(plan, architecture, output):
+def build_record_name(architecture, selection=None):
+    if architecture == "all" or selection in (None, "", "all"):
+        return f"build-record-{architecture}.json"
+    return f"build-record-{architecture}-{selection}.json"
+
+
+def build(plan, architecture, output, selection=None):
     output = work_path(output)
-    for selection in plan["selections"]:
-        source_closure(selection)
+    selected_entries = [
+        entry for entry in plan["packages"]
+        if entry["architecture"] == architecture
+        and (selection in (None, "", "all") or entry["selection"] == selection)
+    ]
+    for item in sorted(set(plan["selections"]) if architecture == "all" else {
+        entry["selection"] for entry in selected_entries
+    }):
+        source_closure(item)
     output.mkdir(parents=True, exist_ok=True)
     records = []
-    for entry in plan["packages"]:
-        if entry["architecture"] != architecture:
-            continue
+    for entry in selected_entries:
         root = output / f".stage-{entry['package']}-{architecture}"
         root.mkdir()
         try:
@@ -395,7 +406,7 @@ def build(plan, architecture, output):
     development = {
         selection: build_archive(plan, selection, output) for selection in plan["selections"]
     } if architecture == "all" and plan["include_fixtures"] else {}
-    write_json(output / f"build-record-{architecture}.json", {
+    write_json(output / build_record_name(architecture, selection), {
         "format": "yuos.app-build/v1", "plan": plan, "packages": records,
         "development": development,
         "interfaces": {},
@@ -403,7 +414,7 @@ def build(plan, architecture, output):
     return records
 
 
-def test_selected(plan, architecture):
+def test_selected(plan, architecture, selection=None):
     if architecture == "all":
         selected = [item for item in plan["selections"] if item not in ("support", "sets")]
         products = [item for item in selected if not item.startswith("capability:")]
@@ -419,14 +430,16 @@ def test_selected(plan, architecture):
             subprocess.run([sys.executable, "tools/test.py", "--shared"], check=True, cwd=ROOT)
     else:
         require_repository_sdk()
-        for selection in sorted({
-            entry["selection"] for entry in plan["packages"] if entry["architecture"] == architecture
+        for item in sorted({
+            entry["selection"] for entry in plan["packages"]
+            if entry["architecture"] == architecture
+            and (selection in (None, "", "all") or entry["selection"] == selection)
         }):
-            _, package = stage.load_package(selection, "product")
+            _, package = stage.load_package(item, "product")
             if package.get("native_build_system") == "cmake":
                 # This graph is qualified by building its real native payload.
                 continue
-            subprocess.run([sys.executable, "tools/native_build.py", selection, "test"], check=True, cwd=ROOT)
+            subprocess.run([sys.executable, "tools/native_build.py", item, "test"], check=True, cwd=ROOT)
 
 
 def main():
@@ -442,6 +455,7 @@ def main():
         action = commands.add_parser(command)
         action.add_argument("--plan", type=Path, required=True)
         action.add_argument("--architecture", choices=["all", "amd64", "arm64"], required=True)
+        action.add_argument("--selection")
         if command == "build":
             action.add_argument("--output", type=Path, default=ROOT / "build/release")
     options = parser.parse_args()
@@ -452,9 +466,9 @@ def main():
     else:
         plan = load_plan(options.plan)
         if options.command == "build":
-            build(plan, options.architecture, options.output)
+            build(plan, options.architecture, options.output, options.selection)
         else:
-            test_selected(plan, options.architecture)
+            test_selected(plan, options.architecture, options.selection)
 
 
 if __name__ == "__main__":

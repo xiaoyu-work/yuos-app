@@ -43,7 +43,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", type=Path, default=ROOT / "build/native-target/debug/yuos-notifications")
     parser.add_argument("--source", type=Path, default=ROOT / "build/notifications-native")
-    parser.add_argument("--yuos-binary", type=Path)
+    parser.add_argument("--yu-binary", "--yuos-binary", dest="yu_binary", type=Path)
     parser.add_argument("--fixture-root", type=Path, default=ROOT / "build/nf-process")
     options = parser.parse_args()
     fixture = options.fixture_root.resolve()

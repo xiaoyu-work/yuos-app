@@ -33,14 +33,15 @@ EXTRA_NATIVE = {
 }
 
 
-def dependencies(plan, mode, architecture):
+def dependencies(plan, mode, architecture, selection=None):
     result = list(BASE)
     if mode == "test":
         result.extend(["ripgrep", "bubblewrap", "dbus-daemon"])
     elif architecture != "all":
         result.extend(NATIVE)
-        for selection in plan["selections"]:
-            result.extend(EXTRA_NATIVE.get(selection, []))
+        selected = [selection] if selection not in (None, "", "all") else plan["selections"]
+        for item in selected:
+            result.extend(EXTRA_NATIVE.get(item, []))
     return sorted(set(result))
 
 
@@ -49,6 +50,7 @@ def main():
     parser.add_argument("mode", choices=["test", "build"])
     parser.add_argument("--plan", type=Path)
     parser.add_argument("--architecture", choices=["all", "amd64", "arm64"], default="all")
+    parser.add_argument("--selection")
     options = parser.parse_args()
     if os.environ.get("GITHUB_ACTIONS") != "true":
         raise ValueError("CI provisioning is forbidden on a developer's host")
@@ -66,7 +68,8 @@ def main():
     apt = [*sudo, "apt-get", "-o", f"Dir::Etc::sourcelist={sources}", "-o", "Dir::Etc::sourceparts=-"]
     subprocess.run([*apt, "update", "-qq"], check=True, env=environment)
     subprocess.run([*apt, "install", "--no-install-recommends", "-y",
-                    *dependencies(plan, options.mode, options.architecture)], check=True, env=environment)
+                    *dependencies(plan, options.mode, options.architecture, options.selection)],
+                   check=True, env=environment)
     if options.mode == "test":
         subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements-dev.txt"],
                        check=True, cwd=ROOT, env=environment)
