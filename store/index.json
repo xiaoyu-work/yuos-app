@@ -1,6 +1,591 @@
 {
   "apps": [
     {
+      "app_id": "accessibility-manager",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-6bfa46b108d3b199b6a5ea3425181378d4b657253f1039008de02863227022ef.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "6bfa46b108d3b199b6a5ea3425181378d4b657253f1039008de02863227022ef",
+        "size": 23725
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "2674baa490eda6ff5c9113e662233489a4b367330b796511677b041619becdf2"
+      },
+      "display": {
+        "description": "Control COSMIC magnifier, screen filters, inversion, and AT-SPI screen-reader state",
+        "name": "Accessibility Manager",
+        "source_kind": "product",
+        "source_name": "settings"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "2a84401afb9133cec07fa88b509a0a29f20dcf6ba909d22459ddf858efb9e9f9",
+        "size": 5117
+      },
+      "provenance": {
+        "content_digest": "sha256:2aa6a61bd18116c3494fdbb9642d248f3cc6358dfac5b72de1dd66bda55be249",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "edf28b5d4ff5fcdfb9c4c7c76bc6efa8f0051de715a4d55f8f6dadd99e33ccc2"
+      },
+      "release_tag": "yuos-app-settings-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "c2328f4b1ade03f558ad680f5663683c7b884026fff1a6969865de1e198d7426"
+      }
+    },
+    {
+      "app_id": "audio-manager",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-3b1e9b0f2f66c189d33913ec611bcbc3c21773470e739ba00c7f1e36636023db.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "3b1e9b0f2f66c189d33913ec611bcbc3c21773470e739ba00c7f1e36636023db",
+        "size": 24369
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "2674baa490eda6ff5c9113e662233489a4b367330b796511677b041619becdf2"
+      },
+      "display": {
+        "description": "Control PipeWire and WirePlumber volume, mute, defaults, routes, and profiles",
+        "name": "Audio Manager",
+        "source_kind": "product",
+        "source_name": "settings"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "10a88787487c5476bab54fb04b87fdedc25adda599ae2404d58ab07aad1bedad",
+        "size": 9402
+      },
+      "provenance": {
+        "content_digest": "sha256:1ad2eef1a90ac0fbc6a08772369a59782124fedeb4e674ddc0a177b107eda2a1",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "9654fe566ee71edb1896beb11fb18bfaf7cf51bbb2f9d4811142d07dd73c3b5f"
+      },
+      "release_tag": "yuos-app-settings-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "2dc29855957d2e86717ad5ca3affe4a9d4d331bc2f3ed5e6d6129d2111e36049"
+      }
+    },
+    {
+      "app_id": "backup-center",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-d3fd7dfdb34a2fb793054ccad7e7cce6f4c8919a0f6da03296ea6d9a17c1a6b9.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "d3fd7dfdb34a2fb793054ccad7e7cce6f4c8919a0f6da03296ea6d9a17c1a6b9",
+        "size": 14622
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "cc80afd934a2df0410cbc577d79cb6d1e973576be90bf2350e440c1677aaa80a"
+      },
+      "display": {
+        "description": "Create, retain, inspect, forget, and restore local Restic user-data backups",
+        "name": "Backup Center",
+        "source_kind": "product",
+        "source_name": "backup-recovery"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "888af91684a88088fbeb39059db038def6cecaa3e4513382da4eab293f05a8ef",
+        "size": 10668
+      },
+      "provenance": {
+        "content_digest": "sha256:ffe2bef0e160fc669a4f09a8c56ef9d5e5750d579e7e1d60ee697e25d6a2b39d",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "fe78064ab0f3e97801368a5f578e84262c4f7d322d5ae93d8fd141696ba39fdc"
+      },
+      "release_tag": "yuos-app-backup-recovery-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "8b3251cc5b8607f6f05b91400c4c90b412b43ff7e163e7020a03c8affdbc1ce6"
+      }
+    },
+    {
+      "app_id": "bluetooth-manager",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-2a1691e71937aa39d7f9e78697dcf5a0b6effd135820b53b4edd0f8d86512742.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "2a1691e71937aa39d7f9e78697dcf5a0b6effd135820b53b4edd0f8d86512742",
+        "size": 24978
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "2674baa490eda6ff5c9113e662233489a4b367330b796511677b041619becdf2"
+      },
+      "display": {
+        "description": "Discover, pair, connect, trust, forget, and power BlueZ devices",
+        "name": "Bluetooth Manager",
+        "source_kind": "product",
+        "source_name": "settings"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "7036f4cc0523df80539c74a5229305cee141e275d480eec6e0b10eb48a439655",
+        "size": 12141
+      },
+      "provenance": {
+        "content_digest": "sha256:b6bb871b98e8b062e0d98e80d717ded19e3aa23bff7c580896c68e0b2f4ce9e0",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "6ff6f1c979a3ab1b446b1f8766d8f3118845dd70ed21adc9eb59080b94a1a85e"
+      },
+      "release_tag": "yuos-app-settings-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "a5ee0e5f983ce7c4c32bdbc45836160e0443d52b9daca8d711fb7745ee61f77c"
+      }
+    },
+    {
+      "app_id": "browser-attached",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-68385d92104014b40f8ef499a25a3c2d333dc971b2c8ff640bfed5b05d88ae13.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "68385d92104014b40f8ef499a25a3c2d333dc971b2c8ff640bfed5b05d88ae13",
+        "size": 17465
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "58894846ed8fb28563c41af7d07a244f90311d6cca3a24494a9a3ff790e3f972"
+      },
+      "display": {
+        "description": "Operate the user's signed-in Helium tabs through the authorized Native Messaging bridge",
+        "name": "Browser (attached)",
+        "source_kind": "product",
+        "source_name": "browser"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "9380afab431fa0b0088795ee708b512a4ebdc54e14fb5f7ac5e98447d651a3d3",
+        "size": 14736
+      },
+      "provenance": {
+        "content_digest": "sha256:a85b5dba3224e0fd8b23f8606d16faab3d81b1346246eaa42a35f9c251aadaf8",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "4023b9c21a9b17fc7e3ad4ce9a42a92b39080c5be6190db4f7b08c5eb01fea15"
+      },
+      "release_tag": "yuos-app-browser-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "7ac5863696abf469849ef535bf0282b5a6d88e2dbe2e50c182c55027e19d1035"
+      }
+    },
+    {
+      "app_id": "calendar",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-737f0364c8ea3741a3c69f111ef2502783431721994aca027f69d04a67957d82.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "737f0364c8ea3741a3c69f111ef2502783431721994aca027f69d04a67957d82",
+        "size": 34208
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "bccd17329d14b612aecc93ebfa1315c4b82fe7ad6c1b1737916bf5da28a102ab"
+      },
+      "display": {
+        "description": "Calendar — local events with optional Google/Outlook sync",
+        "name": "Calendar",
+        "source_kind": "product",
+        "source_name": "calendar"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "a5575325854e3bd5df33ffd129cda50e8ef304379485566d7028837bd1612a48",
+        "size": 66238
+      },
+      "provenance": {
+        "content_digest": "sha256:28b54698c95cf02da8927d45b3ca5cf488e02f156edd365a995691e62a0c76c3",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "28c7fb08feef24abc37909bc02d2fe9f3c6aeb4f0456393565dfda8bba25ce7a"
+      },
+      "release_tag": "yuos-app-calendar-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "a65ab588ba0282efc8c687398db0a59c350bee2b2847dd5d0ae0dd8e74978ee4"
+      }
+    },
+    {
+      "app_id": "camera-manager",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-0aa192e2e794d29f75ec07ef35cf10eefb848ce5b8faefab3c19c4e533825114.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "0aa192e2e794d29f75ec07ef35cf10eefb848ce5b8faefab3c19c4e533825114",
+        "size": 24043
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "2674baa490eda6ff5c9113e662233489a4b367330b796511677b041619becdf2"
+      },
+      "display": {
+        "description": "Discover PipeWire cameras and capture bounded PNG/JPEG still images",
+        "name": "Camera Manager",
+        "source_kind": "product",
+        "source_name": "settings"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "5702b259a7c8761a5635f8e0b80ad84ba044dd858c87d298457bb62ced57be21",
+        "size": 3206
+      },
+      "provenance": {
+        "content_digest": "sha256:573d92e4156c075cc7e9e5cdf3c2c66dd627cb3a96b35c5bd95a90c99ab7ee63",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "4049f0b956b84918b87c9d1fe717dcc7ed615c80b67906ab6e0d0cf216508598"
+      },
+      "release_tag": "yuos-app-settings-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "0eae2d10df4771f4713273edd61cad2a81e9e07b910f9d257463cff9126a9dbf"
+      }
+    },
+    {
+      "app_id": "clipboard-manager",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-26327291d3e93b462a253ff31c5cd924ea47e692c0df58eabe79eeb3b49ed7c5.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "26327291d3e93b462a253ff31c5cd924ea47e692c0df58eabe79eeb3b49ed7c5",
+        "size": 14230
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "151044158b30dfe9870e949d17dfd6603249bcff95ffd29d1eb2f48f50a7a5e6"
+      },
+      "display": {
+        "description": "Read, inspect, write, or clear Wayland clipboard selections",
+        "name": "Clipboard Manager",
+        "source_kind": "product",
+        "source_name": "clipboard"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "6f0ea4ee754f133f05ec063368cae92005ddc5d71d89b844c49e0fc808142662",
+        "size": 5902
+      },
+      "provenance": {
+        "content_digest": "sha256:8dcba6845348f83cabf0be47fb0e5ada26f0e60a339f271502bc1506f8271224",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "50a4ecf55b0af516efd419e1eec796ddc711f964ab3a18133e7b8437c70576b5"
+      },
+      "release_tag": "yuos-app-clipboard-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "26f8c128fd4a07b280caf976c5ee16d8d4d66e611e66163ebf6172c210a728da"
+      }
+    },
+    {
+      "app_id": "config-editor",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-110ef41afd7fa02f52d5705a67c1df086903df46778c70f991d83b86a5f10d12.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "110ef41afd7fa02f52d5705a67c1df086903df46778c70f991d83b86a5f10d12",
+        "size": 12326
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "f6930c290b56db210853abda387928325ab844d6134788c6f509759558b0a884"
+      },
+      "display": {
+        "description": "Validate, atomically replace, and restore supported system configuration files",
+        "name": "Safe Config Editor",
+        "source_kind": "product",
+        "source_name": "maintenance"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "5bff2b44fc1989794f8e52d14c928af3b37fd4bce4d6b19d4e97b5752d319132",
+        "size": 4980
+      },
+      "provenance": {
+        "content_digest": "sha256:794bbe9e6f513c1c4ce3a8b9be4202febee9ab082be8f76c4e832733d27f1444",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "71293d1d2368f3f3771ec66281ead2b75b6e0a4d0d673a3d1a039ea131e85ef4"
+      },
+      "release_tag": "yuos-app-maintenance-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "b4ab3b0c6356029f091d4e84e2264f4817716ca4b9b85d9b48eaf60e11405052"
+      }
+    },
+    {
+      "app_id": "container-manager",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-4e80a4c319a3d4ec852517c98581b0dbf3c319d6390bfc12abe27d12c512baf7.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "4e80a4c319a3d4ec852517c98581b0dbf3c319d6390bfc12abe27d12c512baf7",
+        "size": 13684
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "46617ec35e02ed37a6de3a13461dbbbf4592a1ad0a7964690c72a09672342bee"
+      },
+      "display": {
+        "description": "Inspect and control Docker, rootless/root Podman, and containerd workloads",
+        "name": "Container Manager",
+        "source_kind": "product",
+        "source_name": "containers"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "c1237bff31d6107714481680a39b42d856b808f64b20f08ddb49413254ccd352",
+        "size": 20015
+      },
+      "provenance": {
+        "content_digest": "sha256:9b8358b844ce96fde027586cbd61ffcf936cc919de8e9c618d05f7bd57ea5a78",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "cd972eb860598fc50c3513ff16026ca4ff217b82448797fa0eab8f0c2486fc16"
+      },
+      "release_tag": "yuos-app-containers-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "1cc1c074fc0c484a88e9c55863e8e0420c8784644673a0ce99c3395acb5261d8"
+      }
+    },
+    {
+      "app_id": "crash-doctor",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-c85651fde3eb0179dba023a0c16a126078d2c6988830d8aeddc148edb1e6d489.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "c85651fde3eb0179dba023a0c16a126078d2c6988830d8aeddc148edb1e6d489",
+        "size": 12409
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "ba2acb3de3150810e46b23590b0ccaf12fac49d6e64883ccf1c166bd298946e9"
+      },
+      "display": {
+        "description": "Correlate coredumps, OOM kills, segmentation faults, journals, and backtraces",
+        "name": "Crash Doctor",
+        "source_kind": "product",
+        "source_name": "diagnostics"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "98d0a1abfc8bf10a65c79c34ccd4b422afc836cef7128c0e7684dd123078936d",
+        "size": 3594
+      },
+      "provenance": {
+        "content_digest": "sha256:a77646cd194ca293d71d9fb2127723660323ba9df014908757f983a42d0fb255",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "d08b1a3b22e03eeefbfc508e9bcd9d20f4682731c60e68c3e8ce23d517ad4b11"
+      },
+      "release_tag": "yuos-app-diagnostics-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "52de433f7817e4b54898b33f9eb4090fdda8ac4ffa2f22f1f1f1b29ef665a82e"
+      }
+    },
+    {
+      "app_id": "db",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-7d858b00737d5d766dadf2be975b399a74e3ff51d78f7df90724ab3d629228f5.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "7d858b00737d5d766dadf2be975b399a74e3ff51d78f7df90724ab3d629228f5",
+        "size": 12717
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "266ed8ab6f0f090394a5d3c10c488dbf342df55b72a935008563cec4cedc908b"
+      },
+      "display": {
+        "description": "SQLite database — create, query, and manage databases",
+        "name": "Database",
+        "source_kind": "capability",
+        "source_name": "storage-sdk"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "754801980a5bbcf9768690036eee6887bd5151a6393dca666c63c56b7cb364d9",
+        "size": 4874
+      },
+      "provenance": {
+        "content_digest": "sha256:404a792f23fe7bc70b373b776bb85fbab7e03b8c4f64596743f5030079fb8838",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "cb9d4f620bdee58082186433d1dc0934577d1aeb72c0e43b69c8dc0f651e4001"
+      },
+      "release_tag": "yuos-cap-storage-sdk-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "88d4e42961047ba8aa17d719cd304e63db76219413b356b342de82450ddb457d"
+      }
+    },
+    {
+      "app_id": "desktop-manager",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-e09f68c304d59376952b0ca7a4fa4d576098b1cdce8a04eebe9fa75618116774.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "e09f68c304d59376952b0ca7a4fa4d576098b1cdce8a04eebe9fa75618116774",
+        "size": 23882
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "2674baa490eda6ff5c9113e662233489a4b367330b796511677b041619becdf2"
+      },
+      "display": {
+        "description": "Discover, focus, close, and restart COSMIC Wayland windows",
+        "name": "Desktop Manager",
+        "source_kind": "product",
+        "source_name": "settings"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "b3ca4d776531825ec4052af75fcb89627e839ba6a547e3a17297a85ceff11e1d",
+        "size": 4176
+      },
+      "provenance": {
+        "content_digest": "sha256:d7257816da4a8359d6327f75dbc7216394ed3dac1df9980228a6baf3bb93c5c5",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "020e50e220484115b85e70e7594badf3f7d4e909a3da57c1df316264579a708f"
+      },
+      "release_tag": "yuos-app-settings-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "49e62d5a28a0a80d8c252730d70fddb0b8427bae7bc8841a6483de6e642de26e"
+      }
+    },
+    {
+      "app_id": "display-manager",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-1747d63564e26a432c09ba1f38b26bd957db1ce3ab867f75246d2c6ae6351901.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "1747d63564e26a432c09ba1f38b26bd957db1ce3ab867f75246d2c6ae6351901",
+        "size": 25847
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "2674baa490eda6ff5c9113e662233489a4b367330b796511677b041619becdf2"
+      },
+      "display": {
+        "description": "Control COSMIC output layout, modes, scale, mirroring, rotation, and backlight",
+        "name": "Display Manager",
+        "source_kind": "product",
+        "source_name": "settings"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "0628ccc78a9323418aad851400efb76787872e386e21a181b7eecf54c923a89b",
+        "size": 11830
+      },
+      "provenance": {
+        "content_digest": "sha256:792c008c7a389e49581299213eaafa63e42365c51f1d9dd0771c83b02b07f937",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "36fdb09c612ef7468164eed7ee0ba381d474793130973a839d6d1dac4024f453"
+      },
+      "release_tag": "yuos-app-settings-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "69d3c5697b20b589c7fab3f6cc300277c6635781f8cb9afe943ccca39746d83c"
+      }
+    },
+    {
+      "app_id": "doc",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-aeb774bef809e527d6c9895debe841d1e0ace01a031c76e9fd360fef5bd8a8ea.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "aeb774bef809e527d6c9895debe841d1e0ace01a031c76e9fd360fef5bd8a8ea",
+        "size": 12207
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "ecd16ebb1ac322fd67d7a391bc442ba0e8522b74c6024d54d1fe3142c4207756"
+      },
+      "display": {
+        "description": "Universal document reader — any format in, structured text out",
+        "name": "Documents",
+        "source_kind": "capability",
+        "source_name": "document-engine"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "ca8f738674dfea9b8ee996c44848ab41c9a72075a58708daebea797fbe80475a",
+        "size": 15077
+      },
+      "provenance": {
+        "content_digest": "sha256:b694384f1595c142d58b5aac4fa6dbeb2fee0991e17cf79e9864453bab9101fc",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "2937b720f8a2c28a38321930e615227d3e5200203fa386664e02dd240bd54ee3"
+      },
+      "release_tag": "yuos-cap-document-engine-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "3d2c6cbb107c20e04b1d6d2aa6f08009ad2a775cbe36fbc58317adac7a983940"
+      }
+    },
+    {
       "app_id": "docs",
       "app_version": "0.1.0",
       "architecture": "all",
@@ -12,7 +597,7 @@
       },
       "delivery": {
         "kind": "apt",
-        "package_sha256": "7bb048708b7813bdf59b15f738080b6fd209b0c9496008a43b3c529329321df5"
+        "package_sha256": "281dba6f3dd94a0eb237538a9b0021e52271a0fd37669730e74043a9374d3b97"
       },
       "display": {
         "description": "Local document full-text search across your files (PDF, Office, mail, source code, ...) using Recoll / Xapian.",
@@ -31,12 +616,168 @@
         "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
         "sha256": "f7b4b41474b7ea64780e4ddcdcd0e8acaeb5a7cb001c8a92dc74f48a79c72beb"
       },
-      "release_tag": "yuos-app-files-v0.1.0.dev2026112701",
-      "release_version": "0.1.0.dev2026112701",
+      "release_tag": "yuos-app-files-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
       "web_ui": {
         "entry": "web/index.html",
         "path": "web-ui.json",
         "sha256": "fa6891b0d8e7206682ec9c67a0e3ff53e7393bf114531f4f99466915f2b7429d"
+      }
+    },
+    {
+      "app_id": "email",
+      "app_version": "0.2.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-241cad2991f5e253964171eb396a5aa79d49fad6a637856262765cda3ac74ec9.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "241cad2991f5e253964171eb396a5aa79d49fad6a637856262765cda3ac74ec9",
+        "size": 38635
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "a6d2c5ed9cf0811658787ee12826e28ba9a02379a1ed20c635539d617cf1989f"
+      },
+      "display": {
+        "description": "Email over the owner's existing Thunderbird accounts, shared with its GUI.",
+        "name": "Email",
+        "source_kind": "product",
+        "source_name": "mail"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "ade5ff935ead1266ab35b12a3613bdb050f6241db47d69de2561dad81ac889ca",
+        "size": 61176
+      },
+      "provenance": {
+        "content_digest": "sha256:43d0957e877eb6bfdc1a86eccea9e91168fb20d37350fd31aaad34654ac74738",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "6ceaf363cdbfb8a96a8d67aa98eeafe303394b3d9f14e42b37777c523de3981c"
+      },
+      "release_tag": "yuos-app-mail-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "3c552c3977a13da3595c8e4b941463e86ef6bc7039933c13be6272a89d195850"
+      }
+    },
+    {
+      "app_id": "event-center",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-36eb139e868b67a0068417ba96a6d52959ee1b707477efabfa9278a9c9e565da.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "36eb139e868b67a0068417ba96a6d52959ee1b707477efabfa9278a9c9e565da",
+        "size": 12292
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "31fa4866953ac5b71baeeb0b6581ace5339762b50aee22268c54e87e0ab68d10"
+      },
+      "display": {
+        "description": "Query persistent udev, systemd, journal, storage, security, and process-exit events",
+        "name": "Event Center",
+        "source_kind": "product",
+        "source_name": "events-audit"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "c9e62862008328b5fe9a9cc2da45fde5e9dd1e57554ebcf8bec454b6467a1a8f",
+        "size": 3159
+      },
+      "provenance": {
+        "content_digest": "sha256:07d5099146bebe011475d8bece5ddab831287ca06e3c020f547b7c3f08c86ba1",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "50dddb9e096f5d2d36d3cb3835a8cff44e620a8ae4def83d3f2cbcbf1302c0b6"
+      },
+      "release_tag": "yuos-app-events-audit-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "c63dbdda6aa55089109afecb0f392091546c2f59660dcd4d54a72f74820749c2"
+      }
+    },
+    {
+      "app_id": "exec",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-2dfae0eead8a4b5ebe40e23f2a4f24f9da6780cd05d2b123a43cd1401d39af91.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "2dfae0eead8a4b5ebe40e23f2a4f24f9da6780cd05d2b123a43cd1401d39af91",
+        "size": 17975
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "8233d99c6b3ec17509924945345ee3f2f81b7e983bf786012e25eaf1faf81bfe"
+      },
+      "display": {
+        "description": "Command execution and process management",
+        "name": "Shell",
+        "source_kind": "product",
+        "source_name": "terminal"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "dc419fd798fd3b7da1c39f3f37ac772af2c39e4205652ca0ed297181e8b0ccbc",
+        "size": 11451
+      },
+      "provenance": {
+        "content_digest": "sha256:7941abdf0b7b95cbdd25a2e85221075874d43db775f0637302a9cfe8d52178c7",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "32795ad1671d06c04cda0dc84caa131bc37cd4107f8a73e8a551cb85b22e5b67"
+      },
+      "release_tag": "yuos-app-terminal-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "9c7ea0743698adbe1a87fa863128aaac29f940a3423291ccb929aea41fad2d04"
+      }
+    },
+    {
+      "app_id": "firewall-manager",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-063450bfc5de6ec0af23339c5f10770b54bae60ecc79655a0d692a399ac690ea.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "063450bfc5de6ec0af23339c5f10770b54bae60ecc79655a0d692a399ac690ea",
+        "size": 13957
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "244c3466d24a176872c10e3e391b3999a1cb3de88a63c2ab35c03f3abc2acbc5"
+      },
+      "display": {
+        "description": "Manage scoped nftables allow/drop rules with durable rollback",
+        "name": "Firewall Manager",
+        "source_kind": "product",
+        "source_name": "security"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "d85a8271003005aea485edf213805c3b8bc52a5654261ed52e716a65178af26c",
+        "size": 5754
+      },
+      "provenance": {
+        "content_digest": "sha256:4201ae77be6dc3e4f13655901ee01ae7f077cd61414446aaaa9e4b687f26a01a",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "4fcad7a75126186f09f881ef40236cf93fa9c0312d4acaf68e8226f5b3451fee"
+      },
+      "release_tag": "yuos-app-security-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "0370b19ad65c2602c005f4bf84b24feb243e184ae9ed0e49559bff99b2a6fe29"
       }
     },
     {
@@ -51,7 +792,7 @@
       },
       "delivery": {
         "kind": "apt",
-        "package_sha256": "7bb048708b7813bdf59b15f738080b6fd209b0c9496008a43b3c529329321df5"
+        "package_sha256": "281dba6f3dd94a0eb237538a9b0021e52271a0fd37669730e74043a9374d3b97"
       },
       "display": {
         "description": "Agent-native file system with metadata and search.",
@@ -70,8 +811,8 @@
         "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
         "sha256": "efa4b7c39a04dee0d6777b2f87316812fe69ffdac46c5a07b30e80682dd99b84"
       },
-      "release_tag": "yuos-app-files-v0.1.0.dev2026112701",
-      "release_version": "0.1.0.dev2026112701",
+      "release_tag": "yuos-app-files-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
       "web_ui": {
         "entry": "web/index.html",
         "path": "web-ui.json",
@@ -79,18 +820,1383 @@
       }
     },
     {
+      "app_id": "gateway-discord",
+      "app_version": "0.3.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-924d9dd76f48cf138bfd5fdb81b51c7cb5f1ee642ca065019fbe1f11bb17e69a.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "924d9dd76f48cf138bfd5fdb81b51c7cb5f1ee642ca065019fbe1f11bb17e69a",
+        "size": 16410
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "ace75153277d2de75563871a5ccc3b1dab1c3701cf940639c8bddf896664b3fe"
+      },
+      "display": {
+        "description": "Discord outbound client and authenticated owner-bound Activity channel through the OS service.",
+        "name": "Discord Gateway",
+        "source_kind": "product",
+        "source_name": "messaging-channels"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "9dd67503876ad7d4bcd9495a074f4b67b597fbe7bb94981fe9d57823d075e232",
+        "size": 12489
+      },
+      "provenance": {
+        "content_digest": "sha256:29adc70724966cb19dc8f606e239324d3aee7446da9fa3ca248f3c3ee5032e1e",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "4fc7c0d0baf74c1695a00c7a3af4b649f377b35229282f33b0bd009b8f1e6f7d"
+      },
+      "release_tag": "yuos-app-messaging-channels-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "429578ca794797f87f61fb8a7178898ae720a05f8db85b17b94b88f13bd2b66e"
+      }
+    },
+    {
+      "app_id": "gateway-homeassistant",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-b2c3b8328901f1ad0858983dc2b4e327dc8c678763ce4e799e2de9494b23dfd6.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "b2c3b8328901f1ad0858983dc2b4e327dc8c678763ce4e799e2de9494b23dfd6",
+        "size": 13406
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "ee9531a4d507c2831b382d91ff10570d28b5042fd2f5760a40f794e077b4e80b"
+      },
+      "display": {
+        "description": "Home Assistant gateway. Calls REST service endpoints using a long-lived access token.",
+        "name": "Home Assistant Gateway",
+        "source_kind": "product",
+        "source_name": "home-integration"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "dc0ca4992b809db133e15463404fae22ac28b95981f0001c2ef1c5940da81d92",
+        "size": 10608
+      },
+      "provenance": {
+        "content_digest": "sha256:65a0dad7d2ba6274c3e5259c9a0ce2d25f0a4d01dc0dc6889fbab6c4c3d72148",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "51400c3dd8a1c11a5abb5eb02cb5c9dfaf9c327fe3fa22433f1868d51865df68"
+      },
+      "release_tag": "yuos-app-home-integration-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "928093e54f556e26231f16d324cb67e5e162180c9d3049b942c7368835a364eb"
+      }
+    },
+    {
+      "app_id": "gateway-ntfy",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-2cd98ad1b4523894064c318e858cd83fae27a633af7423124e8bb865b7ed9b85.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "2cd98ad1b4523894064c318e858cd83fae27a633af7423124e8bb865b7ed9b85",
+        "size": 15514
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "101521af7cfd0700f040fa9f27fa4e4cc97487be4f1d7c089aa115cf92e02954"
+      },
+      "display": {
+        "description": "ntfy.sh push-notification gateway. POSTs plain-text bodies to a configured server and topic with optional authentication and ntfy headers.",
+        "name": "ntfy Gateway",
+        "source_kind": "product",
+        "source_name": "notification-delivery"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "64f46e3475febb67f68b34e19bfb48bc34db33bfadeb9910367d271ebebf0542",
+        "size": 11156
+      },
+      "provenance": {
+        "content_digest": "sha256:c92c1a626b82f69451939b196e762887924703d5a6c0b25d958e8539913f32b1",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "df5a5e2ef50ea041802a688aebe69f0d1e205db78ce722e938ef100c974d0fea"
+      },
+      "release_tag": "yuos-app-notification-delivery-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "666436685e836392f1b17281edd4bb8cee3a1c958e3aba1648a2b197af1bc727"
+      }
+    },
+    {
+      "app_id": "gateway-pushover",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-da796b81a045c2c8fad24917ab765b0003998e5731a67329b9a9280da5df8b47.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "da796b81a045c2c8fad24917ab765b0003998e5731a67329b9a9280da5df8b47",
+        "size": 15492
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "101521af7cfd0700f040fa9f27fa4e4cc97487be4f1d7c089aa115cf92e02954"
+      },
+      "display": {
+        "description": "Outbound-only Pushover push-notification gateway. send POSTs notifications to a user or group through the Pushover API.",
+        "name": "Pushover Gateway",
+        "source_kind": "product",
+        "source_name": "notification-delivery"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "7286455549fccc29e6ba37d536e913500f5eb2be742950a5b82dd8c73dd81559",
+        "size": 9818
+      },
+      "provenance": {
+        "content_digest": "sha256:8991b7f002a0ed46adc230fffd9c4804f10b0efca618061600ea903ce9bc671a",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "5d6341870e8e8522c9ac41bf215189874b86371c33031c7acc187458cdf5ded4"
+      },
+      "release_tag": "yuos-app-notification-delivery-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "d0d1fd112b2e239d7b65f7c0ad36d0087c8c20f3223d87ac1fcf1a00849cbd13"
+      }
+    },
+    {
+      "app_id": "gateway-slack",
+      "app_version": "0.2.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-8be7cddb2490b4d94fd66060c0060fb250ef370afc133b458b23b5ab0f62ec9e.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "8be7cddb2490b4d94fd66060c0060fb250ef370afc133b458b23b5ab0f62ec9e",
+        "size": 14506
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "ace75153277d2de75563871a5ccc3b1dab1c3701cf940639c8bddf896664b3fe"
+      },
+      "display": {
+        "description": "Slack outbound client and authenticated owner-bound Activity channel through the OS service.",
+        "name": "Slack Gateway",
+        "source_kind": "product",
+        "source_name": "messaging-channels"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "18cfe4ef50882cfafdac5c2a88e9a0281b30f3d4c573f11085553fa06e46896b",
+        "size": 11419
+      },
+      "provenance": {
+        "content_digest": "sha256:5ec5e2dc370a923d3a08137fcfbe4972e73ae885ed62c30a3f27e6d43d8d2074",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "06ab8515c060e477cabf6f8a1fc2375bdd12fa7a1a60c19af3862f5e423c552e"
+      },
+      "release_tag": "yuos-app-messaging-channels-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "56ca69802de9c2ee8035678fadda49d328670dcd33d452298dbfea06042e0743"
+      }
+    },
+    {
+      "app_id": "gateway-telegram",
+      "app_version": "0.2.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-555c1a769fc4602dbe8b5f5d4b1b242408f312a59a77f220148c9a8a901578a6.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "555c1a769fc4602dbe8b5f5d4b1b242408f312a59a77f220148c9a8a901578a6",
+        "size": 14026
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "ace75153277d2de75563871a5ccc3b1dab1c3701cf940639c8bddf896664b3fe"
+      },
+      "display": {
+        "description": "Telegram outbound client and authenticated owner-bound Activity channel through the OS service.",
+        "name": "Telegram Gateway",
+        "source_kind": "product",
+        "source_name": "messaging-channels"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "54277effb131d1bf4002d4ff9f098db73b7b920ca191cccc00371bd1df6cd2aa",
+        "size": 11585
+      },
+      "provenance": {
+        "content_digest": "sha256:c4af94bfa2295ce46810e1bb9812b693de3b201d7548c0c237a854522e044964",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "35586fad825158066eb7ea612abc5dd8de27af43462c3a408899f344c3c1207f"
+      },
+      "release_tag": "yuos-app-messaging-channels-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "8b90723fe3761d35605a556a7fe9c31f23644758b7c0c5727b148223df68e31a"
+      }
+    },
+    {
+      "app_id": "gateway-webhook",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-f3895c2564bfb060531985ee671138caa3bc483dcd0b040505d0fcbeef9a1a7a.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "f3895c2564bfb060531985ee671138caa3bc483dcd0b040505d0fcbeef9a1a7a",
+        "size": 15605
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "101521af7cfd0700f040fa9f27fa4e4cc97487be4f1d7c089aa115cf92e02954"
+      },
+      "display": {
+        "description": "Generic outbound webhook gateway. POSTs JSON or text to any configured URL with optional bearer, basic, API-key, or HMAC-SHA256 authentication.",
+        "name": "Generic Webhook Gateway",
+        "source_kind": "product",
+        "source_name": "notification-delivery"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "9bb60bc73b3ae283bd26369277f5d9bd2f209791cb690b4aa361adcf6e64b15e",
+        "size": 8423
+      },
+      "provenance": {
+        "content_digest": "sha256:d713d943ed909f10cf433405d8c4c298dafa3a6db5cb609813062c4e3b2df7dc",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "01e99b9ed6b6ed1cd83d288c592f8e38a885d629cb9663363d7c390143c70b53"
+      },
+      "release_tag": "yuos-app-notification-delivery-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "c5f0c099aeaf710e73307b1578a0a28e16455d33a15f4a00f20509b806794cfe"
+      }
+    },
+    {
+      "app_id": "gateway-whatsapp",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-2a40bd57b51da805c0d7c2a9ee57057c88569271cfde21a9c355b38d71d4f4bd.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "2a40bd57b51da805c0d7c2a9ee57057c88569271cfde21a9c355b38d71d4f4bd",
+        "size": 14905
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "ace75153277d2de75563871a5ccc3b1dab1c3701cf940639c8bddf896664b3fe"
+      },
+      "display": {
+        "description": "Whatsapp outbound client and authenticated owner-bound Activity channel through the OS service.",
+        "name": "WhatsApp Gateway",
+        "source_kind": "product",
+        "source_name": "messaging-channels"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "f79506b68be6ac84fcc47a0471335ad6c4515db673e0f22dc7ed9f446a4b6b9b",
+        "size": 12339
+      },
+      "provenance": {
+        "content_digest": "sha256:37aebb3767f48033298b5017044241ba00bf4053a22530fa79b5e0463611487c",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "21ac272307948351153edb1a52a33ae7eeb7790fc47f0d68b248bdc57aa2aafa"
+      },
+      "release_tag": "yuos-app-messaging-channels-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "c5ed17e14fb08593ec00f6d282c8e9c86cef7619c828c44a9a71bfa3af6aadba"
+      }
+    },
+    {
+      "app_id": "hardware-center",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-725e8fedbdee52a1cca349813c707940141f4a9d80a7194b120f6026047fb219.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "725e8fedbdee52a1cca349813c707940141f4a9d80a7194b120f6026047fb219",
+        "size": 12246
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "ba2acb3de3150810e46b23590b0ccaf12fac49d6e64883ccf1c166bd298946e9"
+      },
+      "display": {
+        "description": "Inventory CPU, GPU, PCI, USB, memory, storage, drivers, firmware, and thermals",
+        "name": "Hardware Center",
+        "source_kind": "product",
+        "source_name": "diagnostics"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "50b7f25169dbb906d521bd94d2139cfa88533f451199c4f9bfc15c6ffbd1911f",
+        "size": 6988
+      },
+      "provenance": {
+        "content_digest": "sha256:b343f6e27f69a94c3125ebf8fcac16b51fd08e310022a2ab17391e54a2e59e88",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "27a47e488a6c2e3ecc6c6f6b9c67e8283aaf546b5178b66af99e472e3152fddd"
+      },
+      "release_tag": "yuos-app-diagnostics-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "370da591915fecea5d29a527fd93a527648563b4a92de14756b50e462c03d41c"
+      }
+    },
+    {
+      "app_id": "kv",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-5e823c3f7f0eb07b55c234093419998e1d1ac4d18f2dccb058edd2dd540cd9f6.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "5e823c3f7f0eb07b55c234093419998e1d1ac4d18f2dccb058edd2dd540cd9f6",
+        "size": 11424
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "266ed8ab6f0f090394a5d3c10c488dbf342df55b72a935008563cec4cedc908b"
+      },
+      "display": {
+        "description": "Persistent string key-value storage",
+        "name": "Key-Value Store",
+        "source_kind": "capability",
+        "source_name": "storage-sdk"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "9f518940618a065181dfdab64b7323b93819b821787a4367afe5088dea20db4d",
+        "size": 4881
+      },
+      "provenance": {
+        "content_digest": "sha256:700e963690f7db3d1836691828dfa91e6c277b0d8377ec74eecd7c8e9307dd9b",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "a9153a209b4720b1eb1133880f9c302b48452d7db9b1756c8280b4b116ab843c"
+      },
+      "release_tag": "yuos-cap-storage-sdk-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "0c41f048e2ecb8bd4a3f7e0efe3b0e4b38d60f4f2a75c7b3bb94c9f07fe90f38"
+      }
+    },
+    {
+      "app_id": "launcher",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-1217aada12a985adbe9af9f7264d9b1cfe4f5de4f5e008dbad8a265a334d4f51.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "1217aada12a985adbe9af9f7264d9b1cfe4f5de4f5e008dbad8a265a334d4f51",
+        "size": 17644
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "36c9b018ad9dc9acf8e3222e53d0aeef261f98719d3afb9aa5bcc9ba21256ff0"
+      },
+      "display": {
+        "description": "Find and launch installed desktop (GUI) applications by name or AppID.",
+        "name": "Launcher",
+        "source_kind": "product",
+        "source_name": "launcher"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "e160f75bf6dffd586e43f847cf89983c04e5721fc80665155f70841f9eafd975",
+        "size": 10672
+      },
+      "provenance": {
+        "content_digest": "sha256:fb8b36104fc61f962879da8bd6f6a70215b4feb3c77f252e11c37b8b8eff54fd",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "31bce9722e7cec168a3cbfe5dfde47aece387522d0e2a2280f24b4e2a64a242c"
+      },
+      "release_tag": "yuos-app-launcher-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "c4dbcdec79443c14d89c8a5803c06d987d5581d4553549d3079f0c9b952e3303"
+      }
+    },
+    {
+      "app_id": "location-manager",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-ea762bd6aa80e2c5ae7ac90b8c9114e1a5eadd8aab8decaf8ab6879c60499ee2.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "ea762bd6aa80e2c5ae7ac90b8c9114e1a5eadd8aab8decaf8ab6879c60499ee2",
+        "size": 23408
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "2674baa490eda6ff5c9113e662233489a4b367330b796511677b041619becdf2"
+      },
+      "display": {
+        "description": "Request GeoClue location fixes and offline timezone suggestions",
+        "name": "Location Manager",
+        "source_kind": "product",
+        "source_name": "settings"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "ac990c94004c24ea0a839e4a1e7bf8ee574efa73357fe3f7f5b937defb23fa87",
+        "size": 2337
+      },
+      "provenance": {
+        "content_digest": "sha256:0d15422729eb22ae14ae53be7f9decb7739e6f2cfb1bb15752c1af2de651588b",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "efb2a430f1aa48e4f1c987c07460630ed42d1e2a65efa0bc7efe97a00840771e"
+      },
+      "release_tag": "yuos-app-settings-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "4df47364f80eb424f8d6e99e2b0c77b83bfd8d47369b2a8d5045d3a7e7e82b52"
+      }
+    },
+    {
+      "app_id": "log",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-93ff8e7a9e9d8a3be98681969dc283998c5aa5d9eb363e5ef6e391fb8e1fe924.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "93ff8e7a9e9d8a3be98681969dc283998c5aa5d9eb363e5ef6e391fb8e1fe924",
+        "size": 12809
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "31fa4866953ac5b71baeeb0b6581ace5339762b50aee22268c54e87e0ab68d10"
+      },
+      "display": {
+        "description": "System audit log — every command is recorded automatically",
+        "name": "Activity Log",
+        "source_kind": "product",
+        "source_name": "events-audit"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "c060b84d18cb92979e245db1d7c417a63cf6e70b23987f6882a0c52474a5e273",
+        "size": 4584
+      },
+      "provenance": {
+        "content_digest": "sha256:5e14f6304e186ce79c00247ae38be1fac4e7a21975f8ea6fa34474bf39b11fe7",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "30564b0276287a3ca917e70b2beaadcf5228340ddc1bd62b215dfd7a706376ab"
+      },
+      "release_tag": "yuos-app-events-audit-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "c32877c85e136ec73c483d546aab9d19c54298f73a29d2eb9e7e2cbd198fe944"
+      }
+    },
+    {
+      "app_id": "net",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-947d184ce1d8798a2867e5d2181be32fe63d832157bdf5800da15c047c44dd5e.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "947d184ce1d8798a2867e5d2181be32fe63d832157bdf5800da15c047c44dd5e",
+        "size": 11691
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "ef981a6ce04bdabd363e77c584949880382fff840775e210a12786eb380d09bd"
+      },
+      "display": {
+        "description": "HTTP client for API calls",
+        "name": "Network",
+        "source_kind": "capability",
+        "source_name": "http"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "ba40772a3663cafa927540e6e72b50055a4522174e7f9311ec19b7e21775089b",
+        "size": 3610
+      },
+      "provenance": {
+        "content_digest": "sha256:47983b153db69088379fd31bbef9466ce877ef186e0a1e6eeac3f8f97ce03194",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "aa8671efbb89e043f49e1d7c07472df66ef521913db22efa79c8d5628cf47c3d"
+      },
+      "release_tag": "yuos-cap-http-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "fc8837569e882aa2f62fe694bad9fbae720ed02d96cf45244e3d1dcbffdebe29"
+      }
+    },
+    {
+      "app_id": "netdiag",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-a8c7cb9ac1b349ec930ed91864e63ddcf3f1e63abf082f2ee7ba91be420897e6.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "a8c7cb9ac1b349ec930ed91864e63ddcf3f1e63abf082f2ee7ba91be420897e6",
+        "size": 12894
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "ba2acb3de3150810e46b23590b0ccaf12fac49d6e64883ccf1c166bd298946e9"
+      },
+      "display": {
+        "description": "Diagnose host interfaces, routes, DNS, TCP reachability, and latency",
+        "name": "Network Doctor",
+        "source_kind": "product",
+        "source_name": "diagnostics"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "4e54b929868a3f08acb55b1c34c4bd65df9003dfaf48221f46d21aba62162ef6",
+        "size": 5774
+      },
+      "provenance": {
+        "content_digest": "sha256:9495004e7bba2d821325c2b0c88df1a62aea6b2bbe186769f3713c1dba9cbbe6",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "7643501c0940c01b9d1eccdbc3afbfefcc3a35fe2f5c91483e8cc8064b25c052"
+      },
+      "release_tag": "yuos-app-diagnostics-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "8af06fa621251c0f4f07010b7b83627a2cf98457b8743507fb3a718abc5929cc"
+      }
+    },
+    {
+      "app_id": "network-manager",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-06b2d5983c90c22bb18dac64a8f5737edf67867d95b2425433e89737d98f92a3.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "06b2d5983c90c22bb18dac64a8f5737edf67867d95b2425433e89737d98f92a3",
+        "size": 24484
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "2674baa490eda6ff5c9113e662233489a4b367330b796511677b041619becdf2"
+      },
+      "display": {
+        "description": "Control Wi-Fi, VPN profiles, and network radio state through NetworkManager",
+        "name": "Network Manager",
+        "source_kind": "product",
+        "source_name": "settings"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "4b47bbff5386247e17130f0bea225de37584aa3b835061c96478e48a3da635ac",
+        "size": 9802
+      },
+      "provenance": {
+        "content_digest": "sha256:3e09ffaadd4a34a164cd5e8f9230fe945428de6186937d9a8a86a19e9cb05e88",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "42f00be9303d8f6d93397c228b2db39d4df31196ef509839e981d8b8aee446e5"
+      },
+      "release_tag": "yuos-app-settings-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "339fe6ae8094cb63bc52422f1ffeaf382de57d3de25afefe611318071bbbb288"
+      }
+    },
+    {
+      "app_id": "notify",
+      "app_version": "0.2.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-3ca0c9cce3a2f3fb446c19968be8ef2b1944c455e5c743d2197641b6c1873ed2.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "3ca0c9cce3a2f3fb446c19968be8ef2b1944c455e5c743d2197641b6c1873ed2",
+        "size": 13794
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "97c20953ab332983c2c688e24cb9e71da57b1053e4d46e6d18281f52e81af4aa"
+      },
+      "display": {
+        "description": "Send and list your new OS notifications; historical JSON is preserved but not imported",
+        "name": "Notifications",
+        "source_kind": "product",
+        "source_name": "notifications"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "fbcdb9eb279ed8f4c7adacad02cbae57825b56d633de8e6c1b194631d8ae2f2f",
+        "size": 3171
+      },
+      "provenance": {
+        "content_digest": "sha256:87741cbe58b34dafde7bfae16d1e5969f38e1d7315422fe5d4f53506b9051c21",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "d44884b9290ba9a494b192dd86a6a14366409d98f2feb04f1a54b21c968d003d"
+      },
+      "release_tag": "yuos-app-notifications-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "21d0f76b320085bef3a94fc73b864066d0033a493fd38462e29db81d61d802e5"
+      }
+    },
+    {
+      "app_id": "panel-calendar",
+      "app_version": "0.1.0",
+      "architecture": "amd64",
+      "artifact": {
+        "file": "yuos-app-snapshot-cb844f98022cedb8cee3dbd17a2789c9dfdc23e57669c802aeb74982d10be57f.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "cb844f98022cedb8cee3dbd17a2789c9dfdc23e57669c802aeb74982d10be57f",
+        "size": 9687498
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "a69b50a6c525337bb1fc5d92323617690cef8057e3caa4dddecd8fe509fc6396"
+      },
+      "display": {
+        "description": "Native calendar and local agenda panel applet.",
+        "name": "Calendar",
+        "source_kind": "product",
+        "source_name": "calendar"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "aaa93dbd1d58958565a4cca7bf344e2a25387d0f205ce624a7e414164ca809d3",
+        "size": 2736
+      },
+      "provenance": {
+        "content_digest": "sha256:06501db7fe9e8248d0a3ab4276cf7c773827943132fac52ee1b472f241d48264",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "bab61ebb0ad8c4ee8c65bfcbd3df4705b68c8355a59683ab8e8d0e62dcf9ec4c"
+      },
+      "release_tag": "yuos-app-calendar-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "457063945f06a69d2c34d235af95f82e224c092436f832fe3b98b5e0fb5b461f"
+      }
+    },
+    {
+      "app_id": "panel-calendar",
+      "app_version": "0.1.0",
+      "architecture": "arm64",
+      "artifact": {
+        "file": "yuos-app-snapshot-63bf8ec52db4449edaa147f7a026501dca99eb383973e8263947c728cc839d16.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "63bf8ec52db4449edaa147f7a026501dca99eb383973e8263947c728cc839d16",
+        "size": 8767920
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "cae7f258376e819997c7307c88eacd403f86e7b4095cc6fafc2b7dfd69167af0"
+      },
+      "display": {
+        "description": "Native calendar and local agenda panel applet.",
+        "name": "Calendar",
+        "source_kind": "product",
+        "source_name": "calendar"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "aaa93dbd1d58958565a4cca7bf344e2a25387d0f205ce624a7e414164ca809d3",
+        "size": 2736
+      },
+      "provenance": {
+        "content_digest": "sha256:4597aa03f57f2fab84887b64abf3142dcfa671daffda4743215017d7632bd4b0",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "9e88d4a42f2e58e78deae5d718a5af0d115d8165b290c94a963c121d33ee276e"
+      },
+      "release_tag": "yuos-app-calendar-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "457063945f06a69d2c34d235af95f82e224c092436f832fe3b98b5e0fb5b461f"
+      }
+    },
+    {
+      "app_id": "panel-clipboard",
+      "app_version": "0.1.0",
+      "architecture": "amd64",
+      "artifact": {
+        "file": "yuos-app-snapshot-fd4027839cd48195621d71095973dd859aab99e1f7763ee1fbe443c194b921e2.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "fd4027839cd48195621d71095973dd859aab99e1f7763ee1fbe443c194b921e2",
+        "size": 9506955
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "473ab17a8abd7a8892763178c65d0d7c03a412a2aa35a1481a8deefc0866ba68"
+      },
+      "display": {
+        "description": "Read and manage existing CopyQ history through the owner-bound OS clipboard service.",
+        "name": "Clipboard History",
+        "source_kind": "product",
+        "source_name": "clipboard"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "06f2a676f82188537de146f7a7330afb173d08586bd059cd06b7d42c23cee0c4",
+        "size": 5741
+      },
+      "provenance": {
+        "content_digest": "sha256:4517aec74c7d77dc75aaadd8563a6a19e22ee68b42ae62ad1f716fbaa0abc774",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "fa9793cc5a330437a15c368035b0479224bc0f921de650301d06150d8b70dee8"
+      },
+      "release_tag": "yuos-app-clipboard-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "4f26e2e9139c56285e761f48f779259dbb191f136e1b8f5be7fac7eabdb5c2b0"
+      }
+    },
+    {
+      "app_id": "panel-clipboard",
+      "app_version": "0.1.0",
+      "architecture": "arm64",
+      "artifact": {
+        "file": "yuos-app-snapshot-ff6867318f14103aede517172f60bc3aed771c36c8396dce864634abba52d163.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "ff6867318f14103aede517172f60bc3aed771c36c8396dce864634abba52d163",
+        "size": 8607733
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "bf1bde4002a7073db5a5cfefeeb271b00015de391a0afbad7529521d1befb426"
+      },
+      "display": {
+        "description": "Read and manage existing CopyQ history through the owner-bound OS clipboard service.",
+        "name": "Clipboard History",
+        "source_kind": "product",
+        "source_name": "clipboard"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "06f2a676f82188537de146f7a7330afb173d08586bd059cd06b7d42c23cee0c4",
+        "size": 5741
+      },
+      "provenance": {
+        "content_digest": "sha256:cb1c4d622b162d917d68e97794d39a18bbe38c82b601c9daddf507183e94bd0b",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "1af0dac0823d314a6350c67cfc03fb42649924971010df939527d616486b68bc"
+      },
+      "release_tag": "yuos-app-clipboard-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "4f26e2e9139c56285e761f48f779259dbb191f136e1b8f5be7fac7eabdb5c2b0"
+      }
+    },
+    {
+      "app_id": "pkg",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-4b547eaa96fc7d36120bd6a487657314c0796fbe5f0962a437c78e6504a5ae07.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "4b547eaa96fc7d36120bd6a487657314c0796fbe5f0962a437c78e6504a5ae07",
+        "size": 17015
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "1dc26ebdb95c63cae908d82775323cbf5173239bc222e153c91f0d3d12771517"
+      },
+      "display": {
+        "description": "Declarative capability management — say what you need, not how to install it",
+        "name": "Packages",
+        "source_kind": "product",
+        "source_name": "store"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "8662d7c8e33fd9c91b08ae59039fc2adfdeae10db1c4bad9e3a02e268956f69f",
+        "size": 19641
+      },
+      "provenance": {
+        "content_digest": "sha256:c5fa54bcaa6cd61bf8749ca0786485231120188d75a67031a9deffeeb45fcece",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "37a49f3db56c94bb443dcf086e458e8a0a34dc4d580323c08b5d27d2984a16b4"
+      },
+      "release_tag": "yuos-app-store-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "683a3e2377a62bcf2b40dd4a2b8a0ddd37369d965ca7a19d112c8bae80775e5d"
+      }
+    },
+    {
+      "app_id": "power-manager",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-0f171ad95ef62392bcc2869fa5995634010ec24d728bd51239234910e806a658.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "0f171ad95ef62392bcc2869fa5995634010ec24d728bd51239234910e806a658",
+        "size": 23744
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "2674baa490eda6ff5c9113e662233489a4b367330b796511677b041619becdf2"
+      },
+      "display": {
+        "description": "Inspect UPower state and request logind sleep, hibernate, reboot, or shutdown",
+        "name": "Power Manager",
+        "source_kind": "product",
+        "source_name": "settings"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "3431e0ea302d16c19f86a78800b6bfe2eb0af8aa03421a3790328b37ba115b6b",
+        "size": 6129
+      },
+      "provenance": {
+        "content_digest": "sha256:8da3374139b7e3b63dc0030ca5287e6b96a24ff37faa36be7e53ebb755c02cf2",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "227c80e896d186433033e7c52791a6cd88036f5228d6c9a6432f8c389a8426d9"
+      },
+      "release_tag": "yuos-app-settings-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "c51b899940551578f304f1265f989617a986de96696c827ed3712b5415c6f79f"
+      }
+    },
+    {
+      "app_id": "printer-manager",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-541e59aed684804ff28d44c3db2f3428cca766671f18ccce53af41f7eaab2ce8.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "541e59aed684804ff28d44c3db2f3428cca766671f18ccce53af41f7eaab2ce8",
+        "size": 24688
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "2674baa490eda6ff5c9113e662233489a4b367330b796511677b041619becdf2"
+      },
+      "display": {
+        "description": "Discover CUPS printers, inspect capabilities/queues, print files, and cancel owned jobs",
+        "name": "Printer Manager",
+        "source_kind": "product",
+        "source_name": "settings"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "42fa3e8908956895c6b68586aa2666d3f5b319a960f08b513e1a35dbd0db5cee",
+        "size": 6024
+      },
+      "provenance": {
+        "content_digest": "sha256:4055f289e9b6d89400009e91281e323fbc86849f4272c50f23d1949dc1db5dd5",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "fbc923c18506325bb1ecb12b714e30186f0a02307631a780282d997f40145597"
+      },
+      "release_tag": "yuos-app-settings-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "b956f63066506aeb8d7272de6290df6d503e90afd9260a4674e25a5022975163"
+      }
+    },
+    {
+      "app_id": "search",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-7bc0e1a28de730d824410b5dfa966d93893b7b6df322fff2828dd646b1c3edb5.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "7bc0e1a28de730d824410b5dfa966d93893b7b6df322fff2828dd646b1c3edb5",
+        "size": 15865
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "58894846ed8fb28563c41af7d07a244f90311d6cca3a24494a9a3ff790e3f972"
+      },
+      "display": {
+        "description": "Web and image search through an explicitly selected Google or Brave provider",
+        "name": "Web Search",
+        "source_kind": "product",
+        "source_name": "browser"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "53400e0d7ea3a8b73de94292a6f4961d92296f47a558ce2235b84aad037987f2",
+        "size": 7375
+      },
+      "provenance": {
+        "content_digest": "sha256:1ac039f2f2a4a0ec96da46048a1ca34265216642b31b3aecc42c3f219c10a9ef",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "a747975fe72ab33674f2fa91a08c3cf3ae1a2b764f0d187bcc5ab0c7ef80234b"
+      },
+      "release_tag": "yuos-app-browser-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "bb3c28247eb1701b513a6d78a0e15d7b25d0945f8d512920d7cc9215a147bd09"
+      }
+    },
+    {
+      "app_id": "security-center",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-30f0d8c79699fddd638ec45b784f3b2d10752a2880144f7d85818c316af694d8.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "30f0d8c79699fddd638ec45b784f3b2d10752a2880144f7d85818c316af694d8",
+        "size": 12979
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "244c3466d24a176872c10e3e391b3999a1cb3de88a63c2ab35c03f3abc2acbc5"
+      },
+      "display": {
+        "description": "Analyze authentication, sudo, SSH, MAC policy, listening ports, and security events",
+        "name": "Security Center",
+        "source_kind": "product",
+        "source_name": "security"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "3ca32bb30a9662ffce07484f473b271716bda278d1c4aa92f633c6512f37e65d",
+        "size": 5591
+      },
+      "provenance": {
+        "content_digest": "sha256:da8b86bc1a438fd0beefba4a858de43e822fc2a680e9e5b76a23793c5d41a0fe",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "d16da8fbb3e4f343f710c13841c357cf1ed5c6995abd52933947a0744cc6b4dd"
+      },
+      "release_tag": "yuos-app-security-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "7083ec5a864df14e41a6428fd639be4ae6e842291a4f325d2e1cc1dc3a38fb63"
+      }
+    },
+    {
+      "app_id": "storage-manager",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-b99029ace993303505fcd84a6f3fc69dd119c98225eb9482df7aaadf5fc3cc87.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "b99029ace993303505fcd84a6f3fc69dd119c98225eb9482df7aaadf5fc3cc87",
+        "size": 11878
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "197fce8598451bd055c7271f4e8a5f9e2a61d7f605651c596977ffa2adac6af8"
+      },
+      "display": {
+        "description": "Inspect disks, diagnose SMART/filesystem health, and control removable media through UDisks2",
+        "name": "Storage Manager",
+        "source_kind": "product",
+        "source_name": "storage"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "abad2cb3e59cff904e54df7e5d4ed9df0a4fd71e0199bb58cfff0d808071620e",
+        "size": 5523
+      },
+      "provenance": {
+        "content_digest": "sha256:0999b06f50a42324bf19fc32a41dc062c798fb4a02540ef961fec7cc7568ee49",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "a01a7b2ccfcda77dbe5228688f90d52aed720f251781ac4eb363ca4d39bd66f4"
+      },
+      "release_tag": "yuos-app-storage-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "e5720fe383c44585a26ef999c055d3edfca1401c9883379f91cdb55597c68d1c"
+      }
+    },
+    {
+      "app_id": "summarize",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-75c9c6572bc2a27bfddc163ddce257f0210770a25601d005f53b76a7480038aa.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "75c9c6572bc2a27bfddc163ddce257f0210770a25601d005f53b76a7480038aa",
+        "size": 9291
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "63c3310a9f8c90b723cab40734b16dbd02238cfd7ef1056b75bed1960b5afc7d"
+      },
+      "display": {
+        "description": "Summarize a block of text using a language model.",
+        "name": "Summarize",
+        "source_kind": "capability",
+        "source_name": "ai-helpers"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "296eb76b37039fe5176ade04b805da0bf7f70af5d297d8865fd2126f706de5ad",
+        "size": 1943
+      },
+      "provenance": {
+        "content_digest": "sha256:773cb7f50d0045dfcc990f0a62a1e9b4d8d5274edbb89f23f533ff4c7a0fe6d9",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "f576d48832e7fb2f9e5e9ab14ed6164821730c830ff0459305216970adc62e65"
+      },
+      "release_tag": "yuos-cap-ai-helpers-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "391e491d0779efa86e7804f738779764e0f76467e95785a07c1317cb602d6741"
+      }
+    },
+    {
+      "app_id": "system-snapshot",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-bec35d45b6815596ab244c4cc453e4c86b401dff476378beda6af39bdaeeef9b.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "bec35d45b6815596ab244c4cc453e4c86b401dff476378beda6af39bdaeeef9b",
+        "size": 13296
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "cc80afd934a2df0410cbc577d79cb6d1e973576be90bf2350e440c1677aaa80a"
+      },
+      "display": {
+        "description": "Create and restore full-system recovery points using Snapper, Btrfs, or LVM",
+        "name": "System Recovery",
+        "source_kind": "product",
+        "source_name": "backup-recovery"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "5cdc78cdd1225c52de5533bc5cd242936b282b6be256d67868b832424e77025b",
+        "size": 4383
+      },
+      "provenance": {
+        "content_digest": "sha256:e61a907866516baa6d1db4c0f515ef9e0e7ca9a928520b58b831b54ac5fb2372",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "8f8add92325ff5261e37b3388e004f78fc1cf9efd13f27195347e0590723c2aa"
+      },
+      "release_tag": "yuos-app-backup-recovery-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "39a7ea15b37031ad95b7131b4104de6c45998166b0cc84303f4710f690a5e89d"
+      }
+    },
+    {
+      "app_id": "systemd",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-769da51f4b94e02eda600ec3f6d29488432ad0ca1d54eff06cf79a4680978367.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "769da51f4b94e02eda600ec3f6d29488432ad0ca1d54eff06cf79a4680978367",
+        "size": 11883
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "f6930c290b56db210853abda387928325ab844d6134788c6f509759558b0a884"
+      },
+      "display": {
+        "description": "Inspect and control native systemd units through the privileged Yu OS broker",
+        "name": "System Services",
+        "source_kind": "product",
+        "source_name": "maintenance"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "c9ebd5ea3bf41ca72ee46763f6297d388596e72f940d9113d57b6574de2e2268",
+        "size": 6158
+      },
+      "provenance": {
+        "content_digest": "sha256:3770157a82a67936ec1dbd1d83a012443a311cd9b993fd5de55dc836901b5d8d",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "7be95278f79e0ba4ee2ec907295ffc0c4cbb7f0aacce14de815eb46b23bdbaa2"
+      },
+      "release_tag": "yuos-app-maintenance-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "ca2d531f6d85823c14c56cff40571fd358476340a92293e76f66b8bae98cb316"
+      }
+    },
+    {
+      "app_id": "usb-guard",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-570db827a77c0a241d44a4086b1deaba2e79fdb94c58e0d5efd33de8f7c4a26d.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "570db827a77c0a241d44a4086b1deaba2e79fdb94c58e0d5efd33de8f7c4a26d",
+        "size": 13832
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "244c3466d24a176872c10e3e391b3999a1cb3de88a63c2ab35c03f3abc2acbc5"
+      },
+      "display": {
+        "description": "Inventory, authorize, persistently block, unblock, and safely eject USB devices",
+        "name": "USB Guard",
+        "source_kind": "product",
+        "source_name": "security"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "7c0ee5c9f5832061ed05e6c91f63741f57459b656de38fba12ebfb97fe975826",
+        "size": 7072
+      },
+      "provenance": {
+        "content_digest": "sha256:a5c799eab1af3a7c8871d7b5c57dd63121c0c11430d201464f86bb9630ad0f52",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "2cce3093916a97dab89a56046791d1b9668fe4929ff4d8f2aae8311ce6d9f21f"
+      },
+      "release_tag": "yuos-app-security-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "14c2251b93667a69f19cb5103adeec73f68bb396cfa09f25b0fa4158e1ec4b54"
+      }
+    },
+    {
+      "app_id": "user-manager",
+      "app_version": "0.1.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-853caa898c501225701d9855b82dfffcfb68b3bf3de4552d1396cc64977a064b.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "853caa898c501225701d9855b82dfffcfb68b3bf3de4552d1396cc64977a064b",
+        "size": 25599
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "2674baa490eda6ff5c9113e662233489a4b367330b796511677b041619becdf2"
+      },
+      "display": {
+        "description": "Manage regular local users, groups, passwords, shells, and memberships with rollback",
+        "name": "User Manager",
+        "source_kind": "product",
+        "source_name": "settings"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "482ee82e0b105efa7b1b72229ba6a4097ddfadf0923a6a8967a617268defd834",
+        "size": 12587
+      },
+      "provenance": {
+        "content_digest": "sha256:eed15091f33f425ae5625e70185048ffabe7d1ca0bdd6237f1c46554f823ce3a",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "7fcf0c7ed1524c6d2782c728dae9cdca53e3a0d0b8ea92adb5a3ed749c524369"
+      },
+      "release_tag": "yuos-app-settings-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "5bae6d582236e6e20b082abba5f154a0dc32465fdfa9dbad102efa11e36e2741"
+      }
+    },
+    {
+      "app_id": "web",
+      "app_version": "0.2.0",
+      "architecture": "all",
+      "artifact": {
+        "file": "yuos-app-snapshot-91fe0fc6306dc5a87f30baeca11b9f3e2f9d21fd73ed139751d0d3fbb691e45a.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "91fe0fc6306dc5a87f30baeca11b9f3e2f9d21fd73ed139751d0d3fbb691e45a",
+        "size": 20770
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "58894846ed8fb28563c41af7d07a244f90311d6cca3a24494a9a3ff790e3f972"
+      },
+      "display": {
+        "description": "Isolated Helium page rendering through the Yu OS broker",
+        "name": "Browser",
+        "source_kind": "product",
+        "source_name": "browser"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "d802a8cf9d67ba2d2fa31458a061db3ccef7ef24900ab2fd5127f15315e6eb3e",
+        "size": 18614
+      },
+      "provenance": {
+        "content_digest": "sha256:ea14654b17d90ba83435d85f219550e0d8db0dabc8e95623900f6ab246b6589a",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "dd4fcb44a1d159ca71e4432f7a66f90df8f7775847a9f6b32988b0b278cfc025"
+      },
+      "release_tag": "yuos-app-browser-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "b6fe32c19133d02c87f5aee7d9f3bb5451243eaae605011f4456ee78394110c1"
+      }
+    },
+    {
+      "app_id": "yuos-edit",
+      "app_version": "0.1.0",
+      "architecture": "amd64",
+      "artifact": {
+        "file": "yuos-app-snapshot-48e8f3e4f81ca78ae0a5b16102e41892715b378f860a2179847f16a9da3e6974.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "48e8f3e4f81ca78ae0a5b16102e41892715b378f860a2179847f16a9da3e6974",
+        "size": 18100043
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "6257d4373e2818974efa5d83664ced10435885e55aef63fd324e868926da2ea5"
+      },
+      "display": {
+        "description": "Read, edit, open, summarize, explain, and rewrite text files.",
+        "name": "Text Editor",
+        "source_kind": "product",
+        "source_name": "editor"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "5c639e53d39e2b752307e5f45501d036379278fb8892abc4b542a10399f41861",
+        "size": 10354
+      },
+      "provenance": {
+        "content_digest": "sha256:d92adc82920276cffe907f3efc5b953c6f6e8637066186a010a933d456323b8a",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "b5d9e65307115d05a9679eb7a2f60f12ab3363ef4fe77d3b927861edd19e9f4d"
+      },
+      "release_tag": "yuos-app-editor-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "cefa8e8c8d36598a9d5abced243451d8db41289f5f7fba093eade7062127d95a"
+      }
+    },
+    {
+      "app_id": "yuos-edit",
+      "app_version": "0.1.0",
+      "architecture": "arm64",
+      "artifact": {
+        "file": "yuos-app-snapshot-c6a623fd948482f01ca9827f0b230307133ac035afe07d5abf10cd36d1089ae0.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "c6a623fd948482f01ca9827f0b230307133ac035afe07d5abf10cd36d1089ae0",
+        "size": 16998352
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "82ff0884708a39a5f38480d1dd698bb0636fcd4b301e955c51901bd4bb7472cf"
+      },
+      "display": {
+        "description": "Read, edit, open, summarize, explain, and rewrite text files.",
+        "name": "Text Editor",
+        "source_kind": "product",
+        "source_name": "editor"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "5c639e53d39e2b752307e5f45501d036379278fb8892abc4b542a10399f41861",
+        "size": 10354
+      },
+      "provenance": {
+        "content_digest": "sha256:18c5184b47e1b40c0daedd4d503c6290ee0a9e4f591836f20b507db763bc2ab5",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "97d938b38d7ca41f65ad4c67abe9f7254700fe07fb96ca6fa1f0d94a0d7dcdbc"
+      },
+      "release_tag": "yuos-app-editor-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "cefa8e8c8d36598a9d5abced243451d8db41289f5f7fba093eade7062127d95a"
+      }
+    },
+    {
       "app_id": "yuos-files",
       "app_version": "0.1.0",
       "architecture": "amd64",
       "artifact": {
-        "file": "yuos-app-snapshot-77cb4d1b5be3d51a5046b9ebeacd635e7225af9eda33f65271d9488d3d4b15ba.tar.gz",
+        "file": "yuos-app-snapshot-ead9352abf59db4de7620184bb80c2344a8c32b504de0f0bbaec4a13e8b5e5a1.tar.gz",
         "media_type": "application/gzip",
-        "sha256": "77cb4d1b5be3d51a5046b9ebeacd635e7225af9eda33f65271d9488d3d4b15ba",
-        "size": 32258821
+        "sha256": "ead9352abf59db4de7620184bb80c2344a8c32b504de0f0bbaec4a13e8b5e5a1",
+        "size": 32258825
       },
       "delivery": {
         "kind": "apt",
-        "package_sha256": "31500afc0a67044e723e888c69bd8f0312e06d8c21aa0ad6301d2d3f55c5f8f3"
+        "package_sha256": "4a768849d513f614f8167826fae30654a375b390c257768a36f3d533c8effb29"
       },
       "display": {
         "description": "Inspect, search, reveal, and understand files through the native file manager.",
@@ -104,13 +2210,13 @@
         "size": 13405
       },
       "provenance": {
-        "content_digest": "sha256:12b1ff749914a3af830a496f1348fe6412745ec701189fffce41be65e48ee014",
+        "content_digest": "sha256:2146c80482a4ecef77f8f8b063c13126861c2f53a1bd0a71237ec399ca45f858",
         "path": ".provenance.json",
         "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
-        "sha256": "80f14ddaad34eb3611d3a35bf71ab07c4c5423345dec03446c52e7106d47e143"
+        "sha256": "affc6d641c66ec85d4bdc10b90313604dd1e59040ae29311352348535f374f9b"
       },
-      "release_tag": "yuos-app-files-v0.1.0.dev2026112701",
-      "release_version": "0.1.0.dev2026112701",
+      "release_tag": "yuos-app-files-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
       "web_ui": {
         "entry": "web/index.html",
         "path": "web-ui.json",
@@ -122,14 +2228,14 @@
       "app_version": "0.1.0",
       "architecture": "arm64",
       "artifact": {
-        "file": "yuos-app-snapshot-c68b64b9d7584d384f5392f64d8903d93d36facb316ec0264b5793494394c6b9.tar.gz",
+        "file": "yuos-app-snapshot-61c4b3bd8b25a5ea0147c89a0bdb2425f18183b5070b4fed0ef078eeaaf9db7f.tar.gz",
         "media_type": "application/gzip",
-        "sha256": "c68b64b9d7584d384f5392f64d8903d93d36facb316ec0264b5793494394c6b9",
-        "size": 30306540
+        "sha256": "61c4b3bd8b25a5ea0147c89a0bdb2425f18183b5070b4fed0ef078eeaaf9db7f",
+        "size": 30306554
       },
       "delivery": {
         "kind": "apt",
-        "package_sha256": "367a0a02efbb0c060b0117188692206aab8218f721524cde16400333c76c08bc"
+        "package_sha256": "99d1f59a191a049c487e8d96fd665ef2c7fd8a2618ab187652289117c4f3c84a"
       },
       "display": {
         "description": "Inspect, search, reveal, and understand files through the native file manager.",
@@ -143,24 +2249,726 @@
         "size": 13405
       },
       "provenance": {
-        "content_digest": "sha256:6ed39f44f2b70f3ff4dc1cabc994f334ea91ba4b52bffaa2a64eb3b9f8deea82",
+        "content_digest": "sha256:9e279ff9e6aeabfaf9cf350dc4c6b749eb9cc31be0fd0bd674dd7f1753d87b7b",
         "path": ".provenance.json",
         "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
-        "sha256": "0402db14a1365e7e3bea2cea79bb252eef3dc011f21fe8bc895dc6cef064ba58"
+        "sha256": "175a7e343a5a13d4ef9e21b65415a6e7987db49e6ffa485fe6a8e0245f8243d0"
       },
-      "release_tag": "yuos-app-files-v0.1.0.dev2026112701",
-      "release_version": "0.1.0.dev2026112701",
+      "release_tag": "yuos-app-files-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
       "web_ui": {
         "entry": "web/index.html",
         "path": "web-ui.json",
         "sha256": "04c0442448d383c3808e447c63d6934322974ca5c0745195ebb8b2bcd0dd88f1"
       }
+    },
+    {
+      "app_id": "yuos-launcher",
+      "app_version": "0.1.0",
+      "architecture": "amd64",
+      "artifact": {
+        "file": "yuos-app-snapshot-9b51153b9d34b33c3eee38d590cbba95191e0856a7c54590145e581b7f772996.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "9b51153b9d34b33c3eee38d590cbba95191e0856a7c54590145e581b7f772996",
+        "size": 10936003
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "ff42ce5c04c827b31ef5433eb7f67451e4ee0d55a3812207f7cc6e56b2913a73"
+      },
+      "display": {
+        "description": "Search and launch installed desktop applications through the native launcher.",
+        "name": "Yu Launcher",
+        "source_kind": "product",
+        "source_name": "launcher"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "2eb7d936cdfedd9ab584396210f64c504cdfeaa4567a1f5f3501542a92b6c24b",
+        "size": 7945
+      },
+      "provenance": {
+        "content_digest": "sha256:75793aa96c0fa07fc593243f0721a0140cf94a5f718df5fec460eccc36cf6ded",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "a70b3503c367ea4090f0a46a70351a0743938e649210e85c84134aaea27c5fc5"
+      },
+      "release_tag": "yuos-app-launcher-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "c8291b544a1fdc0a99965f4f45e0ed2c5effd825597bf4ddb51ad712ee1acc2c"
+      }
+    },
+    {
+      "app_id": "yuos-launcher",
+      "app_version": "0.1.0",
+      "architecture": "arm64",
+      "artifact": {
+        "file": "yuos-app-snapshot-cb94f1adfe0912a605c9c3a8435192c183cea1be2a6145e78f7e89403d928262.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "cb94f1adfe0912a605c9c3a8435192c183cea1be2a6145e78f7e89403d928262",
+        "size": 10260740
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "7ab053dd94a5c3a045a8582a2154630191e7ed406364985f5923640e0c4d9705"
+      },
+      "display": {
+        "description": "Search and launch installed desktop applications through the native launcher.",
+        "name": "Yu Launcher",
+        "source_kind": "product",
+        "source_name": "launcher"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "2eb7d936cdfedd9ab584396210f64c504cdfeaa4567a1f5f3501542a92b6c24b",
+        "size": 7945
+      },
+      "provenance": {
+        "content_digest": "sha256:063f65fc522e696858a9d32e49c76817b7d0c09d7d52dbc40a3e866e49630e98",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "50908447ade84f12aa8c3ff96ee3cabc254e8127aacb6517375d6a248621f052"
+      },
+      "release_tag": "yuos-app-launcher-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "c8291b544a1fdc0a99965f4f45e0ed2c5effd825597bf4ddb51ad712ee1acc2c"
+      }
+    },
+    {
+      "app_id": "yuos-notifications",
+      "app_version": "0.2.0",
+      "architecture": "amd64",
+      "artifact": {
+        "file": "yuos-app-snapshot-fc486840fbfadc895f07cdb699bb60a4b5cae24696073a2a71bcd8473ffd49cc.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "fc486840fbfadc895f07cdb699bb60a4b5cae24696073a2a71bcd8473ffd49cc",
+        "size": 8907327
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "036ddfdfe52b27726323479e21c816caf23099986e71f16f0af9394b5acbaddf"
+      },
+      "display": {
+        "description": "Post durable owner-scoped notifications and dismiss this App's own records through the OS Notification Service.",
+        "name": "Notifications",
+        "source_kind": "product",
+        "source_name": "notifications"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "a60e02fc706936889171ff93e4352124d12f9c3eea238da265fb8abe06ebaca9",
+        "size": 5187
+      },
+      "provenance": {
+        "content_digest": "sha256:38073ecf10f402ff9c1da04a96ac3ee736149e6889f3afffc40920beae2e7c5d",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "7dc5c2132b4f6ad4d78a281728d68b3273a7b6317f897806ea0a067011da8ce8"
+      },
+      "release_tag": "yuos-app-notifications-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "07ca3d4acb1ecb126572b2256ab95dbb9de5bfd0c5536f651d1e6305a440c9a5"
+      }
+    },
+    {
+      "app_id": "yuos-notifications",
+      "app_version": "0.2.0",
+      "architecture": "arm64",
+      "artifact": {
+        "file": "yuos-app-snapshot-dcb19e427a5d9bee16fd20625df994f4ab4827b49b124b92ad85737c8a52baa5.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "dcb19e427a5d9bee16fd20625df994f4ab4827b49b124b92ad85737c8a52baa5",
+        "size": 8408358
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "ad4ee8c39bf67f32b5cece1e9af62452e3e1bf7fa3540b16e4651f17901f5770"
+      },
+      "display": {
+        "description": "Post durable owner-scoped notifications and dismiss this App's own records through the OS Notification Service.",
+        "name": "Notifications",
+        "source_kind": "product",
+        "source_name": "notifications"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "a60e02fc706936889171ff93e4352124d12f9c3eea238da265fb8abe06ebaca9",
+        "size": 5187
+      },
+      "provenance": {
+        "content_digest": "sha256:1daec75dccd7be2a21f28b2c57124aac32a4e1e14292a7f70038018430d301d9",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "b4fa4796b8ed9f6b84eecc40371ba5277b4b93bcd824716b9949cf581e4e4e7e"
+      },
+      "release_tag": "yuos-app-notifications-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "07ca3d4acb1ecb126572b2256ab95dbb9de5bfd0c5536f651d1e6305a440c9a5"
+      }
+    },
+    {
+      "app_id": "yuos-player",
+      "app_version": "0.1.0",
+      "architecture": "amd64",
+      "artifact": {
+        "file": "yuos-app-snapshot-e8867e8d89b0cb12ec1d3cce9ba86c75501b3ec7e1a580328b9a7b8553e99725.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "e8867e8d89b0cb12ec1d3cce9ba86c75501b3ec7e1a580328b9a7b8553e99725",
+        "size": 15113838
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "f32bba8bcba1c9b25685c90eb3048fee174fad5c9ab4497dd3b04c69744ac8c9"
+      },
+      "display": {
+        "description": "Read and control this owner's running Media Player through the OS playback service.",
+        "name": "Media Player",
+        "source_kind": "product",
+        "source_name": "media-player"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "a1878926413b683ba20da86b2b8d0280b5fef93968631e937d479dafcd3857ee",
+        "size": 7096
+      },
+      "provenance": {
+        "content_digest": "sha256:8c494a9f20943f675ee530a44c11a93193d088e91915e695dd647886f8e3ae6b",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "637c99700e375ad9f4da2581b918dfddb9b5d964dcf473fac6c904489e52c0ad"
+      },
+      "release_tag": "yuos-app-media-player-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "cbfd363a642ba3f3fd5f9cfac7c0d3708a4896eb869116a97723b2fb67c506cf"
+      }
+    },
+    {
+      "app_id": "yuos-player",
+      "app_version": "0.1.0",
+      "architecture": "arm64",
+      "artifact": {
+        "file": "yuos-app-snapshot-8cd3d1ab0444dc86094389c2b29600970067c3eb262cb18ed3652e4d1e0fefae.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "8cd3d1ab0444dc86094389c2b29600970067c3eb262cb18ed3652e4d1e0fefae",
+        "size": 14189427
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "f90ef902ea4c153968269086559a6bfade21ff539e9b6e121d1e8802287b95c4"
+      },
+      "display": {
+        "description": "Read and control this owner's running Media Player through the OS playback service.",
+        "name": "Media Player",
+        "source_kind": "product",
+        "source_name": "media-player"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "a1878926413b683ba20da86b2b8d0280b5fef93968631e937d479dafcd3857ee",
+        "size": 7096
+      },
+      "provenance": {
+        "content_digest": "sha256:2f1cc936680417d7fdba75fcc96b83c6f460120d6503138f6fac21222b6a701c",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "37c54d11de638c768ad0f750e43c9daa43d27a3c5a03b3b475b94adf21f81944"
+      },
+      "release_tag": "yuos-app-media-player-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "cbfd363a642ba3f3fd5f9cfac7c0d3708a4896eb869116a97723b2fb67c506cf"
+      }
+    },
+    {
+      "app_id": "yuos-screenshot",
+      "app_version": "0.1.0",
+      "architecture": "amd64",
+      "artifact": {
+        "file": "yuos-app-snapshot-271302efed8f33fc90fc130fa8b9fc4e5e8bab022835303732842f362b4e1fcf.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "271302efed8f33fc90fc130fa8b9fc4e5e8bab022835303732842f362b4e1fcf",
+        "size": 1456223
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "b21ebd1382a4e9f8908c1642692422fb26fc5f0b4d05c7d0a9319797d7a32d1d"
+      },
+      "display": {
+        "description": "Capture the screen through xdg-desktop-portal and save a PNG.",
+        "name": "Screenshot",
+        "source_kind": "product",
+        "source_name": "capture"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "9d3ebb5e51032b45a8e3d55b9ab27f768c8afd7f2e1792bdc0952bc41938fd42",
+        "size": 3909
+      },
+      "provenance": {
+        "content_digest": "sha256:8d4c811645591df8b8359d908a73fb95f86e1bb28e3379d2ade3611cfc6d611a",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "19675ebce4bee6bd3e58048e10a4414604c514815e013caf6c35d292c18c30b5"
+      },
+      "release_tag": "yuos-app-capture-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "ac727d0c1560b474f34107fc20a079d43281d4368b6836d3608b9a74041c140c"
+      }
+    },
+    {
+      "app_id": "yuos-screenshot",
+      "app_version": "0.1.0",
+      "architecture": "arm64",
+      "artifact": {
+        "file": "yuos-app-snapshot-a29490047f6f63a6c0b31a1aeafe8fc31eac1594adb39188b8cf5d203e21a51f.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "a29490047f6f63a6c0b31a1aeafe8fc31eac1594adb39188b8cf5d203e21a51f",
+        "size": 1352733
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "82c0e782807499023647227a81120ebd1d875dd7dd26f56a5fd87d25fec38a59"
+      },
+      "display": {
+        "description": "Capture the screen through xdg-desktop-portal and save a PNG.",
+        "name": "Screenshot",
+        "source_kind": "product",
+        "source_name": "capture"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "9d3ebb5e51032b45a8e3d55b9ab27f768c8afd7f2e1792bdc0952bc41938fd42",
+        "size": 3909
+      },
+      "provenance": {
+        "content_digest": "sha256:8e37ab3c61aa1f06634c71331999fb859aa17ee8e0c34d99d23ace61dd112352",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "2c1d2ea05fc00ab57fd3e1ef03dedf4d70059b576a9bf0886737ae833b59d42c"
+      },
+      "release_tag": "yuos-app-capture-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "ac727d0c1560b474f34107fc20a079d43281d4368b6836d3608b9a74041c140c"
+      }
+    },
+    {
+      "app_id": "yuos-settings",
+      "app_version": "0.1.0",
+      "architecture": "amd64",
+      "artifact": {
+        "file": "yuos-app-snapshot-2bec72e465ee9661774dd91bb4708b75d60290c16bbf146cb602487aed586f8b.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "2bec72e465ee9661774dd91bb4708b75d60290c16bbf146cb602487aed586f8b",
+        "size": 20109337
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "5bbbae58363a5a15e11a6179c3480eb5a50d6085af90da0a53421f3eca41897d"
+      },
+      "display": {
+        "description": "Discover and open Settings pages and manage owner-scoped App permission requests and revocations through the OS.",
+        "name": "Settings",
+        "source_kind": "product",
+        "source_name": "settings"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "1cff1934b05493e1001cd68ab428b13b26030f0061ed85b91e059c5467c0b9c2",
+        "size": 23849
+      },
+      "provenance": {
+        "content_digest": "sha256:c03dc3173b4a8a39695af6615c9cd576c527fe2aebf3c6bc0df3f2ffc0459e43",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "614c45743c1cbdd6cf6d1895a06d89fab1c7bb0bbabee5e63d395a161b7c4b0d"
+      },
+      "release_tag": "yuos-app-settings-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "03647e6aae32d3331ea70baf5280c82c6b6c03f052f3eba04b545ec8b2603036"
+      }
+    },
+    {
+      "app_id": "yuos-settings",
+      "app_version": "0.1.0",
+      "architecture": "arm64",
+      "artifact": {
+        "file": "yuos-app-snapshot-e9dedb9e05ffb8241204a55203d9216a6154de3634932d593e15734589c50c8f.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "e9dedb9e05ffb8241204a55203d9216a6154de3634932d593e15734589c50c8f",
+        "size": 18948532
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "24ba2d572c100c8691383cb247356c1c434bec5ea2fbb6bdfbee57f5d46f2390"
+      },
+      "display": {
+        "description": "Discover and open Settings pages and manage owner-scoped App permission requests and revocations through the OS.",
+        "name": "Settings",
+        "source_kind": "product",
+        "source_name": "settings"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "1cff1934b05493e1001cd68ab428b13b26030f0061ed85b91e059c5467c0b9c2",
+        "size": 23849
+      },
+      "provenance": {
+        "content_digest": "sha256:cc523b3058ec6ff66c0e4148fde2f33efebf7b1c84688c66fe297268431a93a3",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "f3dd21f62d0bcdb0443786ad09e70d3bbcbf48f9189ba248f84c151f94843501"
+      },
+      "release_tag": "yuos-app-settings-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "03647e6aae32d3331ea70baf5280c82c6b6c03f052f3eba04b545ec8b2603036"
+      }
+    },
+    {
+      "app_id": "yuos-store",
+      "app_version": "0.1.0",
+      "architecture": "amd64",
+      "artifact": {
+        "file": "yuos-app-snapshot-36642c789d35011f139fa12b7360f50e56087f3762edd700d12e5897159c30a2.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "36642c789d35011f139fa12b7360f50e56087f3762edd700d12e5897159c30a2",
+        "size": 17516617
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "cd92c8cea6e4ab267ea1be942e8760f2220af68ee83e0b1b42ac0444c3cfbbad"
+      },
+      "display": {
+        "description": "Search installed and available packages and open the native Yu OS Store.",
+        "name": "Yu OS Store",
+        "source_kind": "product",
+        "source_name": "store"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "c510d68654ad8a1728b875511da582eea9eb344210b8bd1bef402009522a2257",
+        "size": 4820
+      },
+      "provenance": {
+        "content_digest": "sha256:849d727162a891444696d8a9d642348ce0b6c843c60373b15521616436a22c2a",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "4f72101f047e8f6f29ffbfad230e5cc64c706748c92fa286f057b998aff9cfd0"
+      },
+      "release_tag": "yuos-app-store-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "0723c85e3e76a309172ac6d6b2cddb4c37e4cb1f153f7c63e0a496f1d51902bc"
+      }
+    },
+    {
+      "app_id": "yuos-store",
+      "app_version": "0.1.0",
+      "architecture": "arm64",
+      "artifact": {
+        "file": "yuos-app-snapshot-b0e8b7ae6882d5682c1020489dfd6e6b0ba8d1ba30211ed1a02913599b1321d0.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "b0e8b7ae6882d5682c1020489dfd6e6b0ba8d1ba30211ed1a02913599b1321d0",
+        "size": 16427578
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "57d926192b6c782dcce4317b443eee8e906cb841fa0eba6182befbcaf77eea53"
+      },
+      "display": {
+        "description": "Search installed and available packages and open the native Yu OS Store.",
+        "name": "Yu OS Store",
+        "source_kind": "product",
+        "source_name": "store"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "c510d68654ad8a1728b875511da582eea9eb344210b8bd1bef402009522a2257",
+        "size": 4820
+      },
+      "provenance": {
+        "content_digest": "sha256:4000105ee107ca50b6192365f3371932fa80475c08146f8173d7722c64b27a16",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "fc033b3f30749ff03df49e467fa0277c8af79b6c6278f04340c67bcea156a067"
+      },
+      "release_tag": "yuos-app-store-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "0723c85e3e76a309172ac6d6b2cddb4c37e4cb1f153f7c63e0a496f1d51902bc"
+      }
+    },
+    {
+      "app_id": "yuos-term",
+      "app_version": "0.1.0",
+      "architecture": "amd64",
+      "artifact": {
+        "file": "yuos-app-snapshot-7a7d43b8f600cfd5d1c8ef1f59ffcf223cfe00df17318deb960172778cdbf512.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "7a7d43b8f600cfd5d1c8ef1f59ffcf223cfe00df17318deb960172778cdbf512",
+        "size": 16840253
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "cafdbc76520d7ae6052b2d28b77ad90ecc15cee92208ecc2c801ff10175a0ec6"
+      },
+      "display": {
+        "description": "Run audited commands, resolve programs, and open the native terminal.",
+        "name": "Terminal",
+        "source_kind": "product",
+        "source_name": "terminal"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "fca9a0832b767edbd1236a108f663f12e8b701e31f0899e1becfdbbd0ad52e2f",
+        "size": 3919
+      },
+      "provenance": {
+        "content_digest": "sha256:e24f5c52ebad71e1a909a903e8bad2ee2192c9e36558898b675772730a7ffb07",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "6b419727f2070e4dad95ad935cc0a6801e7c9b5e89d401ef85c718dd89b2b129"
+      },
+      "release_tag": "yuos-app-terminal-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "989e0b2ecb33b869da98c9676d896c556f9aedbff6ae060237ec34788e142f6c"
+      }
+    },
+    {
+      "app_id": "yuos-term",
+      "app_version": "0.1.0",
+      "architecture": "arm64",
+      "artifact": {
+        "file": "yuos-app-snapshot-96d02d2ad6e830f59763e38b7da3fa6ee5f91866286fc812ae7f8a2c4e11b712.tar.gz",
+        "media_type": "application/gzip",
+        "sha256": "96d02d2ad6e830f59763e38b7da3fa6ee5f91866286fc812ae7f8a2c4e11b712",
+        "size": 15671466
+      },
+      "delivery": {
+        "kind": "apt",
+        "package_sha256": "818dc7fb3fb99045e7980662454e2230a596bb0b67cc12b574aff2123a15980c"
+      },
+      "display": {
+        "description": "Run audited commands, resolve programs, and open the native terminal.",
+        "name": "Terminal",
+        "source_kind": "product",
+        "source_name": "terminal"
+      },
+      "manifest": {
+        "path": "app.json",
+        "sha256": "fca9a0832b767edbd1236a108f663f12e8b701e31f0899e1becfdbbd0ad52e2f",
+        "size": 3919
+      },
+      "provenance": {
+        "content_digest": "sha256:88d31806ec5081a4ccdb0259e3ea57b29ed2ff5383eb603ae4b76fa379d8722b",
+        "path": ".provenance.json",
+        "publisher_key_id": "sha256:446530c9189e8aff4a5db3871f3ac8ed82b2f06e1c0423c4bfb28babd81f5ed1",
+        "sha256": "185358e16226b674c8b31b5441be823d3a507eb56929d13af454aa0c4e17e1cc"
+      },
+      "release_tag": "yuos-app-terminal-v0.1.0.dev2026112801",
+      "release_version": "0.1.0.dev2026112801",
+      "web_ui": {
+        "entry": "web/index.html",
+        "path": "web-ui.json",
+        "sha256": "989e0b2ecb33b869da98c9676d896c556f9aedbff6ae060237ec34788e142f6c"
+      }
     }
   ],
-  "expires_at": "2026-12-11T08:45:31Z",
-  "generation": "1795769131",
-  "issued_at": "2026-11-27T08:45:31Z",
+  "expires_at": "2026-12-12T03:29:44Z",
+  "generation": "1795836584",
+  "issued_at": "2026-11-28T03:29:44Z",
   "packages": [
+    {
+      "apps": [
+        "backup-center",
+        "system-snapshot"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-backup-recovery",
+      "sha256": "cc80afd934a2df0410cbc577d79cb6d1e973576be90bf2350e440c1677aaa80a",
+      "size": 19816,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "browser-attached",
+        "search",
+        "web"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-browser",
+      "sha256": "58894846ed8fb28563c41af7d07a244f90311d6cca3a24494a9a3ff790e3f972",
+      "size": 54224,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "calendar"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-calendar",
+      "sha256": "bccd17329d14b612aecc93ebfa1315c4b82fe7ad6c1b1737916bf5da28a102ab",
+      "size": 34848,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "panel-calendar"
+      ],
+      "architecture": "amd64",
+      "package": "yuos-app-calendar-desktop",
+      "sha256": "a69b50a6c525337bb1fc5d92323617690cef8057e3caa4dddecd8fe509fc6396",
+      "size": 6368316,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "panel-calendar"
+      ],
+      "architecture": "arm64",
+      "package": "yuos-app-calendar-desktop",
+      "sha256": "cae7f258376e819997c7307c88eacd403f86e7b4095cc6fafc2b7dfd69167af0",
+      "size": 5428968,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-screenshot"
+      ],
+      "architecture": "amd64",
+      "package": "yuos-app-capture-desktop",
+      "sha256": "b21ebd1382a4e9f8908c1642692422fb26fc5f0b4d05c7d0a9319797d7a32d1d",
+      "size": 1070272,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-screenshot"
+      ],
+      "architecture": "arm64",
+      "package": "yuos-app-capture-desktop",
+      "sha256": "82c0e782807499023647227a81120ebd1d875dd7dd26f56a5fd87d25fec38a59",
+      "size": 921696,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "clipboard-manager"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-clipboard",
+      "sha256": "151044158b30dfe9870e949d17dfd6603249bcff95ffd29d1eb2f48f50a7a5e6",
+      "size": 17976,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "panel-clipboard"
+      ],
+      "architecture": "amd64",
+      "package": "yuos-app-clipboard-desktop",
+      "sha256": "473ab17a8abd7a8892763178c65d0d7c03a412a2aa35a1481a8deefc0866ba68",
+      "size": 6232004,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "panel-clipboard"
+      ],
+      "architecture": "arm64",
+      "package": "yuos-app-clipboard-desktop",
+      "sha256": "bf1bde4002a7073db5a5cfefeeb271b00015de391a0afbad7529521d1befb426",
+      "size": 5316632,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "container-manager"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-containers",
+      "sha256": "46617ec35e02ed37a6de3a13461dbbbf4592a1ad0a7964690c72a09672342bee",
+      "size": 17372,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "crash-doctor",
+        "hardware-center",
+        "netdiag"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-diagnostics",
+      "sha256": "ba2acb3de3150810e46b23590b0ccaf12fac49d6e64883ccf1c166bd298946e9",
+      "size": 20132,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-edit"
+      ],
+      "architecture": "amd64",
+      "package": "yuos-app-editor-desktop",
+      "sha256": "6257d4373e2818974efa5d83664ced10435885e55aef63fd324e868926da2ea5",
+      "size": 11846828,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-edit"
+      ],
+      "architecture": "arm64",
+      "package": "yuos-app-editor-desktop",
+      "sha256": "82ff0884708a39a5f38480d1dd698bb0636fcd4b301e955c51901bd4bb7472cf",
+      "size": 10618204,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "event-center",
+        "log"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-events-audit",
+      "sha256": "31fa4866953ac5b71baeeb0b6581ace5339762b50aee22268c54e87e0ab68d10",
+      "size": 18532,
+      "version": "0.1.0.dev2026112801"
+    },
     {
       "apps": [
         "docs",
@@ -171,6 +2979,17 @@
       "sha256": "7bb048708b7813bdf59b15f738080b6fd209b0c9496008a43b3c529329321df5",
       "size": 407968,
       "version": "0.1.0.dev2026112701"
+    },
+    {
+      "apps": [
+        "docs",
+        "fs"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-files",
+      "sha256": "281dba6f3dd94a0eb237538a9b0021e52271a0fd37669730e74043a9374d3b97",
+      "size": 407920,
+      "version": "0.1.0.dev2026112801"
     },
     {
       "apps": [
@@ -191,6 +3010,349 @@
       "sha256": "367a0a02efbb0c060b0117188692206aab8218f721524cde16400333c76c08bc",
       "size": 13145432,
       "version": "0.1.0.dev2026112701"
+    },
+    {
+      "apps": [
+        "yuos-files"
+      ],
+      "architecture": "amd64",
+      "package": "yuos-app-files-desktop",
+      "sha256": "4a768849d513f614f8167826fae30654a375b390c257768a36f3d533c8effb29",
+      "size": 14678584,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-files"
+      ],
+      "architecture": "arm64",
+      "package": "yuos-app-files-desktop",
+      "sha256": "99d1f59a191a049c487e8d96fd665ef2c7fd8a2618ab187652289117c4f3c84a",
+      "size": 13149868,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "gateway-homeassistant"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-home-integration",
+      "sha256": "ee9531a4d507c2831b382d91ff10570d28b5042fd2f5760a40f794e077b4e80b",
+      "size": 17300,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "launcher"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-launcher",
+      "sha256": "36c9b018ad9dc9acf8e3222e53d0aeef261f98719d3afb9aa5bcc9ba21256ff0",
+      "size": 21072,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-launcher"
+      ],
+      "architecture": "amd64",
+      "package": "yuos-app-launcher-desktop",
+      "sha256": "ff42ce5c04c827b31ef5433eb7f67451e4ee0d55a3812207f7cc6e56b2913a73",
+      "size": 6848152,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-launcher"
+      ],
+      "architecture": "arm64",
+      "package": "yuos-app-launcher-desktop",
+      "sha256": "7ab053dd94a5c3a045a8582a2154630191e7ed406364985f5923640e0c4d9705",
+      "size": 6052164,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "email"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-mail",
+      "sha256": "a6d2c5ed9cf0811658787ee12826e28ba9a02379a1ed20c635539d617cf1989f",
+      "size": 116952,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [],
+      "architecture": "all",
+      "package": "yuos-app-mail-desktop",
+      "sha256": "98ab7ca45c09722dedd0e8e65a1c3393ebbc67b1f0b53be3b9f0f398ae1dc22b",
+      "size": 152916,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "config-editor",
+        "systemd"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-maintenance",
+      "sha256": "f6930c290b56db210853abda387928325ab844d6134788c6f509759558b0a884",
+      "size": 17628,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-player"
+      ],
+      "architecture": "amd64",
+      "package": "yuos-app-media-player-desktop",
+      "sha256": "f32bba8bcba1c9b25685c90eb3048fee174fad5c9ab4497dd3b04c69744ac8c9",
+      "size": 9624080,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-player"
+      ],
+      "architecture": "arm64",
+      "package": "yuos-app-media-player-desktop",
+      "sha256": "f90ef902ea4c153968269086559a6bfade21ff539e9b6e121d1e8802287b95c4",
+      "size": 8597204,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "gateway-discord",
+        "gateway-slack",
+        "gateway-telegram",
+        "gateway-whatsapp"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-messaging-channels",
+      "sha256": "ace75153277d2de75563871a5ccc3b1dab1c3701cf940639c8bddf896664b3fe",
+      "size": 24580,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "gateway-ntfy",
+        "gateway-pushover",
+        "gateway-webhook"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-notification-delivery",
+      "sha256": "101521af7cfd0700f040fa9f27fa4e4cc97487be4f1d7c089aa115cf92e02954",
+      "size": 24524,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "notify"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-notifications",
+      "sha256": "97c20953ab332983c2c688e24cb9e71da57b1053e4d46e6d18281f52e81af4aa",
+      "size": 17636,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-notifications"
+      ],
+      "architecture": "amd64",
+      "package": "yuos-app-notifications-desktop",
+      "sha256": "036ddfdfe52b27726323479e21c816caf23099986e71f16f0af9394b5acbaddf",
+      "size": 5789352,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-notifications"
+      ],
+      "architecture": "arm64",
+      "package": "yuos-app-notifications-desktop",
+      "sha256": "ad4ee8c39bf67f32b5cece1e9af62452e3e1bf7fa3540b16e4651f17901f5770",
+      "size": 5117960,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "firewall-manager",
+        "security-center",
+        "usb-guard"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-security",
+      "sha256": "244c3466d24a176872c10e3e391b3999a1cb3de88a63c2ab35c03f3abc2acbc5",
+      "size": 20860,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "accessibility-manager",
+        "audio-manager",
+        "bluetooth-manager",
+        "camera-manager",
+        "desktop-manager",
+        "display-manager",
+        "location-manager",
+        "network-manager",
+        "power-manager",
+        "printer-manager",
+        "user-manager"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-settings",
+      "sha256": "2674baa490eda6ff5c9113e662233489a4b367330b796511677b041619becdf2",
+      "size": 43900,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-settings"
+      ],
+      "architecture": "amd64",
+      "package": "yuos-app-settings-desktop",
+      "sha256": "5bbbae58363a5a15e11a6179c3480eb5a50d6085af90da0a53421f3eca41897d",
+      "size": 12494712,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-settings"
+      ],
+      "architecture": "arm64",
+      "package": "yuos-app-settings-desktop",
+      "sha256": "24ba2d572c100c8691383cb247356c1c434bec5ea2fbb6bdfbee57f5d46f2390",
+      "size": 11201792,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "storage-manager"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-storage",
+      "sha256": "197fce8598451bd055c7271f4e8a5f9e2a61d7f605651c596977ffa2adac6af8",
+      "size": 15820,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "pkg"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-store",
+      "sha256": "1dc26ebdb95c63cae908d82775323cbf5173239bc222e153c91f0d3d12771517",
+      "size": 20468,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-store"
+      ],
+      "architecture": "amd64",
+      "package": "yuos-app-store-desktop",
+      "sha256": "cd92c8cea6e4ab267ea1be942e8760f2220af68ee83e0b1b42ac0444c3cfbbad",
+      "size": 11312600,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-store"
+      ],
+      "architecture": "arm64",
+      "package": "yuos-app-store-desktop",
+      "sha256": "57d926192b6c782dcce4317b443eee8e906cb841fa0eba6182befbcaf77eea53",
+      "size": 10085000,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [],
+      "architecture": "all",
+      "package": "yuos-app-support",
+      "sha256": "db79ac091fdcdd393d9c35012de7fc4ce3cd948c40fd0f7b78cedbdd8d667041",
+      "size": 49564,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "exec"
+      ],
+      "architecture": "all",
+      "package": "yuos-app-terminal",
+      "sha256": "8233d99c6b3ec17509924945345ee3f2f81b7e983bf786012e25eaf1faf81bfe",
+      "size": 21420,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-term"
+      ],
+      "architecture": "amd64",
+      "package": "yuos-app-terminal-desktop",
+      "sha256": "cafdbc76520d7ae6052b2d28b77ad90ecc15cee92208ecc2c801ff10175a0ec6",
+      "size": 10756292,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "yuos-term"
+      ],
+      "architecture": "arm64",
+      "package": "yuos-app-terminal-desktop",
+      "sha256": "818dc7fb3fb99045e7980662454e2230a596bb0b67cc12b574aff2123a15980c",
+      "size": 9504484,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [],
+      "architecture": "all",
+      "package": "yuos-apps-agent",
+      "sha256": "c6adce9fbc139198b49a7ba862623ef4ac1ae40b179ea4767e31d5386c2c119f",
+      "size": 5232,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "summarize"
+      ],
+      "architecture": "all",
+      "package": "yuos-cap-ai-helpers",
+      "sha256": "63c3310a9f8c90b723cab40734b16dbd02238cfd7ef1056b75bed1960b5afc7d",
+      "size": 13572,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "doc"
+      ],
+      "architecture": "all",
+      "package": "yuos-cap-document-engine",
+      "sha256": "ecd16ebb1ac322fd67d7a391bc442ba0e8522b74c6024d54d1fe3142c4207756",
+      "size": 16156,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "net"
+      ],
+      "architecture": "all",
+      "package": "yuos-cap-http",
+      "sha256": "ef981a6ce04bdabd363e77c584949880382fff840775e210a12786eb380d09bd",
+      "size": 15728,
+      "version": "0.1.0.dev2026112801"
+    },
+    {
+      "apps": [
+        "db",
+        "kv"
+      ],
+      "architecture": "all",
+      "package": "yuos-cap-storage-sdk",
+      "sha256": "266ed8ab6f0f090394a5d3c10c488dbf342df55b72a935008563cec4cedc908b",
+      "size": 18844,
+      "version": "0.1.0.dev2026112801"
     }
   ],
   "repository": "xiaoyu-work/yuos-app",

@@ -1,3 +1,245 @@
+Package: yuos-app-backup-recovery
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - backup-recovery (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: backup-center, system-snapshot
+X-YuOS-Product: backup-recovery
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-backup-recovery/yuos-app-backup-recovery_0.1.0.dev2026112801_all.deb
+Size: 19816
+SHA256: cc80afd934a2df0410cbc577d79cb6d1e973576be90bf2350e440c1677aaa80a
+SHA512: 89173e1349a7f03fc0e9135bc0b2689e038692986c9bd49d5300252b50c5391192ef8cd9175d6fe76d31ce112ffbe05589329eb666b4efdbaa158b6d98ebc89e
+
+Package: yuos-app-browser
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: helium-bin (>= 0.22.1.1-1), python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1, yuos-browser-bridge-v1 (= 1), yuos-browser-render-v1 (= 1)
+Description: Yu OS Applications - browser (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: search, web, browser-attached
+X-YuOS-Product: browser
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-browser/yuos-app-browser_0.1.0.dev2026112801_all.deb
+Size: 54224
+SHA256: 58894846ed8fb28563c41af7d07a244f90311d6cca3a24494a9a3ff790e3f972
+SHA512: c32947001cf4f4af6e531cabf337bf3011dedc5597216cce6ccce4161dbd2724eeec42f7c68d415353edd1cd188dd1e1b7cfdb9d50a3c256de0bcbab700467c2
+
+Package: yuos-app-calendar
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - calendar (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: calendar
+X-YuOS-Product: calendar
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-calendar/yuos-app-calendar_0.1.0.dev2026112801_all.deb
+Size: 34848
+SHA256: bccd17329d14b612aecc93ebfa1315c4b82fe7ad6c1b1737916bf5da28a102ab
+SHA512: 0b03ac6d58708b44aca9d1c0f8c78e79354970c27ce893bc1fd7e9a96774859d5cd02403a0c9e337763b36eeaa8ab7c07a6950672efd2f4a9a8ca1b98c56081d
+
+Package: yuos-app-calendar-desktop
+Version: 0.1.0.dev2026112801
+Architecture: amd64
+Depends: libc6 (>= 2.39), libgcc-s1 (>= 4.2), libxkbcommon0 (>= 0.5.0), python3 (>= 3.11), yuos-app-calendar (= 0.1.0.dev2026112801), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1, yuos-calendar-read-v1 (= 1)
+Description: Yu OS Applications - calendar (desktop)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: panel-calendar
+X-YuOS-Product: calendar
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: desktop
+Filename: pool/main/yuos-app-calendar-desktop/yuos-app-calendar-desktop_0.1.0.dev2026112801_amd64.deb
+Size: 6368316
+SHA256: a69b50a6c525337bb1fc5d92323617690cef8057e3caa4dddecd8fe509fc6396
+SHA512: 74be8122d488396c6509f755a78bf408911b4eb63abf9377389ba9218d4c1bbb9492325f3427768814c258a79eb6a170542cbca0faf099b6d071ca190e312d5a
+
+Package: yuos-app-capture-desktop
+Version: 0.1.0.dev2026112801
+Architecture: amd64
+Depends: libc6 (>= 2.39), libgcc-s1 (>= 4.2), python3 (>= 3.11), xdg-desktop-portal, yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1, yuos-capture-v1
+Description: Yu OS Applications - capture (desktop)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: yuos-screenshot
+X-YuOS-Product: capture
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: desktop
+Filename: pool/main/yuos-app-capture-desktop/yuos-app-capture-desktop_0.1.0.dev2026112801_amd64.deb
+Size: 1070272
+SHA256: b21ebd1382a4e9f8908c1642692422fb26fc5f0b4d05c7d0a9319797d7a32d1d
+SHA512: 3f0fa7ca8f8c3df782e14251f9ab4acca12b38e6ead9f39d04c6f005b0b72c5235e30e313de0854ec99e7a2f2fe122690d0389ec6347a10016a9d1863a9c37ad
+
+Package: yuos-app-clipboard
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - clipboard (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: clipboard-manager
+X-YuOS-Product: clipboard
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-clipboard/yuos-app-clipboard_0.1.0.dev2026112801_all.deb
+Size: 17976
+SHA256: 151044158b30dfe9870e949d17dfd6603249bcff95ffd29d1eb2f48f50a7a5e6
+SHA512: c7799fb4a1dce3dd21689fd96655a5e6290ba18f49a850cf1f858d38721fd42a908fdab52631aa2c5c049f845756a03f5b8280ee29adda46d0f49d6b6e165b52
+
+Package: yuos-app-clipboard-desktop
+Version: 0.1.0.dev2026112801
+Architecture: amd64
+Depends: copyq, libc6 (>= 2.39), libgcc-s1 (>= 4.2), libxkbcommon0 (>= 0.5.0), python3 (>= 3.11), yuos-app-clipboard (= 0.1.0.dev2026112801), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1, yuos-clipboard-history-v1 (= 1)
+Description: Yu OS Applications - clipboard (desktop)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: panel-clipboard
+X-YuOS-Product: clipboard
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: desktop
+Filename: pool/main/yuos-app-clipboard-desktop/yuos-app-clipboard-desktop_0.1.0.dev2026112801_amd64.deb
+Size: 6232004
+SHA256: 473ab17a8abd7a8892763178c65d0d7c03a412a2aa35a1481a8deefc0866ba68
+SHA512: 654d8c0e4015acdf31c480a8e06e536c88ac56946be66b49804a18bcc257ce3151150c417f8c5599517f3f199da699e0ef394fad338f55d33fbdc2edfc4b1157
+
+Package: yuos-app-containers
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - containers (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: container-manager
+X-YuOS-Product: containers
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-containers/yuos-app-containers_0.1.0.dev2026112801_all.deb
+Size: 17372
+SHA256: 46617ec35e02ed37a6de3a13461dbbbf4592a1ad0a7964690c72a09672342bee
+SHA512: 4990c59692e02f58896bd9901cb8cb6509febf00c402e94e5908723a54a237129eb005edfe050ee6db252a9f489d31ecd6348d7647a9394c18da707ac3c1b679
+
+Package: yuos-app-diagnostics
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - diagnostics (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: hardware-center, crash-doctor, netdiag
+X-YuOS-Product: diagnostics
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-diagnostics/yuos-app-diagnostics_0.1.0.dev2026112801_all.deb
+Size: 20132
+SHA256: ba2acb3de3150810e46b23590b0ccaf12fac49d6e64883ccf1c166bd298946e9
+SHA512: f41558bd45341de4d80b56cd21bb4d35ed3f936b59a4fbddd7b797891af7b3c13addb47195168e22088b76f5ef592f8799004eb8b56c80eee6c0204965b8ef49
+
+Package: yuos-app-editor-desktop
+Version: 0.1.0.dev2026112801
+Architecture: amd64
+Depends: libc6 (>= 2.39), libgcc-s1 (>= 4.2), libglib2.0-0t64 (>= 2.36.0), libxkbcommon0 (>= 0.5.0), python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - editor (desktop)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: yuos-edit
+X-YuOS-Product: editor
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: desktop
+Filename: pool/main/yuos-app-editor-desktop/yuos-app-editor-desktop_0.1.0.dev2026112801_amd64.deb
+Size: 11846828
+SHA256: 6257d4373e2818974efa5d83664ced10435885e55aef63fd324e868926da2ea5
+SHA512: 422e25329a6f1b75438baa3682ae14f81f8e429e8eeeb060910ecdad2c3eff8a7ee3e669e42505756db3e0a748313f6bbd2f1823385e512424114425cbec7726
+
+Package: yuos-app-events-audit
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - events-audit (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: event-center, log
+X-YuOS-Product: events-audit
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-events-audit/yuos-app-events-audit_0.1.0.dev2026112801_all.deb
+Size: 18532
+SHA256: 31fa4866953ac5b71baeeb0b6581ace5339762b50aee22268c54e87e0ab68d10
+SHA512: 2fe41e779f3db78f7ddb04031f5f307992b9df2c879d1a23097d23bb2095e6d8ec21cd90033d031d73f409b14bae1bd25fbf6d4b5366a783b1da132427c08837
+
 Package: yuos-app-files
 Version: 0.1.0.dev2026112701
 Architecture: all
@@ -21,6 +263,29 @@ Size: 407968
 SHA256: 7bb048708b7813bdf59b15f738080b6fd209b0c9496008a43b3c529329321df5
 SHA512: c573f96a13a5f98a6cd5f5cf754e6feebc1a51e82c8a48a9813fb47675fa71af510a0fc19e696090395146b46f2a2f69cdc88abe5eaed90745b97a9b6672578d
 
+Package: yuos-app-files
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: coreutils, python3 (>= 3.11), python3-docx, python3-fitz, python3-lxml, python3-openpyxl, python3-pil, python3-typing-extensions (>= 4.9), python3-xlsxwriter, recollcmd, ripgrep, yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - files (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Provides: yuos-app-python-yuos-files-v1
+Section: misc
+X-YuOS-App-Ids: fs, docs
+X-YuOS-Product: files
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-files/yuos-app-files_0.1.0.dev2026112801_all.deb
+Size: 407920
+SHA256: 281dba6f3dd94a0eb237538a9b0021e52271a0fd37669730e74043a9374d3b97
+SHA512: b46527d4520f0261cc739daec773cfd3b29d238a60d6fd69187bb1abc7bb645acc84b54d11f8a261c310fe77d93b29c90af8a2a0be7b0cec353409bfdb005df1
+
 Package: yuos-app-files-desktop
 Version: 0.1.0.dev2026112701
 Architecture: amd64
@@ -42,4 +307,574 @@ Filename: pool/main/yuos-app-files-desktop/yuos-app-files-desktop_0.1.0.dev20261
 Size: 14684372
 SHA256: 31500afc0a67044e723e888c69bd8f0312e06d8c21aa0ad6301d2d3f55c5f8f3
 SHA512: 13b26ce38af759d64682d4a22654de2d7d6faf8bc225fc6556031ae18921a1b3914f23d0f095f15131f4f2e8438e8bc40b6462fe6288cf79e89f55ae5e693bc2
+
+Package: yuos-app-files-desktop
+Version: 0.1.0.dev2026112801
+Architecture: amd64
+Depends: libc6 (>= 2.39), libgcc-s1 (>= 4.2), libglib2.0-0t64 (>= 2.36.0), libxkbcommon0 (>= 0.5.0), python3 (>= 3.11), yuos-app-files (= 0.1.0.dev2026112801), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - files (desktop)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: yuos-files
+X-YuOS-Product: files
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: desktop
+Filename: pool/main/yuos-app-files-desktop/yuos-app-files-desktop_0.1.0.dev2026112801_amd64.deb
+Size: 14678584
+SHA256: 4a768849d513f614f8167826fae30654a375b390c257768a36f3d533c8effb29
+SHA512: 81bc7740594c51568091b8853679a5f4a4c500da51c75aea6872bf3d91c676bdce1b0cd8efabb45af4b5f2a6bb649741a5de24d3429beff4b8d205deb8607690
+
+Package: yuos-app-home-integration
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - home-integration (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: gateway-homeassistant
+X-YuOS-Product: home-integration
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-home-integration/yuos-app-home-integration_0.1.0.dev2026112801_all.deb
+Size: 17300
+SHA256: ee9531a4d507c2831b382d91ff10570d28b5042fd2f5760a40f794e077b4e80b
+SHA512: 588b45db29f0d593a6c0f7790e96abac2fa18dcaeb2641f476cb571b24b840bcdd34463844ef677760526ac54e64c2cb7fbe3708e46d6aab353d36f0d227440c
+
+Package: yuos-app-launcher
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - launcher (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: launcher
+X-YuOS-Product: launcher
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-launcher/yuos-app-launcher_0.1.0.dev2026112801_all.deb
+Size: 21072
+SHA256: 36c9b018ad9dc9acf8e3222e53d0aeef261f98719d3afb9aa5bcc9ba21256ff0
+SHA512: b366c76882b39b99e57d93aa9ad9ea54a827abe811cce304050f75d2cd2b2c4eca29ca9d3a171cda02f789abbf8ccd1f0cd235bd3f0b5bd2da0033fa4cd14b24
+
+Package: yuos-app-launcher-desktop
+Version: 0.1.0.dev2026112801
+Architecture: amd64
+Depends: libc6 (>= 2.39), libgcc-s1 (>= 4.2), libxkbcommon0 (>= 0.5.0), python3 (>= 3.11), yuos-app-launcher (= 0.1.0.dev2026112801), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1, yuos-launcher-backend-v1 (= 1)
+Description: Yu OS Applications - launcher (desktop)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: yuos-launcher
+X-YuOS-Product: launcher
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: desktop
+Filename: pool/main/yuos-app-launcher-desktop/yuos-app-launcher-desktop_0.1.0.dev2026112801_amd64.deb
+Size: 6848152
+SHA256: ff42ce5c04c827b31ef5433eb7f67451e4ee0d55a3812207f7cc6e56b2913a73
+SHA512: b96e221ced68ef8723160897fc76d41395fd0e3b23006b84900c24daea478e0821c0bcebdaa96ae410d177d0b48770be257272525afa041b68ab4203d102f7fb
+
+Package: yuos-app-mail
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - mail (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: email
+X-YuOS-Product: mail
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-mail/yuos-app-mail_0.1.0.dev2026112801_all.deb
+Size: 116952
+SHA256: a6d2c5ed9cf0811658787ee12826e28ba9a02379a1ed20c635539d617cf1989f
+SHA512: c19537232d354b1bac13da0b0bd5fce20a15de94b4bec55fdd349b475df4e32cfcc10522a270d820fc95b555c49d9f2dd269ffffe002c4010875c115a798b025
+
+Package: yuos-app-mail-desktop
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), thunderbird, yuos-app-mail (= 0.1.0.dev2026112801), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - mail (desktop)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-Product: mail
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: desktop
+Filename: pool/main/yuos-app-mail-desktop/yuos-app-mail-desktop_0.1.0.dev2026112801_all.deb
+Size: 152916
+SHA256: 98ab7ca45c09722dedd0e8e65a1c3393ebbc67b1f0b53be3b9f0f398ae1dc22b
+SHA512: e93533f7b2451b881fcb434b8394c8b9847f60ccb5994f403c86f4c3bb062add98aed51c5e7ee09d6f43c3db168f78d9eae1f06eb603101de563c7907966c1c5
+
+Package: yuos-app-maintenance
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - maintenance (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: config-editor, systemd
+X-YuOS-Product: maintenance
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-maintenance/yuos-app-maintenance_0.1.0.dev2026112801_all.deb
+Size: 17628
+SHA256: f6930c290b56db210853abda387928325ab844d6134788c6f509759558b0a884
+SHA512: cc3831df8d8e6380545ac76e815f792bf5a4c612eb8662063cc0e7e97597adde18f2cc14fe586d088276dfe24649f948bd3d0f102afd6eed221bfdde94b638ad
+
+Package: yuos-app-media-player-desktop
+Version: 0.1.0.dev2026112801
+Architecture: amd64
+Depends: gstreamer1.0-libav, gstreamer1.0-plugins-base, gstreamer1.0-plugins-good, libc6 (>= 2.39), libgcc-s1 (>= 4.2), libglib2.0-0t64 (>= 2.32.0), libgstreamer-plugins-base1.0-0 (>= 1.10.0), libgstreamer1.0-0 (>= 1.6.0), libvulkan1, libxkbcommon0 (>= 0.5.0), mesa-vulkan-drivers, pipewire-bin, python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1, yuos-media-player-v1
+Description: Yu OS Applications - media-player (desktop)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: yuos-player
+X-YuOS-Product: media-player
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: desktop
+Filename: pool/main/yuos-app-media-player-desktop/yuos-app-media-player-desktop_0.1.0.dev2026112801_amd64.deb
+Size: 9624080
+SHA256: f32bba8bcba1c9b25685c90eb3048fee174fad5c9ab4497dd3b04c69744ac8c9
+SHA512: 74ffce24beca650e9cf61f44d15fd9a249b48e3018518db514ea6cbef22b7f0b3a31eb53792c2d677a22c0d6e6e719583b656fb876857645355f277a2b978a4d
+
+Package: yuos-app-messaging-channels
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - messaging-channels (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: gateway-discord, gateway-slack, gateway-telegram, gateway-whatsapp
+X-YuOS-Product: messaging-channels
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-messaging-channels/yuos-app-messaging-channels_0.1.0.dev2026112801_all.deb
+Size: 24580
+SHA256: ace75153277d2de75563871a5ccc3b1dab1c3701cf940639c8bddf896664b3fe
+SHA512: 553ea125ad7c1414f8096804d014fc3e7859bca0af126eb302f4d869eed681f2d1bb825a7656a0b832ac02315fd643b0bba2da8acd3b55f7ad5447311524ecf5
+
+Package: yuos-app-notification-delivery
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - notification-delivery (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: gateway-ntfy, gateway-pushover, gateway-webhook
+X-YuOS-Product: notification-delivery
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-notification-delivery/yuos-app-notification-delivery_0.1.0.dev2026112801_all.deb
+Size: 24524
+SHA256: 101521af7cfd0700f040fa9f27fa4e4cc97487be4f1d7c089aa115cf92e02954
+SHA512: 38be37bdb5face52cfc1a2edcbe560128b3be52da7ddaac4a1152042d14a3c9a0bfa8b1e6621f0fef0e2eeff4b42260beec570849d0f7a6c7df4a8f74f9f1aa9
+
+Package: yuos-app-notifications
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1, yuos-notifications-v1
+Description: Yu OS Applications - notifications (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: notify
+X-YuOS-Product: notifications
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-notifications/yuos-app-notifications_0.1.0.dev2026112801_all.deb
+Size: 17636
+SHA256: 97c20953ab332983c2c688e24cb9e71da57b1053e4d46e6d18281f52e81af4aa
+SHA512: 8014515661ea235d130472dd80ead122cf3ed0ef211819c5e9b23039738cf79d3ce272387796495ae00423f115d63800c34a7cdf1e1a9d9ea8a0718cdb664097
+
+Package: yuos-app-notifications-desktop
+Version: 0.1.0.dev2026112801
+Architecture: amd64
+Depends: libc6 (>= 2.39), libgcc-s1 (>= 4.2), libxkbcommon0 (>= 0.5.0), python3 (>= 3.11), yuos-app-notifications (= 0.1.0.dev2026112801), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1, yuos-notifications-v1
+Description: Yu OS Applications - notifications (desktop)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: yuos-notifications
+X-YuOS-Product: notifications
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: desktop
+Filename: pool/main/yuos-app-notifications-desktop/yuos-app-notifications-desktop_0.1.0.dev2026112801_amd64.deb
+Size: 5789352
+SHA256: 036ddfdfe52b27726323479e21c816caf23099986e71f16f0af9394b5acbaddf
+SHA512: 1e85d20032e11a6e7c11389bb88e01fefb0bc22b103eb7dbc7a19bde2fe74f5e591c811f9f14bf546ff006af6f46a07e3cd1a445601adc0f70c060819838868e
+
+Package: yuos-app-security
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - security (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: security-center, firewall-manager, usb-guard
+X-YuOS-Product: security
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-security/yuos-app-security_0.1.0.dev2026112801_all.deb
+Size: 20860
+SHA256: 244c3466d24a176872c10e3e391b3999a1cb3de88a63c2ab35c03f3abc2acbc5
+SHA512: 217445b8e5887146ce23aefabb22677bcb7298badd175d53df8a3dfc30b9d1f5ad8ba6b9421a2c8430776b22141691518ead038102d1a4070294957e564c181d
+
+Package: yuos-app-settings
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - settings (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: accessibility-manager, audio-manager, bluetooth-manager, camera-manager, display-manager, desktop-manager, location-manager, network-manager, power-manager, printer-manager, user-manager
+X-YuOS-Product: settings
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-settings/yuos-app-settings_0.1.0.dev2026112801_all.deb
+Size: 43900
+SHA256: 2674baa490eda6ff5c9113e662233489a4b367330b796511677b041619becdf2
+SHA512: 2e879351fa6082f2af7c1e36cb7dfe48bc9b074771fb0ba408821aad7da3004daeb91f9b1867e001bf1c7aa92d4ffd5d08af6970957bf95e13f01caf7576a1bb
+
+Package: yuos-app-settings-desktop
+Version: 0.1.0.dev2026112801
+Architecture: amd64
+Depends: libc6 (>= 2.39), libgcc-s1 (>= 4.2), libudev1 (>= 183), libxkbcommon0 (>= 1.0.0), python3 (>= 3.11), xkb-data, yuos-app-permissions-v1, yuos-app-runtime-v1 (>= 0.1.0), yuos-app-settings (= 0.1.0.dev2026112801), yuos-app-support-v1
+Description: Yu OS Applications - settings (desktop)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: yuos-settings
+X-YuOS-Product: settings
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: desktop
+Filename: pool/main/yuos-app-settings-desktop/yuos-app-settings-desktop_0.1.0.dev2026112801_amd64.deb
+Size: 12494712
+SHA256: 5bbbae58363a5a15e11a6179c3480eb5a50d6085af90da0a53421f3eca41897d
+SHA512: faccc41611b6e68820e26aba494eca7e8a820c20961a3c6411ee02c8414a6c00db99bfddc52b677bc67d11dfb1f6b5123fb4bdb520afd7aa0a49b2c1c8b29694
+
+Package: yuos-app-storage
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - storage (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: storage-manager
+X-YuOS-Product: storage
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-storage/yuos-app-storage_0.1.0.dev2026112801_all.deb
+Size: 15820
+SHA256: 197fce8598451bd055c7271f4e8a5f9e2a61d7f605651c596977ffa2adac6af8
+SHA512: 174fb078c742c4f1f2b45a6842a72829a3c4c16dac4feac7a4ee8bebebddc58c06733676b59275bdcb25df00a23706d5076532704b7c66755becaf922c918084
+
+Package: yuos-app-store
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - store (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: pkg
+X-YuOS-Product: store
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-store/yuos-app-store_0.1.0.dev2026112801_all.deb
+Size: 20468
+SHA256: 1dc26ebdb95c63cae908d82775323cbf5173239bc222e153c91f0d3d12771517
+SHA512: dadbfaefca5ac042ef418b45c18f36275a785ea1b79281e5c9ad5525ea35c0e4526b408bc94ff2f38aa1e76937f9e34df599e28488082798256b593ae8fa1d0f
+
+Package: yuos-app-store-desktop
+Version: 0.1.0.dev2026112801
+Architecture: amd64
+Depends: appstream, flatpak, gir1.2-flatpak-1.0, libc6 (>= 2.39), libgcc-s1 (>= 4.2), libxkbcommon0 (>= 0.5.0), packagekit, python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-store (= 0.1.0.dev2026112801), yuos-app-support-v1, yuos-software-store-v1 (= 1)
+Description: Yu OS Applications - store (desktop)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: yuos-store
+X-YuOS-Product: store
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: desktop
+Filename: pool/main/yuos-app-store-desktop/yuos-app-store-desktop_0.1.0.dev2026112801_amd64.deb
+Size: 11312600
+SHA256: cd92c8cea6e4ab267ea1be942e8760f2220af68ee83e0b1b42ac0444c3cfbbad
+SHA512: 3e80487a4349f9f79632ff760b1b5bf87fd70276d9483c749591e62128fe85fdbc4542885ceab15f1bfbd03bc45b3a79cfcdace7f978a2234cb44ae7c9072ca1
+
+Package: yuos-app-support
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), python3-idna (<< 4), python3-idna (>= 3.3), yuos-app-runtime-v1 (>= 0.1.0)
+Description: Yu OS Applications - support (support)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Provides: yuos-app-support-v1
+Section: misc
+X-YuOS-Product: support
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: support
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: support
+Filename: pool/main/yuos-app-support/yuos-app-support_0.1.0.dev2026112801_all.deb
+Size: 49564
+SHA256: db79ac091fdcdd393d9c35012de7fc4ce3cd948c40fd0f7b78cedbdd8d667041
+SHA512: 53b1dfb81c66ce585dceca4ab27650b827c5904f2f3c00934f2d7728871778d1d0a3f7bad6fc34a0481ee187f094d2d30be7795bae3fce85e735d0788cfc9273
+
+Package: yuos-app-terminal
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: bash, python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - terminal (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: exec
+X-YuOS-Product: terminal
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-app-terminal/yuos-app-terminal_0.1.0.dev2026112801_all.deb
+Size: 21420
+SHA256: 8233d99c6b3ec17509924945345ee3f2f81b7e983bf786012e25eaf1faf81bfe
+SHA512: e621962265d9e0c9c0ec1ecb8bc3d7e49201f8c45e62bd4e8cfaf7b321df8ca9dade49216f523dd248dbd6950e7b95f1123b3ab3c11b53cbe976f574eff4f96d
+
+Package: yuos-app-terminal-desktop
+Version: 0.1.0.dev2026112801
+Architecture: amd64
+Depends: libc6 (>= 2.39), libgcc-s1 (>= 4.2), libxkbcommon0 (>= 0.5.0), python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1, yuos-app-terminal (= 0.1.0.dev2026112801)
+Description: Yu OS Applications - terminal (desktop)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: yuos-term
+X-YuOS-Product: terminal
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: product
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: desktop
+Filename: pool/main/yuos-app-terminal-desktop/yuos-app-terminal-desktop_0.1.0.dev2026112801_amd64.deb
+Size: 10756292
+SHA256: cafdbc76520d7ae6052b2d28b77ad90ecc15cee92208ecc2c801ff10175a0ec6
+SHA512: ecc4608cc0330acfa7058f8ab2964b930fcb0be278b0fcb2bd289900de2bcddfe741333d6928f1b638d665c6a80f21e3293e941c3941bd89fb0b2517f211dfe9
+
+Package: yuos-apps-agent
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: yuos-app-backup-recovery, yuos-app-browser, yuos-app-calendar, yuos-app-clipboard, yuos-app-containers, yuos-app-diagnostics, yuos-app-events-audit, yuos-app-files, yuos-app-home-integration, yuos-app-launcher, yuos-app-mail, yuos-app-maintenance, yuos-app-messaging-channels, yuos-app-notification-delivery, yuos-app-notifications, yuos-app-security, yuos-app-settings, yuos-app-storage, yuos-app-store, yuos-app-support, yuos-app-terminal, yuos-cap-ai-helpers, yuos-cap-document-engine, yuos-cap-http, yuos-cap-storage-sdk
+Description: Yu OS Applications - sets (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-Product: sets
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: sets
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-apps-agent/yuos-apps-agent_0.1.0.dev2026112801_all.deb
+Size: 5232
+SHA256: c6adce9fbc139198b49a7ba862623ef4ac1ae40b179ea4767e31d5386c2c119f
+SHA512: 5abd90d68cdfae439105584d4aa4970e0165b23da1728f4a498797b99393ec0428c2b89887f8233e64779f80790ab07c77e72fab09010c91a5da32dc3a6d1198
+
+Package: yuos-cap-ai-helpers
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - ai-helpers (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: summarize
+X-YuOS-Product: ai-helpers
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: capability
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-cap-ai-helpers/yuos-cap-ai-helpers_0.1.0.dev2026112801_all.deb
+Size: 13572
+SHA256: 63c3310a9f8c90b723cab40734b16dbd02238cfd7ef1056b75bed1960b5afc7d
+SHA512: 16796e32f443da78398960eca8ce94ce28dea97faee4642d5cd89dbcdb1e795ace5e8850fdfd16920896d09fa624481781d19d7ce581cadb42e4863402d3a8f3
+
+Package: yuos-cap-document-engine
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-files, yuos-app-python-yuos-files-v1, yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - document-engine (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: doc
+X-YuOS-Product: document-engine
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: capability
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-cap-document-engine/yuos-cap-document-engine_0.1.0.dev2026112801_all.deb
+Size: 16156
+SHA256: ecd16ebb1ac322fd67d7a391bc442ba0e8522b74c6024d54d1fe3142c4207756
+SHA512: 05d82ee00bda7e9584a8ab4b0172fb7872648dba4e71734892bb15ad1e64d13c68de62bc13b6a9338cc1464dcae88f39a8e4200ad55fb1a0ef7e60ab1a76d9e5
+
+Package: yuos-cap-http
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: ca-certificates, curl, python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - http (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: net
+X-YuOS-Product: http
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: capability
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-cap-http/yuos-cap-http_0.1.0.dev2026112801_all.deb
+Size: 15728
+SHA256: ef981a6ce04bdabd363e77c584949880382fff840775e210a12786eb380d09bd
+SHA512: bee950c39e60ab4329120b3e8cfc291ff37b59e1b9f01fffcff35e32d72e5dc61a5cedb5381d0d17a43eaf0d803bd5de2b17ce49e8e6f81a73207cee26e7a509
+
+Package: yuos-cap-storage-sdk
+Version: 0.1.0.dev2026112801
+Architecture: all
+Depends: python3 (>= 3.11), yuos-app-runtime-v1 (>= 0.1.0), yuos-app-support-v1
+Description: Yu OS Applications - storage-sdk (agent)
+ Independently updated application payload; authority remains in Yu OS.
+ Installed App identities, grants and user data remain separate.
+Homepage: https://github.com/xiaoyu-work/yuos-app
+Maintainer: Yu OS Applications <noreply@github.com>
+Priority: optional
+Section: misc
+X-YuOS-App-Ids: db, kv
+X-YuOS-Product: storage-sdk
+X-YuOS-Runtime-ABI: 1
+X-YuOS-Source-Kind: capability
+X-YuOS-Source-Revision: 798a6f1662ca088dd2bbec05f8c859fd9a0f4537
+X-YuOS-Variant: agent
+Filename: pool/main/yuos-cap-storage-sdk/yuos-cap-storage-sdk_0.1.0.dev2026112801_all.deb
+Size: 18844
+SHA256: 266ed8ab6f0f090394a5d3c10c488dbf342df55b72a935008563cec4cedc908b
+SHA512: ebbeaf11319dc1b2cef9d76bbdfdfe9222616659c8b1f8c2897768acffc6e4f168c7cc777f044c52d846c683de1f42c8d0d2663f21fdbc0ddfaa55553f53229f
 
